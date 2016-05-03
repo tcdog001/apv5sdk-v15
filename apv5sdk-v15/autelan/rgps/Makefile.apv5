@@ -1,0 +1,74 @@
+.NOTPARALLEL:
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR = src
+PKG_BUILD_DIR_1 = gps-demo
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE), amcc)
+CROSS=powerpc-apm-linux-gnu-
+else
+ifeq ($(BOARD_TYPE), armada370)
+CROSS=arm-marvell-linux-gnueabi-
+else
+CROSS=mips-linux-uclibc-
+endif
+endif
+#wangyu add end
+CC=${CROSS}-gcc
+
+TOOLCHAIN_ABI_64=y
+
+ifdef TOOLCHAIN_ABI_N32
+  export TOOLCHAIN_ABI=-mabi=n32
+  export LDFLAGS=-melf32btsmipn32
+  export LIBDIR=/usr/lib32
+endif
+
+ifdef TOOLCHAIN_ABI_64
+  export TOOLCHAIN_ABI=-mabi=64
+  export LDFLAGS=-melf64btsmip
+  export LIBDIR=/usr/lib64
+endif
+
+ifdef TOOLCHAIN_UCLIBC
+  export TOOLCHAIN_ABI=-muclibc
+  export LDFLAGS=-melf32btsmipn32
+  export LIBDIR=/uclibc/usr/lib
+endif
+
+
+unexport LDFLAGS
+
+.PHONY: all
+all: build install
+
+.PHONY: build
+ifeq ($(SUB_TYPE),LTEFI)
+build:
+	${MAKE} -C ${PKG_BUILD_DIR} CC="${CC}" LTEFI=1
+endif
+ifeq ($(SUB_TYPE),LTEFI_V2)
+build: clean
+	${MAKE} -C ${PKG_BUILD_DIR} CC="${CC}" LTEFI_V2=1
+	${MAKE} -C ${PKG_BUILD_DIR_1} CC="${CC}"
+endif
+
+.PHONY: clean
+
+clean:
+	${MAKE} -C ${PKG_BUILD_DIR} clean
+	${MAKE} -C ${PKG_BUILD_DIR_1} clean
+
+#install dir /usr/bin
+.PHONY: install
+install: 
+	cp -f ${PKG_BUILD_DIR}/rgps ${ROOTFSDIR}/usr/sbin
+ifeq ($(SUB_TYPE),LTEFI_V2)
+	cp -f ${PKG_BUILD_DIR_1}/gps ${ROOTFSDIR}/usr/sbin
+endif

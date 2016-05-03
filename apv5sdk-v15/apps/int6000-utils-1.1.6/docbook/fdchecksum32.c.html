@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			fdchecksum32.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='expect.c.html' title=' expect.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='fdchecksum_32.c.html' title=' fdchecksum_32.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   uint32_t fdchecksum32 (int fd, size_t extent, uint32_t checksum);
+ *
+ *   memory.h
+ *
+ *   return the 32-bit checksum of a file region starting with the
+ *   current file offset; extent specifies the number of 32-bit words;
+ *
+ *   the endian conversion has proven unecessary but must be kept in
+ *   for the time being;
+ *
+ *.  Motley Tools by Charles Maier &lt;cmaier@cmassoc.net&gt;;
+ *:  Published 2001-2006 by Charles Maier Associates Limited;
+ *;  Released under the GNU General Public Licence v2 and later;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *	Alex Vasquez &lt;alex.vasquez@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef FDCHECKSUM32_SOURCE
+#define FDCHECKSUM32_SOURCE
+
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../tools/memory.h&quot;
+
+uint32_t fdchecksum32 (int fd, size_t extent, uint32_t checksum) 
+
+{
+	uint32_t memory;
+	while (extent-- &gt; 0) 
+	{
+		if (read (fd, &amp;memory, sizeof (memory)) &lt; sizeof (memory)) 
+		{
+			return (-1);
+		}
+		checksum ^= LE32TOH (memory);
+	}
+	return (~checksum);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='expect.c.html' title=' expect.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='fdchecksum_32.c.html' title=' fdchecksum_32.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

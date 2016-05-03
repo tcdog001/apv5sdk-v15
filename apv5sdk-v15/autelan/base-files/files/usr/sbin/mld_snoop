@@ -1,0 +1,15 @@
+#!/bin/sh /etc/rc.common
+
+KILLALL=/usr/bin/killall
+
+start()
+{
+	echo 1 > /proc/sys/net/br_igmp/igmp_snooping_switch
+	/usr/sbin/mldsnoop &
+}
+
+stop()
+{
+	echo 0 > /proc/sys/net/br_igmp/igmp_snooping_switch
+	$KILLALL mldsnoop
+}

@@ -1,0 +1,154 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+xml_locate=`config_read /config/locate`
+xml_locate_enable=`config_getoption "$xml_locate" enable`
+xml_macfilter_enable=`config_getoption "$xml_locate" macfilter`
+xml_locate_macaddr=`config_getoption "$xml_locate" macaddr`
+xml_locate_region=`config_getoption "$xml_locate" region`
+xml_locate_scantype=`config_getoption "$xml_locate" scantype`
+xml_locate_scansize=`config_getoption "$xml_locate" scansize`
+xml_locate_interval=`config_getoption "$xml_locate" interval`
+xml_locate_ipaddr=`config_getoption "$xml_locate" ipaddr`
+xml_locate_port=`config_getoption "$xml_locate" port`
+
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js services.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+
+function Ip() {
+	  overlayer();
+}
+
+function shielding(){
+   if(document.all.proto[0].checked == true){      
+	  document.getElementById("a1").style.display="none";
+	  document.getElementById("a2").style.display="none";
+	  document.getElementById("a4").style.display="";
+	  }
+	else if(document.all.proto[1].checked == true){
+	  document.getElementById("a1").style.display="";
+	  document.getElementById("a2").style.display="";
+	  document.getElementById("a4").style.display="none";
+	  document.all.ipaddr.focus(); 
+	  }
+    
+}
+ 
+</script>
+</head>
+<body >
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_services.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return Ip()">
+<div align="center">
+		<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+			<tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(service_aplocator_set)</script></b></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+			
+			<tr>
+				<td align="right" bordercolor="#ffffff" width="280"><script language="javascript">replace(aplocator_enable)</script>£º</td>
+				<td  height="28" width="370" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_locate_enable" "yes" %> name="locate_enable" value="yes" >&nbsp;</td>
+				
+			</tr>
+			
+			<tr>
+				<td align="right" bordercolor="#ffffff"><script language="javascript">replace(aplocator_mac_filter)</script>£º</td>
+				<td  height="28"  bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_macfilter_enable" "yes" %> name="macfilter_enable" value="yes" >&nbsp;</td>
+				
+			</tr>
+			
+			<tr >
+			<td align="right" height="28" bordercolor="#ffffff"><script language="javascript">replace(aplocator_filter_macaddr)</script>£º
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="macaddr" id="macaddr" value="<%= "$xml_locate_macaddr" %>"  ></td>
+			</tr>
+
+			<tr >
+			<td align="right" height="28" bordercolor="#ffffff"><script language="javascript">replace(aplocator_time_zone)</script>£º
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="region" id="region" value="<%= "$xml_locate_region" %>"  ></td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="28" bordercolor="#ffffff"><script language="javascript">replace(aplocator_scan_type)</script>£º
+			</td><td align="left" bordercolor="#ffffff"><select name="scantype" size="1" id="scantype">
+					<option value="SCAN_ALL" <% webui_listbox_select "$xml_locate_scantype" "SCAN_ALL" %>>SCAN ALL</option>
+					<option value="SCAN_AP" <% webui_listbox_select "$xml_locate_scantype" "SCAN_AP" %>>SCAN AP</option>
+					<option value="SCAN_STA" <% webui_listbox_select "$xml_locate_scantype" "SCAN_STA" %>>SCAN STA</option>
+				</select></td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="28" bordercolor="#ffffff"><script language="javascript">replace(aplocator_store_filesize)</script>£º
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="scansize" id="scansize" value="<%= "$xml_locate_scansize" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="28" bordercolor="#ffffff"><script language="javascript">replace(aplocator_send_time)</script>£º
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="interval" id="interval" value="<%= "$xml_locate_interval" %>"  ></td>
+			</tr>
+			
+		  <tr >
+			<td align="right" height="28" bordercolor="#ffffff"><script language="javascript">replace(aplocator_server_ip)</script>£º
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="ipaddr" id="ipaddr" value="<%= "$xml_locate_ipaddr" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="28" bordercolor="#ffffff"><script language="javascript">replace(aplocator_server_port)</script>£º
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="port" id="port" value="<%= "$xml_locate_port" %>"  ></td>
+			</tr>
+			
+		  
+		  
+		  <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+		</table>
+		<table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+			<tr>
+			  <td align="center" height="40" valign="middle" colspan="2" ><script language="javascript" >replace(lan_settings_apply)</script>&nbsp;</td>
+			</tr>
+			<tr>
+        <td align="right"   colspan="2"><script language="javascript">replace(aplocator_help)</script></td>
+      </tr>
+		</table>
+</div>
+<input type="hidden" value="Locate Setup" name="SERVLET">
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

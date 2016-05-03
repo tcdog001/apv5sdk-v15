@@ -1,0 +1,13 @@
+#!/bin/sh
+if [ ! $# -eq 1 ];then
+echo "usage:$0 [essid]"
+echo "e.g.  $0 CMCC"
+exit
+fi
+
+ps | awk '/udhcpc/{if($7=="ath1"){print $1}}' | xargs kill -9 >/dev/null 2>&1
+wlanconfig ath1 destroy
+wlanconfig ath1 create wlandev wifi1 wlanmode sta 
+iwconfig ath1 essid $1
+ifconfig ath1 up
+udhcpc -i ath1 -t 3 -b &

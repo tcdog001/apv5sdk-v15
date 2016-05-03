@@ -1,0 +1,298 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			OptionTopology.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='OptionSecurity.c.html' title=' OptionSecurity.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='PHYRates.c.html' title=' PHYRates.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed OptionTopology (signed margin, const char * style);
+ *   
+ *   page.h
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef OPTIONTOPOLOGY_SOURCE
+#define OPTIONTOPOLOGY_SOURCE
+
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../ether/channel.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/format.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../cgi/session.h&quot;
+#include &quot;../cgi/page.h&quot;
+
+#define TARGET &quot;background: yellow;&quot;
+#define LOC &quot;LOC&quot;
+#define REM &quot;REM&quot;
+#define CCO &quot;CCO&quot;
+#define STA &quot;STA&quot;
+
+/*====================================================================*
+ *
+ *   signed platform (signed margin, const char * style, const byte device []);
+ *
+ *
+ *--------------------------------------------------------------------*/
+
+static signed platform (signed margin, const char * style, const byte device []) 
+
+{
+	extern struct channel channel;
+	extern const char * chipset [CHIPSETS+1];
+	struct message message;
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_sw_ver_cnf 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint8_t MDEVICEID;
+		uint8_t MVERLENGTH;
+		char MVERSION [INT6K_VERSTRING];
+	}
+	* confirm = (struct vs_sw_ver_cnf *) (&amp;message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	memset (&amp;message, 0, sizeof (message));
+	EthernetHeader (&amp;message.ethernet, device, channel.host);
+	IntellonHeader (&amp;message.intellon, (VS_SW_VER | MMTYPE_REQ));
+	if (sendpacket (&amp;channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+	{
+
+// margin = report (margin, errno, INT6K_CANTSEND);
+// return (margin);
+
+	}
+	if (readpacket (&amp;channel, &amp;message, sizeof (message)) &lt;= 0) 
+	{
+
+// margin = report (margin, errno, INT6K_CANTREAD);
+// return (margin);
+
+	}
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin, &quot;%s&quot;, chipset [confirm-&gt;MDEVICEID]);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin, &quot;%s&quot;, confirm-&gt;MVERSION);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	return (margin);
+}
+
+/*====================================================================*
+ *
+ *   signed OptionTopology (signed margin, const char * style);
+
+ *--------------------------------------------------------------------*/
+
+signed OptionTopology (signed margin, const char * style) 
+
+{
+	extern struct channel channel;
+	extern struct message message;
+	extern struct session session;
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed station 
+	{
+		uint8_t LDA [ETHER_ADDR_LEN];
+		uint8_t TEI;
+		uint8_t BDA [ETHER_ADDR_LEN];
+		uint8_t AVGTX;
+		uint8_t AVGRX;
+	}
+	* station;
+	struct __packed network 
+	{
+		uint8_t NID [7];
+		uint8_t SNID;
+		uint8_t TEI;
+		uint8_t ROLE;
+		uint8_t CCO_MAC [ETHER_ADDR_LEN];
+		uint8_t CCO_TEI;
+		uint8_t NUMSTAS;
+		struct station station [1];
+	}
+	* network;
+	struct __packed networks 
+	{
+		uint8_t NUMAVLNS;
+		struct network network [1];
+	}
+	* networks = (struct networks *) (&amp;message.content);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	unsigned bridge = session.bridges;
+	const char * mark;
+	const char * link;
+	const char * role;
+	output (margin++, &quot;&lt;div class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;table class='%s'&gt;&quot;, style);
+	while (bridge--) 
+	{
+		memset (&amp;message, 0, sizeof (message));
+		memcpy (channel.peer, session.bridge [bridge].MAC, sizeof (channel.peer));
+		EthernetHeader (&amp;message.ethernet, channel.peer, channel.host);
+		IntellonHeader (&amp;message.intellon, (VS_NW_INFO | MMTYPE_REQ));
+		if (sendpacket (&amp;channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+		{
+			margin = report (margin, ENODATA, INT6K_CANTSEND);
+			return (margin);
+		}
+		while (readpacket (&amp;channel, &amp;message, sizeof (message)) &gt; 0) 
+		{
+			char address [ETHER_ADDR_LEN * 3];
+			if (UnwantedPacket (&amp;message, (VS_NW_INFO | MMTYPE_CNF))) 
+			{
+				continue;
+			}
+			output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+			output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+			output (margin, &quot;P/L&quot;);
+			output (margin--, &quot;&lt;/th&gt;&quot;);
+			output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+			output (margin, &quot;NET&quot;);
+			output (margin--, &quot;&lt;/th&gt;&quot;);
+			output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+			output (margin, &quot;%s&quot;, &quot;TEI&quot;);
+			output (margin--, &quot;&lt;/th&gt;&quot;);
+			output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+			output (margin, &quot;%s&quot;, &quot;------ MAC ------&quot;);
+			output (margin--, &quot;&lt;/th&gt;&quot;);
+			output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+			output (margin, &quot;%s&quot;, &quot;------ BDA ------&quot;);
+			output (margin--, &quot;&lt;/th&gt;&quot;);
+			output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+			output (margin, &quot;%s&quot;, &quot;TX&quot;);
+			output (margin--, &quot;&lt;/th&gt;&quot;);
+			output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+			output (margin, &quot;%s&quot;, &quot;RX&quot;);
+			output (margin--, &quot;&lt;/th&gt;&quot;);
+			output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+			output (margin, &quot;%s&quot;, &quot;CHIPSET&quot;);
+			output (margin--, &quot;&lt;/th&gt;&quot;);
+			output (margin++, &quot;&lt;th class='%s' style='width:100%%; text-align: left;'&gt;&quot;, style);
+			output (margin, &quot;%s&quot;, &quot;FIRMWARE&quot;);
+			output (margin--, &quot;&lt;/th&gt;&quot;);
+			output (margin--, &quot;&lt;/tr&gt;&quot;);
+			network = (struct network *)(networks-&gt;network);
+			mark = memcmp (message.ethernet.OSA, session.device.MAC, ETHER_ADDR_LEN)? &quot;none&quot;: TARGET;
+			link = memcmp (message.ethernet.OSA, session.bridge [bridge].MAC, ETHER_ADDR_LEN)? REM: LOC;
+			role = memcmp (message.ethernet.OSA, network-&gt;CCO_MAC, ETHER_ADDR_LEN)? STA: CCO;
+			output (margin++, &quot;&lt;tr class='%s' style='%s'&gt;&quot;, style, mark);
+			output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+			output (margin, &quot;LOC&quot;);
+			output (margin--, &quot;&lt;/td&gt;&quot;);
+			output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+			output (margin, &quot;%s&quot;, role);
+			output (margin--, &quot;&lt;/td&gt;&quot;);
+			output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+			output (margin, &quot;%03d&quot;, network-&gt;TEI);
+			output (margin--, &quot;&lt;/td&gt;&quot;);
+			output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+			output (margin, &quot;%s&quot;, hexstring (address, sizeof (address), message.ethernet.OSA, sizeof (message.ethernet.OSA)));
+			output (margin--, &quot;&lt;/td&gt;&quot;);
+			output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+			output (margin, &quot;%s&quot;, hexstring (address, sizeof (address), message.ethernet.ODA, sizeof (message.ethernet.ODA)));
+			output (margin--, &quot;&lt;/td&gt;&quot;);
+			output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+			output (margin, &quot;n/a&quot;);
+			output (margin--, &quot;&lt;/td&gt;&quot;);
+			output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+			output (margin, &quot;n/a&quot;);
+			output (margin--, &quot;&lt;/td&gt;&quot;);
+			margin = platform (margin, style, message.ethernet.OSA);
+			output (margin--, &quot;&lt;/tr&gt;&quot;);
+			while (networks-&gt;NUMAVLNS-- &gt; 0) 
+			{
+				station = (struct station *)(network-&gt;station);
+				while (network-&gt;NUMSTAS-- &gt; 0) 
+				{
+					mark = memcmp (station-&gt;LDA, session.device.MAC, ETHER_ADDR_LEN)? &quot;none&quot;: TARGET;
+					link = memcmp (station-&gt;BDA, session.bridge [bridge].MAC, ETHER_ADDR_LEN)? REM: LOC;
+					role = memcmp (station-&gt;LDA, network-&gt;CCO_MAC, ETHER_ADDR_LEN)? STA: CCO;
+					output (margin++, &quot;&lt;tr class='%s' style='%s'&gt;&quot;, style, mark);
+					output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+					output (margin, &quot;REM&quot;);
+					output (margin--, &quot;&lt;/td&gt;&quot;);
+					output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+					output (margin, &quot;%s&quot;, role);
+					output (margin--, &quot;&lt;/td&gt;&quot;);
+					output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+					output (margin, &quot;%03d&quot;, station-&gt;TEI);
+					output (margin--, &quot;&lt;/td&gt;&quot;);
+					output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+					output (margin, &quot;%s&quot;, hexstring (address, sizeof (address), station-&gt;LDA, sizeof (station-&gt;LDA)));
+					output (margin--, &quot;&lt;/td&gt;&quot;);
+					output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+					output (margin, &quot;%s&quot;, hexstring (address, sizeof (address), station-&gt;BDA, sizeof (station-&gt;BDA)));
+					output (margin--, &quot;&lt;/td&gt;&quot;);
+					output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+					output (margin, &quot;%03d&quot;, station-&gt;AVGTX);
+					output (margin--, &quot;&lt;/td&gt;&quot;);
+					output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+					output (margin, &quot;%03d&quot;, station-&gt;AVGRX);
+					output (margin--, &quot;&lt;/td&gt;&quot;);
+					margin = platform (margin, style, station-&gt;LDA);
+					output (margin--, &quot;&lt;/tr&gt;&quot;);
+					station++;
+				}
+				network = (struct network *)(station);
+			}
+		}
+	}
+	output (margin--, &quot;&lt;/table&gt;&quot;);
+	output (margin--, &quot;&lt;/div&gt;&quot;);
+	return (margin);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='OptionSecurity.c.html' title=' OptionSecurity.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='PHYRates.c.html' title=' PHYRates.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,36 @@
+.NOTPARALLEL:
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR = core/adb
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+PWD=$(shell pwd)
+TARGET=adb
+
+.PHONY: all
+all: build install
+.PHONY: build
+ifeq ($(BOARD_TYPE),db12x)
+ifeq ($(AQ_TYPE),AQ2000_X)
+build:
+#	$(MAKE) -C $(PKG_BUILD_DIR)/../zlib -f Makefile #liuhj
+#	$(MAKE) -C $(PKG_BUILD_DIR)/../openssl -f Makefile #liuhj
+	$(MAKE) -C $(PKG_BUILD_DIR) clean 
+	$(MAKE) -C $(PKG_BUILD_DIR) -f Makefile
+else
+build:
+	echo "nothing to be done"
+endif
+endif
+
+.PHONY: clean
+clean:
+	${MAKE} -C ${PKG_BUILD_DIR} clean
+
+.PHONY: install
+install: 
+	cp -f ./core/adb/$(TARGET) ${ROOTFSDIR}/usr/sbin

@@ -1,0 +1,83 @@
+#!/bin/sh
+#
+#board management
+#
+
+if [ -f /jffs/sys.patch ];then
+	/jffs/sys.patch
+fi
+
+cd /lib/modules/2.6.21.5
+	. /usr/lib/web/constant.sh
+	. /usr/lib/web/xmlconf.sh
+	config_country_code=`config_read /config/network/country`
+	country_code=`config_getoption "$config_country_code" region`
+insmod wlan.ko
+insmod ath_hal.ko
+insmod ath_rate_minstrel.ko
+insmod wlan_acl.ko
+insmod wlan_scan_sta.ko
+insmod wlan_scan_ap.ko
+insmod wlan_xauth.ko
+insmod wlan_ccmp.ko
+insmod wlan_tkip.ko
+insmod wlan_wep.ko
+insmod wpi.ko
+insmod wlan_sms4.ko
+	AHB_POLICY=""
+	if [ "$country_code" == "Asia" -o "$country_code" == "Europe" ]; then
+		AHB_POLICY="countrycode=156"
+	fi
+	if [ -f /jffs/.mac-policy ];then
+		AHB_POLICY="${AHB_POLICY} new_dispatch_mac=2"
+	else
+		AHB_POLICY="${AHB_POLICY} new_dispatch_mac=1"
+	fi
+	insmod ath_ahb ${AHB_POLICY}
+
+insmod capwap_split_fast
+
+#
+# loopback
+#
+ifconfig lo 127.0.0.1
+#
+# bridge
+#
+brctl addbr default
+brctl setfd default 1
+brctl addif default eth0
+#brctl addif default eth1
+ifconfig default 0.0.0.0 up
+#init app
+/etc/init.d/boot start
+#set oem info from sysinfo
+/usr/sbin/oeminfo
+#eth up
+mac_eth="`/usr/sbin/showsysinfo | awk -F ":" '/MAC/{print $2":"$3":"$4":"$5":"$6":"$7}'`"
+ifconfig eth0 hw ether $mac_eth
+ifconfig eth0 up
+#ifconfig eth1 up
+if [ -f /jffs/.OEM/.mac_wifi0 ];then
+	temp_mac_wifi="`cat /jffs/.OEM/.mac_wifi0`"
+	mac_wifi="`/sbin/set_mac org $temp_mac_wifi`"
+else
+	temp_mac_eth="`/usr/sbin/showsysinfo | awk -F ":" '/MAC/{print $2$3$4$5$6$7}'`"
+	mac_wifi="`/sbin/set_mac upper $temp_mac_eth`"
+fi
+ifconfig wifi0 down
+ifconfig wifi0 hw ether $mac_wifi
+
+#route add default default
+#DEVICE_MODEL="AQ2010"
+DEVICE_MODEL="`/sbin/wrcpuutil -i | awk -F ":" '/product type/{print $2}'`"
+echo "$DEVICE_MODEL"
+device_info $DEVICE_MODEL
+#init app
+/etc/init.d/mini_httpd start
+/usr/sbin/telnetd
+#start watchdog
+#/etc/wlan/watchdog &
+if [ ! -f /jffs/apinfo.conf ];then
+	cp -f /etc/wlan/apinfo.conf /jffs
+fi

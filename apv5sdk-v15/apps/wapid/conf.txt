@@ -1,0 +1,120 @@
+Configuration File
+
+============================================================================
+1.Introduction
+============================================================================
+
+The configuration file for wapid  by Atheros.
+
+
+============================================================================
+2. Example configuration file with full MIB supporting
+============================================================================
+#Example configuration file
+#WLAN section
+[WLAN_BEGIN]
+ath0   15  0  12345678  2  86400  1000000  2  86400  1000000  3  3  3  43200  70  60
+[WLAN_END]
+
+#CERT_AUTH section
+CERT_NAME="/tmp/wapi.cert"
+CERT_INDEX="1"
+CERT_MODE="1"
+CERT_STATUS="1"
+ASU_IP="192.168.1.205"
+ASU_PORT=3810
+
+
+============================================================================
+Explanations on  parameters
+WLAN section: Defines per-BSS arguments, each line for a BSS.
+
+ath0  15  0    12345678  2   86400  1000000  2  86400  1000000  3     3     3    43200  70  60
+s1     s2  s3       s4        s5    s6        s7       s8   s9         s10    s11  s12 s13   s14   s15  s16
+
+s1:    interface name
+s2:    bits flag for mode
+        bit0 = mcast key mgmt suite,  currently must be 1
+        bit1 = ucast key mgmt suite,   curently  must be 1
+        bit2 = WAPI-PSK,                   
+        bit3 = WAPI-CERT_AUTH
+        bit4 = WAI_PREAUTH
+        bit5 = WAPI_MRekeyStrict,      MSK rekey strict, when sta leaves, force to MSK rekey 
+        bit6-bit7 reserve
+     
+s3:   passphrase type for PSK, 
+       0  ASCII characters
+       1  HEX
+       
+s4:   passphrass, max 64 characters
+s5:   USK rekey policy
+        1  disable
+        2  time based
+        3  packet based
+        4  time-packet based
+        
+s6:   time for USK rekey (seconds)
+s7:   packets for USK rekey
+s8:   MSK rekey policy
+        1  disable
+        2  time based
+        3  packet based
+        4  time-packet based
+        
+s9:    time for MSK rekey (seconds)
+s10:  packets for MSK rekey
+s11:  certificate update count, max retries for certificate authentication
+s12:  multicast update   count, max retries for MSK notification
+s13:  unicast   update   count, max retries for USK negociation
+s14:  BK life time(seconds)
+s15:  BK reauth threshold(1-100), percentage of BK life time when activate BK reauthetication
+s16:  SA timeout
+
+
+CERT_AUTH section: Defines certificate path/type/mode and ASU parametes
+
+CERT_NAME: Certificate full path
+CERT_INDEX: 
+	1: X509
+	2:GBW     currently not support
+CERT_MODE:
+       1: two certificate mode
+       2: three certificate mode
+CERT_STATUS:  status paramter written back by wapid
+	0: NOT_EXIST
+	1:VALID
+	2:INVALID
+ASU_IP:  IP address of ASU
+ASU_PORT: Port of ASU
+
+============================================================================
+3. Example configuration file with the least MIB supporting
+============================================================================
+#Example configuration file
+#WLAN section
+[WLAN_BEGIN]
+ath0   15  0  12345678   86400   86400  
+[WLAN_END]
+
+#CERT_AUTH section
+CERT_NAME="/tmp/wapi.cert"
+CERT_INDEX="1"
+CERT_MODE="1"
+CERT_STATUS="1"
+ASU_IP="192.168.1.205"
+ASU_PORT=3810
+
+============================================================================
+Explanations on  parameters
+WLAN section:
+
+ath0   15  0  12345678   86400   86400  
+s1      s2  s3      s4         s6         s9
+
+s1,s2,s3,s4,s6,s9: see the definitions in previous paragraph 
+
+CERT_AUTH section: the same as previous definition
+
+
+
+

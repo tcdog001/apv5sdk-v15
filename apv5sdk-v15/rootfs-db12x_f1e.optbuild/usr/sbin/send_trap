@@ -1,0 +1,291 @@
+ #!/bin/sh 
+ 
+OID_FILE=/jffs/.OEM/.vendor_oid
+
+snmp_trap_conf="/etc/snmp/snmpd.conf"
+SNMPTRAP=/usr/sbin/snmptrap
+trap_addr=`cat $snmp_trap_conf | awk '/trap2sink/{print $2}'`
+
+VENDOR_OID=".1.3.6.1.4.1.31656"
+if [ -f /jffs/.OEM/.vendor_oid ];then
+    VENDOR_OID=`cat /jffs/.OEM/.vendor_oid`
+fi
+
+OID_AP_OPTION="2.3.4.0.8.3.1"
+
+OID_AP_TRAP_ID="${VENDOR_OID}.${OID_AP_OPTION}.1"
+OID_AP_TRAP_DES="${VENDOR_OID}.${OID_AP_OPTION}.2"
+OID_AP_TRAP_LEVEL="${VENDOR_OID}.${OID_AP_OPTION}.3"
+OID_AP_TRAP_TYPE="${VENDOR_OID}.${OID_AP_OPTION}.4"
+OID_AP_TRAP_RID="${VENDOR_OID}.${OID_AP_OPTION}.5"
+OID_AP_TRAP_RDES="${VENDOR_OID}.${OID_AP_OPTION}.6"
+OID_AP_TRAP_TIME="${VENDOR_OID}.${OID_AP_OPTION}.7"
+OID_AP_TRAP_STATE="${VENDOR_OID}.${OID_AP_OPTION}.8"
+OID_AP_TRAP_TITLE="${VENDOR_OID}.${OID_AP_OPTION}.9"
+OID_AP_TRAP_CONTENT="${VENDOR_OID}.${OID_AP_OPTION}.10"
+
+TRAP_TYPE="2.3.2.0"
+LEVEL=0
+ID=0
+DES="$1"
+TYPE=0
+RID=0
+TIME=0
+STATE=0
+TITLE="$1"
+CONTENT=""
+
+case $1 in  
+	apIPChangeAlarm )  
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.1"
+		ID=1
+		DES="apIPChangeAlarm"	
+		LEVEL=4
+		TYPE=4
+		RID=1
+		STATE=1
+		TITLE="apIPChangeAlarm"
+		CONTENT="ap ip address has channged." 
+	;;  
+	apEncryptionTypeChange ) 
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.2"		
+		ID=2
+		DES="apEncryptionTypeChange"	
+		LEVEL=4
+		TYPE=4
+		RID=2
+		STATE=1
+		TITLE="apEncryptionTypeChange"
+		CONTENT="ap encryption  type channged." 
+	;;  
+	apShareKeyChange )
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.3"		
+		ID=3
+		DES="apShareKeyChange"	
+		LEVEL=4
+		TYPE=4
+		RID=3
+		STATE=1
+		TITLE="apShareKeyChange"
+		CONTENT="share key channged." 
+	;; 
+	apChannelConfigChange ) 
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.4"		
+		ID=4
+		DES="apChannelConfigChange"	
+		LEVEL=4
+		TYPE=5
+		RID=4
+		STATE=1
+		TITLE="apChannelConfigChange"
+		CONTENT="channel has channged."
+ 	;;
+ 	DeviceInterferenceDetected ) 
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.5"		
+		ID=5
+		DES="DeviceInterferenceDetected"	
+		LEVEL=4
+		TYPE=5
+		RID=5
+		STATE=1
+		TITLE="DeviceInterferenceDetected"
+		CONTENT="detect a device interference."
+	 	;; 
+	PowerCycleRegisteredAlarm )
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.6"		
+		ID=6
+		DES="PowerCycleRegisteredAlarm."	
+		LEVEL=4
+		TYPE=5
+		RID=6
+		STATE=1
+		TITLE="PowerCycleRegisteredAlarm"
+		CONTENT="power cycle registered."
+ 	;; 
+ 	apFileTransAlarm )
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.7"		
+		ID=7
+		DES="apFileTransAlarm"	
+		LEVEL=4
+		TYPE=5
+		RID=7
+		STATE=1
+		TITLE="apFileTransAlarm"
+		CONTENT="file transfer."
+ 	;;  
+ 	apUploadSucceed )
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.8"		
+		ID=8
+		DES="apUploadSucceed"	
+		LEVEL=4
+		TYPE=5
+		RID=8
+		STATE=1
+		TITLE="apUploadSucceed."
+		CONTENT="load  successful."
+ 	;; 
+	STAOnline )
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.9"		
+		ID=9
+		DES="STAOnlineAlarm"	
+		LEVEL=4
+		TYPE=5
+		RID=9
+		STATE=1
+		TITLE="STAOnlineAlarm."
+		CONTENT="detect a station on line"
+ 	;;	 	  
+	STAOffline )
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.10"		
+		ID=10
+		DES="STAOfflineAlarm"	
+		LEVEL=4
+		TYPE=5
+		RID=10
+		STATE=1
+		TITLE="STAOfflineAlarm."
+		CONTENT="detect a station off line"
+ 	;;  
+ 	dot11Deauthenticate )  
+		TRAP_ID="1.2.840.10036.1.6.0.2"		
+ 	;;  
+ 	dot11AuthenticateFail )  
+		TRAP_ID="1.2.840.10036.1.6.0.3"		
+ 	;; 
+
+	apPowerSupTroub )
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.11"		
+		ID=11
+		DES="apPowerSupTroub"	
+		LEVEL=4
+		TYPE=5
+		RID=11
+		STATE=1
+		TITLE="apPowerSupTroub"
+		CONTENT="ap power trouble."
+	;;
+ 	apWiFiFaultAlert )
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.12"		
+		ID=12
+		DES="apWiFiFaultAlert"	
+		LEVEL=4
+		TYPE=5
+		RID=12
+		STATE=1
+		TITLE="apWiFiFaultAlert"
+		CONTENT="wifi fault alert."
+ 	;;	
+	FlashWriteFail )
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.13"	
+		ID=13
+		DES="FlashWriteFail"	
+		LEVEL=4
+		TYPE=5
+		RID=13
+		STATE=1
+		TITLE="FlashWriteFail"
+		CONTENT="write flash fail."
+	;;	
+	UnsecureApDetected )
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.14"
+		ID=14
+		DES="UnsecureApDetected"				
+		LEVEL=4
+		TYPE=5
+		RID=14
+		STATE=1
+		TITLE="UnsecureApDetected"
+		CONTENT="rogue ap detect."
+	;;
+	apNtpFail )
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.15"	
+		ID=15
+		DES="apNtpFail"
+		LEVEL=4
+		TYPE=5
+		RID=15
+		TIEM=
+		STATE=1
+		TITLE="apNtpFail"
+		CONTENT="ap ntp fail."
+		
+	;;
+	
+	CPUusageThreshhdHigher )
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.16"	
+		ID=16
+		DES="CPUusageThreshhdHigh"
+		LEVEL=4
+		TYPE=5
+		RID=16
+		STATE=1
+		TITLE="CPUusageThreshhdHigher"
+		CONTENT="CPU  utilization rate higher than this threshold, you have a warning."
+		
+	;;
+		
+	MemUsageThreshhdHigher )
+		TRAP_ID="${VENDOR_OID}.${TRAP_TYPE}.17"	
+		ID=17
+		DES="MemUsageThreshhdHigher"
+		LEVEL=4
+		TYPE=5
+		RID=17
+		STATE=1
+		TITLE="MemUsageThreshhdHigher"
+		CONTENT="Memory utilization rate higher than this threshold, you have a warning.."
+		
+	;;
+	*)  
+		echo "Ignorant"  
+		exit 1
+	;;  
+ esac    
+
+TRAP_STR_LEVEL=""
+if [ ! ${LEVEL} -eq 0 ];then
+	TRAP_STR_LEVEL="${OID_AP_TRAP_LEVEL} i ${LEVEL}"
+fi
+
+TRAP_STR_ID=""
+if [ ! ${ID} -eq 0 ];then
+	TRAP_STR_ID="${OID_AP_TRAP_ID} i ${ID}"
+fi
+
+TRAP_STR_DES=""
+if [ ! -z "${DES}" ];then
+	TRAP_STR_DES="${OID_AP_TRAP_DES} s \"${DES}\""
+fi
+
+TRAP_STR_TITLE=""
+if [ ! -z "${TITLE}" ];then
+	TRAP_STR_TITLE="${OID_AP_TRAP_TITLE} s \"${TITLE}\""
+fi
+
+TRAP_STR_CONTENT=""
+if [ ! -z "${CONTENT}" ];then
+	TRAP_STR_CONTENT="${OID_AP_TRAP_CONTENT} s \"${CONTENT}\""
+fi
+
+TRAP_STR_TYPE=""
+if [ ! 0 -eq ${TYPE} ];then
+	TRAP_STR_TYPE="${OID_AP_TRAP_TYPE} i ${TYPE}"
+fi
+    
+TRAP_STR_RID=""
+if [ ! 0 -eq ${RID} ];then
+	TRAP_STR_RID="${OID_AP_TRAP_RID} i ${RID}"
+fi
+
+TIME=`/usr/sbin/systime`
+TRAP_STR_TIME="${OID_AP_TRAP_TIME} i ${TIME}"
+
+TRAP_STR_STATE=""
+if [ ! 0 -eq ${STATE} ];then
+	TRAP_STR_STATE="${OID_AP_TRAP_STATE} i ${STATE}"
+fi
+
+for addr in $trap_addr
+do
+	eval "$SNMPTRAP -v2c  -c  public  $addr \"\" ${TRAP_ID} ${TRAP_STR_LEVEL} ${TRAP_STR_ID} ${TRAP_STR_DES} ${TRAP_STR_TYPE} ${TRAP_STR_RID} ${TRAP_STR_TIME} ${TRAP_STR_STATE} ${TRAP_STR_TITLE} ${TRAP_STR_CONTENT}"
+done

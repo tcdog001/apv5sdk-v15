@@ -1,0 +1,15 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c:83: warning: missing braces around initializer
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c:83: warning: (near initialization for 'mcs_rate[0]')
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c:118: warning: missing braces around initializer
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c:118: warning: (near initialization for 'autelan_addr[0]')
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c: In function 'ieee80211_iw_getstats':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c:817: warning: unused variable 'rssi_info'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c: In function 'wlan_set_scan_locate_start':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c:3891: warning: ISO C90 forbids mixed declarations and code
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c: In function 'ieee80211_ioctl_autelan_arp_filter':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c:3940: warning: unused variable 'ic'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c: In function 'get_scan_result':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c:8875: warning: unused variable 'i'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c:8874: warning: unused variable 'se_bssid'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c: In function 'get_sta_info':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/../os/linux/src/ieee80211_wireless.c:9075: warning: unused variable 'sc'

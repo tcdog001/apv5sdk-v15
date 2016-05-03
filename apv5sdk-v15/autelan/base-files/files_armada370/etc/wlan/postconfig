@@ -1,0 +1,26 @@
+#!/bin/sh
+if [ -z "$1" ];then
+showsysinfo
+fi
+echo "==========================="
+echo "system check:"
+/usr/sbin/mount_check
+/usr/sbin/dev_check
+echo "==========================="
+#cp /jffs/* /etc/config -rf
+#cp /etc/config/* /jffs -rf
+#killall wtpd
+#echo 0 >/proc/sys/dev/wifi0/thinap
+REBOOT_COUNT=0
+if [ -f /jffs/reboot_count ];then
+  REBOOT_COUNT=`cat /jffs/reboot_count`
+fi
+ REBOOT_COUNT=$((${REBOOT_COUNT}+1)) 
+echo ${REBOOT_COUNT} > /jffs/reboot_count
+
+while [ ! -e /jffs/dropbear/dropbear_dss_host_key ]
+do
+	val=1
+done
+
+dropbear -d /jffs/dropbear/dropbear_dss_host_key -r /jffs/dropbear/dropbear_rsa_host_key  &

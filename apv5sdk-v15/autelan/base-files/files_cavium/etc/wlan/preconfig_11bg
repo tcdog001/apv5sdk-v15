@@ -1,0 +1,124 @@
+#!/bin/sh
+
+#
+#board management
+#
+
+cd /lib/modules/2.6.21.7-Cavium-Octeon/drivers/bm
+insmod bm.ko
+mknod -m 644 /dev/bm0 c 236 0
+
+insmod /lib/modules/2.6.21.7-Cavium-Octeon/avrmod/avrmod.ko
+mknod /dev/avrmod c 10 131 
+#create device information file
+DEVICE_MODEL=`bmutil -p | awk -F ":" '/product name/{print $2}'`
+device_info $DEVICE_MODEL
+
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+config_country_code=`config_read /config/network/country`
+country_code=`config_getoption "$config_country_code" region`
+	
+cd /lib/modules/2.6.21.7-Cavium-Octeon/drivers/wireless/11g/
+insmod wlan.ko
+insmod ath_hal.ko
+insmod ath_rate_minstrel.ko
+insmod wlan_acl.ko
+insmod wlan_scan_sta.ko
+insmod wlan_scan_ap.ko
+insmod wlan_xauth.ko
+insmod wlan_ccmp.ko
+insmod wlan_tkip.ko
+insmod wlan_wep.ko
+if [ "$country_code" == "Asia" ]; then
+	insmod ath_pci.ko countrycode=156
+else
+	insmod ath_pci.ko 
+fi
+insmod /lib/modules/2.6.21.7-Cavium-Octeon/drivers/net/cavium-ethernet/cavium-ethernet.ko
+insmod capwap_split_fast
+fi
+
+#
+# loopback
+#
+ifconfig lo 127.0.0.1
+
+#
+# bridge
+#
+brctl addbr default
+brctl setfd default 1
+brctl addif default eth0
+brctl addif default eth1
+ifconfig default 0.0.0.0 up
+
+#
+#set mac address
+#
+if [ -f /jffs/.OEM/.company_name ];then
+	if [ -f /jffs/.OEM/.mac_eth0 ];then
+		mac_org=`cat /jffs/.OEM/.mac_eth0`
+		if [ -f /jffs/.OEM/.mac_eth1 ];then
+			mac_upper=`cat /jffs/.OEM/.mac_eth1`
+		fi
+	fi
+fi
+if [ -z $mac_org ];then
+	mac_org=`bmutil -p | awk -F ":" '/product mac/{print $2}' `
+fi
+mac_org_formed=`set_mac org $mac_org`
+
+if [ -z $mac_upper ];then
+	mac_upper_formed=`set_mac upper $mac_org`
+else
+	mac_upper_formed=`set_mac org $mac_upper`
+fi
+
+
+ifconfig eth0 hw ether $mac_org_formed
+ifconfig eth1 hw ether $mac_upper_formed
+
+#
+#eth up
+#
+ifconfig eth0 up
+ifconfig eth1 up
+
+#
+#set wifi mac
+#
+if [ -f /jffs/.OEM/.mac_wifi0 ];then
+	mac_wifi0=`cat /jffs/.OEM/.mac_wifi0`
+	if [ ! -z $mac_wifi0 ];then
+		ifconfig wifi0 down
+		ifconfig wifi0 hw ether $mac_wifi0
+	fi
+fi
+if [ -f /jffs/.OEM/.mac_wifi1 ];then
+	mac_wifi1=`cat /jffs/.OEM/.mac_wifi1`
+	if [ ! -z $mac_wifi1 ];then
+		ifconfig wifi1 down
+		ifconfig wifi1 hw ether $mac_wifi1
+	fi
+fi
+
+
+
+#init app
+#/etc/init.d/boot start
+/etc/init.d/mini_httpd start
+#/usr/sbin/telnetd
+#start watchdog
+#/etc/wlan/watchdog &
+#set telnet passwd
+#if [ -f /jffs/etc/passwd ];then
+#	cp -f /jffs/etc/passwd /etc
+#else
+#	cp -af /etc/wlan/etc /jffs
+#	cp -f /jffs/etc/passwd /etc
+#fi
+if [ ! -f /jffs/apinfo.conf ];then
+        cp -f /etc/wlan/apinfo.conf /jffs
+fi
+

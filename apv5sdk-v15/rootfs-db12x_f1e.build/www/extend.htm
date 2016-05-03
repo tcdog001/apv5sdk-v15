@@ -1,0 +1,515 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_ac_addr=`awk '/^[1-9][0-9]{0,2}\./' /etc/config/config.wtp`
+xml_ac_addr1=`echo $xml_ac_addr | cut -f 1 -d" "`
+xml_ac_addr2=`echo $xml_ac_addr | cut -f 2 -d" "`
+xml_ac_addr3=`echo $xml_ac_addr | cut -f 3 -d" "`
+xml_ac_addr4=`echo $xml_ac_addr | cut -f 4 -d" "`
+if [ $xml_ac_addr2 == $xml_ac_addr1 ]; then
+	xml_ac_addr2=""
+fi
+if [ $xml_ac_addr3 == $xml_ac_addr1 ]; then
+	xml_ac_addr3=""
+fi
+if [ $xml_ac_addr4 == $xml_ac_addr1 ]; then
+	xml_ac_addr4=""
+fi	
+
+wifi_status()
+{
+	if [ "$DEV_wifi1" == "enable" ];then
+		  echo "<option value=\"wifi1\" >wifi1</option>"										
+	fi
+}
+xml_ac_name=`awk -F'> ' '/WTP_NAME/{print $2}' /etc/config/config.wtp`
+xml_ac_location=`awk -F'> ' '/WTP_LOCATION/{print $2}' /etc/config/config.wtp`
+xml_ac_proto=`awk -F'> ' '/WTP_LEV3_PROTOCOL/{print $2}' /etc/config/config.wtp`
+xml_ac_mtu=`awk -F'> ' '/WTP_FORCE_MTU/{print $2}' /etc/config/config.wtp`
+xml_ac_fileable=`awk -F'> ' '/AC_LOG_FILE_ENABLE/{print $2}' /etc/config/config.wtp`
+xml_ac_filesize=`awk -F'> ' '/AC_LOG_FILE_SIZE/{print $2}' /etc/config/config.wtp`
+xml_ac_domain=`awk -F'> ' '/WTP_AC_DOMAIN_NAME/{print $2}' /etc/config/config.wtp`
+xml_wtp=`config_read /config/system`
+xml_wtp_enable=`config_getoption "$xml_wtp" wtpenable`
+
+xml_config=`config_read /config/network/lan`
+xml_lan_proto=`config_getoption "$xml_config" proto`
+xml_lan_ipaddr=`config_getoption "$xml_config" ipaddr`
+xml_lan_netmask=`config_getoption "$xml_config" netmask`
+xml_lan_gateway=`config_getoption "$xml_config" gateway`
+xml_lan_dhcpcount=`config_getoption "$xml_config" dhcpcount`
+xml_lan_vendorclassid=`config_getoption "$xml_config" vendorclassid`
+
+xml_wifi0=`config_read /config/network/wifi0`
+xml_wifi0_distance=`config_getoption "$xml_wifi0" distance`
+
+xml_wifi1=`config_read /config/network/wifi1`
+xml_wifi1_distance=`config_getoption "$xml_wifi1" distance`
+
+xml_sroute=`config_read /config/network/sroute`
+xml_sroute_route1=`config_getoption "$xml_sroute" route1`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" src="js/util.js" type="text/javascript"></script>
+<script language="javascript">
+function shielding(){
+   if(document.all.proto[0].checked == true){      
+	  document.getElementById("a1").style.display="none";
+	  document.getElementById("a2").style.display="none";
+	  document.getElementById("a3").style.display="none";
+	  document.getElementById("a4").style.display="";
+	  document.getElementById("a5").style.display="";
+	  }
+	else if(document.all.proto[1].checked == true){
+	  document.getElementById("a1").style.display="";
+	  document.getElementById("a2").style.display="";
+	  document.getElementById("a3").style.display="";
+	  document.getElementById("a4").style.display="none";
+	  document.getElementById("a5").style.display="none";
+	  document.all.ipaddr.focus(); 
+	  }
+    
+}
+
+String.prototype.trim   =   function()
+{
+         //   用正则表达式将前后空格
+         //   用空字符串替代。
+         return   this.replace(/(^\s*)|(\s*$)/g,   "");
+}
+
+
+
+
+
+function check()
+{
+	x1=document.all.ac_adress1; 
+	x2=document.all.ac_adress2;
+	x3=document.all.ac_adress3;
+	x4=document.all.ac_adress4;
+	var reg1 = /^([1-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$/;
+    var reg2 = /^([1-9]|[1-9]\d|1\d\d|2[0-1]\d|2[0-2][0-3])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+    var reg3 = /^([1-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+    var reg = /^([0-9]|[1-9]\d*)$/;
+     if ( x1.value.trim() == "" && x2.value.trim() == "" && x3.value.trim() == "" && x4.value.trim() == "" ){
+        alert("AC address is null .");
+        var ac_null_flag=1;
+				x1.focus();
+				return false;
+     }
+     if ( !reg1.test(x1.value)&& x1.value.trim()!="" ){
+     	alert("AC ADDRESSES 1 is error .");
+     	x1.focus();
+     	return false;
+     }
+     
+     if ( !reg1.test(x2.value)&& x2.value.trim()!="" ){
+     	alert("AC ADDRESSES 2 is error .");
+     	x2.focus();
+     	return false;
+     }
+     
+     if ( !reg1.test(x3.value)&& x3.value.trim()!="" ){
+     	alert("AC ADDRESSES 3 is error .");
+     	x3.focus();
+     	return false;
+     }
+     
+     if ( !reg1.test(x4.value)&& x4.value.trim()!="" ){
+     	alert("AC ADDRESSES 4 is error .");
+     	x4.focus();
+				return false;
+     }
+     
+     if ( document.all.ac_wtpname.value.trim() == "" ){
+        alert(document.all.ac_wtpname.name + " is null .");
+				document.all.ac_wtpname.focus();
+				return false;
+     }
+     
+     if ( document.all.ac_location.value.trim() == "" ){
+        alert(document.all.ac_location.name + " is null .");
+				document.all.ac_location.focus();
+				return false;
+     }
+     
+     if ( document.all.protocol.value.trim() == "" ){
+        alert(document.all.protocol.name + " is null .");
+				document.all.protocol.focus();
+				return false;
+     }
+     
+     if ( document.all.forcemtu.value.trim() == "" ){
+        alert(document.all.forcemtu.name + " is null .");
+				document.all.forcemtu.focus();
+				return false;
+     }
+     
+     if ( document.all.fileable.value.trim() == "" ){
+        alert(document.all.fileable.name + " is null .");
+				document.all.fileable.focus();
+				return false;
+     }
+     
+     if ( document.all.filesize.value.trim() == "" ){
+        alert(document.all.filesize.name + " is null .");
+				document.all.filesize.focus();
+				return false;
+     }
+     
+     if ( document.all.domain.value.trim() == "" ){
+        alert(document.all.domain.name + " is null .");
+				document.all.domain.focus();
+				return false;
+     }
+ 	
+  if(document.all.proto[1].checked == true){
+  	if (document.all.ipaddr.value.trim() == "" ){
+     		alert("IP Address is null .");
+     		document.all.ipaddr.focus();
+     		return false;
+	}
+	
+	if (document.all.netmask.value.trim() == "" ){
+     		alert("Subnet Mask is null .");
+     		document.all.netmask.focus();
+     		return false;
+	}
+    
+     if (document.all.route1.value.trim() == ""  && ac_null_flag==1){
+     		alert("Gateway is null .");
+     		document.all.route1.focus();
+     		return false;
+		 }
+    	if ( document.all.ipaddr.value.trim()!="" && !reg2.test(document.all.ipaddr.value)){
+     		alert("IP Address is error .");
+     		document.all.ipaddr.focus();
+     		return false;
+ 	}
+ 	
+ 	if ( document.all.netmask.value.trim()!="" && !reg3.test(document.all.netmask.value)){
+     		alert("Subnet Mask is error .");
+     		document.all.netmask.focus();
+     		return false;
+		 }
+	}
+
+} 
+
+function valvalidate_ack(){
+	x6=document.all.distance_wifi0; 
+	x7=document.all.distance_wifi1; 
+	var reg = /^([0-9]|[1-9]\d*)$/;
+	if(document.all.wifiname_distance.value == "wifi0"){  
+		if ( x6.value == "" ){
+			alert("The distance of acktimeout is null.");
+			x6.focus();
+			return false;
+		}
+		if (!reg.test(x6.value)){
+			alert("The distance of acktimeout is error.");
+			x6.focus();
+			return false;
+		 }
+		 if( parseInt(x6.value) < 0 || parseInt(x6.value) > 40000){
+			 alert("The distance of acktimeout is out of range 0 to 40000.");
+			 x6.focus();
+			 return false;
+		  }
+	}
+	if(document.all.wifiname_distance.value == "wifi1"){  
+		if ( x7.value == "" ){
+			alert("The distance of acktimeout is null.");
+			x7.focus();
+			return false;
+		}
+		if (!reg.test(x7.value)){
+			alert("The distance of acktimeout is error.");
+			x7.focus();
+			return false;
+		 }
+		 if( parseInt(x7.value) < 0 || parseInt(x7.value) > 40000){
+			 alert("The distance of acktimeout is out of range 0 to 40000.");
+			 x7.focus();
+			 return false;
+		  }
+	}
+
+}
+
+
+function shielding_distance(){
+	
+	if(document.all.wifiname_distance.value == "wifi0"){    
+		document.getElementById("wifi0_distance").style.display="";
+		document.getElementById("wifi1_distance").style.display="none";
+		}
+	if(document.all.wifiname_distance.value == "wifi1"){    
+		document.getElementById("wifi0_distance").style.display="none";
+		document.getElementById("wifi1_distance").style.display="";
+		}
+				 
+}
+</script>
+</head>
+<body onload="shielding();shielding_distance()">
+<%in page_header.htm %>
+<%in menu_extend.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return check()">
+<div align="center" >
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+
+<tr>
+<td colspan="2" align="left" width="100%"  height="22" bgcolor="#456f95" bordercolor="#456f95"><b>AP Config</b></td>
+</tr>
+
+<tr>
+			<td colspan="2" height="10">
+			</td>
+</tr>
+
+<tr>
+<td align="right" height="10"  bordercolor="#ffffff">Company Name:&nbsp;</td>
+<td   bordercolor="#ffffff"><% /usr/sbin/showsysinfo | grep 'Company'|awk -F':' '{print $2}' %></td>
+</tr>
+
+<tr>
+<td align="right" height="10"  bordercolor="#ffffff">SN:&nbsp;</td>
+<td   bordercolor="#ffffff"><% /usr/sbin/showsysinfo | grep 'SN'|awk -F':' '{print $2}' %></td>
+</tr>
+
+<tr>
+<td align="right" height="10"  bordercolor="#ffffff">Ap Mode:&nbsp;</td>
+<td   bordercolor="#ffffff"><% /usr/sbin/showsysinfo | grep 'Ap'|awk -F':' '{print $2}' %></td>
+</tr>
+
+<tr>
+<td align="right" height="10"  bordercolor="#ffffff">Device Type:&nbsp;</td>
+<td   bordercolor="#ffffff"><% /usr/sbin/showsysinfo | grep 'Device'|awk -F':' '{print $2}' %></td>
+</tr>
+
+<tr>
+<td align="right" height="10"  bordercolor="#ffffff">MAC:&nbsp;</td>
+<td   bordercolor="#ffffff"><% /usr/sbin/showsysinfo | grep 'MAC'|awk -F':' '{print $2":"$3":"$4":"$5":"$6":"$7}' %></td>
+</tr>
+
+<tr>
+<td align="right" height="10"  bordercolor="#ffffff">Software Version:&nbsp;</td>
+<td   bordercolor="#ffffff"><% /usr/sbin/showsysinfo | grep 'Software'|awk -F':' '{print $2}' %></td>
+</tr>
+
+<tr>
+<td align="right" height="10"  bordercolor="#ffffff">Hardware Version:&nbsp;</td>
+<td   bordercolor="#ffffff"><% /usr/sbin/showsysinfo | grep 'Hardware'|awk -F':' '{print $2}' %></td>
+</tr>
+
+<tr>
+		<td height="28" align="right" bordercolor="#ffffff" width="280">AP Mode Auto Switch ENABLE:&nbsp;</td>
+		<td bordercolor="#ffffff" width="370"><input type="checkbox" <% webui_checkbox_check "$xml_wtp_enable" "yes" %> name="wtpenable" value="yes" >&nbsp;</td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff">AC ADDRESSES 1:&nbsp;</td>
+<td   bordercolor="#ffffff"><input type="text" name="ac_adress1" value="<%= "$xml_ac_addr1" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff">AC ADDRESSES 2:&nbsp;</td>
+<td   bordercolor="#ffffff"><input type="text" name="ac_adress2" value="<%= "$xml_ac_addr2" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff">AC ADDRESSES 3:&nbsp;</td>
+<td   bordercolor="#ffffff"><input type="text" name="ac_adress3" value="<%= "$xml_ac_addr3" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff">AC ADDRESSES 4:&nbsp;</td>
+<td   bordercolor="#ffffff"><input type="text" name="ac_adress4" value="<%= "$xml_ac_addr4" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff">WTP ID:&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="ac_wtpname" value="<%= "$xml_ac_name" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff">WTP LOCATION:&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="ac_location" value="<%= "$xml_ac_location" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff">WTP_LEV3_PROTOCOL:&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="protocol" value="<%= "$xml_ac_proto" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff">WTP_FORCE_MTU:&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="forcemtu" value="<%= "$xml_ac_mtu" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff">AC_LOG_FILE_ENABLE:&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="fileable" value="<%= "$xml_ac_fileable" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff">AC_LOG_FILE_SIZE:&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="filesize" value="<%= "$xml_ac_filesize" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff">WTP AC DOMAIN NAME:&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="domain" value="<%= "$xml_ac_domain" %>"></td>
+</tr>
+
+			<tr>
+				<td align="right" height="28" bordercolor="#ffffff">IP TYPE:&nbsp;</td>
+			<td  bordercolor="#ffffff"><input type="radio" <% webui_radiobutton_check "$xml_lan_proto" "dhcp" %> name="proto" value="dhcp"  onclick="shielding();"> DHCP&nbsp;
+			<input type="radio" <% webui_radiobutton_check "$xml_lan_proto" "static" %> name="proto" value="static" onclick="shielding();">Static
+			</td>
+			</tr>
+			
+			<tr id="a1">
+			<td align="right" height="28" bordercolor="#ffffff">IP Address:&nbsp;</td>
+			<td  bordercolor="#ffffff"><input type="text" name="ipaddr" id="ipaddr" value="<%= "$xml_lan_ipaddr" %>"  ></td>
+			</tr>
+			
+			<tr id="a2">
+			<td align="right" height="28" bordercolor="#ffffff">Subnet Mask:&nbsp;</td>
+			<td  bordercolor="#ffffff"><input type="text" name="netmask" id="netmask" value="<%= "$xml_lan_netmask" %>" ></td>
+			</tr>
+			
+			<tr id="a3">
+			<td align="right" height="28" bordercolor="#ffffff">Gateway:&nbsp;</td>
+			<td align="left" bordercolor="#ffffff"><input type="text" name="route1"  value="<%= "$xml_sroute_route1" %>" ></td>
+			</tr>
+			
+			  <tr id="a4">
+			<td align="right" height="28" bordercolor="#ffffff" >DHCP COUNT:&nbsp;</td>
+			 <td align="left" bordercolor="#ffffff"><select name="count" value="<%= "$xml_lan_dhcpcount" %>">
+					<option value="3" <% webui_listbox_select "$xml_lan_dhcpcount" "3" %>>3</option>
+					<option value="6" <% webui_listbox_select "$xml_lan_dhcpcount" "6" %>>6</option>
+					<option value="9" <% webui_listbox_select "$xml_lan_dhcpcount" "9" %>>9</option>
+				</select>
+			</td>
+			</tr>
+		  <tr id="a5">
+			<td align="right" height="28" bordercolor="#ffffff">VENDORCLASSID:&nbsp;</td>
+			<td align="left" bordercolor="#ffffff"><input type="text" maxlength="255" name="vendorclassid" id="vendorclassid" value="<%= "$xml_lan_vendorclassid" %>" ></td>
+		  </tr>			
+		
+<tr>
+			<td colspan="2" height="10">
+			</td>
+</tr>
+</table>
+<table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+<tr>
+			<td colspan="2" height="5">
+			</td>
+<tr>
+<td align="center" ><input type="submit" value="ApplySetup" name="SERVLET" onclick="return confirm('Modify the configuration?if continue,ap will be restart to take effect! ')" ></td>
+</tr>
+</table>
+</div>
+</form>
+</td>
+</tr>
+<tr>
+			<td  height="5">
+			</td>
+</tr>
+</table>
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+
+<div align="center">
+	<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0">
+	<tr>
+	<td bordercolor="#456f95">	
+
+	<form name="form_ack" method="post" action="<%= $action_cgi %>" >
+	<table id="tab_ack"  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+	
+		<tr>
+		<td width="100%"  colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b>ACK Timeout</b></td>
+		</tr>
+		<tr>
+			<td colspan="2" height="10">
+			</td>
+		</tr>		
+
+		<tr>
+		<td align="right" height="28" width="280" bordercolor="#ffffff">SELECT WIFI&nbsp;</td>
+		<td  bordercolor="#ffffff" width="370">
+			<select name="wifiname_distance" onclick="shielding_distance();">
+			<option value="wifi0" >wifi0</option>
+			<% wifi_status %>
+		  </select>	
+		</td>
+		</tr>
+		
+		<tr id="wifi0_distance">
+		<td align="right" height="28" bordercolor="#ffffff">ACKTIMEOUT DISATANCE:&nbsp;</td>
+		<td bordercolor="#ffffff"><input type="text" name="distance_wifi0" maxlength="5" size="7" value="<%= "$xml_wifi0_distance" %>">&nbsp;(Unit:meter, range:0-40000)</td>
+		</tr>
+		
+		<tr id="wifi1_distance">
+		<td align="right" height="28" bordercolor="#ffffff">ACKTIMEOUT DISATANCE:&nbsp;</td>
+		<td bordercolor="#ffffff"><input type="text" name="distance_wifi1" maxlength="5" size="7" value="<%= "$xml_wifi1_distance" %>">&nbsp;(Unit:meter, range:0-40000)</td>
+		</tr>
+
+			<tr>
+			<td  height="5">
+			</td>
+			</tr>					
+		</table>
+		</td>
+   </tr>
+</table> 
+		<table align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+		<tr>
+			<td colspan="2" height="10">
+			</td>
+		</tr>
+		<tr>
+		<td  align="right">
+		<input type="submit" value="ACKApply" name="SERVLET" onclick="return valvalidate_ack()"></td>
+		<td align="left" >&nbsp;<input type="submit" value="TurnMode" name="SERVLET" onclick="return confirm('Turn to fat ap?if continue,ap will be restart! ')"></td>
+		</tr>
+		</table>
+		</form>
+</div>
+
+
+</td>
+</tr>
+<tr>
+			<td  height="10">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>

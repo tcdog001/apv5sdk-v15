@@ -1,0 +1,10 @@
+reorder.c
+xmlattribute.c
+xmlcontent.c
+xmledit.c
+xmlfree.c
+xmlnode.c
+xmlopen.c
+xmlscan.c
+xmlvalue.c
+xmlschema.c

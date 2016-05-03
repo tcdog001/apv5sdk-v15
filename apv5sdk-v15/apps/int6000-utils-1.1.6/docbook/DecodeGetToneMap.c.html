@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			DecodeGetToneMap.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='DecodeGetRxToneMap.c.html' title=' DecodeGetRxToneMap.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DecodeGetVersion.c.html' title=' DecodeGetVersion.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   int ihp_DecodeGetToneMapInfo (const uint8_t buffer [], size_t length, ihpapi_result_t * result);
+ *
+ *   ihp.h
+ *
+ *   decode buffer as a VS_TONE_MAP_CHAR Confirm MME; update the structure
+ *   named by the caller; 
+ *
+ *   return 0 on decode success or -1 on decode error;
+ *
+ *   See the INT6000 Firmware Technical Reference Manual
+ *   for more information;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon HomePlug AV Application Programming Interface;
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration and evaluation only; Not for production use;
+ *
+ *   Contributor(s): 
+ *	Alex Vasquez, alex.vasquez@intellon.com
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef DECODEGETTONEMAPINFO_SOURCE
+#define DECODEGETTONEMAPINFO_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;string.h&gt;
+
+#include &quot;../ihpapi/ihp.h&quot;
+ 
+int ihp_DecodeGetToneMapInfo (const uint8_t buffer [], size_t length, ihpapi_result_t * result) 
+
+{
+	struct __packed vs_tone_map_char_cnf 
+	{
+		struct header_vs header;
+		uint8_t MSTATUS;
+		uint8_t TMSLOT;
+		uint8_t NUMTMS;
+		uint16_t TMNUMACTCARRIERS;
+		uint8_t MOD_CARRIER [MOD_CARRIER_MAX_TUPLE_NUM];
+	}
+	* confirm = (struct vs_tone_map_char_cnf *)(buffer);
+
+#if INTELLON_SAFEMODE
+ 
+	if (length &lt; sizeof (struct vs_tone_map_char_cnf)) 
+	{
+		return (-1);
+	}
+	if (result == (ihpapi_result_t *)(0)) 
+	{
+		return (-1);
+	}
+
+#endif
+ 
+	result-&gt;opStatus.status = confirm-&gt;MSTATUS;
+	result-&gt;data.toneMap.tmslot = confirm-&gt;TMSLOT;
+	result-&gt;data.toneMap.numtms = confirm-&gt;NUMTMS;
+	result-&gt;data.toneMap.tmnumactcarriers = intohs(confirm-&gt;TMNUMACTCARRIERS);
+	memcpy (result-&gt;data.toneMap.mod_carrier, confirm-&gt;MOD_CARRIER, MOD_CARRIER_MAX_TUPLE_NUM);
+	return (0);
+}
+
+#endif
+ 
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='DecodeGetRxToneMap.c.html' title=' DecodeGetRxToneMap.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DecodeGetVersion.c.html' title=' DecodeGetVersion.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

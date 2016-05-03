@@ -1,0 +1,311 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			openchannel.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='odx.c.html' title=' odx.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='output.c.html' title=' output.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   signed openchannel (struct channel * channel);
+ *
+ *   channel.h
+ *
+ *   open a raw ethernet channel;
+ *
+ *.  Intellon Linux Toolkit; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *	Nathan Houghton &lt;nathan.houghton@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef OPENCHANNEL_SOURCE
+#define OPENCHANNEL_SOURCE
+
+#include &lt;unistd.h&gt;
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+
+#if defined (__linux__)
+#	include &lt;net/if_arp.h&gt;
+#	include &lt;netpacket/packet.h&gt;
+#	include &lt;sys/ioctl.h&gt;
+#elif defined (__APPLE__)
+#	include &lt;fcntl.h&gt;
+#	include &lt;sys/ioctl.h&gt;
+#elif defined (__OpenBSD__)
+#	include &lt;sys/ioctl.h&gt;
+#elif defined (WINPCAP) || defined (LIBPCAP)
+#	include &lt;string.h&gt;
+#ifndef _MSC_VER 
+#	include &quot;../ether/getifname.c&quot;
+#	include &quot;../ether/gethwaddr.c&quot;
+#endif
+#else
+#error &quot;Unknown environment&quot;
+#endif
+
+#include &quot;../ether/channel.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/error.h&quot;
+
+#if defined (__APPLE__) || defined (__OpenBSD__)
+#include &quot;../ether/gethwaddr.c&quot;
+#endif
+
+signed openchannel (struct channel * channel) 
+
+{
+
+#if defined (__linux__) 
+
+	struct ifreq ifreq;
+	struct sockaddr_ll sockaddr_ll = 
+	{
+		PF_PACKET,
+		0x0000,
+		0x0000,
+		ARPHRD_ETHER,
+		PACKET_OTHERHOST,
+		ETHER_ADDR_LEN,
+		{
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00 
+		}
+	};
+	memset (&amp;ifreq, 0, sizeof (ifreq));
+	sockaddr_ll.sll_protocol = htons (channel-&gt;type);
+	if ((channel-&gt;fd = socket (sockaddr_ll.sll_family, SOCK_RAW, sockaddr_ll.sll_protocol)) == -1) 
+	{
+		error (1, errno, &quot;Can't open %s&quot;, channel-&gt;name);
+	}
+	memcpy (ifreq.ifr_name, channel-&gt;name, sizeof (ifreq.ifr_name));
+	if (ioctl (channel-&gt;fd, SIOCGIFINDEX, &amp;ifreq) == -1) 
+	{
+		error (1, errno, &quot;Can't read index: %s&quot;, ifreq.ifr_name);
+	}
+	channel-&gt;id = sockaddr_ll.sll_ifindex = ifreq.ifr_ifindex;
+	if (ioctl (channel-&gt;fd, SIOCGIFHWADDR, &amp;ifreq) == -1) 
+	{
+		error (1, errno, &quot;Can't read address: %s&quot;, ifreq.ifr_name);
+	}
+#if 0
+	memcpy (channel-&gt;host, ifreq.ifr_ifru.ifru_hwaddr.sa_data, sizeof (channel-&gt;host));
+#else
+	memcpy (sockaddr_ll.sll_addr, ifreq.ifr_ifru.ifru_hwaddr.sa_data, sizeof (sockaddr_ll.sll_addr));
+#endif
+	if (bind (channel-&gt;fd, (struct sockaddr *) (&amp;sockaddr_ll), sizeof (sockaddr_ll)) == -1) 
+	{
+		error (1, errno, &quot;Can't bind socket: %s&quot;, ifreq.ifr_name);
+	}
+
+#if 1
+	memcpy (channel-&gt;host, sockaddr_ll.sll_addr, sizeof (channel-&gt;host));
+#endif
+
+#if 1
+
+	if (ioctl (channel-&gt;fd, SIOCGIFFLAGS, &amp;ifreq) == -1) 
+	{
+		error (1, errno, &quot;Can't read state: %s&quot;, ifreq.ifr_name);
+	}
+	ifreq.ifr_flags |= (IFF_UP | IFF_BROADCAST | IFF_MULTICAST);
+	ifreq.ifr_flags &amp;= ~IFF_ALLMULTI;
+	if (ioctl (channel-&gt;fd, SIOCSIFFLAGS, &amp;ifreq) == -1) 
+	{
+		error (1, errno, &quot;Can't save state: %s&quot;, ifreq.ifr_name);
+	}
+
+#endif
+
+#else
+
+	struct bpf_program bpf_program;
+	static struct bpf_insn bpf_insn [] = 
+	{
+		{ BPF_LD + BPF_H + BPF_ABS, 0, 0, 12 },
+		{ BPF_JMP + BPF_JEQ + BPF_K, 0, 25, 0 },
+		{ BPF_LD + BPF_B+BPF_ABS, 0, 0, 0 },
+		{ BPF_JMP + BPF_JEQ + BPF_K, 0, 10, 0 },
+		{ BPF_LD + BPF_B + BPF_ABS, 0, 0, 1 },
+		{ BPF_JMP + BPF_JEQ + BPF_K, 0, 8, 0 },
+		{ BPF_LD + BPF_B + BPF_ABS, 0, 0, 2 },
+		{ BPF_JMP + BPF_JEQ + BPF_K, 0, 6, 0 },
+		{ BPF_LD + BPF_B + BPF_ABS, 0, 0, 3 },
+		{ BPF_JMP + BPF_JEQ + BPF_K, 0, 4, 0 },
+		{ BPF_LD + BPF_B + BPF_ABS, 0, 0, 4 },
+		{ BPF_JMP + BPF_JEQ + BPF_K, 0, 2, 0 },
+		{ BPF_LD + BPF_B + BPF_ABS, 0, 0, 5 },
+		{ BPF_JMP + BPF_JEQ + BPF_K, 12, 1, 0 },
+		{ BPF_LD + BPF_B+BPF_ABS, 0, 0, 0 },
+		{ BPF_JMP + BPF_JEQ + BPF_K, 0, 11, 0xFF },
+		{ BPF_LD + BPF_B+BPF_ABS, 0, 0, 1 },
+		{ BPF_JMP + BPF_JEQ + BPF_K, 0, 9, 0xFF },
+		{ BPF_LD + BPF_B+BPF_ABS, 0, 0, 2 },
+		{ BPF_JMP + BPF_JEQ + BPF_K, 0, 7, 0xFF },
+		{ BPF_LD + BPF_B+BPF_ABS, 0, 0, 3 },
+		{ BPF_JMP + BPF_JEQ + BPF_K, 0, 5, 0xFF },
+		{ BPF_LD + BPF_B+BPF_ABS, 0, 0, 4 },
+		{ BPF_JMP + BPF_JEQ + BPF_K, 0, 3, 0xFF },
+		{ BPF_LD + BPF_B+BPF_ABS, 0, 0, 5 },
+		{ BPF_JMP + BPF_JEQ + BPF_K, 0, 1, 0xFF },
+		{ BPF_RET + BPF_K, 0, 0, 4096 },
+		{ BPF_RET + BPF_K, 0, 0, 0 }
+	};
+
+#if defined (__APPLE__) || defined (__OpenBSD__)
+
+	struct ifreq ifreq;
+	struct timeval timeout = 
+	{
+		0,
+		0 
+	};
+	char filename [sizeof (CHANNEL_BPFDEVICE) + 1];
+	unsigned count;
+	unsigned state;
+	for (count = 0; count &lt; 100; count++) 
+	{
+		snprintf (filename, sizeof (filename), CHANNEL_BPFDEVICE, count);
+		if ((channel-&gt;fd = open (filename, O_RDWR)) != -1) 
+		{
+			break;
+		}
+	}
+	if (channel-&gt;fd == -1) 
+	{
+		error (1, ECANCELED, &quot;No free bpf devices&quot;);
+	}
+	memcpy (ifreq.ifr_name, channel-&gt;name, sizeof (ifreq.ifr_name));
+	if (ioctl (channel-&gt;fd, BIOCSETIF, &amp;ifreq) == -1) 
+	{
+		error (1, errno, &quot;%s&quot;, ifreq.ifr_name);
+	}
+	if (ioctl (channel-&gt;fd, BIOCGBLEN, &amp;channel-&gt;bpf_length) == -1) 
+	{
+		error (1, errno, &quot;Can't determine buffer length: %s&quot;, ifreq.ifr_name);
+	}
+	state = true;
+	if (ioctl (channel-&gt;fd, BIOCIMMEDIATE, &amp;state) == -1) 
+	{
+		error (1, errno, &quot;Can't set immediate mode: %s&quot;, ifreq.ifr_name);
+	}
+#if defined (__APPLE__)
+	state = false;
+	if (ioctl (channel-&gt;fd, BIOCSSEESENT, &amp;state) == -1) 
+	{
+		error (1, errno, &quot;Can't hide outgoing frames: %s&quot;, ifreq.ifr_name);
+	}
+#elif defined (__OpenBSD__)
+	state = BPF_DIRECTION_OUT;
+	if (ioctl (channel-&gt;fd, BIOCSDIRFILT, &amp;state) == -1) 
+	{	
+		error (0, errno, &quot;Can't hide outgoing frames&quot;);
+	}
+#else
+#error &quot;Abandon all hope&quot;
+#endif
+	timeout.tv_usec = channel-&gt;timeout * 1000;
+	if (ioctl (channel-&gt;fd, BIOCSRTIMEOUT, &amp;timeout) == -1) 
+	{
+		error (1, errno, &quot;Can't set timeout: %s&quot;, ifreq.ifr_name);
+	}
+
+#if 1
+
+	gethwaddr (channel-&gt;host, channel-&gt;name);
+
+#else
+
+	if (ioctl (channel-&gt;fd, SIOCGIFADDR, &amp;ifreq) &gt; 0) 
+	{
+		error (1, errno, &quot;%s&quot;, ifreq.ifr_name);
+	}
+	memcpy (channel-&gt;host, ifreq.ifr_ifru.ifru_addr.sa_data, sizeof (channel-&gt;host));
+
+#endif
+
+	bpf_program.bf_len = sizeof (bpf_insn)/sizeof (struct bpf_insn);
+	bpf_program.bf_insns = bpf_insn;
+	bpf_insn [1].k = channel-&gt;type;
+	bpf_insn [3].k = channel-&gt;host [0];
+	bpf_insn [5].k = channel-&gt;host [1];
+	bpf_insn [7].k = channel-&gt;host [2];
+	bpf_insn [9].k = channel-&gt;host [3];
+	bpf_insn [11].k = channel-&gt;host [4];
+	bpf_insn [13].k = channel-&gt;host [5];
+	if (ioctl (channel-&gt;fd, BIOCSETF, &amp;bpf_program) == -1) 
+	{
+		error (1, errno, &quot;Can't use filter program&quot;);
+	}
+
+#elif defined (WINPCAP) || defined (LIBPCAP)
+
+	channel-&gt;name = getifname (channel-&gt;id);
+	gethwaddr (channel-&gt;host, channel-&gt;name);
+	channel-&gt;socket = pcap_open_live (channel-&gt;name, 65536, 0, CHANNEL_PCAP_TIMEOUT, channel-&gt;errbuf);
+	snprintf ((char *)(channel-&gt;name), strlen (channel-&gt;name), &quot;nic%d&quot;, channel-&gt;id);
+	if (!channel-&gt;socket) 
+	{
+		error (1, errno, &quot;Can't open adaptor: %s&quot;, channel-&gt;name);
+	}
+	bpf_program.bf_len = sizeof (bpf_insn)/sizeof (struct bpf_insn);
+	bpf_program.bf_insns = bpf_insn;
+	bpf_insn [1].k = channel-&gt;type;
+	bpf_insn [3].k = channel-&gt;host [0];
+	bpf_insn [5].k = channel-&gt;host [1];
+	bpf_insn [7].k = channel-&gt;host [2];
+	bpf_insn [9].k = channel-&gt;host [3];
+	bpf_insn [11].k = channel-&gt;host [4];
+	bpf_insn [13].k = channel-&gt;host [5];
+	if (pcap_setfilter (channel-&gt;socket, &amp;bpf_program) &lt; 0) 
+	{
+		error (1, errno, &quot;Can't install pcap filter: %s&quot;, channel-&gt;name);
+	}
+	if (pcap_setmintocopy (channel-&gt;socket, ETHER_MAX_LEN) &lt; 0) 
+	{
+		error (1, errno, &quot;Can't set pcap mintocopy: %s&quot;, channel-&gt;name);
+	}
+
+#else
+#error &quot;Unknown Environment&quot;
+#endif
+#endif
+
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='odx.c.html' title=' odx.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='output.c.html' title=' output.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

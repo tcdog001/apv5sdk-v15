@@ -1,0 +1,16 @@
+#!/bin/sh
+
+DMESG=dmesg
+IFCONFIG=ifconfig
+tmp_speed=1000Mbps
+ETHNUM="${1}"
+line=`${DMESG} |grep Mbps| wc -l`
+speed=`${DMESG} |grep Mbps | awk '{if(NR==line){print $7}}' line=$line`
+if [[ "$speed" == "" ]];then 
+#		${IFCONFIG} eth${ETHNUM} down >/dev/null 2>&1
+#		${IFCONFIG} eth${ETHNUM} up >/dev/null 2>&1
+#		sleep 2 
+#		speed=`${DMESG} |grep Mbps | awk '{if(NR==1){print $7}}'`
+		speed=$tmp_speed
+fi
+echo "eth speed is :$speed"

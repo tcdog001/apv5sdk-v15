@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			SHA256Match.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='SHA256Ident.c.html' title=' SHA256Ident.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SHA256Print.c.html' title=' SHA256Print.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   bool SHA256Match (int fd, const byte digest[]);
+ *
+ *   SHA256.h
+ *
+ *   search a fingerprint file for the given digest; return true 
+ *   on success and false on failure; digests in the fingerprint
+ *   file must be upper case because comparison is binary;
+ *
+ *.  Motley Tools by Charles Maier &lt;cmaier@cmassoc.net&gt;;
+ *:  Published 2001-2006 by Charles Maier Associates Limited;
+ *;  Released under the GNU General Public Licence v2 and later;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SHA256MATCH_SOURCE
+#define SHA256MATCH_SOURCE
+
+#include &lt;unistd.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../tools/number.h&quot;
+#include &quot;../crypt/SHA256.h&quot;
+
+bool SHA256Match (int fd, const byte digest []) 
+
+{
+	char string [SHA256_DIGEST_LENGTH &lt;&lt; 1];
+	char buffer [SHA256_DIGEST_LENGTH &lt;&lt; 1];
+	signed length = 0;
+	while (length &lt; sizeof (string)) 
+	{
+		string [length++] = DIGITS_HEX [(*digest &gt;&gt; 4) &amp; 0x0F];
+		string [length++] = DIGITS_HEX [(*digest &gt;&gt; 0) &amp; 0x0F];
+		digest++;
+	}
+	while (read (fd, buffer, sizeof (buffer)) == sizeof (buffer)) 
+	{
+		signed char c;
+		if (!memcmp (string, buffer, sizeof (string))) 
+		{
+			return (true);
+		}
+		while (read (fd, &amp;c, sizeof (c)) == sizeof (c)) 
+		{
+			if (c == '\n') 
+			{
+				break;
+			}
+		}
+	}
+	return (false);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='SHA256Ident.c.html' title=' SHA256Ident.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SHA256Print.c.html' title=' SHA256Print.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

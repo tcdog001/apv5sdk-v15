@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			ttcp.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='setpib.7.html' title=' setpib.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='weeder.7.html' title=' weeder.7 '>NEXT</a>]
+			</div>
+<pre>
+TTCP(7)                                                                                   TTCP(7)
+
+NAME
+       ttcp - test TCP and UDP performance
+
+SYNOPSIS
+       ttcp  -t  [-u]  [-s]  [-p port]  [-l buflen] [-b size] [-n numbufs] [-A align] [-O offset]
+       [-f format] [-D] [-v] host [&lt;in]
+       ttcp -r [-u] [-s] [-p port] [-l buflen] [-b size] [-A align] [-O offset] [-f format]  [-B]
+       [-T] [-v] [&gt;out]
+
+DESCRIPTION
+       Ttcp times the transmission and reception of data between two systems using the UDP or TCP
+       protocols.  It differs from common ‘‘blast’’ tests, which tend to measure the remote inetd
+       as  much  as  the  network performance, and which usually do not allow measurements at the
+       remote end of a UDP transmission.
+
+       For testing, the transmitter should be started with -t and -s after the receiver has  been
+       started  with  -r and -s.  Tests lasting at least tens of seconds should be used to obtain
+       accurate measurements.  Graphical presentations  of  throughput  versus  buffer  size  for
+       buffers ranging from tens of bytes to several ‘‘pages’’ can illuminate bottlenecks.
+
+       Ttcp  can also be used as a ‘‘network pipe’’ for moving directory hierarchies between sys‐
+       tems when routing problems exist or when the use of other mechanisms is  undesirable.  For
+       example, on the destination machine, use: ttcp -r -B | tar xvpf -
+
+       and on the source machine: tar cf - directory | ttcp -t dest_machine
+
+       Additional intermediate machines can be included by: ttcp -r | ttcp -t next_machine
+
+OPTIONS
+       -t        Transmit mode.
+
+       -r        Receive mode.
+
+       -u        Use UDP instead of TCP.
+
+       -s        If  transmitting, source a data pattern to network; if receiving, sink (discard)
+                 the data.  Without the -s option, the default is to transmit data from stdin  or
+                 print the received data to stdout.
+
+       -l length Length of buffers in bytes (default 8192).  For UDP, this value is the number of
+                 data bytes in each packet.  The system limits the  maximum  UDP  packet  length.
+                 This limit can be changed with the -b option.
+
+       -b size   Set  size  of  socket  buffer.   The default varies from system to system.  This
+                 parameter affects the maximum UDP packet length.  It may not be possible to  set
+                 this parameter on some systems (for example, 4.2BSD).
+
+       -n numbufs
+                 Number of source buffers transmitted (default 2048).
+
+       -p port   Port  number to send to or listen on (default 2000).  On some systems, this port
+                 may be allocated to another network daemon.
+
+       -D        If transmitting using TCP, do not buffer data when sending (sets the TCP_NODELAY
+                 socket  option).   It  may not be possible to set this parameter on some systems
+                 (for example, 4.2BSD).
+
+       -B        When receiving data, output only full blocks, using the block size specified  by
+                 -l.   This  option is useful for programs, such as tar(1), that require complete
+                 blocks.
+
+       -A align  Align the start of buffers to this modulus (default 16384).
+
+       -O offset Align the start of buffers to this offset (default 0).   For  example,  ‘‘-A8192
+                 -O1’’ causes buffers to start at the second byte of an 8192-byte page.
+
+       -f format Specify,  using  one  of  the following characters, the format of the throughput
+                 rates  as  kilobits/sec  (’k’),   kilobytes/sec   (’K’),   megabits/sec   (’m’),
+                 megabytes/sec (’M’), gigabits/sec (’g’), or gigabytes/sec (’G’).  The default is
+                 ’K’.
+
+       -T        ‘‘Touch’’ the data as they are read in order to measure cache effects.
+
+       -v        Verbose: print more statistics.
+
+       -d        Debug: set the SO_DEBUG socket option.
+
+SEE ALSO
+       ping(1M), traceroute(1M), netsnoop(1M)
+
+                                              local                                       TTCP(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='setpib.7.html' title=' setpib.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='weeder.7.html' title=' weeder.7 '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,185 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			int6km.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='int6klog.7.html' title=' int6klog.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kmod.7.html' title=' int6kmod.7 '>NEXT</a>]
+			</div>
+<pre>
+int6km(7)                             Intellon Linux Toolkit                            int6km(7)
+
+NAME
+       int6km - INT6x00 Memory Explorer
+
+SYNOPSIS
+       int6km [options] [device] [device] [...]
+
+DESCRIPTION
+       The  Intellon  INT6x00 Memory Explorer reads a region of device memory using one VS_RD_MEM
+       message and prints the contents on stdout in either hexadecimal dump  or  binary  register
+       format.  A maximum of 1024 bytes may be read at one time. This utility is useful only when
+       you know the offset and extent of the data in SDRAM. Of course, the offset  will  probably
+       change  from  one firmware release to another. Also, there may be internal restrictions on
+       memory offsets that can be read. As of firmware revision 3.1  you  cannot  read  addresses
+       below 16M or above 32M.
+
+       This  program  is part of the Intellon Linux Toolkit. See the ilt man page for an overview
+       and installation instructions.
+
+OPTIONS
+       -a     Display absolute memory offsets in hexadecimal dump format. If omitted  then  rela‐
+              tive memory offsets are displayed.
+
+       -e     Redirects  stderr  messages  to stdout. By convention status and error messages are
+              printed on stderr while primary program output is printed on  stdout.  This  option
+              prints all output on stdout in cases where this is desired.
+
+       -h     Display a brief heading to help users interpret information.
+
+       -i interface
+              Select  the  host  Ethernet interface. All requests are sent via this interface and
+              only reponses received via this interface are recognized. The default interface  is
+              eth1  because  most people use eth0 as their principle network connection; however,
+              if environment string &quot;PLC&quot; is defined then it takes precedence  over  the  default
+              interface. This option then takes precedence over either default.
+
+       -l length
+              The  length  of the memory region to be read in bytes. The value may be specifed as
+              either decimal, octal, hexadecimal or binary. Octal values start with 0.  Hexadeci‐
+              mal  values  start  with 0x or 0X. Binary values start with 0xb or 0B.  The minimum
+              value is 0. The default value is 4. The maximum value is 1024.
+
+       -o offset
+              The offset of the memory region to be read in bytes. The offset is a  32-bit  value
+              expressed in hexadecimal with an optional &quot;0x&quot; prefix. Although any 32-bit value is
+              permitted, the runtime firmware may reject selected offsets  and  return  an  error
+              message. The default is 0x00000000.
+
+       -q     Suppresses status messages on stderr.
+
+       -r     Display  memory  as a series of binary registers instead of hexadecimal bytes. This
+              option rounds offset to a 32-bit boundary and truncates length  to  a  multiple  of
+              four  bytes  before  reading  device  memory.  The  ouput  displays absolute memory
+              addresses and their endian converted 32-bit binary values.
+
+       -v     Prints additional information on stdout. In particular, this option dumps  outgoing
+              Ethernet packets on stdout.
+
+       -?,--help
+              Displays  program help information on stderr. This option takes precedence over all
+              other options on the command line except version information.
+
+       -!,--version
+              Displays program version information on stderr. This option takes  precedence  over
+              all other options on the command line except help information. Use this option when
+              sending screen dumps to Intellon technical staff.
+
+ARGUMENTS
+       device The MAC address of some powerline device. More than one address may  be  specified.
+              If  more than one address is specified then operations are performed on each device
+              in turn. The default address is local. See DEVICES for information  about  symbolic
+              device addresses.
+
+DEVICES
+       Powerline  devices  use  Ethernet Media Access Control (MAC) addresses. A MAC address is a
+       48-bit value entered as 12 hexadecimal digits in upper, lower  or  mixed  character  case.
+       Octets   may   be   separated  with  colons  for  clarity.  For  example,  &quot;00b052000001&quot;,
+       &quot;00:b0:52:00:00:01&quot; and &quot;00b052:000001&quot; are valid and equivalent.
+
+       The following MAC addresses are special and may be entered by name instead of number.
+
+       all    Same as &quot;broadcast&quot;.
+
+       broadcast
+              A synonym for the  Ethernet  broadcast  address,  FF:FF:FF:FF:FF:FF.  All  devices,
+              whether local, remote or foreign recognize messages sent to this address.  A remote
+              device is any device at the far end of a powerline connection. A foreign device  is
+              any device not manufactured by Intellon.
+
+       local  A  synonym  for  the  Intellon  vendor  specific  Local  Management  Address (LMA),
+              00:B0:52:00:00:01. All local Intellon devices recognize this address but remote and
+              foreign devices do not. A remote device is any device at the far end of a powerline
+              connection. A foreign device is any device not manufactured by Intellon.
+
+REFERENCES
+       See the Intellon HomePlug AV Firmware Technical Reference Manual for more information.
+
+DISCLAIMER
+       Intellon HomePlug AV Vendor Specific Management Message Entry  structure  and  content  is
+       proprietary  to  Intellon  Corporation, Ocala FL USA. Consequently, public information may
+       not available. Intellon Corporation reserves the right to  modify  message  structure  and
+       content  in  future firmware releases without any obligation to notify or compensate users
+       of this program.
+
+EXAMPLES
+       The following example dumps a region of memory from the local device because  we  did  not
+       specify  a  device  address.  The memory offset is 0x00183000 which happens to be the GPIO
+       register. The region length is 32 bytes. The memory offset is assumed to be hexadecimal so
+       the explicit 0x prefix may be omitted. Observe that the displayed memory offsets are rela‐
+       tive, not absolute.
+
+          # int6km -o 00183000 -l 32
+          00000000 7F 0F 00 00 00 0A 00 00 F8 0F 00 00 00 00 00 00 ................
+          00000010 75 10 02 00 00 00 00 00 00 00 00 00 00 00 00 00 u...............
+
+       The next example does the same thing but displays a one-line header  and  absolute  memory
+       addresses because options -h and  -a are present. The optional header help locate specific
+       bytes within the region. This is especially useful when the offset is not an even multiple
+       of 16 bytes.
+
+          int6km -aho 183000 -l 32
+          LOCATION 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F ----------------
+          00183000 7F 0F 00 00 00 0A 00 00 F8 0F 00 00 00 00 00 00 ................
+          00183010 75 10 02 00 00 00 00 00 00 00 00 00 00 00 00 00 u...............
+
+       The  first  four bytes of this region are the 32-bit GPIO register where each of the first
+       12 bits correspond to a GPIO pin on the device. It is  difficult  to  interpret  the  bits
+       because bytes appear in little endian order.
+
+       The  next  example  displays  the same information in register format because option -r is
+       present. The offset is rounded to an even 32-bit boundary and the length is  truncated  to
+       an even multiple of 4 bytes before the region is read. This ensures that we are reading on
+       a register boundary. The contents of each register are endian converted and  displayed  in
+       binary as 4 bytes. The optional header helps locate specific bits within each register.
+
+          int6km -rho 183000 -l 32
+          REGISTER CONTENTS 31----24 23----16 15----08 07----00
+          00183000 00000D7F 00000000-00000000-00001101-01111111
+          00183004 00000800 00000000-00000000-00001000-00000000
+          00183008 00000FF8 00000000-00000000-00001111-11111000
+          0018300C 00000000 00000000-00000000-00000000-00000000
+          00183010 00021075 00000000-00000010-00010000-01110101
+          00183014 00000000 00000000-00000000-00000000-00000000
+          00183018 00000000 00000000-00000000-00000000-00000000
+          0018301C 00000000 00000000-00000000-00000000-00000000
+
+       Notice  that the memory content shown in this example is different than that shown in pre‐
+       vious ones. This is normal when reading registers because their content is often  dynamic.
+
+SEE ALSO
+       ilt(7), int6k(7), int6kid(7)
+
+CREDITS
+        Charles Maier &lt;charles.maier@intellon.com&gt;
+
+int6000-utils-linux                    Intellon Corporation                             int6km(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='int6klog.7.html' title=' int6klog.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kmod.7.html' title=' int6kmod.7 '>NEXT</a>]
+			</div>
+		</body>
+	</html>

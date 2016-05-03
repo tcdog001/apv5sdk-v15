@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			DivisionHeader.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='DivisionFooter.c.html' title=' DivisionFooter.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DivisionOption.c.html' title=' DivisionOption.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed DivisionHeader (signed margin, const char * style);
+ *   
+ *   page.h
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef DIVISIONHEADER_SOURCE
+#define DIVISIONHEADER_SOURCE
+
+#include &lt;stdio.h&gt;
+
+#include &quot;../tools/markup.h&quot;
+#include &quot;../tools/format.h&quot;
+#include &quot;../cgi/page.h&quot;
+
+signed DivisionHeader (signed margin, const char * style) 
+
+{
+	output (margin, &quot;content-type: %s\n&quot;, ISO_CONTENT);
+	output (margin, &quot;&lt;?xml version='%s' encoding='%s'?&gt;&quot;, XML_VERSION, XML_CHARSET);
+	output (margin, &quot;&lt;!doctype html public '%s' '%s'&gt;&quot;, W3C_STD, W3C_DTD);
+	output (margin++, &quot;&lt;html xmlns='%s' lang='%s'&gt;&quot;, XML_NAMESPACE, XML_LANGUAGE);
+	output (margin++, &quot;&lt;head&gt;&quot;);
+	output (margin++, &quot;&lt;title&gt;&quot;);
+	output (margin, &quot;%s&quot;, PAGE_NAME);
+	output (margin--, &quot;&lt;/title&gt;&quot;);
+	output (margin, &quot;&lt;meta http-equiv='content-type' content='%s'/&gt;&quot;, HTML_CONTENT);
+	output (margin, &quot;&lt;meta name='generator' content='%s'/&gt;&quot;, HTML_PROGRAM);
+	output (margin, &quot;&lt;meta name='author' content='%s'/&gt;&quot;, HTML_AUTHOR);
+	output (margin, &quot;&lt;link href='%s' rel='stylesheet' type='text/css'/&gt;&quot;, PAGE_STYLESHEET);
+	output (margin--, &quot;&lt;/head&gt;&quot;);
+	output (margin++, &quot;&lt;body&gt;&quot;);
+	output (margin++, &quot;&lt;form action='%s' method='POST' enctype='multipart/form-data'&gt;&quot;, PAGE_PATH);
+	output (margin++, &quot;&lt;div class='%s'&gt;&quot;, style);
+	output (margin, &quot;&lt;img class='%s' src='%s' alt='%s'/&gt;&quot;, style, PAGE_LOGO_PATH, PAGE_LOGO_TEXT);
+	output (margin--, &quot;&lt;/div&gt;&quot;);
+	return (margin);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='DivisionFooter.c.html' title=' DivisionFooter.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DivisionOption.c.html' title=' DivisionOption.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

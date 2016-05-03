@@ -1,0 +1,97 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_voip=`config_read /config/voip`
+xml_voip_register_server=`config_getoption "$xml_voip" register_server`
+xml_voip_proxy_server=`config_getoption "$xml_voip" proxy_server`
+xml_voip_port=`config_getoption "$xml_voip" port`
+xml_voip_auth_user=`config_getoption "$xml_voip" auth_user`
+xml_voip_auth_pass=`config_getoption "$xml_voip" auth_pass`
+xml_voip_user=`config_getoption "$xml_voip" user`
+xml_voip_status=`config_getoption "$xml_voip" status`
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>VOIP</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+</head>
+
+<body bgcolor="#efefef">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1">&nbsp;</td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">SIP Setting</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form name="form1" method="post" action="<%= $action_cgi %>" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="SIP Server and Port illustration">SIP Server and Port</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">SIP Register Server </td>
+          <td class="td_style" width="350"><input type="text" name="sip_register_server" value="<%= $xml_voip_register_server %>" style="height:12px; width:150px"/></td>
+        </tr>
+		<tr>
+          <td class="td_style">SIP Proxy Server</td>
+          <td class="td_style"><input type="text" name="sip_proxy_server" value="<%= $xml_voip_proxy_server %>" style="height:12px; width:150px"/></td>
+        </tr>
+		<tr>
+          <td class="td_style">Port</td>
+          <td class="td_style"><input type="text" name="port" value="<%= $xml_voip_port %>" style="height:12px; width:50px; margin-right:5px" value="5060"/>[1024,65535]</td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><font class="table_head" title="Authorization illustration">Authorization</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">Authorized User Name</td>
+          <td class="td_style" width="350"><input type="text" name="author_user_name" value="<%= $xml_voip_auth_user %>" style="height:12px; width:150px"/></td>
+        </tr>
+		<tr>
+          <td class="td_style">Authorization Password</td>
+          <td class="td_style"><input type="password" name="author_password" value="<%= $xml_voip_auth_pass %>" style="height:12px; width:150px"/></td>
+        </tr>
+		<tr>
+          <td class="td_style">User Name</td>
+          <td class="td_style"><input type="text" name="user_name" value="<%= $xml_voip_user %>" style="height:12px; width:150px"/></td>
+        </tr>
+		<tr>
+          <td class="td_style">VOIP Register Status</td>
+          <td class="td_style"><%= $xml_voip_status %></td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><input id="but" type="submit" name="voip_commit" value="Submit"/></td>
+  </tr>
+</table>
+<input type="hidden" value="<%= $xml_voip_status %>" name="status">
+<input type="hidden" value="VOIP Apply" name="SERVLET">
+</form>
+</div>
+</body>
+</html>

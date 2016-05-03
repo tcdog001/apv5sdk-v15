@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			session.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='sendpacket.c.html' title=' sendpacket.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='setnvm.c.html' title=' setnvm.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   session.c - global session variable declaration;
+ *
+ *   session.h
+ *
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SESSION_SOURCE
+#define SESSION_SOURCE
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../cgi/session.h&quot;
+#include &quot;../cgi/page.h&quot;
+
+/*====================================================================*
+ *  
+ *--------------------------------------------------------------------*/
+
+struct fileinfo pib;
+struct fileinfo nvm;
+
+/*====================================================================*
+ *  
+ *--------------------------------------------------------------------*/
+
+struct message message;
+
+/*====================================================================*
+ *   custom variables;
+ *--------------------------------------------------------------------*/
+
+struct session session = 
+
+{
+	OPTION_TOPOLOGY,
+	&quot;&quot;,
+	SESSION_NIC,
+	{
+		{
+			{
+				0x00,
+				0xB0,
+				0x52,
+				0x00,
+				0x00,
+				0x01 
+			}
+		}
+	},
+	0,
+	{
+	},
+	{
+		&quot;HomePlugAV&quot; 
+	},
+	{
+		&quot;HomePlugAV&quot; 
+	},
+	{
+		{
+			2000000,
+			2000000,
+			3000000,
+			3000000 
+		},
+		{
+			1,
+			1 
+		},
+		{
+			1,
+			2,
+			3,
+			0,
+			0,
+			0,
+			0,
+			0 
+		},
+		{
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0 
+		},
+	}
+};
+
+/*====================================================================*
+ *
+ *--------------------------------------------------------------------*/
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='sendpacket.c.html' title=' sendpacket.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='setnvm.c.html' title=' setnvm.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

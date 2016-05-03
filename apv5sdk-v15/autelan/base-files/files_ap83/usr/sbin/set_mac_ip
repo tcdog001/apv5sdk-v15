@@ -1,0 +1,24 @@
+#!/bin/sh
+#set_mac_ip vapname mac ip
+
+AUTELAN=/usr/sbin/autelan
+#
+#usage()
+#
+usage()
+{
+	echo "set_mac_ip vapname mac ip"
+	exit 1
+}
+
+if [ ! $# -eq 3 ];then
+	usage
+fi
+
+VAPNAME=$1
+MAC=$2
+IP=$3
+
+#echo "${AUTELAN} mac_binding ${VAPNAME} set_ip ${MAC} ${IP}"
+${AUTELAN} mac_binding ${VAPNAME} set_ip ${MAC} ${IP}
+

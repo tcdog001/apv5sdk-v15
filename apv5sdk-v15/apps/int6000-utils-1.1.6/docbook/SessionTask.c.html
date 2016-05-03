@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			SessionTask.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='SessionSave.c.html' title=' SessionSave.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SetKey.c.html' title=' SetKey.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void SessionTask ();
+ *
+ *   session.h 
+ *
+ *   inspect session.action and perform indicated action only if the
+ *   action is valid; clear session.action on exit;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SESSIONTASK_SOURCE
+#define SESSIONTASK_SOURCE
+
+#include &lt;errno.h&gt;
+
+#include &quot;../cgi/session.h&quot;
+#include &quot;../cgi/page.h&quot;
+
+void SessionTask () 
+
+{
+	extern struct session session;
+	extern struct channel channel;
+	extern struct fileinfo pib;
+	extern struct fileinfo nvm;
+	CGILocalPLD ();
+	if (!strcmp (session.action, ACTION_SOURCE)) 
+	{
+		closechannel (&amp;channel);
+		channel.name = session.source;
+		openchannel (&amp;channel);
+		CGILocalPLD ();
+	}
+	else if (!strcmp (session.action, ACTION_DEVICE)) 
+	{
+	}
+	else if (!strcmp (session.action, ACTION_NETWORK)) 
+	{
+		CGISetKey ();
+	}
+	else if (!strcmp (session.action, ACTION_PRIORITIZE)) 
+	{
+		status (1, ENOSYS, &quot;This is demonstration software.&quot;);
+	}
+	else if (!strcmp (session.action, ACTION_CONFIGURE)) 
+	{
+		if ((!pib.data) || (!pib.size)) 
+		{
+			status (1, ECANCELED, &quot;No PIB file selected&quot;);
+		}
+		CGIWriteMOD (VS_MODULE_PIB, pib.data, pib.size);
+		CGIFlashMOD (VS_MODULE_PIB);
+		memset (&amp;pib, 0, sizeof (pib));
+		memset (&amp;nvm, 0, sizeof (nvm));
+	}
+	else if (!strcmp (session.action, ACTION_UPGRADE)) 
+	{
+		if ((!pib.data) &amp;&amp; (!pib.size)) 
+		{
+			status (1, ECANCELED, &quot;No PIB file selected&quot;);
+		}
+		if ((!nvm.data) &amp;&amp; (!nvm.size)) 
+		{
+			status (1, ECANCELED, &quot;No NVM file selected&quot;);
+		}
+		CGIWriteMOD (VS_MODULE_PIB, pib.data, pib.size);
+		CGIWriteMOD (VS_MODULE_MAC, nvm.data, nvm.size);
+		CGIFlashMOD (VS_MODULE_MAC|VS_MODULE_PIB);
+		memset (&amp;pib, 0, sizeof (pib));
+		memset (&amp;nvm, 0, sizeof (nvm));
+	}
+	else if (!strcmp (session.action, ACTION_DEFAULT)) 
+	{
+		CGIRestore ();
+	}
+	memset (session.action, 0, sizeof (session.action));
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='SessionSave.c.html' title=' SessionSave.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SetKey.c.html' title=' SetKey.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

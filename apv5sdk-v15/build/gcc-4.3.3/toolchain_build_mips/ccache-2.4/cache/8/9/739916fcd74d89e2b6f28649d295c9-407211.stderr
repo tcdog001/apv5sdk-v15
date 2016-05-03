@@ -1,0 +1,28 @@
+shell/splash.c: In function 'splash_main':
+shell/splash.c:754: warning: passing argument 2 of 'setval' discards qualifiers from pointer target type
+shell/splash.c: In function 'donetwork':
+shell/splash.c:3364: warning: ISO C90 forbids mixed declarations and code
+shell/splash.c:3400: warning: unused variable 'str_status'
+shell/splash.c: In function 'dowireless':
+shell/splash.c:3752: warning: ISO C90 forbids mixed declarations and code
+shell/splash.c: In function 'CWGetCpuUseRatio':
+shell/splash.c:5243: warning: declaration of 'nice' shadows a global declaration
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/include/unistd.h:541: warning: shadowed declaration is here
+shell/splash.c:5244: warning: declaration of 'system' shadows a global declaration
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/include/stdlib.h:621: warning: shadowed declaration is here
+shell/splash.c:5269: warning: unknown conversion type character 0xa in format
+shell/splash.c: In function 'dosystem':
+shell/splash.c:5359: warning: unknown conversion type character 0xa in format
+shell/splash.c: In function 'exe_tab_completion':
+shell/splash.c:8313: warning: ISO C90 forbids mixed declarations and code
+shell/splash.c: In function 'input_tab':
+shell/splash.c:9015: warning: ISO C90 forbids mixed declarations and code
+shell/splash.c: In function 'dosystem':
+shell/splash.c:5368: warning: 'flashTotal' may be used uninitialized in this function
+shell/splash.c:5366: note: 'flashTotal' was declared here
+shell/splash.c:5368: warning: 'flashFree' may be used uninitialized in this function
+shell/splash.c:5367: note: 'flashFree' was declared here
+shell/splash.c:5409: warning: 'cpu_use_ratio' may be used uninitialized in this function
+shell/splash.c:5408: note: 'cpu_use_ratio' was declared here
+shell/splash.c: In function 'CWGetFlashSizeInfo':
+shell/splash.c:5217: warning: 'flashConfigFree' may be used uninitialized in this function

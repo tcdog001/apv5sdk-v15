@@ -1,0 +1,14 @@
+#!/bin/sh
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+SYSREBOOT="/sbin/sysreboot"
+
+local xml_system=`config_read /config/system`
+local workmode=`config_getoption "${xml_system}" workmode`
+
+if [ 0${workmode} -eq 1 ];then
+	xml_system=`config_setoption "${xml_system}" workmode 0`
+	config_write /config/system "${xml_system}"
+	echo l > /proc/kes_debug_flag
+	${SYSREBOOT}
+fi

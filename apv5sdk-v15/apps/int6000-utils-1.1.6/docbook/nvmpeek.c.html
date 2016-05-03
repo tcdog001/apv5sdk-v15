@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			nvmpeek.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='nvmmerge.c.html' title=' nvmmerge.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='nvmspan.c.html' title=' nvmspan.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void nvmpeek (struct header_nvm * header_nvm);
+ *
+ *   nvm.h
+ *
+ *   display an NVM image header on stdout; 
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef NVMPEEK_SOURCE
+#define NVMPEEK_SOURCE
+
+#include &lt;stdio.h&gt;
+
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/format.h&quot;
+#include &quot;../nvm/nvm.h&quot;
+
+void nvmpeek (struct header_nvm * header_nvm) 
+
+{
+
+#define FUNCTIONS_COUNT 8
+
+	static const char * platforms [] = 
+	{
+		&quot;INT6000&quot;,
+		&quot;INT6300&quot;,
+		&quot;INT6400&quot;,
+		(const char *)(0) 
+	};
+	static const char * functions []= 
+	{
+		&quot;Generic Image&quot;,
+		&quot;Synopsis Configuration&quot;,
+		&quot;Denali Configuration&quot;,
+		&quot;Denali Applet&quot;,
+		&quot;Firmware Image&quot;,
+		&quot;OAS Client&quot;,
+		&quot;Custom Image&quot;,
+		&quot;Memory Control&quot;,
+		&quot;Unknown&quot; 
+	};
+	char platform [100];
+	strfbits (platform, sizeof (platform), platforms, &quot;|&quot;, LE32TOH (header_nvm-&gt;IGNOREMASK));
+	printf (&quot;\tHeader Version = 0x%08X-%02X\n&quot;, LE32TOH (header_nvm-&gt;HEADERVERSION), header_nvm-&gt;HEADERMINORVERSION);
+	printf (&quot;\tHeader Checksum = 0x%08X\n&quot;, LE32TOH (header_nvm-&gt;HEADERCHECKSUM));
+	printf (&quot;\tHeader Next = 0x%08X\n&quot;, LE32TOH (header_nvm-&gt;NEXTHEADER));
+	printf (&quot;\tFlash Address = 0x%08X\n&quot;, LE32TOH (header_nvm-&gt;IMAGEROMADDR));
+	printf (&quot;\tImage Address = 0x%08X\n&quot;, LE32TOH (header_nvm-&gt;IMAGEADDR));
+	printf (&quot;\tEntry Address = 0x%08X\n&quot;, LE32TOH (header_nvm-&gt;ENTRYPOINT));
+	printf (&quot;\tImage Checksum = 0x%08X\n&quot;, LE32TOH (header_nvm-&gt;IMAGECHECKSUM));
+	printf (&quot;\tImage Size = 0x%08X (%d)\n&quot;, LE32TOH (header_nvm-&gt;IMAGELENGTH), LE32TOH (header_nvm-&gt;IMAGELENGTH));
+	if (header_nvm-&gt;IMAGETYPE &lt; FUNCTIONS_COUNT) 
+	{
+		printf (&quot;\tImage Type = %s\n&quot;, functions [header_nvm-&gt;IMAGETYPE]);
+	}
+	else 
+	{
+		printf (&quot;\tImage Type = %s\n&quot;, functions [FUNCTIONS_COUNT]);
+	}
+	printf (&quot;\tImage Omit = %s\n&quot;, platform);
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='nvmmerge.c.html' title=' nvmmerge.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='nvmspan.c.html' title=' nvmspan.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

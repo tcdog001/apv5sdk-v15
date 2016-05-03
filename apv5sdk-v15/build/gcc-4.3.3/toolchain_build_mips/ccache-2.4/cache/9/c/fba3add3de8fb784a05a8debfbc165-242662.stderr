@@ -1,0 +1,2 @@
+networking/dnsd.c:157: warning: 'dnsentryinit' defined but not used
+networking/dnsd.c:185: warning: 'table_lookup' defined but not used

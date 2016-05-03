@@ -1,0 +1,18 @@
+#!/bin/sh
+################################################
+#first kill process
+/usr/bin/killall syslogd
+/usr/bin/killall klogd
+/usr/bin/killall hotplug2
+/usr/bin/killall telnetd
+/usr/bin/killall snmpd
+/usr/bin/killall dnsmasq
+/usr/bin/killall hostapd
+/usr/bin/killall udhcpc
+/usr/bin/killall factoryreset
+/usr/bin/killall arpnotice
+/usr/bin/killall linkcheck
+/usr/bin/killall cpu_util_check
+
+################################################
+

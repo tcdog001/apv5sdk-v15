@@ -1,0 +1,52 @@
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR =gobi_serial
+PKG_BUILD_DIR1 =gobi_net
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR = /tmp
+endif
+
+ifndef KERNELDIR
+KERNELDIR := $(PWD)/../../linux/kernels/mips-linux-2.6.31
+endif
+ 
+ifeq ($(BOARD_TYPE),db12x)
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.31/usb
+else
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.15/usb
+endif
+CC=$(TARGET_CROSS)gcc
+
+MAKE_ARGS:= \
+	KERNELPATH="$(KERNELDIR)" \
+	CROSS_COMPILE="$(TARGET_CROSS)" \
+
+.PHONY: all
+all: gobi_serial gobi_net install
+.PHONY: gobi_serial gobi_net
+
+gobi_serial:
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean 
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS)
+	$(CC) ctrl_lte.c -o ctrl_lte
+
+gobi_net:
+	$(MAKE) -C $(PKG_BUILD_DIR1) $(MAKE_ARGS) clean
+	$(MAKE) -C $(PKG_BUILD_DIR1) $(MAKE_ARGS)
+
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean
+	$(MAKE) -C $(PKG_BUILD_DIR1) $(MAKE_ARGS) clean
+	rm -rf ctrl_lte	
+
+install:gobi_serial gobi_net
+	mkdir -p $(INSTALLDIR)
+	cd $(PKG_BUILD_DIR) && cp -f GobiSerial.ko $(INSTALLDIR)
+	cd $(PKG_BUILD_DIR1) && cp -f QCUSBNet.ko $(INSTALLDIR)
+	cp -f ctrl_lte ${ROOTFSDIR}/usr/sbin
+	cd lib && cp -f *.so.1 ${ROOTFSDIR}/lib 
+	cd bin && cp -f netconn ${ROOTFSDIR}/bin
+	cd bin && cp -f qmuxd ${ROOTFSDIR}/bin
+	cd bin && cp -f atc ${ROOTFSDIR}/bin
+	cp -f apn_config ${ROOTFSDIR}/etc

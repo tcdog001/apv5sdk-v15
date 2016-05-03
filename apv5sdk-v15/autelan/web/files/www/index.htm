@@ -1,0 +1,81 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% response_headers %>
+<%
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js login.js %>
+<STYLE type=text/css> 
+BODY,TD,INPUT{font-size:10pt} 
+.window { PADDING-RIGHT: 0px; PADDING-LEFT: 0px; VISIBILITY: ; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-TOP: 0px; POSITION: absolute;  }  
+</STYLE> 
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script type="text/javascript">
+var flag="<%= $xml_session_lang %>";
+init_index(flag);
+function validate()
+{
+	var flag="<%= $my_action_status %>";
+	if(flag=="Login Failed")
+	  alert("please input user or password correctly");
+	document.all.user.focus();
+}
+  
+function form0_submit()
+{ 
+  document.form0.action="lang.cgi";
+	document.form0.submit(); 
+}
+</script>
+</head>
+<body onload="validate()">
+<DIV class=window id="logon" style="LEFT:expression(Math.abs(Math.round((window.document.body.clientWidth - logon.offsetWidth)/2))); WIDTH: 420px;HEIGHT:298PX; TOP:100px" style="filter:progid:DXImageTransform.Microsoft.Gradient(GradientType=1, StartColorStr='#FF003399', EndColorStr='#FF6699CC');"> 
+
+<table   background="image/index.jpg" align="center" width="420" height="298" border="0" cellpadding="0" cellspacing="2">
+<form  name="form0" id="form0" action="lang.cgi" method="post" > 
+<tr  >
+<td height="73"   colspan="2"  align="center"></td>
+</tr>
+
+<tr  >
+<td height="24"   colspan="2"  align="right">
+	<select name="chalang" size="1" onChange="form0_submit()" >
+      <option <% webui_listbox_select "$xml_session_lang" "en" %> value="en">English</option>
+      <option <% webui_listbox_select "$xml_session_lang" "zh-ch" %> value="zh-ch">¼òÌåÖÐÎÄ</option>
+    </select>
+  &nbsp;&nbsp;&nbsp;<input type="hidden" value="lang" name="SERVLET">
+	</td>
+</tr>
+</form>
+<form  name="form1" id="form1" action="<%= $login_cgi %>" method="post" >
+<tr > 
+<td width="132" height="20"   align="right" ><font color="#3399CC"><b><script language="javascript">replace(index_user)</script>&nbsp;</b></font></td> 
+<td width="283" align="left" ><input type="text" name="user"  style="width:200px;height:20px;border:1px solid gray"></td> 
+</tr>
+ 
+<tr > 
+<td width="132" height="20"  align="right" ><font color="#3399CC"><b><script language="javascript">replace(index_pass)</script>&nbsp;</b></font></td> 
+<td width="283" align="left" ><input type="password" name="pass"  style="width:200px;height:20px;border:1px solid gray"></td> 
+</tr> 
+
+<tr> 
+<td height="44"  colspan="2" align="center">
+<script language="javascript">replace(index_login)</script>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<script language="javascript">replace(index_rest)</script>
+</td> 
+</tr>
+
+<tr  >
+<td height="57"   colspan="2"  align="center"></td>
+</tr>
+</form>
+</table> 
+  
+</DIV> 
+	
+</body>
+</html>

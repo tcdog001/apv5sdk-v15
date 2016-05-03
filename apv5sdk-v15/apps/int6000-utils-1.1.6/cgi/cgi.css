@@ -1,0 +1,32 @@
+body { background: white; font: normal 10pt monospace; }
+form { border: solid 1px black; margin: 2px; }
+button { border: none; margin: 0px; background: silver; width: 100px; }
+fieldset { border: solid 1px silver; }
+div { border: solid 1px silver; margin: 2px; }
+legend { font: bold 10pt sanserif; }
+table { font: normal 10pt monospace; }
+tr { vertical-align: top; }
+th, td { padding: 2px 5px; }
+td.lite { background: aqua; }
+td.dark { background: silver; }
+div.header { text-align: center; }
+div.action { min-height: 325px; }
+div.status { min-height: 325px; }
+div.footer { text-align: center; }
+h2.status { margin: 20px 20px; }
+img.header { border: none; align: center; margin: 5px; }
+img.footer { border: none; align: center; width: 100%; }
+input { border:none; background: beige; }
+input.qos { width: 150px; }
+input.vlan { width: 75px; }
+input.tos { width: 75px; }
+input.ttl { width: 75px; }
+input.pwd { width: 300px; padding: 2px 5px; font: normal 10pt monospace; }
+input.file { min-width: 600px; }
+input.option { background: silver; width: 100px; }
+input.action { background: silver; width: 100px; }
+input.device { background: silver; width: 100px; }
+input.source { background: silver; width: 100px; }
+select.source { font: normal 10pt monospace; }
+select.device { font: normal 10pt monospace; }
+input.peek { background: none; }

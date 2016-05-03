@@ -1,0 +1,55 @@
+#!/bin/sh
+
+PRO_CTL_UTIL=/usr/bin/pro_ctl_util
+usage()
+{
+        echo "setled sysled enable\disable\blink"
+        exit 1
+}
+if [ ! $# -eq 2 ];then
+        usage
+fi
+case $1 in
+  sysled) 
+	if [ "$2" == "enable" ];then
+    		$PRO_CTL_UTIL -b 14
+		$PRO_CTL_UTIL -d 13
+    	else if [ "$2" == "disable" ];then
+     	 	$PRO_CTL_UTIL -d 14
+    		$PRO_CTL_UTIL -d 13
+   	else if [ "$2" == "blink" ];then
+     	 	$PRO_CTL_UTIL -u 13	
+    	else 
+    		echo "wrong input" 		
+	fi
+	fi
+	fi
+        ;;
+  wifiled)
+	if [ "$2" == "enable" ];then   
+		$PRO_CTL_UTIL -b 3
+	else if [ "$2" == "disable" ];then
+		$PRO_CTL_UTIL -d 3
+	else if [ "$2" == "blink" ];then
+		$PRO_CTL_UTIL -u 3
+	else
+		echo "wrong input"	
+	fi
+	fi
+    	fi
+        ;;		
+  testled)
+	if [ "$2" == "enable" ];then
+		$PRO_CTL_UTIL -d 5
+	else if [ "$2" == "disable" ];then
+		$PRO_CTL_UTIL -b 5
+	else if [ "$2" == "blink" ];then
+		$PRO_CTL_UTIL -c
+	fi
+	fi
+	fi
+	;;
+  *)
+	echo "setled sysled enable\disable\blink"
+	;;
+esac        

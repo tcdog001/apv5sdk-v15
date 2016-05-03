@@ -1,0 +1,24 @@
+#set_crontab
+#set_crontab {target} {interval} [option]
+CRONTAB_PATH="/etc/crontabs"
+option=""
+
+case "$#" in
+	1) option="TARGET=\"$1\" "
+  	   ;;
+  	2) option="TARGET=\"$1\" INTERVAL=$2"
+  	   ;;
+  	3) option="TARGET=\"$1\" INTERVAL=$2 OPTION=\"$3\""
+  	   ;;
+        *) echo "please input correct parameter"
+           exit 0
+           ;;
+esac
+
+command="cat ${CRONTAB_PATH}/root | awk -f /usr/sbin/set_crontab.awk $option"
+
+eval $command > ${CRONTAB_PATH}/root.new
+mv ${CRONTAB_PATH}/root ${CRONTAB_PATH}/root.old
+mv ${CRONTAB_PATH}/root.new ${CRONTAB_PATH}/root
+killall crond
+/usr/sbin/crond -c /etc/crontabs/ 

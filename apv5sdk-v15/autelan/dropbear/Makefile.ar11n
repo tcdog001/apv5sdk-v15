@@ -1,0 +1,156 @@
+#PKG_INFO
+PKG_NAME:=dropbear
+PKG_VERSION:=0.50
+PKG_RELEASE:=2
+PKG_BUILD_DIR:=src
+
+#command rep
+CPDIR := cp -r
+CP := cp -fpR
+MKDIR := mkdir -p
+MV := mv
+STRIP = $(TARGET_CROSS)strip
+
+#configure option
+FPIC := -fPIC
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE), amcc)
+TARGET_CROSS ?= powerpc-apm-linux-gnu-
+else ifeq ($(BOARD_TYPE), armada370)
+TARGET_CROSS ?= arm-marvell-linux-gnueabi-
+else
+TARGET_CROSS ?= mips-linux-uclibc-
+endif
+#wangyu add end
+
+TARGET_CC ?= $(TARGET_CROSS)gcc
+TARGET_CFLAGS =
+EXTRA_CFLAGS =
+TARGET_CPPFLAGS = $(CAVIUM_CPPFLAGS)
+EXTRA_CFLAGS =
+TARGET_LDFLAGS = $(CAVIUM_LDFLAGS)
+EXTRA_CFLAGS =
+LDFLAGS = $(TARGET_LDFLAGS) $(EXTRA_LDFLAGS)
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE), amcc)
+GNU_TARGET_NAME ?= powerpc-apm-linux
+else ifeq ($(BOARD_TYPE), armada370)
+GNU_TARGET_NAME ?= arm-linux
+else
+GNU_TARGET_NAME ?= mips-linux
+endif
+#wangyu add end
+DISABLE_NLS ?= --disable-nls
+TARGET_CONFIGURE_OPTS ?= \
+  AR=$(TARGET_CROSS)ar \
+  AS="$(TARGET_CC) -c $(TARGET_CFLAGS)" \
+  LD=$(TARGET_CROSS)ld \
+  NM=$(TARGET_CROSS)nm \
+  CC="$(TARGET_CC)" \
+  GCC="$(TARGET_CC)" \
+  CXX=$(TARGET_CROSS)g++ \
+  RANLIB=$(TARGET_CROSS)ranlib \
+  STRIP=$(TARGET_CROSS)strip \
+  OBJCOPY=$(TARGET_CROSS)objcopy \
+  OBJDUMP=$(TARGET_CROSS)objdump \
+  SIZE=$(TARGET_CROSS)size
+
+CONFIGURE_VARS = \
+                $(TARGET_CONFIGURE_OPTS) \
+                CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CXXFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CPPFLAGS="$(TARGET_CPPFLAGS) $(EXTRA_CPPFLAGS)" \
+                LDFLAGS="$(TARGET_LDFLAGS) $(EXTRA_CPPFLAGS)" \
+
+CONFIGURE_ARGS = \
+                --target=$(GNU_TARGET_NAME) \
+                --host=$(GNU_TARGET_NAME) \
+                --build=$(GNU_HOST_NAME) \
+                --program-prefix="" \
+                --program-suffix="" \
+                --prefix=/usr \
+                --exec-prefix=/usr \
+                --bindir=/usr/bin \
+                --sbindir=/usr/sbin \
+                --libexecdir=/usr/lib \
+                --sysconfdir=/etc \
+                --datadir=/usr/share \
+                --localstatedir=/var \
+                --mandir=/usr/man \
+                --infodir=/usr/info \
+                $(DISABLE_NLS) \
+                ac_cv_func_malloc_0_nonnull=yes
+
+CONFIGURE_ARGS += \
+	--with-shared \
+	--disable-pam \
+	--enable-openpty \
+	--enable-syslog \
+	--disable-shadow \
+	--disable-lastlog \
+	--disable-utmp \
+	--disable-utmpx \
+	--disable-wtmp \
+	--disable-wtmpx \
+	--disable-loginfunc \
+	--disable-pututline \
+	--disable-pututxline \
+	--disable-zlib
+
+.PHONY: all
+all: configure compile install
+
+.PHONY: configure
+configure:
+	( cd $(PKG_BUILD_DIR) && \
+	  $(CONFIGURE_VARS) \
+	  ./configure \
+	  $(CONFIGURE_ARGS) \
+	);
+
+.PHONY: compile
+compile:
+	$(MAKE) -C $(PKG_BUILD_DIR) \
+		$(TARGET_CONFIGURE_OPTS) \
+		LD="$(TARGET_CC)" \
+		PROGRAMS="dropbear dbclient dropbearkey scp" \
+		MULTI=1 SCPPROGRESS=1
+
+.PHONY: install
+install:	
+	@echo "installing dropbear"
+	$(MKDIR) $(ROOTFSDIR)/jffs/dropbear
+	$(MKDIR) $(ROOTFSDIR)/usr/sbin
+	$(CP) $(PKG_BUILD_DIR)/dropbearmulti $(ROOTFSDIR)/usr/sbin/dropbear
+	$(MKDIR) $(ROOTFSDIR)/usr/bin
+	ln -sf ../sbin/dropbear $(ROOTFSDIR)/usr/bin/scp
+	ln -sf ../sbin/dropbear $(ROOTFSDIR)/usr/bin/ssh
+	ln -sf ../sbin/dropbear $(ROOTFSDIR)/usr/bin/dbclient
+	ln -sf ../sbin/dropbear $(ROOTFSDIR)/usr/bin/dropbearkey
+	$(MKDIR) $(ROOTFSDIR)/etc/config/
+	$(CP) ./files/dropbear.config $(ROOTFSDIR)/etc/config/dropbear
+	$(CP) ./files/shells $(ROOTFSDIR)/etc
+	$(MKDIR) $(ROOTFSDIR)/etc/init.d/
+	$(CP) ./files/dropbear.init $(ROOTFSDIR)/etc/init.d/dropbear 
+	$(MKDIR) $(ROOTFSDIR)/usr/lib/ipkg/info/ 
+	$(CP) ./files/dropbear.conffiles $(ROOTFSDIR)/usr/lib/ipkg/info
+#sundaolian add note,need to edit
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE),db12x)
+	$(CP) $(TOPDIR)/build/gcc-4.3.3/toolchain_build_mips/uClibc-0.9.30/lib/libutil.so.0 $(ROOTFSDIR)/usr/lib
+	$(CP) $(TOPDIR)/build/gcc-4.3.3/toolchain_build_mips/uClibc-0.9.30/lib/libutil.so   $(ROOTFSDIR)/usr/lib
+	$(CP) $(TOPDIR)/build/gcc-4.3.3/toolchain_build_mips/uClibc-0.9.30/lib/libutil-0.9.30.so $(ROOTFSDIR)/usr/lib
+else
+ifeq ($(BOARD_TYPE),amcc)
+#	$(CP) $(TOPDIR)/build/gcc-4.3.3/toolchain_build_mips/uClibc-0.9.30/lib/libutil.so.0 $(ROOTFSDIR)/usr/lib
+#	$(CP) $(TOPDIR)/build/gcc-4.3.3/toolchain_build_mips/uClibc-0.9.30/lib/libutil.so   $(ROOTFSDIR)/usr/lib
+#	$(CP) $(TOPDIR)/build/gcc-4.3.3/toolchain_build_mips/uClibc-0.9.30/lib/libutil-0.9.30.so $(ROOTFSDIR)/usr/lib
+else ifeq ($(BOARD_TYPE),armada370)
+	$(CP) $(TOPDIR)/build/armv7-marvell-linux-gnueabi-softfp/arm-marvell-linux-gnueabi/libc/lib/libutil.so.1 $(ROOTFSDIR)/usr/lib
+	$(CP) $(TOPDIR)/build/armv7-marvell-linux-gnueabi-softfp/arm-marvell-linux-gnueabi/libc/usr/lib/libutil.so   $(ROOTFSDIR)/usr/lib
+else
+	$(CP) $(ROOTFSDIR)/../../ar11nsdkv14/build/gcc-3.4.4-2.16.1/$(TOOLARCH)/lib/libutil.so.0 $(ROOTFSDIR)/usr/lib
+	$(CP) $(ROOTFSDIR)/../../ar11nsdkv14/build/gcc-3.4.4-2.16.1/$(TOOLARCH)/lib/libutil.so $(ROOTFSDIR)/usr/lib
+	$(CP) $(ROOTFSDIR)/../../ar11nsdkv14/build/gcc-3.4.4-2.16.1/$(TOOLARCH)/lib/libutil-0.9.28.so $(ROOTFSDIR)/usr/lib
+endif
+endif

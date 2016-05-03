@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			dehex.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='decstring.c.html' title=' decstring.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='devices.c.html' title=' devices.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   size_t dehex (char const buffer [], size_t length, void * memory, size_t extent);
+ *
+ *   memory.h
+ *
+ *.  Motley Tools by Charles Maier &lt;cmaier@cmassoc.net&gt;;
+ *:  Published 2001-2006 by Charles Maier Associates Limited;
+ *;  Released under the GNU General Public Licence v2 and later;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef DEHEX_SOURCE
+#define DEHEX_SOURCE
+
+#include &lt;stdint.h&gt;
+
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/types.h&quot;
+
+size_t dehex (char const buffer [], size_t length, void * memory, size_t extent) 
+
+{
+	register char * string = (char *)(buffer);
+	register byte * offset = (byte *)(memory);
+	length &gt;&gt;= 1;
+	while ((length--) &amp;&amp; (extent--)) 
+	{
+		*offset |= (todigit (*string++) &amp; 0x0F) &lt;&lt; 4;
+		*offset |= (todigit (*string++) &amp; 0x0F) &lt;&lt; 0;
+		offset++;
+	}
+	return (string - buffer);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='decstring.c.html' title=' decstring.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='devices.c.html' title=' devices.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

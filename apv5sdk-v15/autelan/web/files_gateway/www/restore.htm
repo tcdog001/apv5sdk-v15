@@ -1,0 +1,70 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+operate_status=$my_action_status
+my_action_status=""
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Restore</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<script type="text/javascript">
+function validate_restore()
+{
+	var flag="<%= $operate_status %>";
+	if(flag=="Reset Default Successful")
+	{
+	  alert("Reset Default Successful!Please wait 120 seconds for restart.");
+	  setTimeout("top.open('http://<%= $HTTP_HOST %>', '_top')", (120 * 1000));
+	}
+	else if(flag == "Reset Default Failed")
+	{
+		alert("Reset Default Failed");
+	}
+}
+</script>
+</head>
+
+<body bgcolor="#efefef" onload="validate_restore()">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+		  <td class="top1"><a href="management.htm" target="MainFrame">Status</a></td>
+          <td class="top1"><a href="upgrade.htm" target="MainFrame">Upgrade</a></td>
+          <td class="top1">Restore</td>
+		  <td class="top1"><a href="manage.htm" target="MainFrame">Password</a></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">System-->Restore Settings</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+	<form method="post" action="<%= $action_cgi %>" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="Restore Factory Defaults illustration">Restore Factory Defaults</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">Restore Factory Defaults</td>
+          <td class="td_style" width="350" align="center"><input id="but" type="submit" name="SERVLET" value="Reset Default" onclick="return confirm('Reset Default?if continue,Device will be restart to take effect!')" style="float:none;"/></td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+</table>
+</form>
+</div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+#!/bin/sh
+SWITCH_PATH=/proc/sys/net/ath0/transmit_switch
+RATE_PATH=/proc/sys/net/ath0/transmit_rate
+pknum=100
+pksz=1600
+
+while :
+do
+    echo "############################"
+    echo "# 1.Enable transmit switch #"
+    echo "# 2.Set transmit rate      #"
+    echo "# 3.Set packet number      #"
+    echo "# 4.Set packet size        #"
+    echo "# 5.Start sending          #"
+    echo "# 6.Quit                   #"
+    echo "############################"
+    
+    echo -n "please input your choice:"
+    read choice
+    case "$choice" in
+    1)
+        if [ -f $SWITCH_PATH ]; then
+            echo "Enable transmit switch"
+            echo 1 > $SWITCH_PATH
+        else
+            echo "transmit_switch doesn't exist!"
+        fi
+        ;;
+    2)
+        if [ -f $RATE_PATH ]; then
+            echo "Set transmit rate"
+            echo -n "please input transmit rate:"
+            read rate
+            echo $rate > $RATE_PATH
+        else
+            echo "transmit_rate doesn't exist!"
+        fi
+        ;;
+    3)
+        echo "Set packet number"
+        echo -n "please input packet number:"
+        read pknum
+        ;;
+    4)
+        echo "Set packet size"
+        echo -n "please input packet size:"
+        read pksz
+        ;;
+    5)
+        echo "Start sending"
+        packet $pknum $pksz ath0
+        ;;
+    6)
+        echo 0 > $SWITCH_PATH
+        exit
+        ;;
+    esac
+done

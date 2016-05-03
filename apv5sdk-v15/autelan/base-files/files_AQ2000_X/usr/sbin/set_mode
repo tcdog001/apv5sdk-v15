@@ -1,0 +1,171 @@
+#!/bin/sh
+
+IWPRIV=/usr/sbin/iwpriv
+IWCONFIG=/usr/sbin/iwconfig
+
+usage()
+{
+	echo "Usage:"
+	echo "	 set_mode {interface} {workmode} [extoffset] [cwmmode]"
+	echo "      	   workmode: 11a, 11b, 11g, 11bg, 11na, 11ng, 11ana, 11gng, 11bgng"
+	echo "      	   extoffset: -1/0/1  -1(down) 0(no) 1(up)"
+	echo "      	   cwmmode: 0/1/2  0(ht20) 1(ht20/40) 2(ht40)"
+
+}
+
+if [ ! $# -eq 2 ] && [ ! $# -eq 4 ];then
+	usage
+	exit 1
+fi
+
+
+INTERFACE=$1
+MODE=$2
+PURE="0"
+PARM_NUM=$#
+
+if [ ${PARM_NUM} -eq 4 ];then
+	CWMMODE=$4
+	EXT_OFFSET=$3
+fi
+
+get_many_parm()
+{
+        if [ $MODE = "11a" ];then 
+		MODE_VALUE="a"
+		WORK_MODE="11a"
+		CAP="0x80"
+		DEFAULT_RATE="0x15FF"
+		DEFAULT_MCS="0x00FFFFFF"
+		DEFAULT_MCS_CAP="0x00"
+        elif [ $MODE = "11g" ];then 
+		MODE_VALUE="g"
+		WORK_MODE="11g"
+		CAP="0x80"
+		DEFAULT_RATE="0x150FF0"
+		DEFAULT_MCS="0x00FFFFFF"
+		DEFAULT_MCS_CAP="0x00"
+		PURE="pureg"
+	elif [ $MODE = "11b" ];then 
+		MODE_VALUE="b"
+		WORK_MODE="11b"
+		CAP="0x80"
+		DEFAULT_RATE="0xFF"
+		DEFAULT_MCS="0x00FFFFFF"
+		DEFAULT_MCS_CAP="0x00"
+        elif [ $MODE = "11bg" ];then 
+		MODE_VALUE="g"
+		WORK_MODE="11g"
+		CAP="0x80"
+		DEFAULT_RATE="0x00FFFF"
+		DEFAULT_MCS="0x00FFFFFF"
+		DEFAULT_MCS_CAP="0x00"
+        elif [ $MODE = "11na" ];then 
+		MODE_VALUE="a"
+		WORK_MODE="11na"
+		CAP="0x80"
+		DEFAULT_RATE="0x15FF"
+		DEFAULT_MCS="0x00FFFFFF"
+		DEFAULT_MCS_CAP="0x80"
+		PURE="puren"
+        elif [ $MODE = "11ng" ];then 
+		MODE_VALUE="g"
+		WORK_MODE="11ng"
+		CAP="0x80"
+		DEFAULT_RATE="0x150FF0"
+		DEFAULT_MCS="0x00FFFFFF"
+		DEFAULT_MCS_CAP="0x80"
+		PURE="puren"
+        elif [ $MODE = "11ana" ];then 
+		MODE_VALUE="a"
+		WORK_MODE="11na"
+		CAP="0x80"
+		DEFAULT_RATE="0x15FF"
+		DEFAULT_MCS="0x00FFFFFF"
+		DEFAULT_MCS_CAP="0x80"
+        elif [ $MODE = "11gng" ];then 
+		MODE_VALUE="g"
+		WORK_MODE="11ng"
+		CAP="0x80"
+		DEFAULT_RATE="0x150FF0"
+		DEFAULT_MCS="0x00FFFFFF"
+		DEFAULT_MCS_CAP="0x80"
+        elif [ $MODE = "11bgng" ];then 
+		MODE_VALUE="g"
+		WORK_MODE="11ng"
+		CAP="0x80"
+		DEFAULT_RATE="0x00FFFF"
+		DEFAULT_MCS="0x00FFFFFF"
+		DEFAULT_MCS_CAP="0x80"
+	else
+		echo "no valid parm"
+		usage
+		exit 1
+        fi
+}
+
+get_work_mode()
+{
+	if [ ${PARM_NUM} -eq 4 ];then
+
+		case ${CWMMODE} in
+			0)
+				EXT_OFFSET=0
+				WORK_MODE="${WORK_MODE}ht20"	
+			;;
+			1|2)
+				if [ ${EXT_OFFSET} -eq -1 ];then
+					WORK_MODE="${WORK_MODE}ht40minus"
+				else
+					WORK_MODE="${WORK_MODE}ht40plus"
+				fi
+			;;
+			*)
+				echo "error: cwmmode error !"
+				usage
+				exit 1
+			;;
+		esac
+	else
+		echo "error: less parameter!"
+		usage
+		exit 1
+	fi
+}
+
+get_num()
+{
+	NUM=`echo ${INTERFACE} | awk -F '.' '{print $2}'`
+	NUM=`echo ${NUM} | awk -F '-' '{print $1}'`
+}
+
+get_many_parm
+if [ $MODE = 11na ] || [ $MODE = 11ng ] || [ $MODE = 11ana ] || [ $MODE = 11gng ] || [ $MODE = 11bgng ];then
+	get_work_mode
+fi
+get_num
+
+${IWCONFIG} ${INTERFACE} channel 0 
+${IWPRIV} ${INTERFACE} mode ${WORK_MODE}
+
+if [ ! $MODE = "11a" ] && [ ! $MODE = "11b" ];then
+	${IWPRIV} ${INTERFACE} pureg 0 
+	${IWPRIV} ${INTERFACE} puren 0 
+fi
+
+if [ ! $PURE = "0" ];then
+	${IWPRIV} ${INTERFACE} ${PURE} 1
+fi
+
+if [ ${PARM_NUM} -eq 4 ] && [ $4 -eq 2 ];then
+	${IWPRIV} ${INTERFACE} disablecoext 1
+fi
+
+${IWPRIV} wifi$NUM set_rate_cap ${CAP}
+${IWPRIV} wifi$NUM set_rate_mask_${MODE_VALUE} ${DEFAULT_RATE}
+${IWPRIV} wifi$NUM set_mcs_mask ${DEFAULT_MCS}
+${IWPRIV} wifi$NUM set_mcs_cap ${DEFAULT_MCS_CAP}
+
+#ifconfig ${INTERFACE} down
+#ifconfig ${INTERFACE} up
+

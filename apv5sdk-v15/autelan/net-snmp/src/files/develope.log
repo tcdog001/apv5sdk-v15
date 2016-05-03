@@ -1,0 +1,15 @@
+2008-04-10: heart beat OK
+2008-04-11: correct a cfg bug: cfg.arm: endianness=little
+2008-04-11: cfg.arm add "-O2"
+2008-04-11: cleaned up the folder of iwncomm
+2008-04-11: syslogd ok
+2008-04-11: sysName can midify now
+2008-04-11: syslogd OK
+
+
+2008-06-02: interfaces OK------all oid OK
+2008-06-03: out pkts of interfaces right
+
+2008-06-13: sysObjectID---define NETSNMP_SYS_OID etc.
+
+

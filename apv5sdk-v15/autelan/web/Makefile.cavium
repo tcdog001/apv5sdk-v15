@@ -1,0 +1,27 @@
+.NOTPARALLEL:
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR = files
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+
+unexport LDFLAGS
+
+.PHONY: all
+all: install 
+
+
+.PHONY: install
+install:
+	sudo cp -rf ${PKG_BUILD_DIR}/* ${ROOTFSDIR}/
+	sudo cp -rf ${PKG_BUILD_DIR}/www_cavium/* ${ROOTFSDIR}/www
+	sudo rm -rf ${ROOTFSDIR}/www_cavium
+	sudo rm -rf ${ROOTFSDIR}/www_cavium_ar11n
+	sudo mv ${ROOTFSDIR}/usr/lib/web/sysinit.sh_cavium ${ROOTFSDIR}/usr/lib/web/sysinit.sh
+	sudo mv ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium ${ROOTFSDIR}/usr/lib/web/constant.sh
+	sudo rm -rf ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium_ar11n
+	sudo rm -rf ${ROOTFSDIR}/www/image/xj-AP2400.jpg ${ROOTFSDIR}/www/image/xj-AP2600.jpg ${ROOTFSDIR}/www/image/xh.jpg

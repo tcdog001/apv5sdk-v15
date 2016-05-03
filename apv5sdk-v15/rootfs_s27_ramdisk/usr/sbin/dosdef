@@ -1,0 +1,49 @@
+#!/bin/sh /etc/rc.common
+IPTABLES=/usr/bin/iptables
+AUTELAN=/usr/sbin/autelan
+NF_SET=/usr/sbin/NF_SET
+DETECT_DOS=/usr/sbin/detect_dos
+KILLALL=/usr/bin/killall
+wlan_name=ath0
+default_limit=80
+default_limit_burst=80
+default_traffic_limit=64
+
+if [ ! -z $1 ];then
+	wlan_name="$1"
+fi
+
+if [ ! -z $2 ];then
+	default_limit="$2"
+fi
+
+if [ ! -z $3 ];then
+	default_limit_burst="$3"
+fi
+
+if [ ! -z $4 ];then
+	default_traffic_limit="$4"
+fi
+
+start()
+{
+	$NF_SET enable
+	$IPTABLES -N SYN_FLOOD 2>/dev/null 
+	$IPTABLES -A INPUT -p tcp --syn -j SYN_FLOOD 2>/dev/null
+	$IPTABLES -A SYN_FLOOD -m limit --limit $default_limit/sec --limit-burst $default_limit_burst -j RETURN 2>/dev/null
+	$IPTABLES -A SYN_FLOOD -j LOG --log-prefix "SYN_FLOOD_DETECTED:" --log-level 4 2>/dev/null
+	$IPTABLES -A SYN_FLOOD -j DROP 2>/dev/null
+	$AUTELAN traffic_limit $wlan_name set_vap_flag 1
+	$AUTELAN traffic_limit $wlan_name set_vap $default_traffic_limit
+	$DETECT_DOS ${wlan_name} & 
+}
+
+stop()
+{
+	$NF_SET disable
+	$KILLALL detect_dos 2>/dev/null
+	$AUTELAN traffic_limit $wlan_name set_vap_flag 0 
+	$IPTABLES -D INPUT -p tcp --syn -j SYN_FLOOD 2>/dev/null
+	$IPTABLES -F SYN_FLOOD 2>/dev/null
+	$IPTABLES -X SYN_FLOOD 2>/dev/null
+}

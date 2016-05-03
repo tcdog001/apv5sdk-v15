@@ -1,0 +1,47 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: In function 'up_led_blink':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:253: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: In function 'down_led_blink':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:261: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: In function 'down_ap2400_led_blink':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:387: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: In function 'up_ap2400_led_blink':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:410: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: In function 'down_xj_pb44_led_blink':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:429: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: In function 'up_xj_pb44_led_blink':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:436: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: In function 'set_ap83_gpio_irq':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:691: warning: passing argument 2 of 'request_irq' from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:691: warning: ISO C90 forbids mixed declarations and code
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: At top level:
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:719: warning: function declaration isn't a prototype
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: In function 'get_sys_frequency':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:720: warning: unused variable 'usec'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: In function 'watchdog_notify_alive':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:766: warning: ISO C90 forbids mixed declarations and code
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:766: warning: unused variable 'reg'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: At top level:
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:785: warning: return type defaults to 'int'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: In function 'ax_soft_i2c_start':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:834: warning: no return statement in function returning non-void
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: At top level:
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:1032: warning: function declaration isn't a prototype
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: In function 'wrcpu_dog_timer_init':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:1033: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: At top level:
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:1039: warning: function declaration isn't a prototype
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: In function 'wrcpu_ioctl':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:1074: warning: format '%08x' expects type 'unsigned int', but argument 2 has type 'long unsigned int'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:1074: warning: format '%08x' expects type 'unsigned int', but argument 3 has type 'long unsigned int'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:1078: warning: format '%08x' expects type 'unsigned int', but argument 2 has type 'long unsigned int'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:1078: warning: format '%08x' expects type 'unsigned int', but argument 3 has type 'long unsigned int'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:1052: warning: unused variable 'reg'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:1049: warning: unused variable 'i'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: In function 'wrcpu_init':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:1471: warning: ISO C90 forbids mixed declarations and code
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:1472: warning: initialization makes pointer from integer without a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c: At top level:
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.h:163: warning: 'base_address64' defined but not used
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/ar9350.h:1030: warning: 'ar7100_gpio_intr_enable' defined but not used
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:146: warning: 'ar7100_watchdog_timer_value' defined but not used
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/pro_ctl_mod/src/pro_ctl_mod_ap83.c:444: warning: 'ap2400_button_reset' defined but not used

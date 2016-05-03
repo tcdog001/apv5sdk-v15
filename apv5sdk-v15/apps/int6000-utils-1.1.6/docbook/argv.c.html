@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			argv.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='anynic.c.html' title=' anynic.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='arpc.c.html' title=' arpc.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   argv.c - display argument vector;
+ *
+ *   this program is a simple debugging tool that displays the argument
+ *   vector argv[] on stdout for inspection.
+ *
+ *   use it to see how your host system processes command line arguments;
+ *
+ *.  published 2003 by charles maier associates limited for internal use;
+ *:  modified sun 07 sep 03 by user root on host zeus;
+ *;  compiled for debian gnu/linux using gcc compiler;
+ *
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+
+int main (int argc, const char * argv []) 
+
+{
+	const char ** strp;
+	for (strp = argv; *strp; strp++) 
+	{
+		printf (&quot; argv[%d] = [%s]\n&quot;, strp - argv, * strp);
+	}
+	printf (&quot; argv[%d] = NULL\n&quot;, strp - argv);
+	return (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='anynic.c.html' title=' anynic.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='arpc.c.html' title=' arpc.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

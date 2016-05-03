@@ -1,0 +1,49 @@
+# file: make.def
+
+# ====================================================================
+# Edimax Hardware;
+# --------------------------------------------------------------------
+
+PLATFORM=-D_ADM5120_
+MODEL=-D_6104KP_
+ENDIAN=-D_LITTLE_ENDIAN_
+GATEWAY=y
+
+# ====================================================================
+# AMiLDA Software; uncomment these lines when cross-compiling;
+# --------------------------------------------------------------------
+
+# CROSS=/export/tools/mipsel-linux-uclibc/bin/mipsel-uclibc-
+CROSS=mips-linux-uclibc-
+# CROSS_LINUX=/export/tools/bin/mipsel-linux-
+
+# ====================================================================
+# toolchain;
+# --------------------------------------------------------------------
+
+CC=$(CROSS)gcc
+STRIP=$(CROSS)strip
+#STRIP=
+LD=$(CROSS)ld
+AR=$(CROSS)ar
+RANLIB=$(CROSS)ranlib
+CAS=$(CROSS)gcc -c
+CPP=$(CROSS)gcc -E
+
+# ====================================================================
+# folders;
+# --------------------------------------------------------------------
+
+#BIN=/usr/local/bin
+BIN=$(INSTALL_ROOT)/sbin
+#MAN=/usr/share/man/man7
+#WWW=/home/www
+#DOC=/home/www/software/int6000-utils/
+
+# ====================================================================
+# permissions;
+# --------------------------------------------------------------------
+
+OWNER=0
+GROUP=0
+

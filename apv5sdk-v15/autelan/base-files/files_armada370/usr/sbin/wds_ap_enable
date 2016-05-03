@@ -1,0 +1,34 @@
+#!/bin/sh
+WLANCONFIG=/usr/sbin/wlanconfig
+IWPRIV=/usr/sbin/iwpriv
+IWCONFIG=/usr/sbin/iwconfig
+IFCONFIG=/sbin/ifconfig
+BRCTL=/usr/sbin/brctl
+#
+#usage()
+#
+usage()
+{
+	echo "Usage:"
+	echo "wds_ap_build  <interface> <essid> <channel>"
+}
+
+if [ ! $# -eq 3 ];then
+	usage
+	exit 1
+fi
+
+INTERFACE=$1
+ESSID=$2
+CHANNEL=$3
+
+echo 0 > /proc/sys/net/capwap/wds_tunnel
+${BRCTL} addif default eth0
+${WLANCONFIG} ${INTERFACE} create wlandev wifi1 wlanmode ap 
+${BRCTL} addif default  ${INTERFACE} 
+${IWCONFIG} ${INTERFACE} channel ${CHANNEL}
+${IWCONFIG} ${INTERFACE} txpower 20
+${IWCONFIG} ${INTERFACE} essid ${ESSID}
+${IWPRIV} ${INTERFACE} wds 1
+${IWPRIV} ${INTERFACE} vap_wds 1
+${IFCONFIG} ${INTERFACE} up

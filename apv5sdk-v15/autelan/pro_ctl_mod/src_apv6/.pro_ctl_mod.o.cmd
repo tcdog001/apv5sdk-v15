@@ -1,0 +1,1 @@
+cmd_/home/blackdragon/chenxuefeng/apv6_pc018work_5002/apv6sdk/autelan/pro_ctl_mod/src_apv6/pro_ctl_mod.o := powerpc-apm-linux-gnu-ld -m elf32ppc    -r -o /home/blackdragon/chenxuefeng/apv6_pc018work_5002/apv6sdk/autelan/pro_ctl_mod/src_apv6/pro_ctl_mod.o /home/blackdragon/chenxuefeng/apv6_pc018work_5002/apv6sdk/autelan/pro_ctl_mod/src_apv6/pro_ctl_mod_ap83.o 

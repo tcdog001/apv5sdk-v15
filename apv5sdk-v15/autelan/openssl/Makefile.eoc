@@ -1,0 +1,117 @@
+OCTEON_ROOT := ../../OCTEON-SDK 
+ROOTFSDIR :=
+#file name and path declare
+PKG := openssl 
+VERSION := 1.4.2
+PKG_NAME := $(PKG)
+#PKG_BUILD_DIR := $(PKG_NAME)
+PKG_BUILD_DIR := src
+
+CAVIUM_CPPFLAGS ?= -I$(OCTEON_ROOT)/tools/mips64-octeon-linux-gnu/sys-root/usr/include
+CAVIUM_LDFLAGS ?= -L$(OCTEON_ROOT)/tools/mips64-octeon-linux-gnu/sys-root/usr/lib64
+PKG_INSTALL_DIR := $(shell pwd)/$(PKG_BUILD_DIR)/ipkg-install/$(PKG)
+
+#command replace
+CPDIR := sudo cp -r 
+CP := sudo cp -fpR
+MKDIR := mkdir -p
+MV := sudo mv
+
+
+#configure option
+FPIC := -fPIC
+TARGET_CROSS ?= mips64-octeon-linux-gnu-
+TARGET_CC ?= $(TARGET_CROSS)gcc
+TARGET_CFLAGS = -g -O2   
+EXTRA_CFLAGS = 
+TARGET_CPPFLAGS = $(CAVIUM_CPPFLAGS) 
+EXTRA_CPPFLAGS = 
+TARGET_LDFLAGS = $(CAVIUM_LDFLAGS)
+EXTRA_LDFLAGS = 
+GNU_TARGET_NAME ?= mips-linux
+TARGET_CONFIGURE_OPTS ?= \
+  AR=$(TARGET_CROSS)ar \
+  AS="$(TARGET_CC) -c $(TARGET_CFLAGS)" \
+  LD=$(TARGET_CROSS)ld \
+  NM=$(TARGET_CROSS)nm \
+  CC="$(TARGET_CC)" \
+  GCC="$(TARGET_CC)" \
+  CXX=$(TARGET_CROSS)g++ \
+  RANLIB=$(TARGET_CROSS)ranlib \
+  STRIP=$(TARGET_CROSS)strip \
+  OBJCOPY=$(TARGET_CROSS)objcopy \
+  OBJDUMP=$(TARGET_CROSS)objdump \
+  SIZE=$(TARGET_CROSS)size
+
+CONFIGURE_VARS = \
+                $(TARGET_CONFIGURE_OPTS) \
+                CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CXXFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CPPFLAGS="$(TARGET_CPPFLAGS) $(EXTRA_CPPFLAGS)" \
+                LDFLAGS="$(TARGET_LDFLAGS) $(EXTRA_LDFLAGS)" \
+			
+CONFIGURE_ARGS = \
+                --target=$(GNU_TARGET_NAME) \
+                --host=$(GNU_TARGET_NAME) \
+                --build=$(GNU_HOST_NAME) \
+                --program-prefix="" \
+                --program-suffix="" \
+                --prefix=/usr \
+                --exec-prefix=/usr \
+                --bindir=/usr/bin \
+                --sbindir=/usr/sbin \
+                --libexecdir=/usr/lib \
+                --sysconfdir=/etc \
+                --datadir=/usr/share \
+                --localstatedir=/var \
+                --mandir=/usr/man \
+                --infodir=/usr/info \
+                $(DISABLE_NLS) \
+		ac_cv_func_malloc_0_nonnull=yes 
+
+MAKE_FLAGS = \
+		$(TARGET_CONFIGURE_OPTS) \
+		CROSS="$(TARGET_CROSS)" \
+		ARCH="$(ARCH)"
+MAKE_VARS = \
+		CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+		CPPFLAGS="$(TARGET_CPPFALGS) $(EXTRA_CPPFLAGS)" \
+ 		CXXFLAGS="$(TARGET_CFALGS) $(EXTAR_CFLAGS)" \
+		LDFLAGS="$(TARGET_LDFLAGS) $(EXTRA_LDFLAGS)"
+
+TARGET_CFLAGS += -g -O2 $(FPIC)
+EXTRA_CFLAGS +=  
+
+.PHONY: all
+all: compile install 
+
+.PHONY: configure
+configure:
+	( cd $(PKG_BUILD_DIR) && \
+ 	  $(CONFIGURE_VARS) \
+  	  ./configure \
+	  shared \
+	  linux-octeon64 \
+  	  $(CONFIGURE_ARGS) \
+	); 
+
+.PHONY: compile
+compile:
+	touch $(PKG_BUILD_DIR)/Makefile
+	$(CP) ./files.cavium/opensslconf.h src/crypto/opensslconf.h	
+	$(MAKE) -C $(PKG_BUILD_DIR) RANLIB=${RANLIB} PRODUCT=CAV 
+
+.PHNOY: install
+install:
+	@echo "installing openssl lib"
+	${STRIP} $(PKG_BUILD_DIR)/libcrypto.so*
+	${STRIP} $(PKG_BUILD_DIR)/libssl.so*
+	sudo cp -rv $(PKG_BUILD_DIR)/libcrypto.so* $(ROOTFSDIR)/usr/lib64/	
+	sudo cp -rv $(PKG_BUILD_DIR)/libssl.so* $(ROOTFSDIR)/usr/lib64/	
+	mkdir -p $(PKG_BUILD_DIR)/lib
+	cp $(PKG_BUILD_DIR)/lib*.so*  $(PKG_BUILD_DIR)/lib
+	cp ./files.cavium/opensslconf.h src/include/openssl/opensslconf.h
+
+.PHONY: clean
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) clean

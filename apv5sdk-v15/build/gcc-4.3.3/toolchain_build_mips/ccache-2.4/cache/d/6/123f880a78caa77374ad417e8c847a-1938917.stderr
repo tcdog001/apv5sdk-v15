@@ -1,0 +1,4 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_xmit.c: In function 'IPADDR_PRASE':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_xmit.c:152: warning: format '%x' expects type 'unsigned int', but argument 2 has type 'struct iphdr *'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_xmit.c:152: warning: format '%x' expects type 'unsigned int', but argument 3 has type 'struct ieee80211_node *'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_xmit.c:113: warning: unused variable 'i'

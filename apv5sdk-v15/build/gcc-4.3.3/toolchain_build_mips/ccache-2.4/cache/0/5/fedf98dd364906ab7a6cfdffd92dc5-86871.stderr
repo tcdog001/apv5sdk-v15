@@ -1,0 +1,2 @@
+autelan-lib/src/partool/partool.c: In function 'part_line_read':
+autelan-lib/src/partool/partool.c:632: warning: unused variable 'size'

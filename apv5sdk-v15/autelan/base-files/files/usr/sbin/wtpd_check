@@ -1,0 +1,48 @@
+#!/bin/sh
+
+IFCONFIG=/sbin/ifconfig
+ROUTE=/sbin/route
+SYSREBOOT=/sbin/sysreboot
+CONNECT_FLAG=/tmp/connect_state
+CONNECT_IP=/jffs/last_connect_ip
+CONNECT_GW=/jffs/last_connect_gw
+CONFIG_XML=/jffs/config.xml
+
+. /usr/lib/web/xmlconf.sh
+
+interval_min=5
+if [ $# -eq 1 ];then
+	interval_min=$1
+	test ${interval_min} -gt 0 || exit 1
+fi
+
+interval_sec=$((interval_min*60))
+
+sleep  ${interval_sec}
+if [ -f "${CONNECT_FLAG}" ];then
+	exit 0
+fi
+
+xml_lan=`config_read /config/network/lan`                             
+xml_proto=`config_getoption "$xml_lan" proto`
+
+if [ "${xml_proto}" == "dhcp" ];then
+	if [ -f ${CONNECT_IP} ];then
+		ap_addr=`cat ${CONNECT_IP}`
+		${IFCONFIG} default ${ap_addr}
+		killall udhcpc
+		if [ -f ${CONNECT_GW} ];then
+			ap_gateway=`cat ${CONNECT_GW}`
+			${ROUTE} add default gw ${ap_gateway}
+		fi
+	fi
+fi
+
+sleep ${interval_sec}
+if [ -f "${CONNECT_FLAG}" ];then
+	exit 0
+fi
+
+rm -rf ${CONNECT_IP}
+rm -rf ${CONNECT_GW}
+/usr/sbin/ac-lose

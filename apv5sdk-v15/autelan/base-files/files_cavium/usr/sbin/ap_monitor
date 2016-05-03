@@ -1,0 +1,133 @@
+#!/bin/sh
+RESET_FLAG=0
+
+INTERVAL=15
+BUF_ERR_FLAG=/proc/sys/dev/wifi0/no_txbuf
+REBOOT=/sbin/sysreboot
+
+THINAP=`cat /proc/sys/dev/wifi0/thinap`
+
+WATCHSTATE=/proc/sys/dev/wifi0/thinap_state
+WATCHDOG=/proc/sys/dev/wifi0/thinap_check_timer
+
+if [ $# -eq 1  ];then
+	INTERVAL=${1}
+fi
+
+check_info=""
+
+#mem_check
+MEM_MAX_COUNT=2
+MEM_CHECK_FLAG=0
+mem_check()
+{
+	local mem_exc=`free | awk '/Mem/{ mr=$3/$2  }END{ if ( mr > 0.9) {print 1} else {print 0}  }'`
+	if [ ${mem_exc} -eq 1  ];then
+		MEM_CHECK_FLAG=$((${MEM_CHECK_FLAG}+1))
+	fi
+	if [ ${MEM_CHECK_FLAG} -gt ${MEM_MAX_COUNT}  ];then
+		check_info="memory check error"
+		RESET_FLAG=1
+	fi
+}
+
+#radio_check
+radio_check()
+{
+	local RADIO_FLAG=0
+	if [ -f ${BUF_ERR_FLAG}  ];then
+		RADIO_FLAG=`cat ${BUF_ERR_FLAG}`
+		if [ ! 0${RADIO_FLAG} -eq 0 ];then
+			RESET_FLAG=1
+		fi
+	fi
+}
+
+#proc_check
+proc_check()
+{
+	local proc_count=`ps | awk '/wtpd/{if($5=="wtpd"){print}}' | wc -l`
+	local wtpd_restart_count=0
+	if [ -f /jffs/wrt ];then
+		wtpd_restart_count="`cat /jffs/wrt`"
+	fi
+	if [  0${proc_count} -lt 1  ];then
+		check_info="proc check error: ${proc_count}"
+		
+		if [ ! -d /jffs/last_log ];then
+			mkdir -p /jffs/last_log
+		fi
+		cat /tmp/wtpd.log | tail -100 > /jffs/last_log/wtpd_log
+		cp /tmp/echo_time /jffs/last_log/
+		if [ -f /tmp/cpu_ratio ];then
+			cp /tmp/cpu_ratio /jffs/last_log/
+		fi
+		if [ -f /proc/net/capwap_record ];then
+			cp /proc/net/capwap_record /jffs/last_log/
+		fi
+		touch /jffs/apmon_log
+		linenu=`cat /jffs/apmon_log | wc -l`
+		if [ ${linenu} -gt 50 ];then
+			echo "reset apmon_log!" > /jffs/apmon_log
+		fi
+		date >> /jffs/apmon_log
+		echo "wtpd hot reboot at this time!" >> /jffs/apmon_log
+		
+		wtpd -V >/dev/null 2>&1 &
+		echo $((wtpd_restart_count+1)) > /jffs/wrt
+#		RESET_FLAG=1
+	fi
+}
+
+#stat_check()
+stat_check()
+{
+	local stat_d_count=`ps | awk '{if($3=="DW"){print }}' | wc -l`
+	if [ 0${stat_d_count} -gt 0 ];then
+		check_info="proc stat check error:${stat_d_count}"
+		RESET_FLAG=1
+	fi
+}
+
+#fat_check()
+fat_check()
+{
+	mem_check
+#	stat_check
+#	radio_check
+}
+
+#thin_check()
+thin_check()
+{
+	mem_check
+#	stat_check
+#	radio_check
+	proc_check
+}
+
+if [ -f /proc/sys/dev/wifi0/monitor_process ];then
+	echo $$ > /proc/sys/dev/wifi0/monitor_process
+fi
+
+if [ ${THINAP} -eq 0 ];then
+	echo 1 > ${WATCHSTATE}
+fi
+
+while :
+do
+	if [ ${THINAP} -eq 1  ];then
+	    thin_check
+	else
+		fat_check
+		echo 0 > ${WATCHDOG}
+	fi
+	if [ ${RESET_FLAG} -eq 1  ];then
+		touch /jffs/apmon_log
+		date >> /jffs/apmon_log
+		echo "${check_info}" >> /jffs/apmon_log
+		echo o > /proc/kes_debug_flag
+		${REBOOT}
+	fi
+	sleep ${INTERVAL}
+done

@@ -1,0 +1,98 @@
+#!/bin/sh
+#
+#board management
+#
+
+cd /lib/modules/2.6.15/net/
+insmod pro_ctl_mod.ko;
+#create device information file
+#HV=`wrcpuutil -i | awk -F ":" '/product sn/{print $2}' | awk 'BEGIN{FS=""}{print $10"."$11$12}'`
+#device_info $DEVICE_MODEL $HV
+DEVICE_MODEL="`/usr/bin/pro_ctl_util -i | awk -F ":" '/product type/{print $2}'`"
+echo "$DEVICE_MODEL"
+/usr/bin/pro_ctl_util -i | awk -F ":" '/company name/{print $2}' | grep -q 'Autelan'
+if [ $? -eq 0 ];then
+   device_info $DEVICE_MODEL
+else
+   device_info_xj $DEVICE_MODEL
+fi
+
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+config_country_code=`config_read /config/network/country`
+country_code=`config_getoption "$config_country_code" region`
+  PCI_POLICY=""
+if [ "${country_code}" == "Asia" ];then
+	PCI_POLICY="countrycode=156"
+fi
+if [ -f /jffs/.mac-policy ];then
+	PCI_POLICY="${PCI_POLICY} new_dispatch_mac=2"
+else
+	PCI_POLICY="${PCI_POLICY} new_dispatch_mac=1"
+fi
+#
+# drivers
+#
+cd /lib/modules/2.6.15/net/
+insmod ag7240_mod.ko
+insmod ath_hal.ko;
+insmod wlan.ko;
+#insmod ath_dfs.ko;
+insmod ath_rate_atheros.ko;
+insmod ath_dev.ko ${PCI_POLICY} 
+#insmod ath_ahb.ko;
+insmod ath_pci.ko;
+insmod ath_pktlog.ko;
+insmod wlan_acl.ko;
+insmod wlan_ccmp.ko;
+insmod wlan_scan_ap.ko;
+insmod wlan_scan_sta.ko;
+insmod wlan_tkip.ko;
+insmod wlan_wep.ko;
+insmod wlan_xauth.ko;
+insmod wlan_sms4.ko;
+insmod capwap_split_fast.ko;
+
+# loopback
+#
+ifconfig lo 127.0.0.1
+
+#set mac
+mac_base="`/usr/sbin/showsysinfo | awk -F ":" '/MAC/{print $2$3$4$5$6$7}'`"
+#set eth mac
+		mac_org_formed=`set_mac org ${mac_base} `
+    ifconfig eth0 hw ether $mac_org_formed
+    ifconfig eth0 up		
+#    ifconfig eth1 hw ether $mac_org_formed
+#    ifconfig eth1 up
+#    ifconfig eth0 down
+
+
+
+#set wifi mac
+
+		mac_org_formed=`set_mac upper ${mac_base} `
+		ifconfig wifi0 down
+		ifconfig wifi0 hw ether ${mac_org_formed}
+brctl addbr default
+brctl setfd default 1
+#brctl addif default eth1
+brctl addif default eth0
+ifconfig default 0.0.0.0 up
+
+#init app
+showsysinfo | grep Software > /tmp/issue
+showsysinfo | grep MAC >> /tmp/issue
+showsysinfo | grep SN >> /tmp/issue
+/usr/sbin/telnetd -f /tmp/issue
+if [ ! -f /jffs/apinfo.conf ];then
+	cp -f /etc/wlan/apinfo.conf /jffs
+fi
+/usr/bin/pro_ctl_util -i | awk -F ":" '/product type/{print $2}' | grep -q '0500'
+if [ $? -eq 0 ];then
+   echo 4 >/proc/sys/dev/wifi0/xjap93_txpower_offset
+else
+   echo 0 >/proc/sys/dev/wifi0/xjap93_txpower_offset
+fi
+iwpriv wifi0 txchainmask 1
+iwpriv wifi0 rxchainmask 1

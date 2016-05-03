@@ -1,0 +1,39 @@
+#!/bin/sh
+usage()
+{
+	echo "Usage: create_interface root/client"
+}
+if [ $# -ne 1 ] ;then
+        usage
+        exit 1
+fi
+echo 0 > /proc/sys/dev/wifi0/thinap
+case $1 in
+  root)
+	stop_monitor
+	killall wtpd
+	wlanconfig ath0 destroy
+	wlanconfig ath0 create wlandev wifi0 wlanmode ap
+	iwpriv ath0 mode 11nght40minus
+	iwconfig ath0 channel 10
+	ifconfig default 192.168.100.100
+	;;
+  client)
+	stop_monitor
+	killall wtpd
+	wlanconfig ath0 destroy
+	wlanconfig ath0 create wlandev wifi0 wlanmode sta
+	iwpriv ath0 mode 11nght40minus
+	ifconfig default 192.168.100.200
+	;;
+  *)
+	usage
+	exit 1
+	;;
+esac
+iwpriv ath0 cwmmode 1
+iwpriv ath0 extoffset -1
+iwpriv ath0 wds 1
+iwconfig ath0 essid woc
+brctl addif default ath0
+ifconfig ath0 up

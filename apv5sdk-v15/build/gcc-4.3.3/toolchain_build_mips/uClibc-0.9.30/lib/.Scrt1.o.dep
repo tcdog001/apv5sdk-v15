@@ -1,0 +1,24 @@
+lib/Scrt1.o: libc/sysdeps/linux/mips/crt1.S include/libc-symbols.h \
+  include/bits/uClibc_arch_features.h include/sys/regdef.h \
+  include/sys/asm.h include/sgidefs.h include/features.h \
+  include/bits/uClibc_config.h include/libc-internal.h \
+  include/sys/cdefs.h
+
+include/libc-symbols.h:
+
+include/bits/uClibc_arch_features.h:
+
+include/sys/regdef.h:
+
+include/sys/asm.h:
+
+include/sgidefs.h:
+
+include/features.h:
+
+include/bits/uClibc_config.h:
+
+include/libc-internal.h:
+
+include/sys/cdefs.h:
+cmd_lib_Scrt1.o := /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/bin/mips-linux-uclibc-gcc -c libc/sysdeps/linux/mips/crt1.S -o lib/Scrt1.o -include include/libc-symbols.h -Wall -Wstrict-prototypes -fno-strict-aliasing -march=mips32r2 -mtune=mips32r2 -mabi=32 -fno-stack-protector -fno-builtin -nostdinc -Iinclude -I. -Ilibc/sysdeps/linux/mips -fno-asm -msoft-float -DUCLIBC_INTERNAL -Os -funit-at-a-time -fno-tree-loop-optimize -fno-tree-dominator-opts -fno-strength-reduce -mno-split-addresses -Ilibpthread/linuxthreads.old/sysdeps/unix/sysv/linux/mips -Ilibpthread/linuxthreads.old/sysdeps/mips -Ilibpthread/linuxthreads.old/sysdeps/unix/sysv/linux -Ilibpthread/linuxthreads.old/sysdeps/pthread -Ilibpthread/linuxthreads.old -Ilibpthread -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/ -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3//include-fixed -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include -DNDEBUG "-mno-split-addresses" -MT lib/Scrt1.o -MD -MP -MF lib/.Scrt1.o.dep -D__ASSEMBLER__ -Wa,--noexecstack -DL_Scrt1

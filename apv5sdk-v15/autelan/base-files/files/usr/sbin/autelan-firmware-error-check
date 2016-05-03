@@ -1,0 +1,71 @@
+#!/bin/sh
+touch 4
+# Max kernel size 1MB, rootfs 6.125MB
+MAX_KERNEL_SIZE=1048576
+MAX_ROOTFS_SIZE=6422528
+
+if [ -z $1 ] || [ ! -f $1 ]; then
+	logger -s "$0 <firmware-file>"
+	exit 1
+fi
+
+cd /tmp
+
+if  ! tar tf $1 vmlinux.bin.l7 > /dev/null 2>&1 || 	   \
+    ! tar tf $1 rootfs.squashfs > /dev/null 2>&1 ||	\
+    ! tar tf $1 kernel.md5 > /dev/null 2>&1 ||	\
+    ! tar tf $1 root_fs.md5 > /dev/null 2>&1; then
+	logger -s "Invalid firmware file"
+	rm -f $1
+	exit 2
+fi
+touch 5
+KERN_FILESIZE=`tar tvf $1 vmlinux.bin.l7 | awk '{print $3}'`
+ROOT_FILESIZE=`tar tvf $1 rootfs.squashfs  | awk '{print $3}'`
+
+logger -s "firmware upgrade: KERN_FILESIZE is $KERN_FILESIZE ROOT_FILESIZE is $ROOT_FILESIZE" 
+
+if [ $KERN_FILESIZE -gt  $MAX_KERNEL_SIZE ] || [ $ROOT_FILESIZE -gt $MAX_ROOTFS_SIZE ];
+then
+	logger -s "File size is greater than flash size"
+	rm -f $1
+	exit 4
+fi
+
+#
+# Check md5 sum of kernel and rootfs
+# ALPHA3 & below firmware did not had md5sum support
+#
+tar xf $1 kernel.md5 root_fs.md5
+#
+#new add for change md5 file type
+#
+#cat kernel.md5|sed 's/ -/*vmlinux.bin.l7/g' > aa
+#mv aa kernel.md5
+#cat root_fs.md5|sed 's/ -/*rootfs.squashfs/g' > bb
+#mv bb root_fs.md5
+#
+#end
+#
+touch 6
+tar xOf $1 vmlinux.bin.l7 | md5sum -c kernel.md5
+if [ $? -ne 0 ]; then
+  touch ERROR_KERNEL_MD5SUM
+	logger -s "ERROR: invalid md5sum of vmlinux.bin.l7"
+	cat kernel.md5 | logger -s
+	rm -f $1 kernel.md5 root_fs.md5 
+	exit 1
+fi
+touch 7
+echo kernel md5 check ok!!!
+tar xOf $1 rootfs.squashfs | md5sum -c root_fs.md5
+if [ $? -ne 0 ]; then
+  touch ERROR_FS_MD5SUM
+	logger -s "ERROR: invalid md5sum of rootfs.squashfs"
+	cat root_fs.md5 | logger -s
+	rm -f $1 kernel.md5 root_fs.md5 
+	exit 1
+fi
+
+echo root md5 check ok!!!
+rm -f kernel.md5 root_fs.md5 

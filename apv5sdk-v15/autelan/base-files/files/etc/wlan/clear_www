@@ -1,0 +1,9 @@
+#!/bin/sh
+cp /www/action.cgi /www/panel_action_status.htm /www/reboot.htm /www/util.js /www/index.htm /www/login.cgi /www/lang.cgi /www/page_title.htm /www/page_header.htm /www/page_footer.htm /www/extend.htm /www/shell_command.htm /www/shell.cgi /www/Css/
+rm /www/*
+#rm /www/js -rf
+cp /www/Css/* /www
+rm /www/Css/*
+cp /www/style.css /www/Css/
+rm /www/style.css -rf
+

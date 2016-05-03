@@ -1,0 +1,5 @@
+In file included from iostat.c:39:
+iostat.h:112: warning: 'packed' attribute ignored for field of type 'char[72]'
+iostat.h:122: warning: 'packed' attribute ignored for field of type 'char[72]'
+iostat.c: In function 'write_stat':
+iostat.c:961: warning: pointer targets in passing argument 1 of 'strftime' differ in signedness

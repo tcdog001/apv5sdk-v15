@@ -1,0 +1,232 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			Upgrade2.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='UpdateDevice.c.html' title=' UpdateDevice.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='UpgradeDevice.c.html' title=' UpgradeDevice.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   signed Upgrade2 (struct int6k *int6k);
+ *   
+ *   int6k2.h
+ *
+ *   Write MAC Firmware and PIB images to device using 
+ *   ihpapi_InitializeDevice, and as many ihpapi_TxFrame and 
+ *   ihpapi_RxFrames as needed.
+ *   
+ *   read the int6k-&gt;NVM and int6k-&gt;PIB files into buffers;
+ *
+ *   See the HomePlugAV Firmware Technical Reference Manual for more 
+ *   information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Alex Vasquez &lt;alex.vasquez@intellon.com&gt;
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef UPGRADE2_SOURCE
+#define UPGRADE2_SOURCE
+
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../ihpapi/ihpapi.h&quot;
+#include &quot;../int6k/int6k.h&quot; 
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../nvm/nvm.h&quot; 
+#include &quot;../pib/pib.h&quot;
+
+signed Upgrade2 (struct int6k *int6k) 
+
+{
+	uint32_t fwlen;
+	uint32_t piblen;
+	uint8_t *fwbuffer;
+	uint8_t *pibbuffer;
+	if (_anyset (int6k-&gt;flags, INT6K_HOST_ACTION)) 
+	{
+		int6k-&gt;hostaction = IHPAPI_HAR_INITIALIZE_DEVICE;
+		HostActionWait2 (int6k);
+		int6k-&gt;hostaction = (uint8_t)(-1);
+	}
+
+/*
+ *      get and validate the MAC and PIB lengths;
+ */
+
+	fwlen = lseek (int6k-&gt;NVM.file, 0, SEEK_END);
+	if (fwlen &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;%s failed to calculate MAC file length&quot;, int6k-&gt;NVM.name);
+		return (-1);
+	}
+	piblen = lseek (int6k-&gt;PIB.file, 0, SEEK_END);
+	if (piblen &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;%s failed to calculate PIB file length&quot;, int6k-&gt;NVM.name);
+		return (-1);
+	}
+	Request (int6k, &quot;Writing MAC and PIB to Device&quot;);
+
+/*
+ *      validate then rewind NVM file before starting;
+ */
+
+	if (lseek (int6k-&gt;NVM.file, 0, SEEK_SET)) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;can't rewind %s&quot;, int6k-&gt;NVM.name);
+		return (-1);
+	}
+	fwbuffer = (uint8_t *)malloc (fwlen);
+	if (fwbuffer == 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;failed get MAC memory buffers&quot;);
+		return (-1);
+	}
+	if (read (int6k-&gt;NVM.file, fwbuffer, fwlen) != fwlen) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;%s failed to read MAC file&quot;, int6k-&gt;NVM.name);
+		free (fwbuffer);
+		return (-1);
+	}
+
+/*
+ *      validate then rewind PIB file before starting;
+ */
+
+	if (lseek (int6k-&gt;PIB.file, 0, SEEK_SET)) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;can't rewind %s&quot;, int6k-&gt;PIB.name);
+		return (-1);
+	}
+	pibbuffer = (uint8_t *)malloc (piblen);
+	if (pibbuffer == 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;failed get PIB memory buffers&quot;);
+		free (fwbuffer);
+		return (-1);
+	}
+	if (read (int6k-&gt;PIB.file, pibbuffer, piblen) != piblen) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;%s failed to read PIB file&quot;, int6k-&gt;PIB.name);
+		free (fwbuffer);
+		free (pibbuffer);
+		return (-1);
+	}
+
+#if INT6K_SAFEMODE
+
+/*
+ *      prevent attempts to write one MAC or PIB image file to multiple devices 
+ *  when the caller specifies the LMA as the ODA; the operation makes
+ *      no sense;
+ */
+
+	if (!memcmp (int6k-&gt;LMA, int6k-&gt;header.ethernet.ODA, sizeof (int6k-&gt;LMA))) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;can't multi-write MAC images&quot;);
+		free (fwbuffer);
+		free (pibbuffer);
+		return (-1);
+	}
+
+#endif
+
+	memset (int6k-&gt;message, 0, sizeof (struct message));
+	if (ihpapi_InitializeDevice (int6k-&gt;channel-&gt;host, int6k-&gt;channel-&gt;peer, fwlen, fwbuffer, piblen, pibbuffer, int6k-&gt;options) == -1) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;initialization error&quot;);
+		free (fwbuffer);
+		free (pibbuffer);
+		return (-1);
+	}
+	do 
+	{
+
+/*
+ *      format request message;
+ */
+
+		int6k-&gt;packetsize = (int)(ihpapi_TxFrame (sizeof (struct message), (uint8_t *)(int6k-&gt;message)));
+		if (int6k-&gt;packetsize != 0) 
+		{
+			if (SendMME (int6k) &lt;= 0) 
+			{
+				error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+				free (fwbuffer);
+				free (pibbuffer);
+				return (-1);
+			}
+		}
+		if (ReadMME2 (int6k) == -1) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+			free (fwbuffer);
+			free (pibbuffer);
+			return (-1);
+		}
+		if (int6k-&gt;result-&gt;opStatus.status) 
+		{
+			Failure (int6k, INT6K_WONTDOIT);
+			free (fwbuffer);
+			free (pibbuffer);
+			return (-1);
+		}
+	}
+	while (int6k-&gt;result-&gt;opCompltCode != IHPAPI_OPCMPLTCODE_COMPLETE);
+	Confirm (int6k, &quot;Done.&quot;);
+	free (fwbuffer);
+	free (pibbuffer);
+	return (0);
+}
+
+/*====================================================================*
+ *
+ *--------------------------------------------------------------------*/
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='UpdateDevice.c.html' title=' UpdateDevice.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='UpgradeDevice.c.html' title=' UpgradeDevice.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,47 @@
+.TH mrgpib 7 "Intellon Corporation" "int6000-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+mrgpib - Intellon PIB Merge Utility 
+.SH SYNOPSIS
+.BR mrgpib 
+.RB [ options ] 
+.IR target 
+.IR source
+.SH DESCRIPTION
+\fB(DO NOT USE THIS PROGRAM TO MERGE PIBS 4-0 OR LOWER WITH PIBS 4-1 OR HIGHER.)\fR
+.PP
+Copy information from one PIB file to another while preseving PIB version, length and checksum. The program automatically adjusts for differences in PIB version and length so don't worry. Be happy!
+.PP
+This program is part of the Intellon Linux Toolkit. See the \fBilt\fR man page for an overview and installation instructions.
+.SH OPTIONS
+.TP
+.RB - q
+Suppress progress messages. Does nothing for this application.
+.TP
+.RB - v
+Print additional information. Does nothing for this application.
+.TP
+.RB - ? ,-- help
+Print program help summary on stdout. This option takes precedence over other options on the command line. 
+.TP
+.RB - ! ,-- version
+Print program version information on stdout. This option takes precedence over other options on the command line. Usethis option when sending screen dumps to Intellon Technical Support so that they know exactly which version of the Linux Toolkit you are using.
+.SH ARGUMENTS
+.TP
+.IR target
+The target PIB file. Information in this file will be replaced with corresponding information in the source file. If the source file is longer that this file then excess information is not copied; otherwise, all source file information is copied. No assumptions are made based on filename and no filename conventions are enforced.
+.TP
+.IR source
+The source PIB file. Information in this file will replace corresponding information in the target file. If the target file is longer that this file, all information will be copied; otherwise, excess information is not copied. No assumptions are made based on filename and no filename conventions are enforced.
+.SH EXAMPLES
+The following example copies information from file \fBold.pib\fR to file \fBnew.pib\fR.
+.PP
+   # mrgpib new.pib old.pib
+.SH DISCLAIMER
+PIB file structure and content is proprietary to Intellon Corporation, Ocala FL USA. Consequently, public information is not available. Intellon Corporation reserves the right to modify PIB file structure or content in future firmware releases without any obligation to notify or compensate users of this program.
+.SH SEE ALSO
+.BR chkpib ( 7 ),
+.BR modpib ( 7 ),
+.BR pxe ( 7 ),
+.BR setpib ( 7 )
+.SH CREDITS
+ Charles Maier <charles.maier@intellon.com>

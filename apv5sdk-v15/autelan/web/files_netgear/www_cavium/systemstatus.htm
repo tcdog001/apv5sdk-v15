@@ -1,0 +1,86 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_firmware=`firmware_read`
+xml_platform=`firmware_getoption platform`
+xml_device_type=`firmware_getoption type`
+xml_device_hversion=`firmware_getoption hversion`
+xml_device_sversion=`firmware_getoption sversion`
+xml_device_serialno=`firmware_getoption serialno`
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js status_info.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	init_mmenu(flag);
+	init_stamenu(flag);
+	init_syssta(flag);
+</script>
+</head>
+<body>
+<%in page_header.htm %>
+<%in menu_status.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="login.cgi">
+<div align="center">
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+							<tr>
+							<td colspan="2" align="left" width="100%"  height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(syssta_system)</script></b></td>
+							</tr>
+              
+              <tr>
+							<td colspan="2" height="10">
+							</td>
+							</tr>
+              
+              <tr>
+              <td width="200" bordercolor="#ffffff"></td><td width="450"   bordercolor="#ffffff"><pre><% /usr/sbin/showsysinfo %></pre></td>
+              </tr>
+              
+              <tr>
+							<td colspan="2" height="10">
+							</td>
+							</tr>							
+</table>
+<table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+			<tr>
+								<td colspan="2" height="20">
+								</td>
+			</tr>
+			
+</table>
+</div>
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

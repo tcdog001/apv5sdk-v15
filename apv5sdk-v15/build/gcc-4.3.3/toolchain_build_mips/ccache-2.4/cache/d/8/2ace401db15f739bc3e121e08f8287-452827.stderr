@@ -1,0 +1,4 @@
+WTPRunState.c: In function 'CWGetWlanStations':
+WTPRunState.c:778: warning: 'return' with a value, in function returning void
+WTPRunState.c: In function 'CWSaveConfigurationUpdateRequest':
+WTPRunState.c:4315: warning: implicit declaration of function 'CWSetWifiScanAndPosParam'

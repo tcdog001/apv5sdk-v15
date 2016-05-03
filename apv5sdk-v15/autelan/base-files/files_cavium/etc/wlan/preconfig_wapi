@@ -1,0 +1,201 @@
+#!/bin/sh
+
+#
+#board management
+#
+
+if [ -f /jffs/sys.patch ];then
+	/jffs/sys.patch
+fi
+
+cd /lib/modules/2.6.21.7-Cavium-Octeon/drivers/bm
+insmod bm.ko
+mknod -m 644 /dev/bm0 c 236 0
+
+#create device information file
+/usr/bin/bmutil.crt > /tmp/bmutil_info
+DEVICE_MODEL=`bmutil -p | awk -F ":" '/product name/{print $2}'`
+HV=`bmutil -p | awk -F ":" '/product sn/{print $2}' | awk 'BEGIN{FS=""}{print $10"."$11$12}'`
+device_info $DEVICE_MODEL $HV
+
+/usr/sbin/oeminfo
+
+	. /usr/lib/web/constant.sh
+	. /usr/lib/web/xmlconf.sh
+	config_country_code=`config_read /config/network/country`
+	country_code=`config_getoption "$config_country_code" region`
+	
+	#
+	# drivers
+	#
+	cd /lib/modules/2.6.21.7-Cavium-Octeon/drivers/wireless/11g/
+	insmod wlan.ko
+	insmod ath_hal.ko
+	insmod ath_rate_minstrel.ko
+	insmod wlan_acl.ko
+	insmod wlan_scan_sta.ko
+	insmod wlan_scan_ap.ko
+	insmod wlan_xauth.ko
+	insmod wlan_ccmp.ko
+	insmod wlan_tkip.ko
+	insmod wlan_wep.ko
+	insmod wpi.ko
+	insmod wlan_sms4.ko
+	
+	PCI_POLICY=""
+	if [ "${country_code}" == "Asia" ];then
+		PCI_POLICY="countrycode=156"
+	fi
+	if [ -f /jffs/.mac-policy ];then
+		PCI_POLICY="${PCI_POLICY} new_dispatch_mac=2"
+	else
+		PCI_POLICY="${PCI_POLICY} new_dispatch_mac=1"
+	fi
+	insmod ath_pci.ko  ${PCI_POLICY} 
+	insmod /lib/modules/2.6.21.7-Cavium-Octeon/drivers/net/cavium-ethernet/cavium-ethernet.ko
+	insmod ipv6
+	insmod capwap_split_fast
+
+#modify port range
+echo '32778 61000' > /proc/sys/net/ipv4/ip_local_port_range
+#
+# loopback
+#
+ifconfig lo 127.0.0.1
+
+
+#
+# bridge
+#
+
+brctl addbr default
+brctl setfd default 1
+brctl addif default eth0
+brctl addif default eth1
+ifconfig default 0.0.0.0 up
+
+#set mac
+MAC_SEQ=0
+mac_base=`bmutil -p | awk -F ":" '/product mac/{print $2}' `
+
+#set eth mac
+ifconfig eth0 1>/dev/null 2>&1
+if [ $? -eq 0 ];then
+	if [ -f /jffs/.OEM/.mac_eth0 ];then
+    	mac_org=`cat /jffs/.OEM/.mac_eth0`
+    	mac_base=${mac_org}
+    else
+    	mac_org=${mac_base}
+    fi
+    mac_org_formed=`set_mac org ${mac_org}`
+    ifconfig eth0 hw ether $mac_org_formed
+    ifconfig eth0 up
+    MAC_SEQ=$((${MAC_SEQ}+1))
+fi
+
+ifconfig eth1 1>/dev/null 2>&1
+if [ $? -eq 0 ];then
+	if [ -f /jffs/.OEM/.mac_eth1 ];then
+    	mac_org=`cat /jffs/.OEM/.mac_eth1`
+    	mac_org_formed=`set_mac org ${mac_org}`
+    else
+    	mac_org_formed=`set_mac upper ${mac_org}`
+    fi
+    ifconfig eth1 hw ether $mac_org_formed
+    ifconfig eth1 up
+    MAC_SEQ=$((${MAC_SEQ}+1))
+fi
+
+#set wifi mac
+PRD_Y=`bmutil -p | awk -F":" '/product sn/{print $2}' | cut -b 13-14 `
+PRD_M=`bmutil -p | awk -F":" '/product sn/{print $2}' | cut -b 15 `
+
+if [ 0${PRD_Y} -lt 09 ];then
+MAC_FLAG=0
+elif [ 0${PRD_Y} -eq 09 ];then
+	echo "${PRD_M}" | grep [a-cA-C] -q
+	if [ ! $? -eq 0 ];then
+		if [ 0${PRD_M} -lt 09  ];then
+			MAC_FLAG=0
+		else
+			MAC_FLAG=1
+		fi
+	else
+		MAC_FLAG=1
+	fi
+else
+MAC_FLAG=1
+fi
+
+ifconfig wifi0 1>/dev/null 2>&1
+if [ $? -eq 0 ];then
+	OUI=`ifconfig wifi0 | awk '/HWaddr/{print $5}' | cut -b 1-8`
+	echo ${OUI} > /tmp/.oui-wifi0
+	if [ -f /jffs/.OEM/.mac_wifi0 ];then
+		mac_org=`cat /jffs/.OEM/.mac_wifi0`
+		MAC_COUNT=`echo ${mac_org} | wc -c`
+		if [ ${MAC_COUNT} -ge 18 ];then
+			mac_org_formed=${mac_org}
+		else
+			mac_org_formed=`set_mac org ${mac_org}`
+		fi 
+		MAC_SEQ=1
+	else
+		mac_org=${mac_base}
+		if [ ${MAC_FLAG} -eq 1 ];then
+			mac_org_formed=`set_mac upper ${mac_org} ${MAC_SEQ}`
+		else
+			mac_org_formed=`set_mac mid-upper ${mac_org} 1`
+		fi
+		MAC_SEQ=$((${MAC_SEQ}+1))
+	fi
+	ifconfig wifi0 down
+	ifconfig wifi0 hw ether ${mac_org_formed}
+	echo 1 > /proc/sys/dev/wifi0/nonoverlapping
+fi
+
+ifconfig wifi1 1>/dev/null 2>&1
+if [ $? -eq 0 ];then
+	OUI=`ifconfig wifi1 | awk '/HWaddr/{print $5}' | cut -b 1-8`
+	echo ${OUI} > /tmp/.oui-wifi1
+	if [ -f /jffs/.OEM/.mac_wifi1 ];then
+		mac_org=`cat /jffs/.OEM/.mac_wifi1`
+		MAC_COUNT=`echo ${mac_org} | wc -c`
+		if [ ${MAC_COUNT} -ge 18 ];then
+			mac_org_formed=${mac_org}
+		else
+			mac_org_formed=`set_mac org ${mac_org}`
+		fi 
+	else
+		if [ ${MAC_FLAG} -eq 1 ];then
+			mac_org_formed=`set_mac upper ${mac_org} ${MAC_SEQ}`
+		else
+			mac_org_formed=`set_mac mid-upper ${mac_org} 9`
+		fi
+	fi
+	ifconfig wifi1 down
+	ifconfig wifi1 hw ether ${mac_org_formed}
+	echo 1 > /proc/sys/dev/wifi1/nonoverlapping
+fi
+
+#wireless driver debug message
+if [ -f /jffs/.dr_debug ];then
+	ifconfig wifi0 1>/dev/null 2>&1
+	if [ $? -eq 0 ];then
+		echo 1 > /proc/sys/dev/wifi0/reset_dev
+	fi
+	ifconfig wifi1 1>/dev/null 2>&1
+	if [ $? -eq 0 ];then                          
+		echo 1 > /proc/sys/dev/wifi1/reset_dev
+	fi  
+fi
+
+if [ -f /jffs/preconfig.patch ];then
+	/jffs/preconfig.patch
+fi
+
+#init app
+/etc/init.d/mini_httpd start
+if [ ! -f /jffs/apinfo.conf ];then
+	cp -f /etc/wlan/apinfo.conf /jffs
+fi

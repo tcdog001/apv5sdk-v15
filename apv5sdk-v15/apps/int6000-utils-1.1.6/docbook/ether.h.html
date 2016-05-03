@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			ether.h
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='error.h.html' title=' error.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='ethernet.h.html' title=' ethernet.h '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   ether.h - Ethernet definitions and declarations;
+ *
+ *   include or exclude various ethernet related definitions based 
+ *   platform and environment;
+ *
+ *.  Intellon Linux Toolkit; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef ETHER_HEADER
+#define ETHER_HEADER
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdint.h&gt;
+#if defined (__linux__)
+#	include &lt;net/if.h&gt;
+#	include &lt;net/ethernet.h&gt;
+#	include &lt;arpa/inet.h&gt;
+#elif defined (__APPLE__)
+#	include &lt;sys/types.h&gt;
+#	include &lt;sys/socket.h&gt;
+#	include &lt;net/if.h&gt;
+#	include &lt;net/ethernet.h&gt;
+#	include &lt;arpa/inet.h&gt;
+#	include &lt;net/bpf.h&gt;
+#elif defined (__OpenBSD__)
+#	include &lt;fcntl.h&gt;
+#	include &lt;sys/types.h&gt;
+#	include &lt;sys/socket.h&gt;
+#	include &lt;net/if.h&gt;
+#	include &lt;netinet/in.h&gt;
+#	include &lt;netinet/if_ether.h&gt;
+#	include &lt;net/bpf.h&gt;
+#elif defined (WINPCAP)
+#	include &lt;pcap.h&gt;
+#	include &lt;pcap/Packet32.h&gt;
+#	include &lt;pcap/Ntddndis.h&gt;
+#	include &lt;net/ethernet.h&gt;
+#	include &lt;net/if.h&gt;
+#else
+#error &quot;Unknown environment&quot;
+#endif
+
+#ifndef ETH_CRC_LEN
+#define ETH_CRC_LEN 4 /* normally defined in ethernet.h or if_ether.h */
+#endif
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/types.h&quot;
+
+/*====================================================================*
+ *   sort out the raw socket mess;
+ *--------------------------------------------------------------------*/
+
+#if defined (__linux__)
+#ifdef WINPCAP
+#	error &quot;Don't enable winpcap on Linux. It won't work.&quot;
+#	endif
+#ifdef LIBPCAP
+#	error &quot;Don't enable libpcap on Linux. You don't need it.&quot;
+#	endif
+#elif defined (__APPLE__) 
+#ifdef WINPCAP
+#	error &quot;Don't enable winpcap on OSX. It won't work.&quot;
+#	endif
+#ifdef LIBPCAP
+#	error &quot;Don't enable libpcap on OSX. You don't need it.&quot;
+#	endif
+#elif defined (__OpenBSD__) 
+#ifdef WINPCAP
+#	error &quot;Don't enable winpcap on OpenBSD. It won't work.&quot;
+#	endif
+#ifdef LIBPCAP
+#	error &quot;Don't enable libpcap on OpenBSD. You don't need it.&quot;
+#	endif
+#elif defined (WINPCAP)
+#ifndef WINPCAP
+#	error &quot;Define preprocessor constant WINPCAP on Windows.&quot;
+#	endif
+#ifdef LIBPCAP
+#	error &quot;Don't enable libpcap on Windows. It won't work.&quot;
+#	endif
+#else
+#	error &quot;Unknown Environment&quot;
+#endif
+
+/*====================================================================*
+ *   variables;
+ *--------------------------------------------------------------------*/
+
+struct nic 
+
+{
+	char name [IF_NAMESIZE];
+	char text [255];
+	byte ethernet [ETHER_ADDR_LEN];
+	byte internet [4];
+}
+
+NIC;
+
+/*====================================================================*
+ *   functions;
+ *--------------------------------------------------------------------*/
+
+char * getifname (signed number);
+signed gethwaddr (void * memory, char const * device);
+signed anynic (char buffer [], size_t length);
+unsigned hostnics (struct nic list [], size_t size);
+
+/*====================================================================*
+ *
+ *--------------------------------------------------------------------*/
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='error.h.html' title=' error.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='ethernet.h.html' title=' ethernet.h '>NEXT</a>]
+			</div>
+		</body>
+	</html>

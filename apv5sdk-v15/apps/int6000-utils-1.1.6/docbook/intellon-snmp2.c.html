@@ -1,0 +1,1468 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			intellon-snmp2.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='intellon-snmp.c.html' title=' intellon-snmp.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='intellon.c.html' title=' intellon.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   intellon-snmp2.c
+ *   
+ *   Implement the IHPAV-OPERATIONS MIB.
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Nathan Houghton &lt;nathan.houghton@intellon.com&gt;
+ *      Help also from mib2c.
+ *
+ *--------------------------------------------------------------------*/
+
+#include &lt;net-snmp/net-snmp-config.h&gt;
+#include &lt;net-snmp/net-snmp-includes.h&gt;
+#include &lt;net-snmp/agent/net-snmp-agent-includes.h&gt;
+
+#include &quot;../ihpapi/ihp.h&quot;
+#include &quot;../ihpapi/ihpapi.h&quot;
+
+#include &quot;../snmp2/intellon-snmp2.h&quot;
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/memory.h&quot;
+
+struct operationsTable_entry *operationsTable_head;
+extern struct int6k int6k;
+static int dev_count;
+void init_intellon (void) 
+
+{
+	init_deviceCount ();
+	init_table_operationsTable ();
+}
+
+void init_deviceCount (void) 
+
+{
+	static oid dev_count_oid [] = 
+	{
+		1,
+		3,
+		6,
+		1,
+		4,
+		1,
+		32019,
+		1,
+		1,
+		1,
+		1,
+		0 
+	};
+	netsnmp_register_int_instance (&quot;deviceCount&quot;, dev_count_oid, OID_LENGTH (dev_count_oid), &amp;dev_count, NULL);
+}
+
+void init_table_operationsTable (void) 
+
+{
+	static oid operationsTable_oid [] = 
+	{
+		1,
+		3,
+		6,
+		1,
+		4,
+		1,
+		32019,
+		1,
+		1,
+		1,
+		2 
+	};
+	size_t operationsTable_oid_len = OID_LENGTH (operationsTable_oid);
+	netsnmp_handler_registration *reg;
+	netsnmp_iterator_info *iinfo;
+	netsnmp_table_registration_info *table_info;
+	reg = netsnmp_create_handler_registration (&quot;operationsTable&quot;, operationsTable_handler, operationsTable_oid, operationsTable_oid_len, HANDLER_CAN_RWRITE);
+	table_info = SNMP_MALLOC_TYPEDEF (netsnmp_table_registration_info);
+
+/* index: deviceIndex */
+
+	netsnmp_table_helper_add_indexes (table_info, ASN_INTEGER, 0);
+	table_info-&gt;min_column = COLUMN_DEVICEMACADDRESS;
+	table_info-&gt;max_column = COLUMN_DEVICERECEIVEDFECBADCOUNT;
+	iinfo = SNMP_MALLOC_TYPEDEF (netsnmp_iterator_info);
+	iinfo-&gt;get_first_data_point = operationsTable_get_first_data_point;
+	iinfo-&gt;get_next_data_point = operationsTable_get_next_data_point;
+	iinfo-&gt;table_reginfo = table_info;
+	netsnmp_register_table_iterator (reg, iinfo);
+}
+
+/* create a new row in the (unsorted) table */
+
+struct operationsTable_entry * operationsTable_createEntry (long deviceIndex, struct device *d) 
+
+{
+	struct operationsTable_entry *entry;
+	entry = SNMP_MALLOC_TYPEDEF (struct operationsTable_entry);
+	if (!entry) return NULL;
+	memcpy (entry-&gt;deviceMacAddress, d-&gt;mac, strlen (d-&gt;mac) + 1);
+	entry-&gt;deviceMacAddress_len = strlen (entry-&gt;deviceMacAddress);
+	memcpy (entry-&gt;deviceID, d-&gt;id, strlen (d-&gt;id) + 1);
+	entry-&gt;deviceID_len = strlen (entry-&gt;deviceID);
+	memcpy (entry-&gt;deviceFirmwareRevision, d-&gt;version, strlen (d-&gt;version) + 1);
+	entry-&gt;deviceFirmwareRevision_len = strlen (entry-&gt;deviceFirmwareRevision);
+	entry-&gt;deviceIndex = deviceIndex;
+	entry-&gt;next = operationsTable_head;
+	operationsTable_head = entry;
+	++dev_count;
+	return entry;
+}
+
+/* remove a row from the table */
+
+void operationsTable_remove (struct operationsTable_entry *entry) 
+
+{
+	struct operationsTable_entry *ptr,
+	*prev;
+	if (!entry) return;
+
+/* Nothing to remove */
+
+	for (ptr = operationsTable_head, prev = NULL; ptr != NULL; prev = ptr, ptr = ptr-&gt;next) 
+	{
+		if (ptr == entry) break;
+	}
+	if (!ptr) return;
+
+/* Can't find it */
+
+	if (prev == NULL) operationsTable_head = ptr-&gt;next;
+	else prev-&gt;next = ptr-&gt;next;
+	SNMP_FREE (entry);
+	--dev_count;
+}
+
+netsnmp_variable_list * operationsTable_get_first_data_point (void **my_loop_context, void **my_data_context, netsnmp_variable_list *put_index_data, netsnmp_iterator_info *mydata) 
+
+{
+	*my_loop_context = operationsTable_head;
+	return operationsTable_get_next_data_point (my_loop_context, my_data_context, put_index_data, mydata);
+}
+
+netsnmp_variable_list * operationsTable_get_next_data_point (void **my_loop_context, void **my_data_context, netsnmp_variable_list *put_index_data, netsnmp_iterator_info *mydata) 
+
+{
+	struct operationsTable_entry *entry = (struct operationsTable_entry *)*my_loop_context;
+	netsnmp_variable_list *idx = put_index_data;
+	if (entry) 
+	{
+		snmp_set_var_typed_integer (idx, ASN_INTEGER, entry-&gt;deviceIndex);
+		idx = idx-&gt;next_variable;
+		*my_data_context = (void *)entry;
+		*my_loop_context = (void *)entry-&gt;next;
+		return put_index_data;
+	}
+	else 
+	{
+		return NULL;
+	}
+}
+
+/* handles requests for the operationsTable table */
+
+int operationsTable_handler (netsnmp_mib_handler *handler, netsnmp_handler_registration *reginfo, netsnmp_agent_request_info *reqinfo, netsnmp_request_info *requests) 
+
+{
+	netsnmp_request_info *request;
+	netsnmp_table_request_info *table_info;
+	struct operationsTable_entry *table_entry;
+	int ret;
+	switch (reqinfo-&gt;mode) 
+	{
+
+/*
+ * Read-support (also covers GetNext requests)
+ */
+
+	case MODE_GET:
+		for (request=requests; request; request=request-&gt;next) 
+		{
+			table_entry = (struct operationsTable_entry *) netsnmp_extract_iterator_context (request);
+			table_info = netsnmp_extract_table_info (request);
+			switch (table_info-&gt;colnum) 
+			{
+			case COLUMN_DEVICEMACADDRESS:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_value (request-&gt;requestvb, ASN_OCTET_STR, (u_char*)table_entry-&gt;deviceMacAddress, table_entry-&gt;deviceMacAddress_len);
+				break;
+			case COLUMN_DEVICEID:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_value (request-&gt;requestvb, ASN_OCTET_STR, (u_char*)table_entry-&gt;deviceID, table_entry-&gt;deviceID_len);
+				break;
+			case COLUMN_DEVICEFIRMWAREREVISION:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_value (request-&gt;requestvb, ASN_OCTET_STR, (u_char*)table_entry-&gt;deviceFirmwareRevision, table_entry-&gt;deviceFirmwareRevision_len);
+				break;
+			case COLUMN_DEVICERESET:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;deviceReset);
+				break;
+			case COLUMN_DEVICEINITIALIZE:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;deviceInitialize);
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAGSENABLE:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityVLANTagsEnable);
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG0:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityVLANTag0);
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG1:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityVLANTag1);
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG2:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityVLANTag2);
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG3:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityVLANTag3);
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG4:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityVLANTag4);
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG5:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityVLANTag5);
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG6:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityVLANTag6);
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG7:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityVLANTag7);
+				break;
+			case COLUMN_DEVICEPRIORITYTRAFFICCLASSENABLE:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTrafficClassEnable);
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITSENABLE:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTOSBitsEnable);
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS0:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTOSBits0);
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS1:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTOSBits1);
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS2:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTOSBits2);
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS3:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTOSBits3);
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS4:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTOSBits4);
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS5:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTOSBits5);
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS6:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTOSBits6);
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS7:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTOSBits7);
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP0:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTTLCap0);
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP1:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTTLCap1);
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP2:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTTLCap2);
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP3:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityTTLCap3);
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTIGMP:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityDefaultIGMP);
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTUNICAST:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityDefaultUnicast);
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTIGMPMANAGEDMULTICAST:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityDefaultIGMPManagedMulticast);
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTMULTICASTBROADCAST:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityDefaultMulticastBroadcast);
+				break;
+			case COLUMN_DEVICEPRIORITYDSCPENABLE:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;devicePriorityDSCPEnable);
+				break;
+			case COLUMN_DEVICENMK:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_value (request-&gt;requestvb, ASN_OCTET_STR, (u_char*)table_entry-&gt;deviceNMK, table_entry-&gt;deviceNMK_len);
+				break;
+			case COLUMN_DEVICERESETTOFACTORYDEFAULT:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;deviceResettoFactoryDefault);
+				break;
+			case COLUMN_DEVICEHFID:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_value (request-&gt;requestvb, ASN_OCTET_STR, (u_char*)table_entry-&gt;deviceHFID, table_entry-&gt;deviceHFID_len);
+				break;
+			case COLUMN_DEVICEMDUENABLE:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;deviceMDUEnable);
+				break;
+			case COLUMN_DEVICEMDUROLE:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;deviceMDURole);
+				break;
+			case COLUMN_DEVICEAVNETWORKCCOSELECTION:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;deviceAVNetworkCCoSelection);
+				break;
+			case COLUMN_DEVICEFIRMWAREUPGRADE:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_INTEGER, table_entry-&gt;deviceFirmwareUpgrade);
+				break;
+			case COLUMN_DEVICETRANSMITTEDPHYRATE:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_GAUGE, table_entry-&gt;deviceTransmittedPhyRate);
+				break;
+			case COLUMN_DEVICERECEIVEDPHYRATE:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_GAUGE, table_entry-&gt;deviceReceivedPhyRate);
+				break;
+			case COLUMN_DEVICETRANSMITTEDTONEMAPS:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_GAUGE, table_entry-&gt;deviceTransmittedToneMaps);
+				break;
+			case COLUMN_DEVICERECEIVEDTONEMAPS:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_GAUGE, table_entry-&gt;deviceReceivedToneMaps);
+				break;
+			case COLUMN_DEVICETRANSMITTEDMPDUGOODCOUNT:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_COUNTER, table_entry-&gt;deviceTransmittedMPDUGoodCount);
+				break;
+			case COLUMN_DEVICERECEIVEDMPDUGOODCOUNT:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_COUNTER, table_entry-&gt;deviceReceivedMPDUGoodCount);
+				break;
+			case COLUMN_DEVICETRANSMITTEDMPDUBADCOUNT:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_COUNTER, table_entry-&gt;deviceTransmittedMPDUBadCount);
+				break;
+			case COLUMN_DEVICERECEIVEDMPDUBADCOUNT:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_COUNTER, table_entry-&gt;deviceReceivedMPDUBadCount);
+				break;
+			case COLUMN_DEVICETRANSMITTEDMPDUCOLLISIONCOUNT:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_COUNTER, table_entry-&gt;deviceTransmittedMPDUCollisionCount);
+				break;
+			case COLUMN_DEVICETRANSMITTEDPDGOODCOUNT:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_COUNTER, table_entry-&gt;deviceTransmittedPDGoodCount);
+				break;
+			case COLUMN_DEVICERECEIVEDPDGOODCOUNT:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_COUNTER, table_entry-&gt;deviceReceivedPDGoodCount);
+				break;
+			case COLUMN_DEVICETRANSMITTEDPDBADCOUNT:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_COUNTER, table_entry-&gt;deviceTransmittedPDBadCount);
+				break;
+			case COLUMN_DEVICERECEIVEDPDBADCOUNT:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_COUNTER, table_entry-&gt;deviceReceivedPDBadCount);
+				break;
+			case COLUMN_DEVICERECEIVEDFECGOODCOUNT:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_COUNTER, table_entry-&gt;deviceReceivedFECGoodCount);
+				break;
+			case COLUMN_DEVICERECEIVEDFECBADCOUNT:
+				if (!table_entry) 
+				{
+					netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+					continue;
+				}
+				snmp_set_var_typed_integer (request-&gt;requestvb, ASN_COUNTER, table_entry-&gt;deviceReceivedFECBadCount);
+				break;
+			default:
+				netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHOBJECT);
+				break;
+			}
+		}
+		break;
+
+/*
+ * Write-support
+ */
+
+	case MODE_SET_RESERVE1:
+		for (request=requests; request; request=request-&gt;next) 
+		{
+			table_entry = (struct operationsTable_entry *) netsnmp_extract_iterator_context (request);
+			table_info = netsnmp_extract_table_info (request);
+			if (table_entry == NULL) 
+			{
+				netsnmp_set_request_error (reqinfo, request, SNMP_NOSUCHINSTANCE);
+				continue;
+			}
+			switch (table_info-&gt;colnum) 
+			{
+			case COLUMN_DEVICEMACADDRESS:
+
+/* or possibly 'netsnmp_check_vb_type_and_size' */
+
+				ret = netsnmp_check_vb_type_and_max_size (request-&gt;requestvb, ASN_OCTET_STR, sizeof (table_entry-&gt;deviceMacAddress));
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICERESET:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEINITIALIZE:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAGSENABLE:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG0:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG1:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG2:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG3:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG4:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG5:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG6:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG7:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTRAFFICCLASSENABLE:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITSENABLE:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS0:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS1:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS2:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS3:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS4:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS5:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS6:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS7:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP0:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP1:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP2:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP3:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTIGMP:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTUNICAST:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTIGMPMANAGEDMULTICAST:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTMULTICASTBROADCAST:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEPRIORITYDSCPENABLE:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICENMK:
+
+/* or possiblc 'netsnmp_check_vb_type_and_size' */
+
+				ret = netsnmp_check_vb_type_and_max_size (request-&gt;requestvb, ASN_OCTET_STR, sizeof (table_entry-&gt;deviceNMK));
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICERESETTOFACTORYDEFAULT:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEHFID:
+
+/* or possiblc 'netsnmp_check_vb_type_and_size' */
+
+				ret = netsnmp_check_vb_type_and_max_size (request-&gt;requestvb, ASN_OCTET_STR, sizeof (table_entry-&gt;deviceHFID));
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEMDUENABLE:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEMDUROLE:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEAVNETWORKCCOSELECTION:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			case COLUMN_DEVICEFIRMWAREUPGRADE:
+
+/* or possibly 'netsnmp_check_vb_int_range' */
+
+				ret = netsnmp_check_vb_int (request-&gt;requestvb);
+				if (ret != SNMP_ERR_NOERROR) 
+				{
+					netsnmp_set_request_error (reqinfo, request, ret);
+					return SNMP_ERR_NOERROR;
+				}
+				break;
+			default:
+				netsnmp_set_request_error (reqinfo, request, SNMP_ERR_NOTWRITABLE);
+				return SNMP_ERR_NOERROR;
+			}
+		}
+		break;
+	case MODE_SET_RESERVE2:
+		break;
+	case MODE_SET_FREE:
+		break;
+	case MODE_SET_ACTION:
+		for (request=requests; request; request=request-&gt;next) 
+		{
+			table_entry = (struct operationsTable_entry *) netsnmp_extract_iterator_context (request);
+			table_info = netsnmp_extract_table_info (request);
+			switch (table_info-&gt;colnum) 
+			{
+			case COLUMN_DEVICEMACADDRESS:
+				memcpy (table_entry-&gt;old_deviceMacAddress, table_entry-&gt;deviceMacAddress, sizeof (table_entry-&gt;deviceMacAddress));
+				table_entry-&gt;old_deviceMacAddress_len = table_entry-&gt;deviceMacAddress_len;
+				memset (table_entry-&gt;deviceMacAddress, 0, sizeof (table_entry-&gt;deviceMacAddress));
+				memcpy (table_entry-&gt;deviceMacAddress, request-&gt;requestvb-&gt;val.string, request-&gt;requestvb-&gt;val_len);
+				table_entry-&gt;deviceMacAddress_len = request-&gt;requestvb-&gt;val_len;
+				break;
+			case COLUMN_DEVICERESET:
+				table_entry-&gt;old_deviceReset = table_entry-&gt;deviceReset;
+				table_entry-&gt;deviceReset = *request-&gt;requestvb-&gt;val.integer;
+
+/* actually reset the device */
+
+				hexencode (int6k.channel-&gt;peer, sizeof (int6k.channel-&gt;peer), table_entry-&gt;deviceMacAddress);
+				ResetDevice2 (&amp;int6k);
+				break;
+			case COLUMN_DEVICEINITIALIZE:
+				table_entry-&gt;old_deviceInitialize = table_entry-&gt;deviceInitialize;
+				table_entry-&gt;deviceInitialize = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAGSENABLE:
+				table_entry-&gt;old_devicePriorityVLANTagsEnable = table_entry-&gt;devicePriorityVLANTagsEnable;
+				table_entry-&gt;devicePriorityVLANTagsEnable = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG0:
+				table_entry-&gt;old_devicePriorityVLANTag0 = table_entry-&gt;devicePriorityVLANTag0;
+				table_entry-&gt;devicePriorityVLANTag0 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG1:
+				table_entry-&gt;old_devicePriorityVLANTag1 = table_entry-&gt;devicePriorityVLANTag1;
+				table_entry-&gt;devicePriorityVLANTag1 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG2:
+				table_entry-&gt;old_devicePriorityVLANTag2 = table_entry-&gt;devicePriorityVLANTag2;
+				table_entry-&gt;devicePriorityVLANTag2 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG3:
+				table_entry-&gt;old_devicePriorityVLANTag3 = table_entry-&gt;devicePriorityVLANTag3;
+				table_entry-&gt;devicePriorityVLANTag3 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG4:
+				table_entry-&gt;old_devicePriorityVLANTag4 = table_entry-&gt;devicePriorityVLANTag4;
+				table_entry-&gt;devicePriorityVLANTag4 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG5:
+				table_entry-&gt;old_devicePriorityVLANTag5 = table_entry-&gt;devicePriorityVLANTag5;
+				table_entry-&gt;devicePriorityVLANTag5 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG6:
+				table_entry-&gt;old_devicePriorityVLANTag6 = table_entry-&gt;devicePriorityVLANTag6;
+				table_entry-&gt;devicePriorityVLANTag6 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG7:
+				table_entry-&gt;old_devicePriorityVLANTag7 = table_entry-&gt;devicePriorityVLANTag7;
+				table_entry-&gt;devicePriorityVLANTag7 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTRAFFICCLASSENABLE:
+				table_entry-&gt;old_devicePriorityTrafficClassEnable = table_entry-&gt;devicePriorityTrafficClassEnable;
+				table_entry-&gt;devicePriorityTrafficClassEnable = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITSENABLE:
+				table_entry-&gt;old_devicePriorityTOSBitsEnable = table_entry-&gt;devicePriorityTOSBitsEnable;
+				table_entry-&gt;devicePriorityTOSBitsEnable = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS0:
+				table_entry-&gt;old_devicePriorityTOSBits0 = table_entry-&gt;devicePriorityTOSBits0;
+				table_entry-&gt;devicePriorityTOSBits0 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS1:
+				table_entry-&gt;old_devicePriorityTOSBits1 = table_entry-&gt;devicePriorityTOSBits1;
+				table_entry-&gt;devicePriorityTOSBits1 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS2:
+				table_entry-&gt;old_devicePriorityTOSBits2 = table_entry-&gt;devicePriorityTOSBits2;
+				table_entry-&gt;devicePriorityTOSBits2 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS3:
+				table_entry-&gt;old_devicePriorityTOSBits3 = table_entry-&gt;devicePriorityTOSBits3;
+				table_entry-&gt;devicePriorityTOSBits3 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS4:
+				table_entry-&gt;old_devicePriorityTOSBits4 = table_entry-&gt;devicePriorityTOSBits4;
+				table_entry-&gt;devicePriorityTOSBits4 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS5:
+				table_entry-&gt;old_devicePriorityTOSBits5 = table_entry-&gt;devicePriorityTOSBits5;
+				table_entry-&gt;devicePriorityTOSBits5 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS6:
+				table_entry-&gt;old_devicePriorityTOSBits6 = table_entry-&gt;devicePriorityTOSBits6;
+				table_entry-&gt;devicePriorityTOSBits6 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS7:
+				table_entry-&gt;old_devicePriorityTOSBits7 = table_entry-&gt;devicePriorityTOSBits7;
+				table_entry-&gt;devicePriorityTOSBits7 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP0:
+				table_entry-&gt;old_devicePriorityTTLCap0 = table_entry-&gt;devicePriorityTTLCap0;
+				table_entry-&gt;devicePriorityTTLCap0 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP1:
+				table_entry-&gt;old_devicePriorityTTLCap1 = table_entry-&gt;devicePriorityTTLCap1;
+				table_entry-&gt;devicePriorityTTLCap1 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP2:
+				table_entry-&gt;old_devicePriorityTTLCap2 = table_entry-&gt;devicePriorityTTLCap2;
+				table_entry-&gt;devicePriorityTTLCap2 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP3:
+				table_entry-&gt;old_devicePriorityTTLCap3 = table_entry-&gt;devicePriorityTTLCap3;
+				table_entry-&gt;devicePriorityTTLCap3 = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTIGMP:
+				table_entry-&gt;old_devicePriorityDefaultIGMP = table_entry-&gt;devicePriorityDefaultIGMP;
+				table_entry-&gt;devicePriorityDefaultIGMP = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTUNICAST:
+				table_entry-&gt;old_devicePriorityDefaultUnicast = table_entry-&gt;devicePriorityDefaultUnicast;
+				table_entry-&gt;devicePriorityDefaultUnicast = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTIGMPMANAGEDMULTICAST:
+				table_entry-&gt;old_devicePriorityDefaultIGMPManagedMulticast = table_entry-&gt;devicePriorityDefaultIGMPManagedMulticast;
+				table_entry-&gt;devicePriorityDefaultIGMPManagedMulticast = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTMULTICASTBROADCAST:
+				table_entry-&gt;old_devicePriorityDefaultMulticastBroadcast = table_entry-&gt;devicePriorityDefaultMulticastBroadcast;
+				table_entry-&gt;devicePriorityDefaultMulticastBroadcast = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEPRIORITYDSCPENABLE:
+				table_entry-&gt;old_devicePriorityDSCPEnable = table_entry-&gt;devicePriorityDSCPEnable;
+				table_entry-&gt;devicePriorityDSCPEnable = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICENMK:
+				memcpy (table_entry-&gt;old_deviceNMK, table_entry-&gt;deviceNMK, sizeof (table_entry-&gt;deviceNMK));
+				table_entry-&gt;old_deviceNMK_len = table_entry-&gt;deviceNMK_len;
+				memset (table_entry-&gt;deviceNMK, 0, sizeof (table_entry-&gt;deviceNMK));
+				memcpy (table_entry-&gt;deviceNMK, request-&gt;requestvb-&gt;val.string, request-&gt;requestvb-&gt;val_len);
+				table_entry-&gt;deviceNMK_len = request-&gt;requestvb-&gt;val_len;
+				break;
+			case COLUMN_DEVICERESETTOFACTORYDEFAULT:
+				table_entry-&gt;old_deviceResettoFactoryDefault = table_entry-&gt;deviceResettoFactoryDefault;
+				table_entry-&gt;deviceResettoFactoryDefault = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEHFID:
+				memcpy (table_entry-&gt;old_deviceHFID, table_entry-&gt;deviceHFID, sizeof (table_entry-&gt;deviceHFID));
+				table_entry-&gt;old_deviceHFID_len = table_entry-&gt;deviceHFID_len;
+				memset (table_entry-&gt;deviceHFID, 0, sizeof (table_entry-&gt;deviceHFID));
+				memcpy (table_entry-&gt;deviceHFID, request-&gt;requestvb-&gt;val.string, request-&gt;requestvb-&gt;val_len);
+				table_entry-&gt;deviceHFID_len = request-&gt;requestvb-&gt;val_len;
+				break;
+			case COLUMN_DEVICEMDUENABLE:
+				table_entry-&gt;old_deviceMDUEnable = table_entry-&gt;deviceMDUEnable;
+				table_entry-&gt;deviceMDUEnable = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEMDUROLE:
+				table_entry-&gt;old_deviceMDURole = table_entry-&gt;deviceMDURole;
+				table_entry-&gt;deviceMDURole = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEAVNETWORKCCOSELECTION:
+				table_entry-&gt;old_deviceAVNetworkCCoSelection = table_entry-&gt;deviceAVNetworkCCoSelection;
+				table_entry-&gt;deviceAVNetworkCCoSelection = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			case COLUMN_DEVICEFIRMWAREUPGRADE:
+				table_entry-&gt;old_deviceFirmwareUpgrade = table_entry-&gt;deviceFirmwareUpgrade;
+				table_entry-&gt;deviceFirmwareUpgrade = *request-&gt;requestvb-&gt;val.integer;
+				break;
+			}
+		}
+		break;
+	case MODE_SET_UNDO:
+		for (request=requests; request; request=request-&gt;next) 
+		{
+			table_entry = (struct operationsTable_entry *) netsnmp_extract_iterator_context (request);
+			table_info = netsnmp_extract_table_info (request);
+			switch (table_info-&gt;colnum) 
+			{
+			case COLUMN_DEVICEMACADDRESS:
+				memcpy (table_entry-&gt;deviceMacAddress, table_entry-&gt;old_deviceMacAddress, sizeof (table_entry-&gt;deviceMacAddress));
+				memset (table_entry-&gt;old_deviceMacAddress, 0, sizeof (table_entry-&gt;deviceMacAddress));
+				table_entry-&gt;deviceMacAddress_len = table_entry-&gt;old_deviceMacAddress_len;
+				break;
+			case COLUMN_DEVICERESET:
+				table_entry-&gt;deviceReset = table_entry-&gt;old_deviceReset;
+				table_entry-&gt;old_deviceReset = 0;
+				break;
+			case COLUMN_DEVICEINITIALIZE:
+				table_entry-&gt;deviceInitialize = table_entry-&gt;old_deviceInitialize;
+				table_entry-&gt;old_deviceInitialize = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAGSENABLE:
+				table_entry-&gt;devicePriorityVLANTagsEnable = table_entry-&gt;old_devicePriorityVLANTagsEnable;
+				table_entry-&gt;old_devicePriorityVLANTagsEnable = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG0:
+				table_entry-&gt;devicePriorityVLANTag0 = table_entry-&gt;old_devicePriorityVLANTag0;
+				table_entry-&gt;old_devicePriorityVLANTag0 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG1:
+				table_entry-&gt;devicePriorityVLANTag1 = table_entry-&gt;old_devicePriorityVLANTag1;
+				table_entry-&gt;old_devicePriorityVLANTag1 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG2:
+				table_entry-&gt;devicePriorityVLANTag2 = table_entry-&gt;old_devicePriorityVLANTag2;
+				table_entry-&gt;old_devicePriorityVLANTag2 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG3:
+				table_entry-&gt;devicePriorityVLANTag3 = table_entry-&gt;old_devicePriorityVLANTag3;
+				table_entry-&gt;old_devicePriorityVLANTag3 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG4:
+				table_entry-&gt;devicePriorityVLANTag4 = table_entry-&gt;old_devicePriorityVLANTag4;
+				table_entry-&gt;old_devicePriorityVLANTag4 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG5:
+				table_entry-&gt;devicePriorityVLANTag5 = table_entry-&gt;old_devicePriorityVLANTag5;
+				table_entry-&gt;old_devicePriorityVLANTag5 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG6:
+				table_entry-&gt;devicePriorityVLANTag6 = table_entry-&gt;old_devicePriorityVLANTag6;
+				table_entry-&gt;old_devicePriorityVLANTag6 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYVLANTAG7:
+				table_entry-&gt;devicePriorityVLANTag7 = table_entry-&gt;old_devicePriorityVLANTag7;
+				table_entry-&gt;old_devicePriorityVLANTag7 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTRAFFICCLASSENABLE:
+				table_entry-&gt;devicePriorityTrafficClassEnable = table_entry-&gt;old_devicePriorityTrafficClassEnable;
+				table_entry-&gt;old_devicePriorityTrafficClassEnable = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITSENABLE:
+				table_entry-&gt;devicePriorityTOSBitsEnable = table_entry-&gt;old_devicePriorityTOSBitsEnable;
+				table_entry-&gt;old_devicePriorityTOSBitsEnable = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS0:
+				table_entry-&gt;devicePriorityTOSBits0 = table_entry-&gt;old_devicePriorityTOSBits0;
+				table_entry-&gt;old_devicePriorityTOSBits0 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS1:
+				table_entry-&gt;devicePriorityTOSBits1 = table_entry-&gt;old_devicePriorityTOSBits1;
+				table_entry-&gt;old_devicePriorityTOSBits1 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS2:
+				table_entry-&gt;devicePriorityTOSBits2 = table_entry-&gt;old_devicePriorityTOSBits2;
+				table_entry-&gt;old_devicePriorityTOSBits2 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS3:
+				table_entry-&gt;devicePriorityTOSBits3 = table_entry-&gt;old_devicePriorityTOSBits3;
+				table_entry-&gt;old_devicePriorityTOSBits3 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS4:
+				table_entry-&gt;devicePriorityTOSBits4 = table_entry-&gt;old_devicePriorityTOSBits4;
+				table_entry-&gt;old_devicePriorityTOSBits4 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS5:
+				table_entry-&gt;devicePriorityTOSBits5 = table_entry-&gt;old_devicePriorityTOSBits5;
+				table_entry-&gt;old_devicePriorityTOSBits5 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS6:
+				table_entry-&gt;devicePriorityTOSBits6 = table_entry-&gt;old_devicePriorityTOSBits6;
+				table_entry-&gt;old_devicePriorityTOSBits6 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTOSBITS7:
+				table_entry-&gt;devicePriorityTOSBits7 = table_entry-&gt;old_devicePriorityTOSBits7;
+				table_entry-&gt;old_devicePriorityTOSBits7 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP0:
+				table_entry-&gt;devicePriorityTTLCap0 = table_entry-&gt;old_devicePriorityTTLCap0;
+				table_entry-&gt;old_devicePriorityTTLCap0 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP1:
+				table_entry-&gt;devicePriorityTTLCap1 = table_entry-&gt;old_devicePriorityTTLCap1;
+				table_entry-&gt;old_devicePriorityTTLCap1 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP2:
+				table_entry-&gt;devicePriorityTTLCap2 = table_entry-&gt;old_devicePriorityTTLCap2;
+				table_entry-&gt;old_devicePriorityTTLCap2 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYTTLCAP3:
+				table_entry-&gt;devicePriorityTTLCap3 = table_entry-&gt;old_devicePriorityTTLCap3;
+				table_entry-&gt;old_devicePriorityTTLCap3 = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTIGMP:
+				table_entry-&gt;devicePriorityDefaultIGMP = table_entry-&gt;old_devicePriorityDefaultIGMP;
+				table_entry-&gt;old_devicePriorityDefaultIGMP = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTUNICAST:
+				table_entry-&gt;devicePriorityDefaultUnicast = table_entry-&gt;old_devicePriorityDefaultUnicast;
+				table_entry-&gt;old_devicePriorityDefaultUnicast = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTIGMPMANAGEDMULTICAST:
+				table_entry-&gt;devicePriorityDefaultIGMPManagedMulticast = table_entry-&gt;old_devicePriorityDefaultIGMPManagedMulticast;
+				table_entry-&gt;old_devicePriorityDefaultIGMPManagedMulticast = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYDEFAULTMULTICASTBROADCAST:
+				table_entry-&gt;devicePriorityDefaultMulticastBroadcast = table_entry-&gt;old_devicePriorityDefaultMulticastBroadcast;
+				table_entry-&gt;old_devicePriorityDefaultMulticastBroadcast = 0;
+				break;
+			case COLUMN_DEVICEPRIORITYDSCPENABLE:
+				table_entry-&gt;devicePriorityDSCPEnable = table_entry-&gt;old_devicePriorityDSCPEnable;
+				table_entry-&gt;old_devicePriorityDSCPEnable = 0;
+				break;
+			case COLUMN_DEVICENMK:
+				memcpy (table_entry-&gt;deviceNMK, table_entry-&gt;old_deviceNMK, sizeof (table_entry-&gt;deviceNMK));
+				memset (table_entry-&gt;old_deviceNMK, 0, sizeof (table_entry-&gt;deviceNMK));
+				table_entry-&gt;deviceNMK_len = table_entry-&gt;old_deviceNMK_len;
+				break;
+			case COLUMN_DEVICERESETTOFACTORYDEFAULT:
+				table_entry-&gt;deviceResettoFactoryDefault = table_entry-&gt;old_deviceResettoFactoryDefault;
+				table_entry-&gt;old_deviceResettoFactoryDefault = 0;
+				break;
+			case COLUMN_DEVICEHFID:
+				memcpy (table_entry-&gt;deviceHFID, table_entry-&gt;old_deviceHFID, sizeof (table_entry-&gt;deviceHFID));
+				memset (table_entry-&gt;old_deviceHFID, 0, sizeof (table_entry-&gt;deviceHFID));
+				table_entry-&gt;deviceHFID_len = table_entry-&gt;old_deviceHFID_len;
+				break;
+			case COLUMN_DEVICEMDUENABLE:
+				table_entry-&gt;deviceMDUEnable = table_entry-&gt;old_deviceMDUEnable;
+				table_entry-&gt;old_deviceMDUEnable = 0;
+				break;
+			case COLUMN_DEVICEMDUROLE:
+				table_entry-&gt;deviceMDURole = table_entry-&gt;old_deviceMDURole;
+				table_entry-&gt;old_deviceMDURole = 0;
+				break;
+			case COLUMN_DEVICEAVNETWORKCCOSELECTION:
+				table_entry-&gt;deviceAVNetworkCCoSelection = table_entry-&gt;old_deviceAVNetworkCCoSelection;
+				table_entry-&gt;old_deviceAVNetworkCCoSelection = 0;
+				break;
+			case COLUMN_DEVICEFIRMWAREUPGRADE:
+				table_entry-&gt;deviceFirmwareUpgrade = table_entry-&gt;old_deviceFirmwareUpgrade;
+				table_entry-&gt;old_deviceFirmwareUpgrade = 0;
+				break;
+			}
+		}
+		break;
+	case MODE_SET_COMMIT:
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='intellon-snmp.c.html' title=' intellon-snmp.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='intellon.c.html' title=' intellon.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

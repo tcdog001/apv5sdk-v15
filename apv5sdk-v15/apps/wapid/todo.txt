@@ -1,0 +1,13 @@
+9/17/2010 zhichen
+1. per-STA statistics of  WPI Replay Counters, WPI Decryptable Errors, WPI MIC Errors
+   These three counters need supporting from WLAN driver. 
+   Note: The per-VAP statistics of these counters has been implemented.
+
+2. BK reauthetication
+    There is no STA available who supports  BK Reauth currently, 
+    so this feature has not be tested sufficiently.
+
+3. PRE AUTH
+    This feature has not been implemented, and there is no STA avalilable too.
+
+

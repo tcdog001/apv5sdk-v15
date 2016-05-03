@@ -1,0 +1,22 @@
+.up1{background-color: #D8D8D0; border-left: 1px solid #ffffff;border-right: 1px solid #000000; border-top: 1px solid #ffffff; border-bottom: 1px solid #000000;  }
+.up{background-color: #D8D8D0; border-left: 2px solid #ffffff;border-right: 2px solid #000000; border-top: 2px solid #ffffff; border-bottom: 2px solid #000000;  }
+.down1{ background-color: #D8D8D0; border-left: 1px solid #000000;border-right: 1px solid #ffffff; border-top: 1px solid #000000; border-bottom: 1px solid #ffffff;  }
+.down{ background-color: #D8D8D0; border-left: 2px solid #000000;border-right: 2px solid #ffffff; border-top: 2px solid #000000; border-bottom: 2px solid #ffffff;  }
+.green {  font-size: 9pt}
+p {  font-size: 9pt}
+body {  font-size: 9pt}
+td {  font-size: 9pt}
+.scn {  font-size: 11pt}
+.bcn {  font-size: 14.8px}
+.well {  font-size: 9pt; color: #FF0000}
+a:hover {  text-decoration: none; color: #FF0000}
+a:link       { text-decoration: none }
+a {  text-decoration: none;color: #000000}
+.title{padding-left:8;background-color: #003DCC;cursor:move;color:#FFFFFF}
+.form1
+{
+    BORDER-BOTTOM: #2982ad 1px solid;
+    BORDER-LEFT: #e6f2f9 1px solid;
+    BORDER-RIGHT: #e6f2f9 1px solid;
+    BORDER-TOP: #e6f2f9 1px solid
+}

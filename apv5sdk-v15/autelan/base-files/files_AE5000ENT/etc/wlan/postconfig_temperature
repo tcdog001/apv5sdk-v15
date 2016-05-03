@@ -1,0 +1,76 @@
+#!/bin/sh
+#showsysinfo
+#echo "==========================="
+#echo "system check:"
+#/usr/sbin/mount_check
+#/usr/sbin/dev_check
+#echo "==========================="
+#cp /jffs/* /etc/config -rf
+#cp /etc/config/* /jffs -rf
+#killall wtpd
+#echo 0 >/proc/sys/dev/wifi0/thinap
+REBOOT_COUNT=0
+if [ -f /jffs/reboot_count ];then
+  REBOOT_COUNT=`cat /jffs/reboot_count`
+fi
+ REBOOT_COUNT=$((${REBOOT_COUNT}+1)) 
+ echo ${REBOOT_COUNT} > /jffs/reboot_count
+ 
+ 
+stop_monitor
+killall mini_httpd
+killall dropbear
+killall factoryreset
+killall arpnotice
+
+killall wtpd
+
+echo 0 > /proc/sys/dev/wifi0/thinap
+wlanconfig ath0 create wlanmode ap wlandev wifi0
+iwconfig ath0 essid autelan_test_2G
+iwconfig ath0 channel 0
+
+############  HT40  ############
+iwpriv ath0 mode 11nght40plus
+iwpriv ath0 disablecoext 1
+
+############  HT20  ###########
+iwpriv ath0 mode 11nght20
+
+#iwpriv wifi0 txchainmask 3
+iwpriv wifi0 rxchainmask 3
+
+iwconfig ath0 channel 6
+sleep 1
+ifconfig ath0 up
+sleep 10
+iwconfig ath0 txpower 27
+brctl addif default ath0
+
+
+wlanconfig ath1 create wlanmode ap wlandev wifi1
+iwconfig ath1 essid autelan_test_5G
+iwconfig ath1 channel 0
+
+############  HT40  ############
+iwpriv ath1 mode 11naht40plus
+iwpriv ath1 disablecoext 1
+
+############  HT20  ###########
+iwpriv ath1 mode 11naht20
+
+iwpriv wifi1 txchainmask 3
+iwpriv wifi1 rxchainmask 3
+
+iwconfig ath1 channel 157
+sleep 1
+ifconfig ath1 up
+sleep 10
+iwconfig ath1 txpower 27
+brctl addif default ath1
+sleep 1
+
+############  ARP  ############
+echo 1 > /proc/sys/dev/wifi0/arp_send_active
+/usr/sbin/arp_notice & 
+#arp -i default req -t 10 &

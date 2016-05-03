@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			Loopback.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='LinkStatistics.c.html' title=' LinkStatistics.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='MACPasswords.c.html' title=' MACPasswords.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed Loopback (struct int6k * int6k, void * memory, size_t extent);
+ *   
+ *   int6k.h
+ * 
+ *   instruct a powerline device to echo a given Etherenet frame for
+ *   a fixed period of time using the VS_FR_LNK message;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef LOOPBACK_SOURCE
+#define LOOPBACK_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;memory.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/memory.h&quot;
+
+signed Loopback (struct int6k * int6k, void * memory, size_t extent) 
+
+{
+
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+#define DATALEN 1038
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_fr_lbk_request 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t DURATION;
+		uint8_t RESERVED;
+		uint16_t LENGTH;
+		uint8_t DATA [DATALEN];
+	}
+	* request = (struct vs_fr_lbk_request *) (message);
+	struct __packed vs_fr_lbk_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint8_t DURATION;
+		uint16_t LENGTH;
+	}
+	* confirm = (struct vs_fr_lbk_confirm *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	memset (message, 0, sizeof (struct message));
+	EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message-&gt;intellon, (VS_FR_LBK | MMTYPE_REQ));
+	if (extent &gt; DATALEN) 
+	{
+		extent = DATALEN;
+	}
+	memcpy (request-&gt;DATA, memory, extent);
+	if (extent &lt; ETHER_MIN_LEN) 
+	{
+		extent = ETHER_MIN_LEN;
+	}
+	request-&gt;DURATION = int6k-&gt;timeperiod;
+	request-&gt;LENGTH = HTOLE16 ((uint16_t)(extent));
+	extent += sizeof (struct header_eth);
+	extent += sizeof (struct header_int);
+	extent += 4;
+	int6k-&gt;packetsize = (uint16_t)(extent);
+	if (SendMME (int6k) &lt;= 0) 
+	{
+		error (1, ECANCELED, INT6K_CANTSEND);
+	}
+	while (ReadMME (int6k, (VS_FR_LBK | MMTYPE_CNF)) &gt; 0) 
+	{
+		if (confirm-&gt;MSTATUS) 
+		{
+			Failure (int6k, INT6K_WONTDOIT);
+			continue;
+		}
+	}
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='LinkStatistics.c.html' title=' LinkStatistics.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='MACPasswords.c.html' title=' MACPasswords.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

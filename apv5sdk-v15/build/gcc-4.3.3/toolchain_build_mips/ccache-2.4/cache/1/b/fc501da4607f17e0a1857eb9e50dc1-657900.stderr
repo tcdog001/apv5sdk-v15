@@ -1,0 +1,5 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/../linux/drivers/i2s/ath_i2s.c:48: warning: function declaration isn't a prototype
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/../linux/drivers/i2s/ath_i2s.c:60: warning: function declaration isn't a prototype
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/../linux/drivers/i2s/ath_i2s.c:946: warning: function declaration isn't a prototype
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/../linux/drivers/i2s/ath_i2s.c: In function 'ath_i2s_init_module':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/../linux/drivers/i2s/ath_i2s.c:1025: warning: passing argument 2 of 'request_irq' from incompatible pointer type

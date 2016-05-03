@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			linesynctest.7a
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='flashtest.7a.html' title=' flashtest.7a '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='marchloop.7a.html' title=' marchloop.7a '>NEXT</a>]
+			</div>
+<pre>
+linesynctest(7a)                      Intellon Linux Toolkit                     linesynctest(7a)
+
+NAME
+       linesynctest - Powerline Synchronization Diagnostic Applet
+
+SYNOPSIS
+       int6ktest linesynctest.nvm [...]
+
+PURPOSE
+       This diagnostic applet runs in SDRAM. It checks onboard zero-cross detection circuitry and
+       reports the powerline frequecy. Possible outcomes are 50hz detected, 60hz detected, unsupâ€â€
+       ported frequency detected and no frequency detected.
+
+       Progress  and  status  messages  appear  on the local host console. Control returns to the
+       bootloader on completion.
+
+PREREQUISITES
+       Bootloader software must be running. The SDRAM controller need not be configured.
+
+EXAMPLES
+       The following example uses program int6ktest to download and execute applet  linesync.nvm.
+
+          # int6ktest linesynctest.nvm
+          eth2 00:B0:52:00:00:01 Start Applet linesynctest.nvm (0)
+          eth2 00:B0:52:00:00:01 Write Memory (00001000:1800)
+          eth2 00:B0:52:00:00:01 Wrote linesynctest.nvm
+          eth2 00:B0:52:00:00:01 (00) Line Sync test - Zero Cross detected - 60HZ
+
+SEE ALSO
+       int6ktest(7), flashtest(7), marchloop(7), memctl(7)
+
+CREDITS
+        John Byron &lt;john.byron@intellon.com&gt;
+
+int6000-utils-linux                    Intellon Corporation                      linesynctest(7a)
+</pre>
+		<div class='footerlink'>
+			[<a href='flashtest.7a.html' title=' flashtest.7a '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='marchloop.7a.html' title=' marchloop.7a '>NEXT</a>]
+			</div>
+		</body>
+	</html>

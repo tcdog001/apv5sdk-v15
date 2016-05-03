@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			piblock.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='pibfile.c.html' title=' pibfile.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='pibpeek.c.html' title=' pibpeek.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   signed piblock (struct _file_ * pib);
+ *
+ *   recompute and update the PIB file checksum; assume the PIB file
+ *   is valid;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef PIBLOCK_SOURCE
+#define PIBLOCK_SOURCE
+
+#include &lt;unistd.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../pib/pib.h&quot;
+
+signed piblock (struct _file_ * pib) 
+
+{
+	struct simple_pib simple_pib;
+	if (lseek (pib-&gt;file, 0, SEEK_SET)) 
+	{
+		error (1, errno, &quot;Can't home %s&quot;, filepart (pib-&gt;name));
+	}
+	if (read (pib-&gt;file, &amp;simple_pib, sizeof (simple_pib)) &lt; sizeof (simple_pib)) 
+	{
+		error (1, errno, &quot;Can't read %s&quot;, filepart (pib-&gt;name));
+	}
+	simple_pib.CHECKSUM = 0;
+	if (lseek (pib-&gt;file, 0, SEEK_SET)) 
+	{
+		error (1, errno, &quot;Can't home %s&quot;, filepart (pib-&gt;name));
+	}
+	if (write (pib-&gt;file, &amp;simple_pib, sizeof (simple_pib)) &lt; sizeof (simple_pib)) 
+	{
+		error (1, errno, &quot;Can't save %s&quot;, filepart (pib-&gt;name));
+	}
+	if (lseek (pib-&gt;file, 0, SEEK_SET)) 
+	{
+		error (1, errno, &quot;Can't seek %s&quot;, filepart (pib-&gt;name));
+	}
+	simple_pib.CHECKSUM = fdchecksum_32 (pib-&gt;file, LE16TOH (simple_pib.PIBLENGTH), 0);
+	if (lseek (pib-&gt;file, 0, SEEK_SET)) 
+	{
+		error (1, errno, &quot;Can't home %s&quot;, filepart (pib-&gt;name));
+	}
+	if (write (pib-&gt;file, &amp;simple_pib, sizeof (simple_pib)) &lt; sizeof (simple_pib)) 
+	{
+		error (1, errno, &quot;Can't save %s&quot;, filepart (pib-&gt;name));
+	}
+	if (lseek (pib-&gt;file, 0, SEEK_SET)) 
+	{
+		error (1, errno, &quot;Can't home %s&quot;, filepart (pib-&gt;name));
+	}
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='pibfile.c.html' title=' pibfile.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='pibpeek.c.html' title=' pibpeek.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

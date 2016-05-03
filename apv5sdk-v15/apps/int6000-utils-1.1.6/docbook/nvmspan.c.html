@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			nvmspan.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='nvmpeek.c.html' title=' nvmpeek.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='nvmsplit.c.html' title=' nvmsplit.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   signed nvmspan (const void * memory);
+ *
+ *   nvm.h
+ *
+ *   return the extent of an NVM file image in memory by walking the
+ *   NVM header chain to the end;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef NVMSPAN_SOURCE
+#define NVMSPAN_SOURCE
+
+#include &lt;memory.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;fcntl.h&gt;
+
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../nvm/nvm.h&quot;
+
+signed nvmspan (const void * memory) 
+
+{
+	struct header_nvm * header_nvm;
+	const byte * origin = (byte *)(memory);
+	const byte * offset = (byte *)(memory);
+	unsigned image = 0;
+	do 
+	{
+		header_nvm = (struct header_nvm *)(offset);
+		if (LE32TOH (header_nvm-&gt;HEADERVERSION) != NVM_HEADER_VERSION) 
+		{
+			return (0);
+		}
+		if (checksum_32 (header_nvm, sizeof (struct header_nvm), 0)) 
+		{
+			return (0);
+		}
+		offset += sizeof (struct header_nvm);
+		if (checksum_32 (offset, LE32TOH (header_nvm-&gt;IMAGELENGTH), header_nvm-&gt;IMAGECHECKSUM)) 
+		{
+			return (0);
+		}
+		offset += header_nvm-&gt;IMAGELENGTH;
+		image++;
+	}
+	while (header_nvm-&gt;NEXTHEADER);
+	return (offset - origin);
+}
+
+/*====================================================================*
+ *   demo/test program;
+ *--------------------------------------------------------------------*/
+
+#if 0
+#include &lt;stdio.h&gt;
+#include &quot;../tools/checksum32.c&quot;
+#include &quot;../tools/error.c&quot;
+
+#ifndef WIN32
+#define O_BINARY 0
+#endif
+
+const char * program_name = &quot;nvmspan&quot;;
+int main (int argc, const char * argv []) 
+
+{
+	const char * buffer;
+	const char * extent;
+	signed length;
+	signed fd;
+	argc--;
+	argv++;
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		if ((fd = open (*argv, O_BINARY|O_RDONLY)) == -1) 
+		{
+			error (1, errno, &quot;Can't open %s&quot;, *argv);
+		}
+		else if ((length = lseek (fd, 0, SEEK_END)) == -1) 
+		{
+			error (1, errno, &quot;Can't size %s&quot;, *argv);
+		}
+		else if (!(buffer = malloc (length))) 
+		{
+			error (1, errno, &quot;Can't allocate buffer&quot;);
+		}
+		else if (lseek (fd, 0, SEEK_SET)) 
+		{
+			error (1, errno, &quot;Can't home %s&quot;, *argv);
+		}
+		else if (read (fd, buffer, length) &lt; length) 
+		{
+			error (1, errno, &quot;Can't read %s&quot;, *argv);
+		}
+		else if (!(extent = nvmspan (buffer))) 
+		{
+			error (1, 0, &quot;%s is corrupt&quot;, *argv);
+		}
+		printf (&quot;length=%d %s\n&quot;, extent - buffer, *argv);
+		close (fd);
+		argc--;
+		argv++;
+	}
+	return (0);
+}
+
+#endif
+
+/*====================================================================*
+ *
+ *--------------------------------------------------------------------*/
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='nvmpeek.c.html' title=' nvmpeek.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='nvmsplit.c.html' title=' nvmsplit.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

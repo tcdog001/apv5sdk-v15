@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			tokentype.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='tokentext.c.html' title=' tokentext.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='tovalue.c.html' title=' tovalue.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   unsigned char tokentype (SCAN * content);
+ *
+ *   scan.h
+ *
+ *   return the current token class as determined by scantoken();
+ *
+ *   the return value may be ' ' for spaces, 'A' for letters and '0' for
+ *   numbers; they indicate that scantoken() found one or more characters
+ *   of that class on its last scan;
+ *
+ *   any other value indicates that scantoken() collected one character of
+ *   that value; for example, a return value of ';' means that scantoken()
+ *   appended one semicolon;
+ *
+ *.  released 2005 by charles maier associates ltd. for public use;
+ *:  compiled on debian gnu/linux with gcc 2.95 compiler;
+ *;  licensed under the gnu public license version two;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef TOKENTYPE_SOURCE
+#define TOKENTYPE_SOURCE
+
+#include &quot;../scan/scan.h&quot;
+
+unsigned tokentype (SCAN * content) 
+
+{
+	return (content-&gt;class);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='tokentext.c.html' title=' tokentext.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='tovalue.c.html' title=' tovalue.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

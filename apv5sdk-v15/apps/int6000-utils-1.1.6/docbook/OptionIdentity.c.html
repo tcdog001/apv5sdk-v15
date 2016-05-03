@@ -1,0 +1,173 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			OptionIdentity.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='OptionFirmware.c.html' title=' OptionFirmware.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='OptionPriority.c.html' title=' OptionPriority.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed OptionIdentity (signed margin, const char * style);
+ *
+ *   page.h
+ *
+ *   print an identity tab on stdout;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef OPTIONIDENTITY_SOURCE
+#define OPTIONIDENTITY_SOURCE
+
+#include &lt;errno.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../ether/channel.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/format.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../cgi/session.h&quot;
+#include &quot;../cgi/page.h&quot;
+#include &quot;../pib/pib.h&quot;
+
+signed OptionIdentity (signed margin, const char * style) 
+
+{
+	extern struct channel channel;
+	extern struct session session;
+	extern struct message message;
+	extern const char * chipset [CHIPSETS+1];
+	extern const char * CCoMode [PIB_CCOMODES];
+	extern const char * MDURole [PIB_MDUROLES];
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_rd_mod_req 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MODULEID;
+		uint8_t RESERVED;
+		uint16_t LENGTH;
+		uint32_t OFFSET;
+	}
+	* request = (struct vs_rd_mod_req *) (&amp;message);
+	struct __packed vs_sw_ver_cnf 
+	{
+		struct header_eth header_eth;
+		struct header_int header_int;
+		uint8_t MSTATUS;
+		uint8_t MDEVICEID;
+		uint8_t MVERLENGTH;
+		char MVERSION [128];
+		uint8_t UPGRADEABLE;
+		uint32_t MCOOKIE;
+	}
+	* version = (struct vs_sw_ver_cnf *) (&amp;message);
+	struct __packed vs_rd_mod_cnf 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint8_t RES [3];
+		uint8_t MODULEID;
+		uint8_t RESERVED;
+		uint16_t LENGTH;
+		uint32_t OFFSET;
+		uint32_t CHKSUM;
+		uint8_t BUFFER [INT6K_BLOCKSIZE];
+	}
+	* confirm = (struct vs_rd_mod_cnf *) (&amp;message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	struct PIB1_5 * pib = (struct PIB1_5 *)(&amp;confirm-&gt;BUFFER);
+	char firmware [INT6K_VERSTRING];
+	byte platform;
+	char buffer [48];
+	memset (&amp;message, 0, sizeof (message));
+	EthernetHeader (&amp;request-&gt;ethernet, session.device.MAC, channel.host);
+	IntellonHeader (&amp;request-&gt;intellon, (VS_SW_VER | MMTYPE_REQ));
+	if (sendpacket (&amp;channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+	{
+		margin = report (margin, ECANCELED, INT6K_CANTREAD);
+		return (margin);
+	}
+	if (readpacket (&amp;channel, &amp;message, sizeof (message)) &lt;= 0) 
+	{
+		margin = report (margin, ENODATA, INT6K_CANTSEND);
+		return (margin);
+	}
+	platform = version-&gt;MDEVICEID;
+	memcpy (firmware, version-&gt;MVERSION, sizeof (firmware));
+	memset (&amp;message, 0, sizeof (message));
+	EthernetHeader (&amp;request-&gt;ethernet, session.device.MAC, channel.host);
+	IntellonHeader (&amp;request-&gt;intellon, (VS_RD_MOD | MMTYPE_REQ));
+	request-&gt;MODULEID = VS_MODULE_PIB;
+	request-&gt;LENGTH = INT6K_BLOCKSIZE;
+	request-&gt;OFFSET = 0;
+	if (sendpacket (&amp;channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+	{
+		margin = report (margin, ECANCELED, INT6K_CANTREAD);
+		return (margin);
+	}
+	if (readpacket (&amp;channel, &amp;message, sizeof (message)) &lt;= 0) 
+	{
+		margin = report (margin, ENODATA, INT6K_CANTSEND);
+		return (margin);
+	}
+	output (margin++, &quot;&lt;div class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;pre class='%s'&gt;&quot;, style);
+	output (1, &quot; &quot;);
+	output (1, &quot;Hardware %s&quot;, chipset [platform]);
+	output (1, &quot;Firmware %s&quot;, firmware);
+	output (1, &quot; &quot;);
+	output (1, &quot;PIB %d-%d %d bytes&quot;, pib-&gt;VersionHeader.FWVersion, pib-&gt;VersionHeader.PIBVersion, LE16TOH (pib-&gt;VersionHeader.PIBLength));
+	output (1, &quot;MAC %s&quot;, hexstring (buffer, sizeof (buffer), pib-&gt;LocalDeviceConfig.MAC, sizeof (pib-&gt;LocalDeviceConfig.MAC)));
+	output (1, &quot;DAK %s&quot;, hexstring (buffer, sizeof (buffer), pib-&gt;LocalDeviceConfig.DAK, sizeof (pib-&gt;LocalDeviceConfig.DAK)));
+	output (1, &quot;NMK %s&quot;, hexstring (buffer, sizeof (buffer), pib-&gt;LocalDeviceConfig.NMK, sizeof (pib-&gt;LocalDeviceConfig.NMK)));
+	output (1, &quot;NID %s&quot;, hexstring (buffer, sizeof (buffer), pib-&gt;LocalDeviceConfig.PreferredNID, sizeof (pib-&gt;LocalDeviceConfig.PreferredNID)));
+	output (1, &quot;NET %s&quot;, pib-&gt;LocalDeviceConfig.NET);
+	output (1, &quot;MFG %s&quot;, pib-&gt;LocalDeviceConfig.MFG);
+	output (1, &quot;USR %s&quot;, pib-&gt;LocalDeviceConfig.USR);
+	output (1, &quot;CCo %s&quot;, CCoMode [pib-&gt;LocalDeviceConfig.CCoSelection]);
+	output (1, &quot;MDU %s&quot;, pib-&gt;LocalDeviceConfig.MDUConfiguration? MDURole [pib-&gt;LocalDeviceConfig.MDURole]: &quot;N/A&quot;);
+	output (margin--, &quot;&lt;/pre&gt;&quot;);
+	output (margin--, &quot;&lt;/div&gt;&quot;);
+	return (margin);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='OptionFirmware.c.html' title=' OptionFirmware.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='OptionPriority.c.html' title=' OptionPriority.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

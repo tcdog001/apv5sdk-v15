@@ -1,0 +1,45 @@
+#!/bin/sh
+usage()
+{
+	echo "Usage: test_led  d4/d5/d6  up/down"
+}
+if [ $# -ne 2 ] ;then
+        usage
+        exit 1
+fi
+case $1 in
+  d5)
+	if [ $2 == "up" ];then
+		pro_ctl_util -b 13
+	else if [ $2 == "down" ];then
+		pro_ctl_util -d 13
+	else
+		echo "test_led d5 up/down"
+	fi
+	fi
+	;;
+  d4)
+	if [ $2 == "up" ];then
+		pro_ctl_util -b 14
+	else if [ $2 == "down" ];then
+		pro_ctl_util -d 14
+	else
+		echo "test_led d4 up/down"
+	fi
+        fi
+	;;
+  d6)
+	if [ $2 == "up" ];then
+		pro_ctl_util -b 16
+	else if [ $2 == "down" ];then
+		pro_ctl_util -d 16
+	else
+		echo "test_led d6 up/down"
+	fi
+	fi
+	;;
+  *)
+	usage
+	exit 1
+	;;
+esac

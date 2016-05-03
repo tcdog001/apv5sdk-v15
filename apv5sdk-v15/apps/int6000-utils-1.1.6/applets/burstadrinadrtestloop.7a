@@ -1,0 +1,39 @@
+.TH burstadriadrtestloop 7a "Intellon Corporation" "int6400-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+burstadriadrtestloop - Address-in-Address Scope-loop Applet
+.SH SYNOPSIS
+.RB int6ktest
+.RB [ memctl.nvm ]
+.BR burstadriadrtestloop.nvm
+.RI [ ... ]
+.SH PURPOSE
+This scope-loop applet writes the address of each memory location in that location using burst cycles then reads each location looking for errors. All LEDs blink amber at three cycles per second if an error is detected. 
+.PP
+The applet executes in Tightly Coupled Memory (TCM) so the test is dependent only on the INT6400, SDRAM and the connections between them. SDRAM bus cycle operates at one half of the INT6400 core execution time.  
+.SH PREREQUISITES
+The device must be in bootloader mode. SDRAM must be properly configured. See applet \fBmemctl.nvm\fR for one method of configuring SDRAM.
+.SH DISCLAIMER
+Intellon image file structure and content is proprietary to Intellon Corporation, Ocala FL USA. Consequently, public information is not available. Intellon Corporation reserves the right to change file structure or content in future firmware releases without any obligation to notify or compensate users of this program. This applet is reserved for use by Intellon Field Application Engineers. Intellon makes no claims concerning the reliability of this applet or the suitability of this applet for any particular purpose.
+.SH EXAMPLES
+The following example uses program \fBint6ktest\fR to download and execute applet \fBmemctl.nvm\fR to configure SDRAM then \fBburstadriadrtestloop\fR to test memory.
+.PP
+   # int6ktest memctl.nvm burstadriadrtestloop.nvm
+   eth2 00:B0:52:00:00:01 Start Applet memctl.nvm (0)
+   eth2 00:B0:52:00:00:01 Write Memory (00000040:6076)
+   eth2 00:B0:52:00:00:01 Wrote memctl.nvm
+   eth2 00:B0:52:00:00:01 Start Applet burstadriadrtestloop.nvm (0)
+   eth2 00:B0:52:00:00:01 Write Memory (00001000:1096)
+   eth2 00:B0:52:00:00:01 Wrote burstadriadrtestloop.nvm
+   eth2 00:00:00:00:00:00 Test did not Complete
+.PP
+Program \fBint6ktest\fR will timeout after 60 seconds if control does not return to the bootloader so the "Test did not Complete" message is normal in this case.
+.SH SEE ALSO
+.BR int6ktest ( 7 ),
+.BR memctl ( 7 ),
+.BR flashtest ( 7 ),
+.BR marchloop ( 7 )
+.BR memburst (7)
+.SH CREDITS
+ John Byron <john.byron@intellon.com>
+
+

@@ -1,0 +1,7 @@
+#!/bin/sh
+#sysreboot command in AQ2120
+touch /jffs/sysrebootflag
+/usr/bin/avrutil -y
+
+echo 1 > /proc/sys/dev/wifi0/sysreboot_flag
+/sbin/reboot -f 

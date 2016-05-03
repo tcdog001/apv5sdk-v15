@@ -1,0 +1,6 @@
+#!/bin/sh
+KILLALL=/usr/bin/killall
+
+$KILLALL datamodel >/dev/null 2>&1
+$KILLALL LocalManager >/dev/null 2>&1
+$KILLALL cwmp >/dev/null 2>&1

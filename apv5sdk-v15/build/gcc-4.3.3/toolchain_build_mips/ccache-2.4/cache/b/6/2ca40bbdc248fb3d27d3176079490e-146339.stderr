@@ -1,0 +1,30 @@
+Assembler messages:
+Warning: A different -mtune was already specified, is now mips32r2
+mount_xdr.c: In function 'xdr_fhandle':
+mount_xdr.c:45: warning: unused variable 'buf'
+mount_xdr.c: In function 'xdr_fhstatus':
+mount_xdr.c:55: warning: unused variable 'buf'
+mount_xdr.c: In function 'xdr_dirpath':
+mount_xdr.c:73: warning: unused variable 'buf'
+mount_xdr.c: In function 'xdr_name':
+mount_xdr.c:83: warning: unused variable 'buf'
+mount_xdr.c: In function 'xdr_mountlist':
+mount_xdr.c:93: warning: unused variable 'buf'
+mount_xdr.c: In function 'xdr_mountbody':
+mount_xdr.c:103: warning: unused variable 'buf'
+mount_xdr.c: In function 'xdr_groups':
+mount_xdr.c:117: warning: unused variable 'buf'
+mount_xdr.c: In function 'xdr_groupnode':
+mount_xdr.c:127: warning: unused variable 'buf'
+mount_xdr.c: In function 'xdr_exports':
+mount_xdr.c:139: warning: unused variable 'buf'
+mount_xdr.c: In function 'xdr_exportnode':
+mount_xdr.c:149: warning: unused variable 'buf'
+mount_xdr.c: In function 'xdr_fhandle3':
+mount_xdr.c:282: warning: unused variable 'buf'
+mount_xdr.c: In function 'xdr_mountstat3':
+mount_xdr.c:292: warning: unused variable 'buf'
+mount_xdr.c: In function 'xdr_mountres3_ok':
+mount_xdr.c:302: warning: unused variable 'buf'
+mount_xdr.c: In function 'xdr_mountres3':
+mount_xdr.c:315: warning: unused variable 'buf'

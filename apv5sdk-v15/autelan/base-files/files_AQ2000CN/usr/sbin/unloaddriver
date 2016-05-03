@@ -1,0 +1,30 @@
+#!/bin/sh
+
+/usr/sbin/des_wlan
+#must wait destroy wlan
+sleep 3
+echo unload wifi driver !!!
+cd /lib/modules/2.6.15/net/
+rmmod wlan_sms4.ko;
+rmmod wlan_xauth.ko;
+rmmod wlan_wep.ko;
+rmmod wlan_tkip.ko;
+rmmod wlan_scan_sta.ko;
+rmmod wlan_scan_ap.ko;
+rmmod wlan_ccmp.ko;
+rmmod wlan_acl.ko;
+rmmod ath_pktlog.ko;
+rmmod ath_pci.ko;
+rmmod ath_dev.ko;
+rmmod ath_rate_atheros.ko;
+
+echo ${MOD_LIST} | grep -E ath_dfs -q
+if [ $? -eq 0 ];then
+rmmod ath_dfs;
+fi
+rmmod wlan.ko;
+rmmod ath_hal.ko;
+echo unload Success!!!
+insmod art.ko
+sleep 1
+mdk_client.out &

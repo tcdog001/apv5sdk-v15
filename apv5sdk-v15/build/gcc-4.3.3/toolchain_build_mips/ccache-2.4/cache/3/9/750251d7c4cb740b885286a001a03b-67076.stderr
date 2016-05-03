@@ -1,0 +1,10 @@
+../common/athr_s27_phy.c: In function 'athrs27_reg_init':
+../common/athr_s27_phy.c:211: warning: implicit declaration of function 'athrs27_reg_rmw'
+../common/athr_s27_phy.c: In function 'athrs27_phy_setup':
+../common/athr_s27_phy.c:384: warning: unused variable 'ar7240_revid'
+../common/athr_s27_phy.c: At top level:
+../common/athr_s27_phy.c:786: warning: conflicting types for 'athrs27_reg_rmw'
+../common/athr_s27_phy.c:211: warning: previous implicit declaration of 'athrs27_reg_rmw' was here
+../common/athr_s27_phy.c:853: warning: function declaration isn't a prototype
+../common/athr_s27_phy.c: In function 'athrs27_phy_speed':
+../common/athr_s27_phy.c:572: warning: 'phySpeed' may be used uninitialized in this function

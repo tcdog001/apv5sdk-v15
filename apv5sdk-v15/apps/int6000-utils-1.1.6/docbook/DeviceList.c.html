@@ -1,0 +1,192 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			DeviceList.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='DecodeWriteModule.c.html' title=' DecodeWriteModule.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DeviceList2.c.html' title=' DeviceList2.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed DeviceList (struct int6k * int6k);
+ *   
+ *   int6k.h
+ * 
+ *   Retrieve a list of local devices.
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Nathan Houghton &lt;nathan.houghton@intellon.com&gt;
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef DEVICELIST_SOURCE
+#define DEVICELIST_SOURCE
+
+#include &lt;memory.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../snmp/DeviceList.h&quot;
+
+void free_list (struct device *head) 
+
+{
+	struct device *n;
+	struct device *d;
+	d = head;
+	while (d) 
+	{
+		n = d-&gt;next;
+		free (d);
+		d = n;
+	}
+}
+
+/*
+ * Add an item d to the end of the list. must pass in head.
+ */
+
+void append_list (struct device **head, struct device *d) 
+
+{
+	struct device *n;
+	struct device *i;
+	n = malloc (sizeof (struct device));
+	if (n == NULL) error (1, errno, INT6K_ERR_MEMORY);
+	memcpy (n, d, sizeof (struct device));
+	n-&gt;next = NULL;
+	i = *head;
+	while (i) 
+	{
+		if (i-&gt;next == NULL) break;
+		i = i-&gt;next;
+	}
+
+/* was not an empty list */
+
+	if (i != NULL) i-&gt;next = n;
+	else *head = n;
+}
+
+void dump_list (struct device *d) 
+
+{
+	while (d) 
+	{
+		printf (&quot;mac: %s\n&quot;, d-&gt;mac);
+		printf (&quot;id: %s\n&quot;, d-&gt;id);
+		printf (&quot;fw version: %s\n&quot;, d-&gt;version);
+		d = d-&gt;next;
+		printf (&quot;----\n&quot;);
+	}
+}
+
+struct device *DeviceList (struct int6k * int6k) 
+
+{
+	extern const char * chipset [CHIPSETS+1];
+	static struct device *head;
+	struct device d;
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_sw_ver_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint8_t MDEVICEID;
+		uint8_t MVERLENGTH;
+		char MVERSION [INT6K_VERSTRING];
+		uint8_t UPGRADEABLE;
+		uint32_t MCOOKIE;
+	}
+	* confirm = (struct vs_sw_ver_confirm *) (int6k-&gt;message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	if (head) 
+	{
+		free_list (head);
+		head = NULL;
+	}
+	memset (int6k-&gt;message, 0, sizeof (struct message));
+	hexencode (int6k-&gt;channel-&gt;peer, sizeof (int6k-&gt;channel-&gt;peer), BROADCAST);
+	EthernetHeader (&amp;int6k-&gt;message-&gt;ethernet, int6k-&gt;channel-&gt;peer, int6k-&gt;channel-&gt;host);
+	IntellonHeader (&amp;int6k-&gt;message-&gt;intellon, (VS_SW_VER | MMTYPE_REQ));
+	int6k-&gt;packetsize = ETHER_MIN_LEN;
+	if (SendMME (int6k) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+		return (NULL);
+	}
+	while (ReadMME (int6k, (VS_SW_VER | MMTYPE_CNF)) &gt; 0) 
+	{
+		if (confirm-&gt;MSTATUS) 
+		{
+			continue;
+		}
+		if (confirm-&gt;MDEVICEID &gt; CHIPSETS) 
+		{
+			confirm-&gt;MDEVICEID = 0x00;
+		}
+		bzero (&amp;d, sizeof (struct device));
+		hexdecode (int6k-&gt;message-&gt;ethernet.OSA, sizeof (int6k-&gt;message-&gt;ethernet.OSA), d.mac, sizeof (d.mac));
+		d.id = chipset [confirm-&gt;MDEVICEID];
+		strlcpy (d.version, confirm-&gt;MVERSION, sizeof (d.version));
+		append_list (&amp;head, &amp;d);
+	}
+
+/* NULL if no devices found */
+
+	return head;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='DecodeWriteModule.c.html' title=' DecodeWriteModule.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DeviceList2.c.html' title=' DeviceList2.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

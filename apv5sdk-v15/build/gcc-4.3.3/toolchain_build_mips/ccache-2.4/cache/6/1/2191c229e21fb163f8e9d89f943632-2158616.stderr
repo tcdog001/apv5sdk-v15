@@ -1,0 +1,12 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_main.c: In function '__check_countrycode':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_main.c:94: warning: return discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_main.c: At top level:
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_main.c:94: warning: initialization discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_main.c: In function 'autelan_DumpRegs':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_main.c:1916: warning: unused variable 'v'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_main.c: In function 'ping_send_monitor':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_main.c:2080: warning: ISO C90 forbids mixed declarations and code
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_main.c: In function 'ath_txq_stuck_checker':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_main.c:2119: warning: unused variable 'reset_required'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_main.c: In function 'ath_txq_stuck_checker_wifi1':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_main.c:2491: warning: unused variable 'reset_required'

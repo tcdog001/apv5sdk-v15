@@ -1,0 +1,28 @@
+#!/bin/sh
+
+if [ -z $1 ]; then
+	logger -s "$0 [netboot]"
+	exit 1
+fi
+
+sync
+/bin/sleep 1
+echo "*** Unmounting existing file systems"
+/bin/umount /oldroot/dev/pts
+/bin/umount /oldroot/proc
+/bin/umount -l /oldroot/
+
+/usr/bin/pro_ctl_util -b 125
+
+#flashcp u-boot.bin /dev/mtd7
+/bin/dd if=apv6_boot.bin of=/dev/mtdblock7
+if [ $? -ne 0 ];
+then
+	logger -s "ERROR: failed to copy u-boot image"
+	exit 3
+fi
+/usr/bin/pro_ctl_util -d 125
+
+/bin/sleep 1
+echo D > /proc/kes_debug_flag
+/sbin/reboot

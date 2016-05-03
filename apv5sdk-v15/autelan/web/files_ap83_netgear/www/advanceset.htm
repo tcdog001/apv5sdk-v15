@@ -1,0 +1,459 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+
+xml_vap=`config_read /config/network`
+vapnum=`config_getoption "$xml_vap" vapnum`
+vapname="vap$vapnum"
+
+for vap_allnum in `seq $NUM_ap`
+do
+	eval "xml_wlan_config_vap${vap_allnum}=\`config_read /config/network/vap${vap_allnum}\`"
+	eval "xml_wlan_vap${vap_allnum}_enable=\`config_getoption \"\$xml_wlan_config_vap${vap_allnum}\" create\`"
+done
+
+xml_config=`config_read /config/network/vap$vapnum`
+xml_wlan_workmode=`config_getoption "$xml_config" wlanmode`
+xml_mode=`config_getoption "$xml_config" mode`
+
+xml_wlan_dtim=`config_getoption "$xml_config" dtim`
+
+xml_wlan_frag=`config_getoption "$xml_config" frag`
+xml_wlan_preamble=`config_getoption "$xml_config" preamble`
+xml_wlan_radiotype=`config_getoption "$xml_config" radiotype`
+xml_wlan_rts=`config_getoption "$xml_config" rts`
+xml_wlan_isolation=`config_getoption "$xml_config" isolation`
+xml_bcisolation=`config_getoption "$xml_config" bcisolation`
+xml_wlan_count=`config_getoption "$xml_config" count`
+
+xml_wlan_wifi=`config_getoption "$xml_config" wifi`
+eval cur_power="$"DEVPOWER_$xml_wlan_wifi
+xml_wifi=`config_read /config/network/$xml_wlan_wifi`
+xml_wlan_txpower=`config_getoption "$xml_wifi" txpower`
+xml_wlan_diversity=`config_getoption "$xml_wifi" diversity`
+xml_wlan_txantenna=`config_getoption "$xml_wifi" txantenna`
+xml_wlan_rxantenna=`config_getoption "$xml_wifi" rxantenna`
+[ $cur_power -lt $xml_wlan_txpower ]&&xml_wlan_txpower=$cur_power
+
+xml_config_vlan=`config_read /config/network/vap$vapnum/vlan`
+xml_wlan_vlan_enable=`config_getoption "$xml_config_vlan" enable`
+xml_wlan_vlan_vid=`config_getoption "$xml_config_vlan" vid`
+
+
+Vlan_VID_display()
+{
+    local xml_vap=`config_read /config/network`
+    local vapnum=`config_getoption "$xml_vap" vapnum `
+    local xml_config_vlan1=`config_read /config/network/vap$vapnum/vlan`
+    local xml_wlan_vlan_enable1=`config_getoption "$xml_config_vlan1" enable`
+    local xml_wlan_vlan_vid1=`config_getoption "$xml_config_vlan1" vid`
+ 
+    for vid in `seq 8`
+    do 
+		local xml_vlan=`config_read /config/network/vlan$vid`
+		local xml_vlan_vid=`config_getoption "$xml_vlan" vid`	
+		local xml_vlan_create=`config_getoption "$xml_vlan" create`
+	
+		if [ "$xml_vlan_vid" != "" ];then
+			if [ "$xml_vlan_create" == "yes" ];then
+		      if [ "$xml_wlan_vlan_vid1" == "$xml_vlan_vid"  ] ;then
+	   		    echo "<option value=\"$xml_vlan_vid\" selected=\"checked\">$xml_vlan_vid</option>"
+		      else
+		        echo "<option value=\"$xml_vlan_vid\">$xml_vlan_vid</option>"
+		      fi
+		   fi
+		fi
+
+    done
+}
+
+
+
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js wireless_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script type="text/javascript">
+var flag="<%= $xml_session_lang %>";
+var mode="<%= $xml_mode %>";
+var array_vapcreate=["<%= $xml_wlan_vap1_enable %>","<%= $xml_wlan_vap2_enable %>","<%= $xml_wlan_vap3_enable %>","<%= $xml_wlan_vap4_enable %>","<%= $xml_wlan_vap5_enable %>","<%= $xml_wlan_vap6_enable %>","<%= $xml_wlan_vap7_enable %>","<%= $xml_wlan_vap8_enable %>","<%= $xml_wlan_vap9_enable %>","<%= $xml_wlan_vap10_enable %>","<%= $xml_wlan_vap11_enable %>","<%= $xml_wlan_vap12_enable %>",];
+var vapname="<%= $vapname %>";
+var allvap_num="<%= $NUM_ap %>";
+var txpower="<%= $cur_power %>";
+var work_mode="<%= $xml_wlan_workmode %>";
+	init_mmenu(flag);
+	init_wiremenu(flag);
+	init_adv(flag);
+function valvalidate() {
+    
+    var y = document.all.DTIM;
+    var z = document.all.frag;
+    var w = document.all.txpower;
+    var v = document.all.rts;
+    var value2 = parseInt(y.value);
+    var value3 = parseInt(z.value);
+    var value4 = parseInt(w.value);
+    var value5 = parseInt(v.value);
+    var reg1 = /^[0-9]{1,4}$/;    
+    var reg2 = /^([0-9]{1,4}|auto)$/;    
+     if (!reg1.test(y.value)){
+        alert(y.name + " have illegal characters,must be [0-9] .");
+				y.focus();
+				return false;
+     }
+     else
+       if (value2 < 1 || value2 > 15){
+						alert(y.name + " value is out of range .");
+						y.focus();
+						return false;
+       }	 
+       
+     if (!reg1.test(z.value)){
+        alert(z.name + " have illegal characters,must be [0-9] .");
+				z.focus();
+				return false;
+     }
+     else
+       if (value3 < 256 || value3 > 2346){
+						alert(z.name + " value is out of range .");
+						z.focus();
+						return false;
+       }	 
+	  
+	  
+	    if (!reg2.test(w.value)){
+	        alert(w.name + " have illegal characters,must be [0-9] .");
+					w.focus();
+					return false;
+	     }
+	     else
+	       if (value4 < 1 || value4 > 30){
+							alert(w.name + " value is out of range .");
+							w.focus();
+							return false;
+	       }	 
+	       
+	    if (!reg1.test(v.value)){
+	        alert(v.name + " have illegal characters,must be [0-9] .");
+					v.focus();
+					return false;
+	     }
+	     else
+	       if (value5 < 1 || value5 > 2346){
+							alert(v.name + " value is out of range .");
+							v.focus();
+							return false;
+	       }	
+	   	
+	   	document.all.vap_name.value=document.all.vapname.value;
+	   	
+	   	overlayer();
+}       
+
+
+function isNull()
+{
+	if(document.all.VID.value=="")
+           document.all.vlanenable[1].checked=true;
+}
+
+function atAlerm()
+{
+	if(document.all.diversity.value == "1")
+	   alert("如果你选择这个选项，你必须重启AP才能让其生效!");  
+}
+
+function vap_specific()
+{
+	 document.form0.onsubmit();
+	 document.form0.action="action.cgi";
+	 document.form0.submit(); 
+}
+
+function vapname_display()
+{
+	for(var i = 1;i <= allvap_num;i++)
+	{
+		if(array_vapcreate[i-1] == "yes")
+		{
+			var tmp_vapname="vap"+i;
+			if(vapname == tmp_vapname)
+			{
+			 		document.write("<option value='"+tmp_vapname+"' selected='selected' >"+tmp_vapname+"</option>");
+			}
+			else
+			{
+				  document.write("<option value='"+tmp_vapname+"' >"+tmp_vapname+"</option>");
+			}
+	  }
+	}
+}
+
+function shielding(){
+	if( work_mode != "sta" && work_mode != "client")
+	{
+		  document.getElementById("tab0").style.display="";
+		  document.getElementById("tab1").style.display="";
+		  document.getElementById("tab5").style.display="";
+	}
+	else
+	{
+			document.getElementById("tab0").style.display="none";
+			document.getElementById("tab1").style.display="none";
+			document.getElementById("tab5").style.display="none";
+	}
+}	
+
+</script>
+</head>
+<body onload="shielding()" >
+<%in overlayer.htm %>
+<%in menu_wireless4.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+
+  <div align="center">
+    <table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+    	<tr>
+					<td bordercolor="#d9d9d9">	
+						           <form action="action.cgi" method="post" name="form0" id="form0" onsubmit="return overlayer()">					
+                        <table  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+										      <tr>
+												<td width="100%"  colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(wset_selectap)</script></b></td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+												
+												<tr>
+													<td align="right" height="24" bordercolor="#ffffff" width="280"><script language="javascript">replace(wset_currentap)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" width="370">
+													<select name="vapname" onChange="vap_specific()">
+														<script language="JavaScript" type="text/javascript">vapname_display()</script>
+													</select>	
+													</td>
+												</tr>
+
+										    
+										     </table>
+										     <input type="hidden" value="VAPSpec AS" name="SERVLET">
+										    </form>
+										    <form action="action.cgi" method="post" name="form1" id="form1" onsubmit="return valvalidate()">
+											 <table id="tab0"   bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+										      <tr>
+										        <td align="left"  width="100%" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9" colspan="3"><b><script language="javascript">replace(adv_as)</script> </b></td>
+										      </tr>
+										     
+										     <tr>
+													<td colspan="3" height="10">
+													</td>
+													</tr>
+										     
+										      <tr>
+										        <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_dtim)</script></td>
+										        <td align="left" bordercolor="#ffffff"><input name="DTIM" type="text" size="7" maxlength="3" value="<%= "$xml_wlan_dtim" %>"  ></td>
+											      <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_dtims)</script></td>
+										      </tr>
+										      
+										      <tr>
+										        <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_frag)</script></td>
+										        <td align="left" bordercolor="#ffffff"><input name="frag" type="text" size="7" maxlength="4" value="<%= "$xml_wlan_frag" %>"  ></td>
+											      <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_frags)</script> </td>
+										      </tr>
+										      
+										      <tr>
+										        <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_diversity)</script></td>
+										        <td align="left" bordercolor="#ffffff">
+										        	<select name="diversity" size="1" onChange="atAlerm()">
+										          <option value="1" <% webui_listbox_select "$xml_wlan_diversity" "1" %> >true</option>
+										          <option value="0" <% webui_listbox_select "$xml_wlan_diversity" "0" %>>false</option>
+										         </select></td>
+											      <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_diversitys)</script></td>
+										      </tr>
+										      
+										      <tr>
+										        <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_tx)</script></td>
+										        <td align="left" bordercolor="#ffffff">
+										         <select name="txantenna" size="1">
+										          <option value="0" <% webui_listbox_select "$xml_wlan_txantenna" "0" %>>Auto</option>
+										          <option value="1" <% webui_listbox_select "$xml_wlan_txantenna" "1" %> >Master</option>
+										          <option value="2" <% webui_listbox_select "$xml_wlan_txantenna" "2" %>>Second</option>
+										         </select></td>
+											       <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_txs)</script>  </td>
+										      </tr>
+										      
+										      <tr>
+										        <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_rx)</script></td>
+										        <td align="left" bordercolor="#ffffff">
+										         <select name="rxantenna" size="1">
+										          <option value="0" <% webui_listbox_select "$xml_wlan_rxantenna" "0" %>>Auto</option>
+										          <option value="1" <% webui_listbox_select "$xml_wlan_rxantenna" "1" %> >Master</option>
+										          <option value="2" <% webui_listbox_select "$xml_wlan_rxantenna" "2" %>>Second</option>
+										         </select></td>
+											       <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_rxs)</script> </td>
+										      </tr>
+										      
+										      <tr>
+										        <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_pream)</script></td>
+										        <td align="left" bordercolor="#ffffff">
+										         <select name="preamble" size="1">
+										          <option value="Long" <% webui_listbox_select "$xml_wlan_preamble" "Long" %>>Long</option>
+										          <option value="Short" <% webui_listbox_select "$xml_wlan_preamble" "Short" %>>Short</option>    
+										         </select></td>
+											       <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_preams)</script> </td>
+										      </tr>
+										     
+										      <tr id="pw_lower">
+										        <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_power)</script></td>
+										        <td align="left" bordercolor="#ffffff"><input name="txpower" type="text" size="7" maxlength="4" value="<%= "$xml_wlan_txpower" %>" ></td>
+											      <% if [ "$cur_power" -ge "27" ]; then %>
+											      <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_powers_big)</script>  </td>
+											      <% else %>
+										        <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_powers)</script>  </td>
+										      	<% fi %>
+										      </tr>
+										      
+										     
+										     
+										     <tr>
+										        <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_rts)</script> </td>
+										        <td align="left" bordercolor="#ffffff"><input name="rts" type="text" size="7" maxlength="4" value="<%= "$xml_wlan_rts" %>" ></td>
+											      <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_rtss)</script> </td>
+										      </tr>
+										   
+										   <tr>
+													<td colspan="3" height="10">
+													</td>
+													</tr>
+										   
+										    <tr>
+										        <td align="left"  width="100%" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9" colspan="3"><b><script language="javascript">replace(adv_user_set)</script></b></td>
+										      </tr>
+										     
+										     <tr>
+													<td colspan="3" height="10">
+													</td>
+													</tr>
+										   
+										    
+										    <tr>
+												<td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(wset_count)</script>&nbsp;</td>
+												<td align="left" bordercolor="#ffffff"><input type="text" name="count" size="7" maxlength="3" value="<%= "$xml_wlan_count" %>"></td>
+												<td align="left" bordercolor="#ffffff"></td>
+												</tr>
+										    
+										    <tr>
+										    	<td align="left" bordercolor="#ffffff"><script language="javascript">replace(wset_isa)</script></td>
+												  <td align="left" height="24" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_wlan_isolation" "0" %> name="isolation" value="0">&nbsp;</td>
+												  <td align="left" bordercolor="#ffffff"></td>
+												</tr>
+												
+												 <tr>
+										    	<td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_cast_iso)</script></td>
+												  <td align="left" height="24" bordercolor="#ffffff">
+												  	<select name="bcisolation" size="1">
+												  		<option value="0" <% webui_listbox_select "$xml_bcisolation" "0" %>>None</option>
+										          <option value="1" <% webui_listbox_select "$xml_bcisolation" "1" %>>Unicast</option>
+										          <option value="2" <% webui_listbox_select "$xml_bcisolation" "2" %>>Multicast</option>    
+										         </select>
+												  <td align="left" bordercolor="#ffffff"></td>
+												</tr>
+												
+										     
+										    <tr>
+													<td colspan="3" height="10">
+													</td>
+													</tr>
+										    </table>
+											 <table id="tab1"   bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+			                    
+										      <tr>
+													<td colspan="3" height="10">
+													</td>
+													</tr>
+										 
+										      <tr>
+										        <td align="left"  width="100%" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9" colspan="3"><b><script language="javascript">replace(adv_vlan)</script></b></td>
+										       </tr>
+										       
+										       <tr>
+													<td colspan="3" height="10">
+													</td>
+													</tr>
+										      
+										      <tr>
+										        <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_vlans)</script></td>
+										        <td align="left" bordercolor="#ffffff">
+											       <input type="radio" <% webui_radiobutton_check "$xml_wlan_vlan_enable" "1" %> name="vlanenable" value="1" onclick="isNull()">
+										          Enable
+										         <input type="radio" <% webui_radiobutton_check "$xml_wlan_vlan_enable" "0" %> name="vlanenable" value="0" >
+										        Disable
+										        </td>
+										         <td align="left" bordercolor="#ffffff"></td>
+										      </tr>
+										      
+										      <tr>
+										        <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_vid)</script></td>
+										      	<td align="left" bordercolor="#ffffff">
+										          <select name="VID" size="1">
+										            <% Vlan_VID_display %>
+										          </select></td>
+										          <td align="left" bordercolor="#ffffff"></td>
+										      </tr>
+											    
+											    <tr>
+													<td colspan="3" height="10">
+													</td>
+													</tr>
+											    </table>
+							 </td>
+       </tr>
+     </table>
+		                      <table id="tab5"  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+											    <tr>
+											     <td align="center" height="40px" valign="middle" >
+											       <script language="javascript">replace(adv_apply)</script>
+											      </td>
+											     </tr>
+											     <tr>
+										        <td align="right"   colspan="2"><script language="javascript">replace(adv_help)</script></td>
+										      </tr>
+    </table>
+      <input type="hidden" name="SERVLET" value="Advanceset Apply">
+      <input type="hidden" name="vap_name" value="">
+    </form>
+  </div>
+
+
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

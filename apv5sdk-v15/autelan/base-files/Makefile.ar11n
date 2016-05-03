@@ -1,0 +1,58 @@
+.NOTPARALLEL:
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR := files
+CAV_BUILD_DIR := files_ap83
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+unexport LDFLAGS
+
+.PHONY: all
+all: install 
+
+
+RMFILE := preconfig_wapi preconfig_11bg config_wapi config_11bg
+TARGETPREFILE := preconfig_11n
+TARGETCONFFILE := config_11n
+
+.PHONY: install
+install:
+ifeq ($(BOARD_TYPE),db12x)
+	cp -rf ${PKG_BUILD_DIR}_APV5/* ${CAV_BUILD_DIR}/
+ifeq ($(AQ_TYPE),XJ9344)
+	cp -rf ${PKG_BUILD_DIR}_$(AQ_TYPE)/* ${CAV_BUILD_DIR}/	       
+endif
+else
+ifeq ($(BOARD_TYPE),amcc)
+	cp -rf ${PKG_BUILD_DIR}_amcc/* ${CAV_BUILD_DIR}/
+else
+ifeq ($(BOARD_TYPE),armada370)
+	cp -rf ${PKG_BUILD_DIR}_armada370/* ${CAV_BUILD_DIR}/
+else
+	cp -rf ${PKG_BUILD_DIR}_$(AQ_TYPE)/* ${CAV_BUILD_DIR}/	        
+endif
+endif
+endif
+
+ifeq ($(GDB_DEBUG),n)
+	rm -rf ${CAV_BUILD_DIR}/etc/init.d/rcS_debug
+else
+#	mv -f ${CAV_BUILD_DIR}/etc/init.d/rcS_debug ${CAV_BUILD_DIR}/etc/init.d/rcS
+	echo ""
+endif
+
+	rm -rf ${ROOTFSDIR}/etc/passwd
+	rm -rf ${PKG_BUILD_DIR}/sbin/set_mac
+	cp -rf ${CAV_BUILD_DIR}/* ${ROOTFSDIR}/
+
+	( cd ${ROOTFSDIR}/etc/wlan && \
+	mv ${TARGETPREFILE} preconfig && \
+	mv ${TARGETCONFFILE} config.ap83 ) 
+	rm -rf ${ROOTFSDIR}/etc/wlan/setsysled
+	ln -sf /tmp/passwd ${ROOTFSDIR}/etc/passwd
+	ln -sf /tmp/crontabs ${ROOTFSDIR}/etc/crontabs
+	ln -sf /tmp/wlan.conf ${ROOTFSDIR}/usr/sbin/wlan.conf  #yuan add for 7240 wapi
+	rm -rf ${ROOTFSDIR}/var

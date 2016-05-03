@@ -1,0 +1,3 @@
+ABS_PATH=$PWD
+make distclean
+./configure --with-cc=/opt/dev_env/XSCALE/usr/local/bin/arm-linux-gcc --with-cflags="-mbig-endian -O2" --host=xscale --with-endianness=big --enable-mfd-rewrites --disable-applications --disable-debugging --disable-mibs --disable-scripts --disable-manuals --disable-embedded-perl --disable-perl-cc-checks --with-sys-location="IWNCOMM" --with-sys-contact="www.iwncomm.com" --with-default-snmp-version="3" --with-enterprise-oid=4000 --with-enterprise-sysoid=.1.3.6.1.4.1.4000.100.2.23 --with-persistent-directory="/tmp" --with-logfile="/tmp/snmp.log" --sysconfdir="/etc/IWNCOMM/snmp" --with-libs=$ABS_PATH/agent/libiw.so.xscale --with-mib-modules=" "

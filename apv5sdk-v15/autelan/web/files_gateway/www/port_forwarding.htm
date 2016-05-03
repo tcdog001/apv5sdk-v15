@@ -1,0 +1,257 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_virtual_server=`config_read /config/firewall/virtual_server`
+xml_virtual_server_count=`config_getoption "$xml_virtual_server" rule_count`
+
+xml_state1=`config_getoption "$xml_virtual_server" enable1`
+xml_private_ip1=`config_getoption "$xml_virtual_server" private_ip1`
+xml_private_port1=`config_getoption "$xml_virtual_server" private_port1`
+xml_protocal_type1=`config_getoption "$xml_virtual_server" protocal_type1`
+xml_public_port1=`config_getoption "$xml_virtual_server" public_port1`
+
+xml_state2=`config_getoption "$xml_virtual_server" enable2`
+xml_private_ip2=`config_getoption "$xml_virtual_server" private_ip2`
+xml_private_port2=`config_getoption "$xml_virtual_server" private_port2`
+xml_protocal_type2=`config_getoption "$xml_virtual_server" protocal_type2`
+xml_public_port2=`config_getoption "$xml_virtual_server" public_port2`
+
+xml_state3=`config_getoption "$xml_virtual_server" enable3`
+xml_private_ip3=`config_getoption "$xml_virtual_server" private_ip3`
+xml_private_port3=`config_getoption "$xml_virtual_server" private_port3`
+xml_protocal_type3=`config_getoption "$xml_virtual_server" protocal_type3`
+xml_public_port3=`config_getoption "$xml_virtual_server" public_port3`
+
+xml_state4=`config_getoption "$xml_virtual_server" enable1`
+xml_private_ip4=`config_getoption "$xml_virtual_server" private_ip4`
+xml_private_port4=`config_getoption "$xml_virtual_server" private_port4`
+xml_protocal_type4=`config_getoption "$xml_virtual_server" protocal_type4`
+xml_public_port4=`config_getoption "$xml_virtual_server" public_port4`
+
+xml_state5=`config_getoption "$xml_virtual_server" enable5`
+xml_private_ip5=`config_getoption "$xml_virtual_server" private_ip5`
+xml_private_port5=`config_getoption "$xml_virtual_server" private_port5`
+xml_protocal_type5=`config_getoption "$xml_virtual_server" protocal_type5`
+xml_public_port5=`config_getoption "$xml_virtual_server" public_port5`
+
+xml_state6=`config_getoption "$xml_virtual_server" enable6`
+xml_private_ip6=`config_getoption "$xml_virtual_server" private_ip6`
+xml_private_port6=`config_getoption "$xml_virtual_server" private_port6`
+xml_protocal_type6=`config_getoption "$xml_virtual_server" protocal_type6`
+xml_public_port6=`config_getoption "$xml_virtual_server" public_port6`
+
+xml_state7=`config_getoption "$xml_virtual_server" enable7`
+xml_private_ip7=`config_getoption "$xml_virtual_server" private_ip7`
+xml_private_port7=`config_getoption "$xml_virtual_server" private_port7`
+xml_protocal_type7=`config_getoption "$xml_virtual_server" protocal_type7`
+xml_public_port7=`config_getoption "$xml_virtual_server" public_port7`
+
+xml_state8=`config_getoption "$xml_virtual_server" enable8`
+xml_private_ip8=`config_getoption "$xml_virtual_server" private_ip8`
+xml_private_port8=`config_getoption "$xml_virtual_server" private_port8`
+xml_protocal_type8=`config_getoption "$xml_virtual_server" protocal_type8`
+xml_public_port8=`config_getoption "$xml_virtual_server" public_port8`
+
+xml_state9=`config_getoption "$xml_virtual_server" enable9`
+xml_private_ip9=`config_getoption "$xml_virtual_server" private_ip9`
+xml_private_port9=`config_getoption "$xml_virtual_server" private_port9`
+xml_protocal_type9=`config_getoption "$xml_virtual_server" protocal_type9`
+xml_public_port9=`config_getoption "$xml_virtual_server" public_port9`
+
+xml_state10=`config_getoption "$xml_virtual_server" enable10`
+xml_private_ip10=`config_getoption "$xml_virtual_server" private_ip10`
+xml_private_port10=`config_getoption "$xml_virtual_server" private_port10`
+xml_protocal_type10=`config_getoption "$xml_virtual_server" protocal_type10`
+xml_public_port10=`config_getoption "$xml_virtual_server" public_port10`
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Port Forwarding</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<script language="javascript" src="JAS.js">
+</script>
+<script language="javascript" >
+
+function addrulecount()
+{
+	if(myTable.rows.length<11)
+	{
+		var count=parseInt(document.all.rule_num.value)+1;
+		document.all.rule_num.value = count;
+	}
+}
+function delrulecount()
+{
+	if(myTable.rows.length>2)
+	{
+		var count=parseInt(document.all.rule_num.value)-1;
+		document.all.rule_num.value = count;
+	}
+}
+
+/****************************************************/
+/*insert one row for port_forwarding.htm           */
+/****************************************************/
+var virtual_server_count="<%= $xml_virtual_server_count %>";
+var server_arr=["<%= $xml_state1 %>","<%= $xml_private_ip1 %>","<%= $xml_private_port1 %>","<%= $xml_protocal_type1 %>","<%= $xml_public_port1 %>","<%= $xml_state2 %>","<%= $xml_private_ip2 %>","<%= $xml_private_port2 %>","<%= $xml_protocal_type2 %>","<%= $xml_public_port2 %>","<%= $xml_state3 %>","<%= $xml_private_ip3 %>","<%= $xml_private_port3 %>","<%= $xml_protocal_type3 %>","<%= $xml_public_port3 %>","<%= $xml_state4 %>","<%= $xml_private_ip4 %>","<%= $xml_private_port4 %>","<%= $xml_protocal_type4 %>","<%= $xml_public_port4 %>","<%= $xml_state5 %>","<%= $xml_private_ip5 %>","<%= $xml_private_port5 %>","<%= $xml_protocal_type5 %>","<%= $xml_public_port5 %>","<%= $xml_state6 %>","<%= $xml_private_ip6 %>","<%= $xml_private_port6 %>","<%= $xml_protocal_type6 %>","<%= $xml_public_port6 %>","<%= $xml_state7 %>","<%= $xml_private_ip7 %>","<%= $xml_private_port7 %>","<%= $xml_protocal_type7 %>","<%= $xml_public_port7 %>","<%= $xml_state8 %>","<%= $xml_private_ip8 %>","<%= $xml_private_port8 %>","<%= $xml_protocal_type8 %>","<%= $xml_public_port8 %>","<%= $xml_state9 %>","<%= $xml_private_ip9 %>","<%= $xml_private_port9 %>","<%= $xml_protocal_type9 %>","<%= $xml_public_port9 %>","<%= $xml_state10 %>","<%= $xml_private_ip10 %>","<%= $xml_private_port10 %>","<%= $xml_protocal_type10 %>","<%= $xml_public_port10 %>",];
+var num = 1;
+var i = 0;
+function insRow(obj)
+{
+	if( obj == "first entry")
+	{
+
+		for( i=0; i<virtual_server_count; i++)
+		{
+			var row_num = String(i+1);
+			var nameCell0 = "private_ip" + row_num;
+			var nameCell1 = "private_port" + row_num;
+			var nameCell2 = "type" + row_num;
+			var nameCell3 = "public_port" + row_num;
+			var nameCell4 = "enabled" + row_num;
+
+			var newRow = document.getElementById('myTable').insertRow(myTable.rows.length);
+        		newRow.id = row_num;
+			newRow.align = "center";
+			var cell0 = newRow.insertCell(0);
+			cell0.className = "td_style";
+			cell0.innerHTML="<input type='text' name='" + nameCell0 + "'  value='" + server_arr[5*i+1] + "'  style='height:12px; width:88px'/>";
+			var cell1 = newRow.insertCell(1);
+			cell1.className = "td_style";
+			cell1.innerHTML="<input type='text' name='" + nameCell1 + "' value='" + server_arr[5*i+2] + "'  style='height:12px; width:40px'/>";
+			var cell2 = newRow.insertCell(2);
+			cell2.className = "td_style";
+			if( server_arr[5*i+3] == "tcp")
+				cell2.innerHTML="<select name='" + nameCell2 + "' id='" + nameCell2 + "' style='width:80px; font-family:Arial, Helvetica, sans-serif; font-size:10px'><option value='tcp' selected=selected >TCP<option value='udp' >UDP<option value='tcp_udp' >TCP/UDP</select>";
+			else if( server_arr[5*i+3] == "udp")
+				cell2.innerHTML="<select name='" + nameCell2 + "' id='" + nameCell2 + "' style='width:80px; font-family:Arial, Helvetica, sans-serif; font-size:10px'><option value='tcp' >TCP<option value='udp' selected=selected >UDP<option value='tcp_udp' >TCP/UDP</select>";
+			else
+				cell2.innerHTML="<select name='" + nameCell2 + "' id='" + nameCell2 + "' style='width:80px; font-family:Arial, Helvetica, sans-serif; font-size:10px'><option value='tcp' >TCP<option value='udp' >UDP<option value='tcp_udp' selected=selected >TCP/UDP</select>";
+
+
+			var cell3 = newRow.insertCell(3);
+			cell3.className = "td_style";
+			cell3.innerHTML="<input type='text' name='" + nameCell3 + "' value='" + server_arr[5*i+4] + "'  style='height:12px; width:40px'/>";
+			var cell4 = newRow.insertCell(4);
+			cell4.className = "td_style";
+			if( server_arr[5*i] == "enable")
+				cell4.innerHTML="<input type='checkbox' checked name='" + nameCell4 + "' value='enable'/>";
+			else
+				cell4.innerHTML="<input type='checkbox' name='" + nameCell4 + "' value='enable'/>";
+		}
+		if (i==0)
+			num = 1;
+		else
+			num = i ;
+			
+		for(var i=1;i<myTable.rows.length;i++)
+			document.getElementById("myTable").rows[i].style.display="";
+	}
+	else
+	{
+		num = num + 1 ;
+		if(myTable.rows.length<11)
+		{
+			
+			var row_num = String(num);
+			var nameCell0 = "private_ip" + row_num;
+			var nameCell1 = "private_port" + row_num;
+			var nameCell2 = "type" + row_num;
+			var nameCell3 = "public_port" + row_num;
+			var nameCell4 = "enabled" + row_num;
+			var newRow = document.getElementById('myTable').insertRow(myTable.rows.length);
+        		newRow.id = String(num+1);
+			newRow.align = "center";
+			var cell0 = newRow.insertCell(0);
+			cell0.className = "td_style";
+			cell0.innerHTML="<input type='text' name='" + nameCell0 + "' style='height:12px; width:88px'/>";
+			var cell1 = newRow.insertCell(1);
+			cell1.className = "td_style";
+			cell1.innerHTML="<input type='text' name='" + nameCell1 + "' style='height:12px; width:40px'/>";
+			var cell2 = newRow.insertCell(2);
+			cell2.className = "td_style";
+			cell2.innerHTML="<select name='" + nameCell2 + "' id='" + nameCell2 + "' style='width:80px; font-family:Arial, Helvetica, sans-serif; font-size:10px'><option value='tcp'>TCP<option value='udp'>UDP<option value='tcp_udp'>TCP/UDP</select>";
+			var cell3 = newRow.insertCell(3);
+			cell3.className = "td_style";
+			cell3.innerHTML="<input type='text' name='" + nameCell3 + "' style='height:12px; width:40px'/>";
+			var cell4 = newRow.insertCell(4);
+			cell4.className = "td_style";
+			cell4.innerHTML="<input type='checkbox' name='" + nameCell4 + "' value='enable'/>";
+		}
+		else
+		{
+			num = num - 1;
+			alert("Max number of fiter virtual server is 10!");
+		}
+	}
+}
+/**************************************************************/
+/*delete one row for port_forwarding.htm                     */
+/**************************************************************/
+function delRow(){
+	if(myTable.rows.length>2){
+	num = num - 1;
+	 	document.getElementById('myTable').deleteRow();
+}
+}
+
+</script>
+</head>
+
+<body bgcolor="#efefef" onload='insRow("first entry");'>
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1"><a href="firewall.htm" target="MainFrame">IP</a></td>
+		  <td class="top1"><a href="mac.htm" target="MainFrame">MAC</a></td>
+		  <td class="top1"><a href="url.htm" target="MainFrame">URL</a></td>
+		  <td class="top1"><a href="dos.htm" target="MainFrame">DoS</a></td>
+		  <td class="top1">Virtual server</td>
+		  <td class="top1"><a href="ip_forwarding.htm" target="MainFrame">DMZ</a></td>
+		  <td class="top1"><a href="upnp.htm" target="MainFrame">upnp</a></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">Firewall-->Virtual server</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:20px">
+<form method="post" action="<%= $firewall_action_cgi %>" >
+<table width="580" border="0" class="main">
+  <tr>
+    <td width="230"><font class="table_head" title="Port Forwarding illustration">Virtual server</font></td>
+	<td width="280"><input id="but" type="button" name="insert_one_row" value="Add" onclick='addrulecount();insRow("click");'/></td>
+	<td width="70"><input id="but" type="button" name="delete_one_row" value="Delete" onclick="delrulecount();delRow();"/></td>
+  </tr>
+  <tr>
+    <td colspan="3" style="padding-top:5px; padding-bottom:10px">
+	  <table id="myTable" width="580" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr align="center">
+          <td class="td_style">Private IP</td>
+          <td class="td_style">Private Port</td>
+		  <td class="td_style">Type</td>
+		  <td class="td_style">Public Port</td>
+		  <td class="td_style">Enabled</td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td colspan="3"><input id="but" type="submit" name="ip_filter_commit" value="Submit"/></td>
+  </tr>
+</table>
+<input type="hidden" value="virtual server" name="SERVLET">
+<input type="hidden" value="<%= $xml_virtual_server_count %>" name="rule_num">
+</form>
+</div>
+</body>
+</html>

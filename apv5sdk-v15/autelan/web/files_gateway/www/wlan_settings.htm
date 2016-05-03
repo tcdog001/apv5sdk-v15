@@ -1,0 +1,177 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+workmode=`$IWCONFIG ath0 2>/dev/null |grep  -i -o 'IEEE 802.11[a,b,g]' | cut -d. -f2 2>/dev/null`
+essid=`$IWCONFIG ath0 2>/dev/null|grep -i -e 'ESSID:' |awk -F'"' '{print $2}' 2>/dev/null`
+apmode=`$IWCONFIG ath0 2>/dev/null|grep -o  -e 'Mode:[0-9a-zA-Z]\{1,64\}' |cut -d: -f2 2>/dev/null`
+frequency=`$IWCONFIG ath0 2>/dev/null|grep -o  -e 'Frequency:[0-9]\{1,3\}.[0-9]\{1,3\} GHz' |cut -d: -f2 2>/dev/null`
+channel=`$IWCONFIG ath0 2>/dev/null|grep -o  -e 'Channel:[0-9]\{1,3\}' 2>/dev/null`
+accesspoint=`$IWCONFIG ath0 2>/dev/null|grep  -i -o -e 'Access Point: [a-zA-Z0-9:-]\{1,20\}'|awk '{print $3}' 2>/dev/null`
+bitrate=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Bit Rate[:=][0-9]\{1,4\} [kM]b/s'|cut -d= -f2|cut -d: -f2 2>/dev/null`
+txpower=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Tx-Power[:=][0-9]\{1,2\} dBM'|cut -d: -f2|cut -d= -f2 2>/dev/null`
+sensitivity=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Sensitivity=[0-9]\{1,2\}/[0-9]\{1,2\}'|cut -d= -f2 2>/dev/null`
+retry=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Retry[:=][0-9a-zA-Z ]\{1,6\}'|cut -d= -f2|cut -d: -f2 2>/dev/null`
+rtsthr=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'RTS thr[:=][0-9a-zA-Z ]\{1,6\}'|cut -d= -f2|cut -d: -f2 2>/dev/null`
+fragmentthr=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Fragment thr[:=][0-9a-zA-Z ]\{1,6\}'|cut -d= -f2|cut -d: -f2 2>/dev/null`
+Encryptionkey=`$IWCONFIG ath0 2>/dev/null|grep -o -i 'Encryption key:[0-9a-zA-Z-]\{1,50\}'|cut -d: -f2 2>/dev/null`
+securitymode=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Security mode:[a-z]\{1,6\}'|cut -d: -f2 2>/dev/null`
+powermanagement=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Power Management:[0-9a-z]\{1,6\}'|cut -d: -f2 2>/dev/null`
+linkquality=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Link Quality=[0-9/]\{1,7\}'|cut -d= -f2 2>/dev/null`
+Signallevel=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Signal level=[0-9-]\{1,7\} dBM'|cut -d= -f2 2>/dev/null`
+Noiselevel=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Noise level=[0-9-]\{1,7\} dBM'|cut -d= -f2 2>/dev/null`
+Rxinvalidnwid=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Rx invalid nwid:[0-9]\{1,8\}'|cut -d: -f2 2>/dev/null`
+Rxinvalidcrypt=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Rx invalid crypt:[0-9]\{1,8\}'|cut -d: -f2 2>/dev/null`
+Rxinvalidfrag=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Rx invalid frag:[0-9]\{1,8\}'|cut -d: -f2 2>/dev/null`
+txexcessiv=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Tx excessive retries:[0-9]\{1,8\}'|cut -d: -f2 2>/dev/null`
+invalidmisc=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Invalid misc:[0-9]\{1,8\}'|cut -d: -f2 2>/dev/null`
+missedbeacon=`$IWCONFIG ath0 2>/dev/null|grep -o -i -e 'Missed beacon:[0-9]\{1,8\}'|cut -d: -f2 2>/dev/null`
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>WLAN Settings</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+</head>
+
+<body bgcolor="#efefef">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1">WLAN State</td>
+          <td class="top1"><a href="wlan_set.htm" target="MainFrame">WLAN Settings</a></td>
+          <td class="top1"><a href="security_settings.htm" target="MainFrame">Security Settings</a></td>
+		  <td class="top1"><a href="radius_settings.htm" target="MainFrame">Radius Settings</a></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">WLAN Settings-->WLAN State</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="Wlan Current Status illustration">Wlan Current Status</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	  	<tr>
+          <td class="td_style">Wlan MAC Address </td>
+          <td class="td_style"><%= $accesspoint %></td>
+        </tr>
+	    <tr>
+          <td class="td_style" width="150">ESSID</td>
+          <td class="td_style" width="350"><%= $essid %></td>
+        </tr>
+		<tr>
+          <td class="td_style">Rate</td>
+          <td class="td_style"><%= $bitrate %></td>
+        </tr>
+		<tr>
+          <td class="td_style">Work Mode</td>
+          <td class="td_style"><%= $workmode %></td>
+        </tr>
+    <tr>
+          <td class="td_style">Mode</td>
+          <td class="td_style"><%= $apmode %></td>
+        </tr>
+     <% if [ "$channel" != "" ];then %>
+    <tr>
+          <td class="td_style">Channel</td>
+          <td class="td_style"><%= $channel %></td>
+    </tr>
+    <% fi %>
+    <% if [ "$frequency" != "" ];then %>
+    <tr>
+          <td class="td_style">Frequency</td>
+          <td class="td_style"><%= $frequency %></td>
+    </tr>
+    <% fi %>
+    <tr>
+          <td class="td_style">TxPower</td>
+          <td class="td_style"><%= $txpower %></td>
+        </tr>
+    <tr>
+          <td class="td_style">Sensitivity</td>
+          <td class="td_style"><%= $sensitivity %></td>
+        </tr>
+    <tr>
+          <td class="td_style">Retry</td>
+          <td class="td_style"><%= $retry %></td>
+        </tr>
+    <tr>
+          <td class="td_style">RTS thr</td>
+          <td class="td_style"><%= $rtsthr %></td>
+    </tr>
+     <tr>
+          <td class="td_style">Fragment thr</td>
+          <td class="td_style"><%= $fragmentthr %></td>
+    </tr>
+    <tr>
+          <td class="td_style">Encryption key</td>
+          <td class="td_style"><%= $Encryptionkey %></td>
+    </tr>
+    <% if [ "$securitymode" != "" ];then %>
+    <tr>
+          <td class="td_style">Security Mode</td>
+          <td class="td_style"><%= $securitymode %></td>
+    </tr>
+    <% fi %>
+    <tr>
+          <td class="td_style">Power Management</td>
+          <td class="td_style"><%= $powermanagement %></td>
+    </tr>   
+    <tr>
+          <td class="td_style">Link Quality</td>
+          <td class="td_style"><%= $linkquality %></td>
+    </tr>  
+    <tr>
+          <td class="td_style">Signal level</td>
+          <td class="td_style"><%= $Signallevel %></td>
+    </tr>  
+    <tr>
+          <td class="td_style">Noise level</td>
+          <td class="td_style"><%= $Noiselevel %></td>
+    </tr>  
+    <tr>
+          <td class="td_style">Rx invalid nwid</td>
+          <td class="td_style"><%= $Rxinvalidnwid %></td>
+    </tr> 
+    <tr>
+          <td class="td_style">Rx invalid crypt</td>
+          <td class="td_style"><%= $Rxinvalidcrypt %></td>
+    </tr> 
+    <tr>
+          <td class="td_style">Rx invalid frag</td>
+          <td class="td_style"><%= $Rxinvalidfrag %></td>
+    </tr> 
+    <tr>
+          <td class="td_style">Tx excessive retries</td>
+          <td class="td_style"><%= $txexcessiv %></td>
+    </tr> 
+    <tr>
+          <td class="td_style">Invalid misc</td>
+          <td class="td_style"><%= $invalidmisc %></td>
+    </tr> 
+    <tr>
+          <td class="td_style">Missed beacon</td>
+          <td class="td_style"><%= $missedbeacon %></td>
+    </tr>  
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><a class="imgLink" href="#" onclick="window.parent.frames.MainFrame.location.reload();">Refresh</a></td>
+  </tr>
+</table>
+</div>
+</body>
+</html>

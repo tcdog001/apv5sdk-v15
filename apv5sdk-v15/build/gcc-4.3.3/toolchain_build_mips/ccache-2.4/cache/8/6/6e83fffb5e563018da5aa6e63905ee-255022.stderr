@@ -1,0 +1,5 @@
+ctrl_iface.c: In function 'wapid_ctrl_check_cert':
+ctrl_iface.c:541: warning: passing argument 1 of 'load_x509' from incompatible pointer type
+ctrl_iface.c: At top level:
+ctrl_iface.c:550: warning: unused parameter 'buf'
+ctrl_iface.c:550: warning: unused parameter 'buf_len'

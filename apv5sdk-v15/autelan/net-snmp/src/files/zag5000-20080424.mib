@@ -1,0 +1,4985 @@
+
+
+	ZAG5000 DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			ifIndex			
+				FROM RFC1213-MIB			
+			OBJECT-GROUP			
+				FROM SNMPv2-CONF			
+			enterprises, IpAddress, Integer32, Counter64, OBJECT-TYPE, 
+			MODULE-IDENTITY			
+				FROM SNMPv2-SMI			
+			DisplayString, MacAddress, TruthValue		
+				FROM SNMPv2-TC;
+	
+	
+		zag5000 MODULE-IDENTITY 
+			LAST-UPDATED "200602241244Z"       -- February 24, 2006 at 12:44 GMT
+			ORGANIZATION 
+				""
+			CONTACT-INFO 
+				""
+			DESCRIPTION 
+				"The MIB module for nb 802.11a/b/g Wireless Access Point entities.
+				iso(1).org(3).dod(6).internet(1).private(4).enterprises(1).nb(1567).
+				zag5000(5000)"
+			::= { nb 5000 }
+
+		
+	
+	
+--
+-- Node definitions
+--
+
+		nb OBJECT IDENTIFIER ::= { enterprises 1567 }
+
+		
+		systemSetting OBJECT IDENTIFIER ::= { zag5000 1 }
+
+		
+		sysVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the AP firmware version."
+			::= { systemSetting 1 }
+
+		
+		sysMacAddr OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the MAC address."
+			::= { systemSetting 2 }
+
+		
+		sysAPName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..15))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field shall indicate the host name of AP."
+			::= { systemSetting 3 }
+
+		
+		sysSpanningTreeEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field indicates whether spanning tree is enabled."
+			::= { systemSetting 4 }
+
+		
+		sysCountryRegion OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				australia(36),
+				austria(40),
+				canada(124),
+				china(156),
+				taiwan(158),
+				denmark(208),
+				finland(246),
+				france(250),
+				germany(276),
+				hongkong(344),
+				iceland(352),
+				ireland(372),
+				italy(380),
+				japan(392),
+				liechtenstein(438),
+				luxembourg(442),
+				netherlands(528),
+				newzealand(554),
+				norway(578),
+				portugal(620),
+				russia(643),
+				singapore(702),
+				spain(724),
+				sweden(752),
+				switzerland(756),
+				unitedkingdom(826),
+				unitedstates(840)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field shall indicate the country/region of wireless domain."
+			::= { systemSetting 5 }
+
+		wams OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				true(1),
+				false(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"WAMS."
+			::= { systemSetting 6 }
+		watchdog OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				true(1),
+				false(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Watchdog."
+			::= { systemSetting 7 }
+
+		-- for WMM/Vlan/multiSSID
+		vlanEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				true(1),
+				false(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate whether enable VLAN(802.1Q)."
+			::= { systemSetting 8 }
+
+		
+		managementVlanID OBJECT-TYPE
+			SYNTAX INTEGER (0..4094)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Management VLAN ID.  "
+			::= { systemSetting 9 }
+		-- for WMM/Vlan/multiSSID
+
+		ethernetDataRate OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				automatic(0),
+				tBase10Mbps(10),
+				tBase100Mbps(100)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the data rate of ethernet."
+			::= { systemSetting 10 }
+
+		sysRedBootVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the AP redboot version."
+			::= { systemSetting 11 }
+
+		ntpdEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disabled(0),
+				enabled(1)
+				}	
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the NTPD if enabled."
+			::= { systemSetting 12 }  
+
+ 		softwareVendor OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the software vender of AP."
+			::= { systemSetting 13 }
+			
+		softwareName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the file name of firmware."
+			::= { systemSetting 14 }
+
+		apBssidNum OBJECT-TYPE
+			SYNTAX INTEGER (0..32)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the number of current AP's interface."
+			::= { systemSetting 15 }
+
+		essidBssidNum OBJECT-TYPE
+			SYNTAX INTEGER (0..32)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the number of current essid's interface."
+			::= { systemSetting 16 }
+
+		apSysNEId OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates the network coding of CMCC customize."
+			::= { systemSetting 17 }			
+
+
+		syslogEnabled OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate whether syslog is enabled.
+				Default: disabled."
+			::= { systemSetting 18 }
+
+		
+		syslogServerIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the syslog server IP address."
+			::= { systemSetting 19 }
+
+		
+		syslogServerPort OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the syslog server port number.
+				Default: 514."
+			::= { systemSetting 20 }
+
+		userName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..15))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field shall indicate the user name."
+			::= { systemSetting 21 }
+
+		mibVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the MIB version."
+			::= { systemSetting 22 }
+
+		cpuUsage OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the usage rate of CPU."
+			::= { systemSetting 23 }
+
+		memoryUsage OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the usage rate of Memory."
+			::= { systemSetting 24 }
+
+		memoryCapacity OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Memory Capacity."
+			::= { systemSetting 25 }
+
+		cpuClockSpeed OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the CPU Clock Speed."
+			::= { systemSetting 26 }
+
+ 		apManufacturer OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the manufacturer of AP."
+			::= { systemSetting 27 }
+
+ 		cpuTemperature OBJECT-TYPE
+			SYNTAX DisplayString 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the Temperature of CPU."
+			::= { systemSetting 28 }
+
+ 		flashUsableCapacity OBJECT-TYPE
+			SYNTAX DisplayString 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the usable capacity of AP FLASH."
+			::= { systemSetting 29 }
+
+		apSerial OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the MAC address."
+			::= { systemSetting 30 }
+
+       --guangdong 
+		nodeCreateTime OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the time of creating node."
+			::= { systemSetting 31 }	
+
+		nodeTimestamp OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the last time of getting info."
+			::= { systemSetting 32 }	
+
+		password OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate password."
+			::= { systemSetting 33 }	
+                                         
+		flashCapacity OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the capacity of AP flash."
+			::= { systemSetting 34 }	
+
+	ipSetting OBJECT IDENTIFIER ::= { zag5000 2 }
+		
+		bridgeOrRouter OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				bridge(0),
+				routerEthernet(1),
+				routerWireless(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field shall indicate that the AP works on router mode or bridge mode.
+				routerEthernet(1) means WAN port is Ethernet,
+				routerWireless(2) means WAN port is Wireless."
+			::= { ipSetting 1 }
+
+		
+		anyIPOnRouter OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ipSetting 2 }
+
+		nat OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"Description."
+			::= { ipSetting 3 }
+
+		
+		bridgeIPSetting OBJECT IDENTIFIER ::= { ipSetting 4 }
+
+		
+		bridgeDHCPClient OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				STATIC(0),
+				dhcpClient(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate whether the bridge IP setting obtains from DHCP Server.
+				fixed(0), uses manual IP setting.
+				dhcpClient(1), obtains IP setting from DHCP Server, if the DHCP Server is not available, default IP setting will be used."
+			::= { bridgeIPSetting 1 }
+
+		
+		bridgeIPAddress OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the IP address on bridge mode."
+			::= { bridgeIPSetting 2 }
+
+		
+		bridgeNetmask OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the netmask on bridge mode."
+			::= { bridgeIPSetting 3 }
+
+		
+		bridgeGateway OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the gateway on bridge mode."
+			::= { bridgeIPSetting 4 }
+
+		
+		bridgeDNSPrimary OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the primary Domain Name Server on bridge mode."
+			::= { bridgeIPSetting 5 }
+
+		
+		bridgeDNSSecondary OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the secondary Domain Name Server on bridge mode."
+			::= { bridgeIPSetting 6 }
+
+		ethernetIPSetting OBJECT IDENTIFIER ::= { ipSetting 5 }
+
+		ethernetIPType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				fixed(0),
+				dhcpClient(1),
+				dhcpServer(2),
+				pppoe(3),
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate how to configure ethernet IP setting of router mode."
+			::= { ethernetIPSetting 1 }
+
+		
+		ethernetIPAddress OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the ethernet IP address on router mode."
+			::= { ethernetIPSetting 2 }
+
+		
+		ethernetNetmask OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate then ethernet netmask on router mode."
+			::= { ethernetIPSetting 3 }
+
+		
+		ethernetGateway OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the ethernet gateway on router mode."
+			::= { ethernetIPSetting 4 }
+
+		
+		ethernetDNSPrimary OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the ethernet primary Domain Name Server on router mode."
+			::= { ethernetIPSetting 5 }
+
+		
+		ethernetDNSSecondary OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the ethernet secondary Domain Name Server on router mode."
+			::= { ethernetIPSetting 6 }
+
+		
+		ethernetDhcpServerSetting OBJECT IDENTIFIER ::= { ethernetIPSetting 7 }
+
+		
+		ethernetDhcpsIPStart OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the ethernet DHCP server's IP pool start."
+			::= { ethernetDhcpServerSetting 1 }
+
+		
+		ethernetDhcpsIPEnd OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the ethernet DHCP server's IP pool end."
+			::= { ethernetDhcpServerSetting 2 }
+
+		
+		ethernetDhcpsNetmask OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the ethernet DHCP server's netmask."
+			::= { ethernetDhcpServerSetting 3 }
+
+		
+		wirelessIPSetting OBJECT IDENTIFIER ::= { ipSetting 6 }
+		
+		wirelessIPType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				fixed(0),
+				dhcpClient(1),
+				dhcpServer(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate how to configure wireless IP setting of router mode."
+			::= { wirelessIPSetting 1 }
+
+		
+		wirelessIPAddress OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the wireless IP address on router mode."
+			::= { wirelessIPSetting 2 }
+
+		
+		wirelessNetmask OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate then wireless netmask on router mode."
+			::= { wirelessIPSetting 3 }
+
+		
+		wirelessGateway OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the wireless gateway on router mode."
+			::= { wirelessIPSetting 4 }
+
+		
+		wirelessDNSPrimary OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the wireless primary Domain Name Server on router mode."
+			::= { wirelessIPSetting 5 }
+
+		
+		wirelessDNSSecondary OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the wireless secondary Domain Name Server on router mode."
+			::= { wirelessIPSetting 6 }
+
+		
+		wirelessDhcpServerSetting OBJECT IDENTIFIER ::= { wirelessIPSetting 7 }
+
+		
+		wirelessDhcpsIPStart OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the wireless DHCP server's IP pool start."
+			::= { wirelessDhcpServerSetting 1 }
+
+		
+		wirelessDhcpsIPEnd OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the wireless DHCP server's IP pool end."
+			::= { wirelessDhcpServerSetting 2 }
+
+		
+		wirelessDhcpsNetmask OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the wireless DHCP server's netmask."
+			::= { wirelessDhcpServerSetting 3 }
+
+		pppoeSetting OBJECT IDENTIFIER ::= { ipSetting 7 }
+        
+       	 	pppoeConnStatus OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..15))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { pppoeSetting 1 }
+		                                 
+		pppoeLocalIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { pppoeSetting 2 }
+		
+		pppoeUserName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..31))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { pppoeSetting 3 }
+			
+		pppoePassword OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..31))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { pppoeSetting 4 }   
+		
+		pppoeTimeOut OBJECT-TYPE
+			SYNTAX INTEGER (0..9999)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { pppoeSetting 5 }
+			                        
+		pppoeRetryTimes OBJECT-TYPE
+			SYNTAX INTEGER (0..9999)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { pppoeSetting 6 }	 
+
+		pppoeAuthenticationType  OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				auto(0),
+				chap(1),
+				pap(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate tht authentication type of PPPoE."
+			::= { pppoeSetting 7 }
+
+		pppoeMTU OBJECT-TYPE
+			SYNTAX INTEGER (128..1492)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate MTU of PPPoE."
+			::= { pppoeSetting 8 }
+
+-- ***********************************************************************
+-- *radiusSetting
+-- ***********************************************************************
+		
+--    The Radius server setting.
+		radiusSetting OBJECT IDENTIFIER ::= { zag5000 3 }
+
+--    The primary authentication RADIUS server setting.
+		radiusAuthPrimaryServer OBJECT IDENTIFIER ::= { radiusSetting 1 }
+
+		
+		radiusAuthPrimaryServerIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the primary authentication RADIUS server IP address."
+			::= { radiusAuthPrimaryServer 1 }
+
+		
+		radiusAuthPrimaryServerPort OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the primary authentication RADIUS server port number.
+				Default: 1812."
+			::= { radiusAuthPrimaryServer 2 }
+
+		
+		radiusAuthPrimaryServerSecret OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the primary authentication RADIUS server shared secret string."
+			::= { radiusAuthPrimaryServer 3 }
+
+		
+--    The secondary authentication RADIUS server setting.
+		radiusAuthSecondaryServer OBJECT IDENTIFIER ::= { radiusSetting 2 }
+
+		
+		radiusAuthSecondaryServerIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the secondary authentication RADIUS server IP address."
+			::= { radiusAuthSecondaryServer 1 }
+
+		
+		radiusAuthSecondaryServerPort OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the secondary authentication RADIUS server port number.
+				Default: 1812."
+			::= { radiusAuthSecondaryServer 2 }
+
+		
+		radiusAuthSecondaryServerSecret OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the secondary authentication RADIUS server shared secret string."
+			::= { radiusAuthSecondaryServer 3 }
+
+		
+--    The primary account RADIUS server setting.
+		radiusAccountPrimaryServer OBJECT IDENTIFIER ::= { radiusSetting 3 }
+
+		
+		radiusAccountPrimaryServerIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the primary account RADIUS server IP address."
+			::= { radiusAccountPrimaryServer 1 }
+
+		
+		radiusAccountPrimaryServerPort OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the primary account RADIUS server port number.
+				Default: 1813."
+			::= { radiusAccountPrimaryServer 2 }
+
+		
+		radiusAccountPrimaryServerSecret OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the primary account RADIUS server shared secret string."
+			::= { radiusAccountPrimaryServer 3 }
+
+		
+--    The secondary account RADIUS server setting.
+		radiusAccountSecondaryServer OBJECT IDENTIFIER ::= { radiusSetting 4 }
+
+		
+		radiusAccountSecondaryServerIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the secondary account RADIUS server IP address."
+			::= { radiusAccountSecondaryServer 1 }
+
+		
+		radiusAccountSecondaryServerPort OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the secondary account RADIUS server port number.
+				Default: 1813."
+			::= { radiusAccountSecondaryServer 2 }
+
+		
+		radiusAccountSecondaryServerSecret OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the secondary account RADIUS server shared secret string."
+			::= { radiusAccountSecondaryServer 3 }
+
+		
+wlanSetting OBJECT IDENTIFIER ::= { zag5000 4 }
+
+		
+		wlanBasicSettingTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlanBasicSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { wlanSetting 1 }
+
+		
+		wlanBasicSettingEntry OBJECT-TYPE
+			SYNTAX WlanBasicSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ifIndex }
+			::= { wlanBasicSettingTable 1 }
+
+		
+		WlanBasicSettingEntry ::=
+			SEQUENCE { 
+				operationMode
+					INTEGER,
+				wirelessMode
+					INTEGER,
+				channel
+					INTEGER,
+				txRate
+					INTEGER,
+				fragmentationThreshold
+					INTEGER,
+				rtsThreshold
+					INTEGER,
+				txPower
+					INTEGER,
+				superMode
+					INTEGER,
+				tdm
+					INTEGER,
+				regatta
+					INTEGER,
+				antenna
+					INTEGER,
+				dot11bPreamble
+					INTEGER,
+				dfsMode
+					INTEGER,
+				wmmSupport
+					INTEGER,
+				flowbalanceMode
+					INTEGER,
+				flowbalanceGroup
+					DisplayString,
+				usernumberinterval
+					INTEGER,
+				datafluxinterval
+					INTEGER,
+				wlanXdosRefuseEnabled
+					INTEGER,
+				wlanVoipAccessMaxNum 
+					INTEGER,
+				wlanAutoFreqSelectEnabled 
+					INTEGER, 
+				wlanAutoFreqSelectInteval
+					INTEGER,
+				wlanAutoFreqSelectSignalLevell
+					INTEGER,
+				linkintegrity
+					INTEGER,
+				autoPowerEnabled
+					INTEGER,
+				usercontrolMode
+					INTEGER,
+				wlanmaxstanum
+					INTEGER,
+				wlanmaxthroughput
+					INTEGER,
+				radio
+					INTEGER,
+				ctsmode
+					INTEGER,
+				autoFreqSelectMode
+					INTEGER,
+				antennaGain11a
+					INTEGER,
+				antennaGain11bg
+                    INTEGER
+			 }
+
+		operationMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ap(0),
+				ptp(2),
+				ptpAP(3),
+				pxp(4),
+				pxpAP(5),
+				smartwds(7)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the operation mode of wireless module.
+				Default: ap."
+			::= { wlanBasicSettingEntry 1 }
+
+		
+		wirelessMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				auto(0),
+				dotlla(1),
+				dot11b(2),
+				dot11g(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the desired wireless mode.
+				The option are:
+				auto -  Both 802.11g and 802.11b wireless stations can be used.
+				dot11a -  Only 802.11a wireless stations can be used.
+				dot11b - All 802.11b wireless stations can be used.
+				802.11g wireless stations can still be used
+				if they can operate in 802.11b mode.
+				dot11g - Only 802.11g wireless stations can be used."
+			::= { wlanBasicSettingEntry 2 }
+
+		
+		channel OBJECT-TYPE
+			SYNTAX INTEGER (1..14 | 34..140 | 149..165)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the channel number to use on your Wireless LAN.
+				1..14:               only used in 11b and 11g
+				34..140,149..165:    only used in 11a"
+			::= { wlanBasicSettingEntry 3 }
+
+		
+		txRate OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				best(0),
+				fixed1Mbps(1000),
+				fixed2Mbps(2000),
+				fixed5dot5Mbps(5500),
+				fixed6Mbps(6000),
+				fixed9Mbps(9000),
+				fixed11Mbps(11000),
+				fixed12Mbps(12000),
+				fixed18Mbps(18000),
+				fixed24Mbps(24000),
+				fixed36Mbps(36000),
+				fixed48Mbps(48000),
+				fixed54Mbps(54000),
+				fixed108Mbps(108000)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the transmite rate of wireless.
+				CCK  rates: fixed1Mbps,  fixed2Mbps,  fixed5dot5Mbps(5.5Mbps), fixed11Mbps
+				OFDM rates: fixed6Mbps,  fixed9Mbps,  fixed12Mbps, fixed18Mbps,
+				            fixed24Mbps, fixed36Mbps, fixed48Mbps, fixed54Mbps
+				
+				Different wirelessMode has different valid rates:
+				wirelessMode     Valid transmit rates
+				===============  ====================
+				auto(802.11b/g)  CCK and OFDM rates
+				802.11a          OFDM rates
+				802.11b          CCK rates
+				802.11g          OFDM rates
+				
+				If choose best txRate, system will transmit data with the best valid rate."
+			::= { wlanBasicSettingEntry 4 }
+
+		
+		fragmentationThreshold OBJECT-TYPE
+			SYNTAX INTEGER (256..2346)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the fragmentation threshold."
+			::= { wlanBasicSettingEntry 5 }
+
+		
+		rtsThreshold OBJECT-TYPE
+			SYNTAX INTEGER (0..2346)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the RTS threshold."
+			::= { wlanBasicSettingEntry 6 }
+
+		
+		txPower OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				full(0),
+				half(1),
+				quarter(2),
+				eighth(3),
+				min(4)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the tranmiste power."
+			::= { wlanBasicSettingEntry 7 }
+
+		
+		superMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate whether super-G or super-A."
+			::= { wlanBasicSettingEntry 8 }
+
+		
+		tdm OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate TDM enable or not."
+			::= { wlanBasicSettingEntry 9 }
+
+		regatta OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Regatta enable or not."
+			::= { wlanBasicSettingEntry 10 }
+
+		antenna OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				built-in(1),
+				external(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Select the desired antenna for Transmitting and Receiving."
+			::= { wlanBasicSettingEntry 11 }
+
+		
+		dot11bPreamble OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				long(0),
+				auto(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the preamble setting."
+			::= { wlanBasicSettingEntry 12 }
+
+		dfsMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				auto(0),
+				force(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set DFS(Dynamic Frequency Selection)."
+			::= { wlanBasicSettingEntry 13 }
+
+		wmmSupport OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				true(1),
+				false(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field indicates whether support WMM(Wireless Multimedia)."
+			::= { wlanBasicSettingEntry 14 }
+
+     		flowbalanceMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				users(1),
+				flux(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the flow balance mode."
+			::= { wlanBasicSettingEntry 15 }
+
+		flowbalanceGroup OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..19))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the flow balance group name."
+			::= { wlanBasicSettingEntry 16 }
+
+		usernumberinterval OBJECT-TYPE
+			SYNTAX INTEGER (1..100)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the interval of user number."
+			::= { wlanBasicSettingEntry 17 }
+		
+		datafluxinterval OBJECT-TYPE
+			SYNTAX INTEGER (1..10240)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the interval of data flux."
+			::= { wlanBasicSettingEntry 18 }
+
+		wlanXdosRefuseEnabled OBJECT-TYPE
+			SYNTAX INTEGER 
+				{
+				disabled(0),
+				enabled(1)
+				}			
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Xdos refuce if enabled."
+			::= { wlanBasicSettingEntry 19 }  
+		
+		wlanVoipAccessMaxNum OBJECT-TYPE
+			SYNTAX INTEGER (0..256)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Max number of Voip access."
+	        ::= { wlanBasicSettingEntry 20 }
+	        
+		wlanAutoFreqSelectEnabled OBJECT-TYPE
+			SYNTAX INTEGER 
+				{
+				disabled(0),
+				enabled(1)
+				}			
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Auto frequence select if enabled."
+			::= { wlanBasicSettingEntry 21 }   
+			
+		wlanAutoFreqSelectInteval OBJECT-TYPE
+			SYNTAX INTEGER (600..10800)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Auto frequence select detect interval(secondss)."
+	        	::= { wlanBasicSettingEntry 22 }
+
+		wlanAutoFreqSelectSignalLevell OBJECT-TYPE
+			SYNTAX INTEGER (-90..10)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Auto frequence select detect Signal Level."
+	        	::= { wlanBasicSettingEntry 23 }
+
+		linkintegrity OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				enable(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Set LINKINTEGRITY."
+			::= { wlanBasicSettingEntry 24 }
+
+        	autoPowerEnabled OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disabled(0),
+				enabled(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the function of autoPower."
+			::= { wlanBasicSettingEntry 26 }		
+
+     		usercontrolMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				users(1),
+				flux(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the user control mode."
+			::= { wlanBasicSettingEntry 27 }
+
+		wlanmaxstanum OBJECT-TYPE
+			SYNTAX INTEGER (8..255)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the max station number."
+	        	::= { wlanBasicSettingEntry 28 }
+
+		wlanmaxthroughput OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the max throughput of the cardset."
+	        	::= { wlanBasicSettingEntry 29 }
+
+		radio OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				enable(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+	        	::= { wlanBasicSettingEntry 30 }
+
+		ctsmode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				always(1),
+				auto(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the cts mode for 11g nonErp protection."
+			::= { wlanBasicSettingEntry 31 }
+
+		autoFreqSelectMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				start(0),
+				running(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the autoFreqSelectMode."
+			::= { wlanBasicSettingEntry 34 }
+
+		antennaGain11a OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This attribute shall indicate the antenna gain 11a.
+				Unit:dBi"
+                ::= { wlanBasicSettingEntry 35 }
+
+		antennaGain11bg OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This attribute shall indicate the antenna gain 11b/g.
+				Unit:dBi"
+                ::= { wlanBasicSettingEntry 36 }
+
+		wlanAccessControlLocalTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlanAccessControlLocalEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { wlanSetting 2 }
+
+		-- 1.3.6.1.4.1.1567.5000.4.2
+		wlanAccessControlLocalEntry OBJECT-TYPE
+			SYNTAX WlanAccessControlLocalEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ifIndex, aclIndex }
+			::= { wlanAccessControlLocalTable 1 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.4.2.1
+		WlanAccessControlLocalEntry ::=
+			SEQUENCE { 
+				aclIndex
+					Integer32,
+				aclMAC
+					DisplayString
+			 }
+
+		-- 1.3.6.1.4.1.1567.5000.4.2.1.1
+		aclIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..256 | 9999)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field should indicate the access control local database entry index.
+				When write this field aclIndex=9999, shall append new MAC address into local database "
+			::= { wlanAccessControlLocalEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.4.2.1.2
+		aclMAC OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field should indicate the access control local database entry MAC address.
+				When write this field aclMAC=000000000000, shall remove current MAC address from local database.
+				Otherwise, shall update the MAC address."
+			::= { wlanAccessControlLocalEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.4.3
+		wlanAPSettingTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlanAPSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { wlanSetting 3 }
+
+		
+		wlanAPSettingEntry OBJECT-TYPE
+			SYNTAX WlanAPSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ifIndex }
+			::= { wlanAPSettingTable 1 }
+
+		
+		WlanAPSettingEntry ::=
+			SEQUENCE { 
+				ssid
+					DisplayString,
+				broadcastSSID
+					INTEGER,
+				beaconInterval
+					INTEGER,
+				dtim
+					INTEGER,
+				wirelessIsolate
+					INTEGER,
+				accessControlMode
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.1567.5000.4.3.1.1
+		ssid OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate SSID.Its length can't be large than 33 ."
+			::= { wlanAPSettingEntry 1 }
+
+		
+		broadcastSSID OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate whether wireless network Name (SSID) will be broadcasted."
+			::= { wlanAPSettingEntry 2 }
+
+		
+		beaconInterval OBJECT-TYPE
+			SYNTAX INTEGER (1..1000)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Beacon Interval."
+			::= { wlanAPSettingEntry 3 }
+
+		
+		dtim OBJECT-TYPE
+			SYNTAX INTEGER (1..255)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the DTIM period."
+			::= { wlanAPSettingEntry 4 }
+
+		
+		wirelessIsolate OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate whether wireless isolate."
+			::= { wlanAPSettingEntry 5 }
+
+		
+		accessControlMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disabled(0),
+				local(2),
+				server(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates whether the access control list enable."
+			::= { wlanAPSettingEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.4.4
+		wlanWDSSettingTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlanWDSSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"AP operation mode."
+			::= { wlanSetting 4 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.4.4.1
+		wlanWDSSettingEntry OBJECT-TYPE
+			SYNTAX WlanWDSSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"operationApModeEntry."
+			INDEX { ifIndex }
+			::= { wlanWDSSettingTable 1 }
+
+		
+		WlanWDSSettingEntry ::=
+			SEQUENCE { 
+				wdsIsolation
+					INTEGER,
+				smartWDSGroupID
+					DisplayString,
+			 }
+
+		-- 1.3.6.1.4.1.1567.5000.4.4.1.1
+		wdsIsolation OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { wlanWDSSettingEntry 1 }
+
+		smartWDSGroupID OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { wlanWDSSettingEntry 2 }
+
+		
+ ------------------P2MP_LIST---------------------------
+ 		wlanWdsPxPTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlanWdsPxPEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { wlanSetting 5 }
+
+		-- 1.3.6.1.4.1.1567.5000.4.5.1
+		wlanWdsPxPEntry OBJECT-TYPE
+			SYNTAX WlanWdsPxPEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ifIndex, pxpIndex }
+			::= { wlanWdsPxPTable 1 }
+
+		
+		WlanWdsPxPEntry ::=
+			SEQUENCE { 
+				pxpIndex
+					Integer32,
+				pxpMAC
+					DisplayString
+			 }
+
+		-- 1.3.6.1.4.1.1567.5000.4.5.1.1
+		pxpIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..256 | 9999)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field should indicate the wds pxp entry index.
+				When write this field aclIndex=9999, shall append new MAC address into p2mp  "
+			::= { wlanWdsPxPEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.4.5.1.2
+		pxpMAC OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field should indicate the wds pxp entry MAC address.
+				When write this field pxpMAC=000000000000, shall remove current MAC address from p2mp list.
+				Otherwise, shall update the MAC address."
+			::= { wlanWdsPxPEntry 2 }
+
+
+		statisticInfo OBJECT IDENTIFIER ::= { zag5000 5 }
+
+		ethernetStats OBJECT IDENTIFIER ::= { statisticInfo 1 }
+
+		-- 1.3.6.1.4.1.1567.5000.5.1.1
+		ethernetRXPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attributes shall indicates to receive date packet account through the
+				***current AP"
+			::= { ethernetStats 1 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.5.1.2
+		ethernetRXBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attributes shall indicates to receive date bytes through
+				***the current AP"
+			::= { ethernetStats 2 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.5.1.3
+		ethernetTXPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attributes shall indicates to transmit date packet account
+				***through the current AP"
+			::= { ethernetStats 3 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.5.1.4
+		ethernetTXBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attributes shall indicates to transmit date bytes through
+				***the current AP"
+			::= { ethernetStats 4 }
+
+		-- 1.3.6.1.4.1.1567.5000.5.1.5
+		ethernetRXPacketsError OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attributes shall indicates to receive error date packet account through the
+				***current AP"
+			::= { ethernetStats 5 }
+
+		-- 1.3.6.1.4.1.1567.5000.5.1.6
+		ethernetRXPacketsDropped OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attributes shall indicates to receive dropped date packet account through the
+				***current AP"
+			::= { ethernetStats 6 }
+
+		-- 1.3.6.1.4.1.1567.5000.5.1.7
+		ethernetTXPacketsError OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attributes shall indicates to transmit error date packet account
+				***through the current AP"
+			::= { ethernetStats 7 }
+		
+		-- 1.3.6.1.4.1.1567.5000.5.1.8
+		ethernetTXPacketsDropped OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attributes shall indicates to transmit Dropped date packet account
+				***through the current AP"
+			::= { ethernetStats 8 }
+			
+		-- 1.3.6.1.4.1.1567.5000.5.1.9
+		ethernetUpkbps OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the transmitted throughput kbps."
+			::= { ethernetStats 9 }			
+
+		-- 1.3.6.1.4.1.1567.5000.5.1.10
+		ethernetDownkbps OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the receive throughput kbps."
+			::= { ethernetStats 10 }			
+		
+		-- 1.3.6.1.4.1.1567.5000.5.1.11
+		ethernetLossTolerance OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the LossTolerance for ethernet."
+			::= { ethernetStats 11 }			
+
+		-- 1.3.6.1.4.1.1567.5000.5.1.12
+		ethernetTXRetryPackts OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the TXRetryPackts for ethernet."
+			::= { ethernetStats 12 }			
+
+		wirelessStatsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WirelessStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				" Wireless static List Table show multiple instances on an agent."
+			::= { statisticInfo 2 }
+
+		
+		wirelessStatsEntry OBJECT-TYPE
+			SYNTAX WirelessStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Wireless static list Entry show the connected station status "
+			INDEX { ifIndex }
+			::= { wirelessStatsTable 1 }
+
+		
+		WirelessStatsEntry ::=
+			SEQUENCE { 
+				wirelessRXPacketsUnicast
+					Counter64,
+				wirelessRXPacketsMulticast
+					Counter64,
+				wirelessRXPacketsBroadcast
+					Counter64,
+				wirelessRXPacketsTotal
+					Counter64,
+				wirelessRXBytesTotal
+					Counter64,
+				wirelessTXPacketsUnicast
+					Counter64,
+				wirelessTXPacketsMulticast
+					Counter64,
+				wirelessTXPacketsBroadcast
+					Counter64,
+				wirelessTXPacketsTotal
+					Counter64,
+				wirelessTXBytesTotal
+					Counter64,
+				wirelessRXPacketsError
+					Counter64,  
+				wirelessRXPacketsDropped
+					Counter64,  
+				wirelessTXPacketsError
+					Counter64,    
+				wirelessTXPacketsDropped
+					Counter64,
+--				wlantTxFluxBytes
+--					Unsigned32,
+--				wlantRxFlusBytes
+--					Unsigned32,
+				wirelessUserAssoCountSum
+					Unsigned32,
+				wirelessReassoUserSum
+					Unsigned32,
+				wirelessAssoSucceedPercentage
+					DisplayString,
+				wirelessUptimes
+					Unsigned32,
+				wirelessDowntimes
+					Unsigned32,
+				wirelessReqAuthCount
+					Unsigned32,
+				wirelessSucceedAuthCount
+					Unsigned32,
+				wirelessAuthSucceedPercentage
+					DisplayString,
+				wirelessTotalRetries
+					Counter64,
+				wirelessulPhyErrors
+					Counter64,
+				wirelessulMacErrors
+					Counter64,
+				wirelessulTotalframes
+					Counter64,
+				wirelessulTotalPackets
+					Counter64,
+				wirelessulTotalBytes
+					Counter64,
+				wirelessTxthroughput
+					INTEGER,
+				wirelessRxthroughput
+					INTEGER,
+				wirelessCurrentChannel
+					INTEGER,
+				wirelessRxTotalFrames
+					Counter64,
+				wirelessTxTotalFrames
+					Counter64,
+				wirelessTxErrorFrames
+					Counter64,
+				wirelessTxErrorFramesPercent
+					DisplayString,
+				wirelessTxFramesRetryPercent
+					DisplayString,
+				wirelessTxFramesRate
+					DisplayString,
+				wirelessAssocUserSum
+					Counter64,
+				wirelessAllStaTotalMin
+					DisplayString,
+				wirelessVerifyErrorInval
+					Counter64,
+				wirelessVerifyErrorTimeout
+					Counter64,
+				wirelessVerifyErrorReject
+					Counter64,
+				wirelessVerifyErrorOther
+					Counter64,
+				wirelessAssocTrySum
+					Counter64,
+				wirelessAssocSucceedSum
+					Counter64,
+				wirelessAssocFailInval
+					INTEGER,
+				wirelessAssocFailTimeout
+					INTEGER,
+				wirelessAssocFailReject
+					INTEGER,
+				wirelessAssocFailOther
+					INTEGER,
+				wirelessReAssocTrySum
+					INTEGER,
+				wirelessReAssocSucceedSum
+					INTEGER,
+				wirelessReAssocFailInval
+					INTEGER,
+				wirelessReAssocFailTimeout
+					INTEGER,
+				wirelessReAssocFailReject
+					INTEGER,
+				wirelessReAssocFailOther
+					INTEGER,
+				wirelessAuthTrySum
+					INTEGER,
+				wirelessAuthSucceedSum
+					INTEGER,
+				wirelessAuthFailPassword
+					INTEGER,
+				wirelessAuthFailInval
+					INTEGER,
+				wirelessAuthFailTimeout
+					INTEGER,
+				wirelessAuthFailReject
+					INTEGER,
+				wirelessAuthFailOther
+					INTEGER,
+				wirelessDislinkSum
+					INTEGER,
+				wirelessDislinkUserLeaving
+					INTEGER,
+				wirelessDislinkAPNoRec
+					INTEGER,
+				wirelessDislinkExceptional
+					INTEGER,
+				wirelessDislinkOther
+					INTEGER,
+				wirelessDisassocSum
+					INTEGER,
+				wirelessDisassocUserLeaving
+					INTEGER,
+				wirelessDisassocAPNoRec
+					INTEGER,
+				wirelessDisassocExceptional
+					INTEGER,
+				wirelessDisassocOther
+					INTEGER,
+				wirelessRejectAssocSum
+					INTEGER,
+				wirelessChannelChangeSum
+					Integer32,
+				wirelessTotalFrameRetries				
+					Counter64,
+				wirelessStatSampleInterval
+					Integer32,
+				wirelessPowerDefault
+					Integer32
+				}
+
+		wirelessRXPacketsUnicast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , receive the unicast packets number."
+			::= { wirelessStatsEntry 1 }
+
+		
+		wirelessRXPacketsMulticast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , receive the multicast packets number."
+			::= { wirelessStatsEntry 2 }
+
+		
+		wirelessRXPacketsBroadcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , receive the broadcast packets number."
+			::= { wirelessStatsEntry 3 }
+
+		
+		wirelessRXPacketsTotal OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , receive all packets number."
+			::= { wirelessStatsEntry 4 }
+
+		
+		wirelessRXBytesTotal OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , receive all data bytes."
+			::= { wirelessStatsEntry 5 }
+
+		
+		wirelessTXPacketsUnicast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , transmit the unicast packets number."
+			::= { wirelessStatsEntry 6 }
+
+		
+		wirelessTXPacketsMulticast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , transmit the multicast packets number."
+			::= { wirelessStatsEntry 7 }
+
+		
+		wirelessTXPacketsBroadcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , transmit the broadcast packets number."
+			::= { wirelessStatsEntry 8 }
+
+		
+		wirelessTXPacketsTotal OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , transmit all packets number."
+			::= { wirelessStatsEntry 9 }
+
+		
+		wirelessTXBytesTotal OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , transmit all data bytes."
+			::= { wirelessStatsEntry 10 }
+
+
+		wirelessRXPacketsError OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , receive the error packets number."
+			::= { wirelessStatsEntry 11}
+
+		wirelessRXPacketsDropped OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , receive the dropped packets number."
+			::= { wirelessStatsEntry 12 }
+
+		wirelessTXPacketsError OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , transmit the error packets number."
+			::= { wirelessStatsEntry 13 }
+			
+		wirelessTXPacketsDropped OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate Ap status , transmit the dropped packets number."
+			::= { wirelessStatsEntry 14 }
+			
+--		wlantTxFluxBytes OBJECT-TYPE
+--			SYNTAX Unsigned32
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"the field indicates the Tx flus of wlan bytes/s."
+--			::= { wirelessStatsEntry 15 }    
+			
+--		wlantRxFlusBytes OBJECT-TYPE
+--			SYNTAX Unsigned32
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"the field indicates the flus wlan upload bytes/s."
+--			::= { wirelessStatsEntry 16 }
+
+		wirelessUserAssoCountSum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the sum of association."
+			::= { wirelessStatsEntry 18 }		
+			
+		wirelessReassoUserSum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the sum of reassociation."
+			::= { wirelessStatsEntry 19 }	
+			
+		wirelessAssoSucceedPercentage OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the value of association Succeed Percentage."
+			::= { wirelessStatsEntry 20}			
+			
+		wirelessUptimes OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the sum of wireless care reset of up."
+			::= { wirelessStatsEntry 21 }			
+
+		wirelessDowntimes OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the sum of wireless care reset of down."
+			::= { wirelessStatsEntry 22 }	
+
+		wirelessReqAuthCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the sum of Request auth."
+			::= { wirelessStatsEntry 23}			
+
+		wirelessSucceedAuthCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the sum of Auth succeed."
+			::= { wirelessStatsEntry 24}			
+
+		wirelessAuthSucceedPercentage OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the value of Auth Succeed Percentage."
+			::= { wirelessStatsEntry 25}			
+
+		wirelessTotalRetries OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the wirelessTotalRetries for this vap."
+			::= { wirelessStatsEntry 26 }
+
+		wirelessulPhyErrors OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the wirelessulPhyErrors for this vap."
+			::= { wirelessStatsEntry 27 }
+			
+		wirelessulMacErrors OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the wirelessulMacErrors for this vap."
+			::= { wirelessStatsEntry 28}
+			
+		wirelessulTotalframes OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the wirelessulTotalframes for this vap."
+			::= { wirelessStatsEntry 29}
+
+		wirelessulTotalPackets OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the wireless total packets for this vap."
+			::= { wirelessStatsEntry 30}
+		wirelessulTotalBytes OBJECT-TYPE
+			SYNTAX Counter64 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the wireless total bytes for this vap."
+			::= { wirelessStatsEntry 31}
+
+
+		wirelessTxthroughput OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the tx throughput for this ap.
+				  Unit: byte/s"
+			::= { wirelessStatsEntry 32 }
+
+		wirelessRxthroughput OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the rx throughput for this ap.
+				  Unit: byte/s"
+			::= { wirelessStatsEntry 33 }
+
+		wirelessCurrentChannel OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the  Current Channel for this ap."
+			::= { wirelessStatsEntry 34 }
+
+		wirelessRxTotalFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the  Ap Rx Total Frames."
+			::= { wirelessStatsEntry 35 }
+
+		wirelessTxTotalFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the  Ap Tx Total Frames."
+			::= { wirelessStatsEntry 36 }
+				
+		wirelessTxErrorFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the  Ap Tx Error Frames."
+			::= { wirelessStatsEntry 37}
+
+		wirelessTxErrorFramesPercent OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the  Ap Tx Error Frames Percent."
+			::= { wirelessStatsEntry 38 }
+			
+		wirelessTxFramesRetryPercent OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the  Ap Tx Frames Retry Percent."
+			::= { wirelessStatsEntry 39 }
+			
+		wirelessTxFramesRate OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the  Ap Tx Frames Rate."
+			::= { wirelessStatsEntry 40 }
+
+		wirelessAssocUserSum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the  current Assoc User Sum."
+			::= { wirelessStatsEntry 41 }
+
+		wirelessAllStaTotalMin OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the total time of all stations with connect to this AP(unit:min)."
+			::= { wirelessStatsEntry 42 }
+
+				
+		wirelessVerifyErrorInval OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates connect Verify Error invalid num."
+			::= { wirelessStatsEntry 43 }
+				
+		wirelessVerifyErrorTimeout OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates connect Verify Error timeout num."
+			::= { wirelessStatsEntry 44 }
+				
+		wirelessVerifyErrorReject OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates connect Verify Error reject num."
+			::= { wirelessStatsEntry 45 }
+
+		wirelessVerifyErrorOther OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates connect Verify Error other num."
+			::= { wirelessStatsEntry 46 }
+				
+
+		wirelessAssocTrySum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates association retry num."
+			::= { wirelessStatsEntry 47 }
+
+		wirelessAssocSucceedSum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates association succeed num."
+			::= { wirelessStatsEntry 48 }
+				
+		wirelessAssocFailInval OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates association fail invalid num."
+			::= { wirelessStatsEntry 49 }
+
+		wirelessAssocFailTimeout OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates association fail timeout num."
+			::= { wirelessStatsEntry 50 }
+
+		wirelessAssocFailReject OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates association fail reject num."
+			::= { wirelessStatsEntry 51 }
+
+		wirelessAssocFailOther OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates association fail other num."
+			::= { wirelessStatsEntry 52 }
+
+		wirelessReAssocTrySum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates reassociation retry num."
+			::= { wirelessStatsEntry 53 }
+
+				
+		wirelessReAssocSucceedSum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates reassociation succeed num."
+			::= { wirelessStatsEntry 54 }
+
+ 		wirelessReAssocFailInval OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates reassociation fail  invalid num."
+			::= { wirelessStatsEntry 55 }
+
+		wirelessReAssocFailTimeout OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates reassociation fail  timeout num."
+			::= { wirelessStatsEntry 56 }
+
+		wirelessReAssocFailReject OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates reassociation fail  reject num."
+			::= { wirelessStatsEntry 57 }
+				
+		wirelessReAssocFailOther OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates reassociation fail  other num."
+			::= { wirelessStatsEntry 58 }
+
+		wirelessAuthTrySum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication retry num."
+			::= { wirelessStatsEntry 59 }
+
+		wirelessAuthSucceedSum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication succeed num."
+			::= { wirelessStatsEntry 60 }
+
+		wirelessAuthFailPassword OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication fail password num."
+			::= { wirelessStatsEntry 61 }
+				
+		wirelessAuthFailInval OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication fail invalid num."
+			::= { wirelessStatsEntry 62 }
+
+		wirelessAuthFailTimeout OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication fail timeout num."
+			::= { wirelessStatsEntry 63 }
+
+		wirelessAuthFailReject OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication fail reject num."
+			::= { wirelessStatsEntry 64 }
+				
+				
+		wirelessAuthFailOther OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication fail other num."
+			::= { wirelessStatsEntry 65 }
+
+		wirelessDisassocSum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates disassociation num."
+			::= { wirelessStatsEntry 66 }
+
+
+		wirelessDisassocUserLeaving OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates disassociation because user leaving num."
+			::= { wirelessStatsEntry 67 }
+				
+
+
+		wirelessDisassocAPNoRec OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates disassociation because of AP resource not enough num."
+			::= { wirelessStatsEntry 68 }
+
+		wirelessDisassocExceptional OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates disassociation because of exceptional num."
+			::= { wirelessStatsEntry 69 }
+
+		wirelessDisassocOther OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates disassociation because of other num."
+			::= { wirelessStatsEntry 70 }
+			
+        wirelessDislinkSum OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The field indicates disconnection verify total num."
+            ::= { wirelessStatsEntry 71 }
+
+        wirelessDislinkUserLeaving OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The field indicates disconnection user leaving total num."
+            ::= { wirelessStatsEntry 72 }
+
+
+        wirelessDislinkAPNoRec OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The field indicates disconnection because of AP resource not enough num."
+            ::= { wirelessStatsEntry 73 }
+
+
+        wirelessDislinkExceptional OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The field indicates disconnection because of exceptional num."
+            ::= { wirelessStatsEntry 74 }
+
+        wirelessDislinkOther OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The field indicates disconnection because of other num."
+            ::= { wirelessStatsEntry 75 }
+
+	
+		wirelessRejectAssocSum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates reject association num."
+			::= { wirelessStatsEntry 76 }
+				
+		wirelessChannelChangeSum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates channel change total num."
+			::= { wirelessStatsEntry 78 }	
+
+		wirelessTotalFrameRetries OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the wirelessTotalFrameRetries for this vap."
+			::= { wirelessStatsEntry 81 }
+
+        wirelessStatSampleInterval OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The field indicates the fixed sample interval."
+            ::= { wirelessStatsEntry 82 }
+	
+		wirelessPowerDefault OBJECT-TYPE
+			SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The field indicates the power default."
+            ::= { wirelessStatsEntry 83 }
+
+		wlanClientNumberTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlanClientNumberEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { statisticInfo 3 }
+
+		wlanClientNumberEntry OBJECT-TYPE
+			SYNTAX WlanClientNumberEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ifIndex }
+			::= { wlanClientNumberTable 1 }
+
+		
+		WlanClientNumberEntry ::=
+			SEQUENCE { 
+				wlanClientNumber
+					INTEGER
+			 }
+		
+			
+	   	wlanClientNumber OBJECT-TYPE
+			SYNTAX INTEGER  (1..255)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the number of Association stations"
+			::= { wlanClientNumberEntry 1 }    
+
+  		wlanClientsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlanClientsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				" Association stationList Table show multiple instances on an agent."
+			::= { statisticInfo 4 }
+
+		
+		wlanClientsEntry OBJECT-TYPE
+			SYNTAX WlanClientsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Association station list Entry show the connected station status."
+			INDEX { ifIndex ,clientIndex}
+			::= { wlanClientsTable 1 }
+
+		
+		WlanClientsEntry ::=
+			SEQUENCE {   
+				clientIndex
+					Integer32,
+				clientMAC
+					DisplayString,
+				clinetRssi
+					Integer32,
+				clientStatus
+					DisplayString,
+				staRxPkts
+					Unsigned32,
+				staTxPkts
+					Unsigned32,
+				staRxBytes
+					Unsigned32,
+				staTxBytes
+					Unsigned32,
+				staDownLossTolerance
+					DisplayString,
+				staRxmanageFrames
+					Unsigned32,
+				staTxmanageFrames
+					Unsigned32,
+				staRxErrorBytes
+					Unsigned32,
+				staTxErrorBytes
+					Unsigned32,
+				staRetryPackets
+					Unsigned32,
+				staRetrybytes
+					Unsigned32,
+				staTxPacktes
+					Unsigned32,
+				staRxPacktes
+					Unsigned32,
+				staApRetryPacktes
+					Unsigned32,
+				staTxErrorPacktes	
+					Unsigned32,
+				staOnelineTime
+					DisplayString,
+--				staSNR
+--					Unsigned32
+
+			 }
+		        
+		clientIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { wlanClientsEntry 1 } 
+			       
+		clientMAC OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Association station's mac address."
+			::= { wlanClientsEntry 2 }
+
+		
+		clinetRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Association station's rssi."
+			::= { wlanClientsEntry 3 }
+
+ 		clientStatus OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Association station's status."
+			::= { wlanClientsEntry 4 }  
+
+		staRxPkts OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of transmitted packets for this station."
+			::= { wlanClientsEntry 5 }
+			
+		staTxPkts OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of received packets for this station."
+			::= { wlanClientsEntry 6 }
+
+		staRxBytes OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of transmitted octets for this station."
+			::= { wlanClientsEntry 7 }
+			
+
+		staTxBytes OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of received octets for this station."
+			::= { wlanClientsEntry 8 }			
+
+  		staDownLossTolerance OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Down LossTolerance for this station."
+			::= { wlanClientsEntry 9 }  
+
+		staRxmanageFrames OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of received manage octets for this station."
+			::= { wlanClientsEntry 10 }			
+
+		staTxmanageFrames OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of transmitted manage octets for this station."
+			::= { wlanClientsEntry 11 }			
+
+		staRxErrorBytes OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of received error octets for this station."
+			::= { wlanClientsEntry 12 }	
+					
+ 		staTxErrorBytes OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of transmitted octets for this station."
+			::= { wlanClientsEntry 13 }			
+
+
+ 		staRetryPackets OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of Retry Packets for this station."
+			::= { wlanClientsEntry 14 }			
+
+ 		staRetrybytes OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of Retry bytes for this station."
+			::= { wlanClientsEntry 15 }	
+
+ 		staTxPacktes OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of TxPacktes for this station."
+			::= { wlanClientsEntry 16 }			
+
+ 		staRxPacktes OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of RxPacktes for this station."
+			::= { wlanClientsEntry 17 }	
+
+ 		staApRetryPacktes OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of RetryPacktes for this station."
+			::= { wlanClientsEntry 18 }			
+
+ 		staTxErrorPacktes OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the sum of TxErrorPacktes for this station."
+			::= { wlanClientsEntry 19 }	
+
+ 		staOnelineTime OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the connected time for this station."
+			::= { wlanClientsEntry 20 }		
+
+ --		staSNR OBJECT-TYPE
+--			SYNTAX Unsigned32
+---			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"The field indicates the SNR for this station."
+--			::= { wlanClientsEntry 21 }	
+
+		wlanClientNumberPecentTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlanClientNumberPecentEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { statisticInfo 5 }
+
+		wlanClientNumberPecentEntry OBJECT-TYPE
+			SYNTAX WlanClientNumberPecentEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ifIndex }
+			::= { wlanClientNumberPecentTable 1 }
+
+		
+		WlanClientNumberPecentEntry ::=
+			SEQUENCE { 
+				wlanClientNumberPecent
+					DisplayString
+			 }
+		
+
+	   	wlanClientNumberPecent OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the number of Association stations is percent of Maxstation enable."
+			::= { wlanClientNumberPecentEntry 1 }    
+
+  		wirelessManageFramesStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WirelessManageFramesStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				" Association stationList Table show multiple instances on an agent."
+			::= { statisticInfo 6 }
+
+		
+		wirelessManageFramesStatEntry OBJECT-TYPE
+			SYNTAX WirelessManageFramesStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Association station list Entry show the connected station status."
+			INDEX { ifIndex, framesIndex}
+			::= { wirelessManageFramesStatTable 1 }
+
+		
+		WirelessManageFramesStatEntry ::=
+			SEQUENCE {   
+				framesIndex
+					Integer32,
+				framesType
+					DisplayString,
+				framesCount
+					DisplayString		
+			 }
+
+		framesIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { wirelessManageFramesStatEntry 1 } 
+		        
+		framesType OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { wirelessManageFramesStatEntry 2 } 
+			       
+		framesCount OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { wirelessManageFramesStatEntry 3 } 
+			
+		-- for WMM/Vlan/multiSSID
+		vapSetting OBJECT IDENTIFIER ::= { zag5000 6}
+		
+		-- 1.3.6.1.4.1.1567.5000.6.1
+		vapWepAndGlobalSettingTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF VapWepAndGlobalSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"VAP attributes setting table."
+			::= { vapSetting 1 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.1.1
+		vapWepAndGlobalSettingEntry OBJECT-TYPE
+			SYNTAX VapWepAndGlobalSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				" VAP attributes setting table."
+			INDEX { ifIndex }
+			::= { vapWepAndGlobalSettingTable 1 }
+
+		
+		VapWepAndGlobalSettingEntry ::=
+			SEQUENCE { 
+				wepKeyType
+					INTEGER,
+				key1
+					DisplayString,
+				key2
+					DisplayString,
+				key3
+					DisplayString,
+				key4
+					DisplayString,
+				wepPassPhrase
+					DisplayString,
+				wpaReauthTime
+					INTEGER,
+				wpaGroupKeyUpdateCondition
+					INTEGER,
+				wpaGroupKeyUpdateIntervalSecond
+					INTEGER,
+				wpaGroupKeyUpdateIntervalPacket
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.1567.5000.6.1.1.1
+		wepKeyType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				none(0),
+				hex64(40),
+				alpha64(41),
+				phrase64(42),
+				hex128(104),
+				alpha128(105),
+				phrase128(106),
+				hex152(128),
+				alpha152(129),
+				phrase152(130)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field shall indicate the type of WEP key."
+			::= { vapWepAndGlobalSettingEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.1.1.2
+		key1 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..40))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates the key value of the first default wep key."
+			::= { vapWepAndGlobalSettingEntry 2 }
+
+		
+		key2 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..40))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates the key value of the second default wep key."
+			::= { vapWepAndGlobalSettingEntry 3 }
+
+		
+		key3 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..40))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates the key value of the third default wep key."
+			::= { vapWepAndGlobalSettingEntry 4 }
+
+		
+		key4 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..40))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates the key value of the fourth default wep key."
+			::= { vapWepAndGlobalSettingEntry 5 }
+
+		
+		wepPassPhrase OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..39))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate WEP pass phrase, used to
+				generate four WEP keys."
+			::= { vapWepAndGlobalSettingEntry 6 }
+
+		
+		wpaReauthTime OBJECT-TYPE
+			SYNTAX INTEGER (100..3600)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate WPA reauth time."
+			::= { vapWepAndGlobalSettingEntry 7 }
+
+		
+		wpaGroupKeyUpdateCondition OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				never(0),
+				seconds(1),
+				packets(2),
+				secondsAndDisconnect(129),
+				packetsAndDisconnect(130)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate WPA group key update
+				condition."
+			::= { vapWepAndGlobalSettingEntry 8 }
+
+		
+		wpaGroupKeyUpdateIntervalSecond OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This fields indicates the wpa keyupdate sec interval."
+			::= { vapWepAndGlobalSettingEntry 9 }
+
+		
+		wpaGroupKeyUpdateIntervalPacket OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			UNITS "1000Packets"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This fields indicates the wpa keyupdate pkt interval."
+			::= { vapWepAndGlobalSettingEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.2
+		vapSettingTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF VapSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"VAP attributes setting table."
+			::= { vapSetting 2 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.2.1
+		vapSettingEntry OBJECT-TYPE
+			SYNTAX VapSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"VAP attributes setting table."
+			INDEX { ifIndex, vapIndex }
+			::= { vapSettingTable 1 }
+
+		
+		VapSettingEntry ::=
+			SEQUENCE { 
+				vapIndex
+					INTEGER,
+				vapEnable
+					INTEGER,
+				vapSsid
+					DisplayString,
+				hidenetworkname
+					INTEGER,
+				vlanID
+					INTEGER,
+				securityProfileName
+					DisplayString,
+				presharekey
+					DisplayString,
+				authenticationtype
+					INTEGER,
+				encryption
+					INTEGER,
+				keyno
+					INTEGER,
+				wlanseparator
+					INTEGER,
+				ssidPri
+					INTEGER,
+				vapeapEnable
+					INTEGER,
+				vapMacAddr
+					DisplayString,
+				vapthroughput
+					INTEGER				
+			 }
+
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.1
+		vapIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..8)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { vapSettingEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.2
+		vapEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				true(1),
+				false(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate whether enable VAP.
+				"
+			::= { vapSettingEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.3
+		vapSsid OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate SSID.Its length can't be large than 33 ."
+			::= { vapSettingEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.4
+		hidenetworkname OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				true(1),
+				false(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate whether broadcast wireless network Name (SSID)."
+			::= { vapSettingEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.5
+		vlanID OBJECT-TYPE
+			SYNTAX INTEGER (1..4094)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the VLAN ID. "
+			::= { vapSettingEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.6
+		securityProfileName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { vapSettingEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.7
+		presharekey OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..63))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate preshare key."
+			::= { vapSettingEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.8
+		authenticationtype OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				open(0),
+				shared(1),
+				legacy802dot1x(2),
+				wpa(4),
+				wpa2(8),
+				wpaORwpa2(12),
+				wpapsk(16),
+				wpa2psk(32),
+				wpapskORwpa2psk(48)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates how to authenticate the station."
+			::= { vapSettingEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.9
+		encryption OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				none(0),
+				wep(1),
+				tkip(2),
+				aes(4),
+				tkipORaes(6)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates how to encryption the station."
+			::= { vapSettingEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.10
+		keyno OBJECT-TYPE
+			SYNTAX INTEGER (1..4)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates the number of default wep key."
+			::= { vapSettingEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.11
+		wlanseparator OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				true(1),
+				false(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate whether enable No see."
+			::= { vapSettingEntry 11 }
+		
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.12
+		ssidPri OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the PRI of SSID."
+			::= { vapSettingEntry 12}
+
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.13
+		vapeapEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(0),
+				notsupporting(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the eap of vap."
+			::= { vapSettingEntry 13}    
+
+		vapMacAddr OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the vap's MAC address."
+			::= { vapSettingEntry 14 }
+
+		-- 1.3.6.1.4.1.1567.5000.6.2.1.15
+		vapthroughput OBJECT-TYPE
+			SYNTAX INTEGER (1..1687)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates the throughput enable for this vap."
+			::= { vapSettingEntry 15 }
+
+		-- 1.3.6.1.4.1.1567.5000.6.3
+		vapDataTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF VapDataEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"VAP attributes Data table."
+			::= { vapSetting 3 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.3.1
+		vapDataEntry OBJECT-TYPE
+			SYNTAX VapDataEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"VAP attributes Data table."
+			INDEX { ifIndex, vapDataIndex }
+			::= { vapDataTable 1 }
+
+		
+		VapDataEntry ::=
+			SEQUENCE { 
+				vapDataIndex
+					INTEGER,
+				vapTxThroughput
+					INTEGER,
+				vapRxThroughput
+					INTEGER,
+				vapLossTolerance
+					INTEGER,
+				vapMTU
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.1567.5000.6.3.1.1
+		vapDataIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..8)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { vapDataEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.3.1.2
+		vapTxThroughput OBJECT-TYPE
+			SYNTAX INTEGER 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Tx througput for this vap .
+				  Unit: kbps"
+			::= { vapDataEntry 2 }
+
+		-- 1.3.6.1.4.1.1567.5000.6.3.1.3
+		vapRxThroughput OBJECT-TYPE
+			SYNTAX INTEGER 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Rx througput for this vap .
+				  Unit: kbps"
+			::= { vapDataEntry 3 }
+
+		-- 1.3.6.1.4.1.1567.5000.6.3.1.4
+		vapLossTolerance OBJECT-TYPE
+			SYNTAX INTEGER 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Loss Tolerance for this vap ."
+			::= { vapDataEntry 4 }
+
+		-- 1.3.6.1.4.1.1567.5000.6.3.1.5
+		vapMTU OBJECT-TYPE
+			SYNTAX INTEGER 
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the MTU for this vap ."
+			::= { vapDataEntry 5 }
+
+
+
+		remoteManagementSetting OBJECT IDENTIFIER ::= { zag5000 7 }
+
+		snmpEnabled OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				true(1),
+				false(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate whether snmp is enabled.
+				Default: enabled."
+			::= { remoteManagementSetting 1 }
+
+		
+		snmpReadCommunity OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..31))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the snmp read community string.
+				Default: public
+				
+				Note: After update this attribute, it will not take effect immediately, until you reboot AP or restart SNMP."
+			::= { remoteManagementSetting 2 }
+
+		
+		snmpWriteCommunity OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..31))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the snmp write community string.
+				Default: private
+				
+				Note: After update this attribute, it will not take effect immediately, until you reboot AP or restart SNMP."
+			::= { remoteManagementSetting 3 }
+
+		
+		snmpDescription OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..255))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the snmp system description."
+			::= { remoteManagementSetting 4 }
+
+		
+		snmpTrapServer OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the snmp trap server IP address.
+				
+				Note: After update this attribute, it will not take effect immediately, until you reboot AP or restart SNMP."
+			::= { remoteManagementSetting 5 }
+
+		
+		resetAP OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disabled(0),
+				enabled(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This is a command field for conntrol AP action.
+				Reboot the AP by choosing enabled."
+			::= { remoteManagementSetting 6 }
+
+		
+		restoreFactory OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disabled(0),
+				enabled(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This is a command field for conntrol AP action.
+				Reset the AP by choosing enabled."
+			::= { remoteManagementSetting 7 }
+
+	pptpSetting OBJECT IDENTIFIER ::= { remoteManagementSetting 8}
+
+		connectStart OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disabled(0),
+				enabled(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { pptpSetting 1 }
+
+		localIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { pptpSetting 2 }
+
+		remoteIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { pptpSetting 3 }
+
+		connStatus OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..13))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the connect status."
+			::= { pptpSetting 4 }
+
+		pptpuserName OBJECT-TYPE
+			SYNTAX DisplayString 
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates username of pptp connect."
+			::= { pptpSetting 5 }
+
+		password OBJECT-TYPE
+			SYNTAX DisplayString 
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates password of pptp connect."
+			::= { pptpSetting 6 }
+
+		serverIPAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { pptpSetting 7 }
+
+ 		managementAgentTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF ManagementAgentEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { remoteManagementSetting 9 }
+
+		managementAgentEntry OBJECT-TYPE
+			SYNTAX ManagementAgentEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ifIndex, pflIndex }
+			::= { managementAgentTable 1 }
+
+		ManagementAgentEntry ::=
+			SEQUENCE { 
+				mapflIndex
+					Integer32,
+				mapflIP
+					IpAddress
+			 }
+
+		mapflIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..256 | 9999)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field should indicate the PortForward List index.
+				When write this field aclIndex=9999, shall append new IP address into PortForward List  "
+			::= { managementAgentEntry 1 }
+
+		
+		mapflIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field should indicate the IP address managed.
+				When write this field '0.0.0.0', shall remove current IP address from PortForward list.
+				Otherwise, shall update the MAC address.
+				When append new IP address into PortForward List ,shall set the value of 'OID to set' 
+				'1.3.6.1.4.1.1567.5000.7.9.1.2.1.9999'."
+			::= { managementAgentEntry 2 }
+		
+		trapServerPort OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the trap server port number.
+				Default: 162."
+			::= { remoteManagementSetting 10 }
+
+		sshEnabled OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				true(1),
+				false(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate whether ssh is enabled."
+			::= { remoteManagementSetting 11 }
+
+		snmpTrapServer2 OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the snmp trap server2 IP address.
+				
+				Note: After update this attribute, it will not take effect immediately, until you reboot AP or restart SNMP."
+			::= { remoteManagementSetting 12 }
+
+		trapPeriods OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Periods of trap minisent.
+				Default: 10 Minutes
+				Unit: minute"
+			::= { remoteManagementSetting 13}
+			
+--***************************************************************
+-- 				Time Server Setting
+--***************************************************************
+
+        timeSettings OBJECT IDENTIFIER ::= { zag5000 9 }
+
+		timeserver OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..20))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates the time server address."
+			::= { timeSettings 1 }
+
+		timeserverport OBJECT-TYPE			
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Port number used for time server."
+			::= { timeSettings 2 }
+
+		currenttime OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..20))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This field indicates the current system time in a format:
+				YYYY/MM/DD hh:mm:ss."
+			::= { timeSettings 3 }
+
+
+		timezone OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				gmtwest12InternationalDateLineWest(0),
+				gmtwest11MidwayIslandSamoa(1),
+				gmtwest10Hawaii(2),
+				gmtwest09Alaska(3),
+				gmtwest08PacificTimeUsCanadaTijuana(4),
+				gmtwest07Arizona(5),
+				gmtwest07ChihuahuaLaPazMazatlan(6),
+				gmtwest07MountainTimeUsCanada(7),
+				gmtwest06CentralAmerica(8),
+				gmtwest06CentralTimeUsCanada(9),
+				gmtwest06GuadalajaraMexicoCityMonterrey(10),
+				gmtwest06Saskatchewan(11),
+				gmtwest05BogotaLimaQuito(12),
+				gmtwest05EasternTimeUsCanada(13),
+				gmtwest05IndianaEast(14),
+				gmtwest04AtlanticTimeCanada(15),
+				gmtwest04CaracasLaPaz(16),
+				gmtwest04Santiago(17),
+				gmtwest0330Newfoundland(18),
+				gmtwest03Brasilia(19),
+				gmtwest03BuenosAiresGeorgetown(20),
+				gmtwest03Greenland(21),
+				gmtwest02MidAtlantic(22),
+				gmtwest01Azores(23),
+				gmtwest01CapeVerdeIs(24),
+				gmt00CasablancaMonrovia(25),
+				gmt00GreenwichMeanTimeDublinEdinburghLisbonLondon(26),
+				gmteast01AmsterdamBerlinBernRomeStockholmVienna(27),
+				gmteast01BelgradeBratislavaBudapestLjubljanaPrague(28),
+				gmteast01BrusselsCopenhagenMadridParis(29),
+				gmteast01SarajevoSkopjeWarsawZagreb(30),
+				gmteast01WestCentralAfrica(31),
+				gmteast02AthensIstanbulMinsk(32),
+				gmteast02Bucharest(33),
+				gmteast02Cairo(34),
+				gmteast02HararePretoria(35),
+				gmteast02HelsinkiKyivRigaSofiaTallinnVilnius(36),
+				gmteast02Jerusalem(37),
+				gmteast03Baghdad(38),
+				gmteast03KuwaitRiyadh(39),
+				gmteast03MoscowStPetersburgVolgograd(40),
+				gmteast03Nairobi(41),
+				gmteast03Tehran(42),
+				gmteast04AbuDhabiMuscat(43),
+				gmteast04BakuTbilisiYerevan(44),
+				gmteast04Kabul(45),
+				gmteast05Ekaterinburg(46),
+				gmteast05IslamabadKarachiKashkent(47),
+				gmteast05ChennaiKolkataMumbaiNewDelhi(48),
+				gmteast05Kathmandu(49),
+				gmteast06AlmatyNovosibirsk(50),
+				gmteast06AstanaDhaka(51),
+				gmteast06SriJayawardenepura(52),
+				gmteast06Rangoon(53),
+				gmteast07BangkokHanoiJakarta(54),
+				gmteast07Krasnoyarsk(55),
+				gmteast08BeijingChongqingHongKongUrumqi(56),
+				gmteast08IrkutskUlaanBataar(57),
+				gmteast08KualaLumpurSingapore(58),
+				gmteast08Perth(59),
+				gmteast08Taipei(60),
+				gmteast09OsakaSapporoTokyo(61),
+				gmteast09Seoul(62),
+				gmteast09Yakutsk(63),
+				gmteast09Adelaide(64),
+				gmteast09Darwin(65),
+				gmteast10Brisbane(66),
+				gmteast10CanberraMelbourneSydney(67),
+				gmteast10GuamPortMoresby(68),
+				gmteast10Hobart(69),
+				gmteast10Vladivostok(70),
+				gmteast11MagadanSolomonIsNewCaledonia(71),
+				gmteast12AucklandWellington(72),
+				gmteast12FijiKamchatkaMarshallIs(73),
+				gmteast13NukuAlofa(74)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field indicates the timezone of the system."
+			::= { timeSettings 4 }
+
+
+		daylightsaving OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disabled(0),
+				enabled(1)
+				}	
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the Daylight Saving time."
+			::= { timeSettings 5 }
+
+				
+-- ***********************************************************************
+-- *Scan
+-- ***********************************************************************
+		scan OBJECT IDENTIFIER ::= { zag5000 10 }
+		
+		scanSettingTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF ScanSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { scan 1 }
+			
+			scanSettingEntry OBJECT-TYPE
+			SYNTAX ScanSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Scan attributes setting table."
+			INDEX { ifIndex }
+			::= { scanSettingTable 1 }
+
+
+
+		ScanSettingEntry ::=
+			SEQUENCE { 
+				scanMode
+					INTEGER,
+				scanStart
+					INTEGER
+			 	}
+
+
+		scanMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				oneShotScan(2),
+				continuousScan(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the mode of the scan."
+			::= { scanSettingEntry 1 }
+
+		scanStart OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the scan is start or stop."
+			::= { scanSettingEntry 2 }			
+			
+		apListTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF ApListEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { scan 2 }
+		
+		apListEntry OBJECT-TYPE
+			SYNTAX ApListEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"AP attributes setting table."
+			INDEX { ifIndex, apIndex }
+			::= { apListTable 1 }
+
+
+
+		ApListEntry ::=
+			SEQUENCE { 
+				apIndex
+					INTEGER,
+				apMacaddress
+					DisplayString,
+				apChannel
+					INTEGER,
+				apRssi
+					INTEGER,
+				apWirelessMode
+					INTEGER,
+				apSecurity
+					INTEGER,
+				apSsid
+					DisplayString,
+				apSNR
+					Unsigned32
+			 }
+
+		apIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..8)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { apListEntry 1 }
+
+		apMacaddress OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate MAC address of the AP."
+			::= { apListEntry 2 }
+
+		apChannel OBJECT-TYPE
+			SYNTAX INTEGER (1..14)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the channel number of the AP."
+			::= { apListEntry 3 }
+
+		apRssi OBJECT-TYPE
+			SYNTAX INTEGER (-255..255)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the RSSI of the AP."
+			::= { apListEntry 4 }
+			
+		apWirelessMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				auto_11b/11g(1),
+				dot11g(2),
+				dot11b(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the wireless mode of the AP."
+			::= { apListEntry 5 }
+			
+		apSecurity OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				none(0),
+				wep(1),
+				wpa(2),
+				wpa2(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the security mode of the AP."
+			::= { apListEntry 6 }
+			
+		apSsid OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the SSID of the AP.Its length can't be large than 33 ."
+			::= { apListEntry 7 }
+
+ 		apSNR OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the SNR for this AP.
+				 Unit:dB"
+			::= { apListEntry 8 }	
+
+		staListTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF StaListEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { scan 3 }
+		
+		staListEntry OBJECT-TYPE
+			SYNTAX StaListEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Sta attributes setting table."
+			INDEX { ifIndex, staIndex }
+			::= { staListTable 1 }
+		
+		StaListEntry ::=
+			SEQUENCE { 
+				staIndex
+					INTEGER,
+				staMacaddress
+					DisplayString,
+				staChannel
+					INTEGER,
+				staRssi
+					INTEGER,
+				staWirelessMode
+					INTEGER,
+				staSecurity
+					INTEGER,
+				bssid
+					DisplayString,
+				staSsid
+					DisplayString,
+				staSNR
+					Unsigned32
+			 }
+
+		staIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..8)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { staListEntry 1 }
+
+		staMacaddress OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate MAC address of the station."
+			::= { staListEntry 2 }
+
+		staChannel OBJECT-TYPE
+			SYNTAX INTEGER (1..14)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the channel number of the station."
+			::= { staListEntry 3 }
+
+		staRssi OBJECT-TYPE
+			SYNTAX INTEGER (-255..255)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the RSSI of the station."
+			::= { staListEntry 4 }
+			
+		staWirelessMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				auto_11b/11g(1),
+				dot11g(2),
+				dot11b(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the wireless mode of the station."
+			::= { staListEntry 5 }
+			
+		staSecurity OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				none(0),
+				wep(1),
+				wpa(2),
+				wpa2(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the security mode of the station."
+			::= { staListEntry 6 }
+
+		bssid OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate bssid of the station."
+			::= { staListEntry 7 }
+			
+		staSsid OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the SSID of the station.Its length can't be large than 33 ."
+			::= { staListEntry 8 }
+
+ 		staSNR OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates the SNR for the station.
+				 Unit:dB"
+			::= { staListEntry 9 }	
+		
+-- ***********************************************************************
+-- *Auto Config
+-- ***********************************************************************
+--		autoCfgSetting OBJECT IDENTIFIER ::= { zag5000 11 }
+--
+--		autoCfgEnabled OBJECT-TYPE
+--			SYNTAX INTEGER
+--				{
+--				true(1),
+--				false(0)
+--				}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"This attribute shall indicate whether auto config is enabled.
+--				Default: false."
+--			::= { autoCfgSetting 1 }
+--
+--		autoCfgServerIpAddr OBJECT-TYPE
+--			SYNTAX IpAddress
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"This attribute shall indicate the auto config server IP address."
+--			::= { autoCfgSetting 2 }
+--
+--		autoCfgUsername OBJECT-TYPE
+--			SYNTAX DisplayString (SIZE (1..31))
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"This attribute shall indicate the auto config user name string.
+--				Default: "
+--			::= { autoCfgSetting 3 }
+--
+--		
+--		autoCfgPassword OBJECT-TYPE
+--			SYNTAX DisplayString (SIZE (1..31))
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"This attribute shall indicate the auto config password string.
+--				Default: "
+--			::= { autoCfgSetting 4 }
+--
+--		autoCfgFilename OBJECT-TYPE
+--			SYNTAX DisplayString (SIZE (1..31))
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"This attribute shall indicate the auto config filename string.
+--				Default: "
+--			::= { autoCfgSetting 5 }
+--
+--		autoCfgInterval OBJECT-TYPE
+--			SYNTAX INTEGER (1..2400)
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"This attribute shall indicate the auto config interval.
+--				Default: 24"
+--			::= { autoCfgSetting 6 }
+
+-- ***********************************************************************
+-- *ipManagementControl
+-- ***********************************************************************
+		ipManagementControl OBJECT IDENTIFIER ::= { zag5000 12 }
+
+		ipManagementControlEnabled OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate whether IP Management Control is enabled.
+				Default: disabled."
+			::= { ipManagementControl 1 }
+
+		ipManagementControlMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				allow(1),
+				deny(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the mode of  IP Management Control.
+				Default: deny."
+			::= { ipManagementControl 2 }
+			
+		ipManagementControlTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IpManagementControlEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ipManagementControl 3 }
+
+		ipManagementControlEntry OBJECT-TYPE
+			SYNTAX IpManagementControlEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ifIndex, pflIndex }
+			::= { ipManagementControlTable 1 }
+
+		
+		IpManagementControlEntry ::=
+			SEQUENCE { 
+				mcpflIndex
+					Integer32,
+				mcpflIP
+					IpAddress
+			 }
+
+		mcpflIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..256 | 9999)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field should indicate the IP Address List index.
+				When write this field aclIndex=9999, shall append new IP address into PortForward List  "
+			::= { ipManagementControlEntry 1 }
+
+		
+		mcpflIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field should indicate the IP address.
+				When write this field '0.0.0.0', shall remove current IP address from IP Address list.
+				Otherwise, shall update the IP address.
+				When append new IP address into IP Address List ,shall set the value of 'OID to set' 
+				'1.3.6.1.4.1.1567.5000.12.3.1.2.1.9999'."
+			::= { ipManagementControlEntry 2 }
+
+-- ***********************************************************************
+-- *pingTestSetting
+-- ***********************************************************************
+		pingTestSetting OBJECT IDENTIFIER ::= { zag5000 13 }
+
+		pingTestEnabled OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				true(1),
+				false(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate whether ping test is enabled.
+				Default: false."
+			::= { pingTestSetting 1 }
+
+		pingTestServerIpAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the ping test IP address."
+			::= { pingTestSetting 2 }
+
+-- ***********************************************************************
+-- *RebootModeSetting
+-- ***********************************************************************
+		RebootModeSetting OBJECT IDENTIFIER ::= { zag5000 14 }
+
+		RebootMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				Disable(0),
+				FixedInterval(1),
+				FixedTime(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the reboot mode.
+				Default: Disable."
+			::= { RebootModeSetting 1 }
+
+		RebootFixedIntervalUnit OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				Hours(0),
+				Days(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the reboot Interval Unit.
+				Default: Hour."
+			::= { RebootModeSetting 2}
+
+		RebootFixedIntervalValue OBJECT-TYPE			
+			SYNTAX INTEGER (1..1000)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the reboot Interval value.
+				Default: 24."
+			::= { RebootModeSetting 3 }
+
+		RebootFixedTimeMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				Day(0),
+				Week(1),
+				Month(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the reboot fixed time mode.
+				Default: Hour."
+			::= { RebootModeSetting 4}
+
+		RebootFixedTimeDayHour OBJECT-TYPE			
+			SYNTAX INTEGER (0..23)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the reboot Fixed time day hour.
+				Default: 0."
+			::= { RebootModeSetting 5 }
+
+		RebootFixedTimeDayMinute OBJECT-TYPE			
+			SYNTAX INTEGER (0..59)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the reboot Fixed time day minute.
+				Default: 0."
+			::= { RebootModeSetting 6 }
+
+		RebootFixedTimeWeekDay OBJECT-TYPE			
+			SYNTAX INTEGER (1..7)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the reboot Fixed time week day .
+				Default: 0."
+			::= { RebootModeSetting 7 }
+
+		RebootFixedTimeWeekHour OBJECT-TYPE			
+			SYNTAX INTEGER (0..23)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the reboot Fixed time week hour .
+				Default: 0."
+			::= { RebootModeSetting 8 }
+
+		RebootFixedTimeWeekMintue OBJECT-TYPE			
+			SYNTAX INTEGER (0..59)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the reboot Fixed time week minute.
+				Default: 0."
+			::= { RebootModeSetting 9 }
+
+		RebootFixedTimeMonthDay OBJECT-TYPE			
+			SYNTAX INTEGER (1..31)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the reboot Fixed time month day .
+				Default: 0."
+			::= { RebootModeSetting 10 }
+
+		RebootFixedTimeMonthHour OBJECT-TYPE			
+			SYNTAX INTEGER (0..23)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the reboot Fixed time month hour .
+				Default: 0."
+			::= { RebootModeSetting 11 }
+
+		RebootFixedTimeMonthMintue OBJECT-TYPE			
+			SYNTAX INTEGER (0..59)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the reboot Fixed time month minute.
+				Default: 0."
+			::= { RebootModeSetting 12 }
+
+-- ***********************************************************************
+-- *DhcpRelaySetting
+-- ***********************************************************************
+dhcpRelaySetting OBJECT IDENTIFIER ::= { zag5000 15 }
+
+		dhcpRelayEnabled OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				true(1),
+				false(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate whether dhcp relay  is enabled.
+				Default: false."
+			::= { dhcpRelaySetting 1 }
+
+		dhcpRelayServerIpAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate the dhcp relay IP address."
+			::= { dhcpRelaySetting 2 }
+
+
+--********************************************************************************
+--* wapiSetting
+--********************************************************************************
+
+wapiSetting OBJECT IDENTIFIER ::= { zag5000 16 }
+
+    iwnWapiAsType OBJECT-TYPE
+        SYNTAX INTEGER { inside(1), outside(2) }
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "AS类型"
+    ::= { wapiSetting 1 }
+    
+    iwnWapiAsIP OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "AS的IP地址"
+    ::= { wapiSetting 2 }
+    
+    iwnWapiAsPort OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "AS的端口"
+    ::= { wapiSetting 3 }
+    
+    iwnWapiCertType OBJECT-TYPE
+        SYNTAX INTEGER { moExist(0), x509(1)}
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "证书类型"
+    ::= { wapiSetting 4 }
+    
+    iwnWapiCertState OBJECT-TYPE
+        SYNTAX INTEGER { noExist(0), valid(1), invalid(2) }
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "证书状态"
+    ::= { wapiSetting 5 }
+    
+    iwnWapiAsCert OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "ASU证书"
+    ::= { wapiSetting 6 }
+    
+    iwnWapiUserCert OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "用户证书"
+    ::= { wapiSetting 7 } 
+    
+    iwnWapiInstallCert OBJECT-TYPE
+        SYNTAX INTEGER { noExist(0), installed(1) }
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "安装证书"
+    ::= { wapiSetting 8 } 
+
+
+wapiConfigTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF wapiConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	      "安全配置属性,以表格形式允许一个代理处有多个实例。"
+	::={ wapiSetting 9 } 
+
+	wapiConfigEntry OBJECT-TYPE
+	SYNTAX wapiConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"gb15629dot11wapiConfigTable的一个表项。有可能一个代理处有多个接口,每个接口有惟一的MAC地址。本规范接口和Internet标准MIB上下文接口的关系是一一对应的,因此ifIndex对象实例值能直接用于标识此处定义的相应对象实例。
+	ifIndex – 每一个本规范接口由一个ifEntry来表示。该MIB模块中的接口表由ifIndex来索引。"
+	INDEX {ifIndex}
+	::={ wapiConfigTable 1 }
+
+	wapiConfigEntry::=
+	SEQUENCE {
+		iwnConfigVersion 								Integer32,
+		iwnControlledAuthControl						TruthValue,
+		iwnControlledPortControl						INTEGER,
+		iwnOptionalImplemented							TruthValue,
+		iwnPreauthenticationImplemented					TruthValue,
+		iwnEnabled										TruthValue,
+		iwnPreauthenticationEnabled						TruthValue,
+		iwnConfigUnicastKeysSupported					Unsigned32,
+		iwnConfigUnicastRekeyMethod 					INTEGER,
+		iwnConfigUnicastRekeyTime						Unsigned32,
+		iwnConfigUnicastRekeyPackets					Unsigned32,
+		iwnConfigMulticastCipher						OCTET STRING,
+		iwnConfigMulticastRekeyMethod 					INTEGER,
+		iwnConfigMulticastRekeyTime						Unsigned32,
+		iwnConfigMulticastRekeyPackets 					Unsigned32,
+		iwnConfigMulticastRekeyStrict 					TruthValue,
+		iwnConfigPSKValue 								OCTET STRING,
+		iwnConfigPSKPassPhrase							DisplayString,
+		iwnConfigCertificateUpdateCount					Unsigned32,
+		iwnConfigMulticastUpdateCount 					Unsigned32,
+		iwnConfigUnicastUpdateCount 					Unsigned32,
+		iwnConfigMulticastCipherSize 					Unsigned32,
+		iwnConfigBKLifetime 							Unsigned32,
+		iwnConfigBKReauthThreshold						Unsigned32,
+		iwnConfigSATimeout								Unsigned32,
+		iwnAuthenticationSuiteSelected					OCTET STRING,
+		iwnUnicastCipherSelected 						OCTET STRING,
+		iwnMulticastCipherSelected 						OCTET STRING,
+		iwnBKIDUsed										OCTET STRING,
+		iwnAuthenticationSuiteRequested 				OCTET STRING,
+		iwnUnicastCipherRequested 						OCTET STRING,
+		iwnGroupCipherRequested							OCTET STRING,
+		iwnConfigUnicastCipher							OCTET STRING,
+		iwnConfigUnicastCipherEnabled					TruthValue ,
+		iwnConfigUnicastCipherSize						Unsigned32,
+		iwnConfigAuthenticationSuite        		 	OCTET STRING,
+		iwnConfigAuthenticationSuiteEnabled  			TruthValue, 
+		iwnMulticastCipherRequested 					OCTET STRING,
+		iwnWapiIfIndex 									INTEGER,
+		iwnWapiIfNmae 									OCTET STRING
+		}	
+
+	  iwnConfigVersion OBJECT-TYPE
+			SYNTAX Integer32
+			  MAX-ACCESS read-only
+			  STATUS current
+			  DESCRIPTION
+			  "该实体支持的WAPI最高版本号"
+	 		 ::= { wapiConfigEntry 1}
+
+		iwnControlledAuthControl OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+	  	"该属性表示实体是否启用鉴别。该值为假,则表示不启用鉴别,受控端口的状态为‘已鉴别’；若为真,则表示启用鉴别,受控端口的状态由端口的控制类型iwnControlledPortControl来决定。"
+		::= { wapiConfigEntry 2}
+
+		iwnControlledPortControl OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"该属性表示实体端口的控制类型,当iwnControlledAuthControl为真时有效。值为0,则表示‘自动’,受控端口的状态取决于鉴别结果；若为1,表示‘强制未鉴别’,受控端口的状态无条件为‘未鉴别’。"
+		::= { wapiConfigEntry 3}
+
+		iwnOptionalImplemented OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"该变量指示实体是否具有WAPI功能。取值为真,表示支持WAPI功能；否则,表示不支持WAPI功能。"
+		::= { wapiConfigEntry 4 }
+
+		iwnPreauthenticationImplemented OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"该变量指示实体是否支持WAPI预鉴别。除非iwnOptionImplemented取值为真,否则,该变量不能取值为真。"
+		::= { wapiConfigEntry 5 }
+
+		iwnEnabled OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"当为真时,该对象指示在该实体上的WAPI已激活。该实体将通过信标帧和探询响应帧广播WAPI信息元素。"
+		::= { wapiConfigEntry 6 }
+
+		iwnPreauthenticationEnabled OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"当为真时,该对象指示该实体上的WAPI预鉴别已激活。该对象要求将dot11WAPI Enabled也置为真。"
+		::= { wapiConfigEntry 7 }
+
+		iwnConfigUnicastKeysSupported OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"该对象指示WAPI实体支持的单播密钥个数。"
+	  ::= { wapiConfigEntry 8 }
+
+		iwnConfigUnicastRekeyMethod OBJECT-TYPE
+		SYNTAX INTEGER { disabled(1), timeBased(2),packetBased(3), timepacket-Based(4) }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"该对象选择一种机制来重新建立WAPI密钥USK。默认是基于时间的,一天一次。USK的更新由担当AE或ASUE角色的实体发起。"
+		DEFVAL { timeBased }
+		::= { wapiConfigEntry 9 }
+		
+		iwnConfigUnicastRekeyTime OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"WAPI USK需要更新的秒级定时。一旦USK通过MLME-SETWPIKEYS.request原语设置后,计时器就开始工作。"
+		::= { wapiConfigEntry 10 }
+
+		iwnConfigUnicastRekeyPackets OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		" WAPI USK需要更新的分组计数（以1000个分组为单位）。一旦USK通过MLME-SETWPIKEYS.request原语设置后,分组计数器就开始工作,统计采用当前USK加密的分组个数。"
+		::= { wapiConfigEntry 11 }
+
+		iwnConfigMulticastCipher OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"该对象指示实体必须采用的组播密码套件。WAPI信息元素的组播密码套件应采用该变量的值,它包含三个八位位组的OUI与一个八位位组的密码套件标识。"
+		::= { wapiConfigEntry 12 }
+
+		iwnConfigMulticastRekeyMethod OBJECT-TYPE
+		SYNTAX INTEGER { disabled(1), timeBased(2),	packetBased(3), timepacket-Based(4) }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"该对象选择一种机制来重新建立WAPI密钥MSK。默认是基于时间的,一天一次。MSK的更新只能由担当AE角色的实体发起。"
+		::= { wapiConfigEntry 13 }
+
+		iwnConfigMulticastRekeyTime OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"WAPI MSK需要更新的秒级定时。一旦MSK通过MLME-SETWPIKEYS.request原语设置后,计时器就开始工作。"
+		::= { wapiConfigEntry 14 }
+
+		iwnConfigMulticastRekeyPackets OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		" WAPI MSK需要更新的分组计数（以1000个分组为单位）。一旦MSK通过MLME-SETWPIKEYS.request原语设置后,分组计数器就开始工作,统计采用当前MSK加密的分组个数。"
+		::= { wapiConfigEntry 15}
+		
+		iwnConfigMulticastRekeyStrict OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"不论STA什么时候离开拥有密钥MSK的BSS,该对象都会发信号通知密钥MSK需要进行更新。"
+		::= { wapiConfigEntry 16 }
+
+		iwnConfigPSKValue OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"将PSK模式选为WAPI的AKM套件时的PSK值。BK将由该对象推导产生。该对象逻辑上是只写的,若读取该变量将返回不成功的状态或无意义或零。"
+		::= { wapiConfigEntry 17 }
+
+		iwnConfigPSKPassPhrase OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"将PSK模式选为WAPI的AKM套件时的PSK值,PSK通过iwnConfigPSKValue来配置。另一种可替换方法是使用口令－密钥算法来设置PSK。该变量提供了一种输入口令的方法 。当该对象被写入时,WAPI实体将使用口令－密钥算法导出一个预共享密钥,同时用导出的密钥填充iwnConfigPSKValue。该对象逻辑上是只写的。读取该对象将返回不成功状态或无意义或零。"
+		::= { wapiConfigEntry 18 }
+
+		iwnConfigCertificateUpdateCount OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"在每次证书鉴别握手中,WAPI证书鉴别握手协议的消息重传次数。"
+--		DEFVAL { 3 } 
+		::= { wapiConfigEntry 19 }
+
+		iwnConfigMulticastUpdateCount OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"在每次MSK握手中,WAPI组播密钥握手协议的消息重传的次数。"
+--		DEFVAL { 3 } 
+		::= { wapiConfigEntry 20 }
+		
+    iwnConfigUnicastUpdateCount OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"在每次3次握手中,WAPI单播密钥握手协议的消息重传的次数。"
+--		DEFVAL { 3 } 
+		::= { wapiConfigEntry 21 }
+
+		iwnConfigMulticastCipherSize OBJECT-TYPE
+		SYNTAX Unsigned32 (0..4294967295)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"该对象指示组播密钥长度的位数。对于SMS4来说,长度值应该为256。前面128位为加密密钥,后面128位为完整性校验密钥。"
+		::= { wapiConfigEntry 22 }
+	
+		iwnConfigBKLifetime OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+--		UNITS "秒"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"BK缓存中,一个BK的最大生存期。"
+--		DEFVAL { 43200 } 
+		::= { wapiConfigEntry 23 }
+
+		iwnConfigBKReauthThreshold OBJECT-TYPE
+		SYNTAX Unsigned32 (1..100)
+--		UNITS "百分比"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"在重新进行证书鉴别之前,应当渡过BK生存期的百分比。"
+--		DEFVAL { 70 } 
+		::= { wapiConfigEntry 24 }
+
+		iwnConfigSATimeout OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+--		UNITS "秒"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"安全关联建立需要的最长时间。"
+		DEFVAL { 60 } 
+		::= { wapiConfigEntry 25 }
+		
+    iwnAuthenticationSuiteSelected OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次协商的AKM套件。"
+		::= { wapiConfigEntry 26 }
+
+		iwnUnicastCipherSelected OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次协商的单播密码套件。"
+		::= { wapiConfigEntry 27 }
+	
+		iwnMulticastCipherSelected OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次协商的组播密码套件。"
+		::= { wapiConfigEntry 28 }
+
+		iwnBKIDUsed OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次单播密钥握手过程中所使用的BKID。"
+		::= { wapiConfigEntry 29 }
+
+		iwnAuthenticationSuiteRequested OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次请求的AKM套件。"
+		::= { wapiConfigEntry 30 }
+
+		iwnUnicastCipherRequested OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次请求的单播密码套件。"
+		::= { wapiConfigEntry 31 }
+
+		iwnGroupCipherRequested OBJECT-TYPE 
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次请求的组播密码套件。"
+		::= { wapiConfigEntry 32 }
+		
+		iwnConfigUnicastCipher OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"所支持的单播密码套件"
+		::= { wapiConfigEntry 33 }
+		
+		iwnConfigUnicastCipherEnabled OBJECT-TYPE
+		SYNTAX TruthValue 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"对象激活或禁止单播密码"
+		::= { wapiConfigEntry 34 }
+		
+		iwnConfigUnicastCipherSize OBJECT-TYPE
+		SYNTAX Unsigned32 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"单播密钥长度的位数"
+		::= { wapiConfigEntry 35 }
+		
+		iwnConfigAuthenticationSuite OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"AKM套件"
+		::= { wapiConfigEntry 36 }
+		
+		iwnConfigAuthenticationSuiteEnabled OBJECT-TYPE
+		SYNTAX TruthValue 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"AKM套件是处于激活还是禁止状态"
+		::= { wapiConfigEntry 37 }
+		
+		iwnWapiIfIndex OBJECT-TYPE
+		SYNTAX INTEGER 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"AKM套件是处于激活还是禁止状态"
+		::= { wapiConfigEntry 38 }
+		
+		iwnWapiIfNmae OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"AKM套件是处于激活还是禁止状态"
+		::= { wapiConfigEntry 39 } 
+		
+
+
+
+--********************************************************************************
+--* syslogSetting
+--********************************************************************************
+
+
+syslogSetting OBJECT IDENTIFIER ::= { zag5000 17 }
+
+	syslogEnable OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			enabled(1),
+			disabled(0)
+			} 
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+	  "Start or stop the service of syslogd"
+ 		::= { syslogSetting 1}
+                              
+	syslogServerIP OBJECT-TYPE
+		SYNTAX IpAddress 
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+	  "The hostIP that syslogd report to"
+ 		::= { syslogSetting 2}
+                              
+	syslogLevel OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			emerg(0),
+			alert(1),
+			crit(2),
+			err(3),
+			warning(4),
+			notice(5),
+			info(6),
+			debug(7)
+			} 
+	  	MAX-ACCESS read-write
+	  	STATUS current
+	  	DESCRIPTION
+	  	"Record events lesser than the level choised"
+ 			::= { syslogSetting 3}
+ 
+        syslogMsgSend OBJECT-TYPE
+        	SYNTAX OCTET STRING
+		MAX-ACCESS read-write
+	  	STATUS current
+	  	DESCRIPTION
+	  	"Start or stop the service of syslogd"
+ 			::= { syslogSetting 4}
+                                     
+ 	syslogMsgLevel OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			emerg(0),
+			alert(1),
+			crit(2),
+			err(3),
+			warning(4),
+			notice(5),
+			info(6),
+			debug(7)
+			} 
+	  	MAX-ACCESS read-write
+	  	STATUS current
+	  	DESCRIPTION
+	  	"Msg level sended"
+ 			::= { syslogSetting 5}
+  				
+
+
+
+
+-- ***********************************************************************
+-- *export group
+-- ***********************************************************************
+	
+zag5000Conformance OBJECT IDENTIFIER ::= { zag5000 18 }
+		
+		zag5000Groups OBJECT-GROUP
+			OBJECTS { sysVersion, sysMacAddr, sysAPName, sysSpanningTreeEnable, sysCountryRegion, 
+				bridgeOrRouter, anyIPOnRouter, bridgeDHCPClient, bridgeIPAddress, bridgeNetmask, 
+				bridgeGateway, bridgeDNSPrimary, bridgeDNSSecondary, ethernetIPType, ethernetIPAddress, 
+				ethernetNetmask, ethernetGateway, ethernetDNSPrimary, ethernetDNSSecondary, ethernetDhcpsIPStart, 
+				ethernetDhcpsIPEnd, ethernetDhcpsNetmask, wirelessIPType, wirelessIPAddress, wirelessNetmask, 
+				wirelessGateway, wirelessDNSPrimary, wirelessDNSSecondary, wirelessDhcpsIPStart, wirelessDhcpsIPEnd, 
+				wirelessDhcpsNetmask, radiusAuthPrimaryServerIP, radiusAuthPrimaryServerPort, radiusAuthPrimaryServerSecret, radiusAuthSecondaryServerIP, 
+				radiusAuthSecondaryServerPort, radiusAuthSecondaryServerSecret, radiusAccountPrimaryServerIP, radiusAccountPrimaryServerPort, radiusAccountPrimaryServerSecret, 
+				radiusAccountSecondaryServerIP, radiusAccountSecondaryServerPort, radiusAccountSecondaryServerSecret, operationMode, wirelessMode, 
+				channel, txRate, fragmentationThreshold, rtsThreshold, txPower, 
+				superMode, dot11bPreamble, wepKeyType, wepPassPhrase, wepKey1, 
+				wepKey2, wepKey3, wepKey4, wepKeyDefault, wpaPSK, 
+				authentication, encryption, aclIndex, aclMAC, ssid, 
+				broadcastSSID, beaconInterval, dtim, wirelessIsolate, accessControlMode, 
+				wdsIsolation, smartWDSGroupID, ptpRemoteMacaddress, pxpRemoteMacaddress1, pxpRemoteMacaddress2, 
+				pxpRemoteMacaddress3, pxpRemoteMacaddress4, pxpRemoteMacaddress5, pxpRemoteMacaddress6, pxpRemoteMacaddress7, 
+				pxpRemoteMacaddress8, pxpRemoteFlowControl1, pxpRemoteFlowControl2, pxpRemoteFlowControl3, pxpRemoteFlowControl4, 
+				pxpRemoteFlowControl5, pxpRemoteFlowControl6, pxpRemoteFlowControl7, pxpRemoteFlowControl8, ethernetRXPackets, 
+				ethernetRXBytes, ethernetTXPackets, ethernetTXBytes, wirelessRXPacketsUnicast, wirelessRXPacketsMulticast, 
+				wirelessRXPacketsBroadcast, wirelessRXPacketsTotal, wirelessRXBytesTotal, wirelessTXPacketsUnicast, wirelessTXPacketsMulticast, 
+				wirelessTXPacketsBroadcast, wirelessTXPacketsTotal, wirelessTXBytesTotal, snmpEnabled, snmpReadCommunity, 
+				snmpWriteCommunity, snmpDescription, snmpTrapServer, resetAP, dhcpServNetmask, 
+				dhcpServGateway, dhcpServEndip, dhcpServStartip, restoreFactory, spaceBetweenBridge
+				 }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { zag5000Conformance 1 }
+			
+	
+	END
+
+--
+-- zag5000.mib
+--
+

@@ -1,0 +1,3 @@
+insmod /lib/modules/2.6.31/net/art-wasp-osprey.ko
+/usr/sbin/nart2_23.out -instance 0 -console &
+/usr/sbin/nart2_23.out -instance 1 -console &

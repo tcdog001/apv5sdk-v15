@@ -1,0 +1,13 @@
+#!/bin/sh
+
+echo load wifi driver!!!
+cd /lib/modules/2.6.15/net/
+insmod adf.ko; 
+insmod asf.ko;
+insmod ath_hal.ko;
+insmod ath_rate_atheros.ko;
+insmod ath_dfs.ko; 
+insmod ath_dev.ko countrycode=156 new_dispatch_mac=2;
+insmod umac.ko;
+insmod ath_pktlog.ko;
+echo load Success!!!

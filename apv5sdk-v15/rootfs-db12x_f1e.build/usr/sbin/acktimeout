@@ -1,0 +1,59 @@
+#!/bin/sh
+
+default_acktimeout=64
+acktimeout=$default_acktimeout
+#x=`echo "scale=3;5678/1000*4" | bc`
+#echo $x
+a=8e-08
+b=0.0054
+c=34
+
+if [ $# -lt 2 ]
+then
+	echo "acktimeout <radio> <set|get> [distance]"
+else
+	if [ "$1" != "wifi0" -a "$1" != "wifi1" ]
+	then
+		echo "No such device"
+	else
+		if [ "$2" = "set" ]
+		then
+			distance=$3
+			if [ -z $distance ] 
+			then
+				echo "acktimeout <radio> <set|get> [distance]"
+			else
+				if [ $distance -lt 0 -o $distance -gt 40000 ]
+				then
+					echo "Distance should be 0~40000!"
+				else
+					acktimeout=`echo "$distance $a $b $c" | awk '{printf("%d\n", $1*$1*$2+$1*$3+$4+0.5)}'`
+					#acktimeout=`echo "$default_acktimeout+($increment*10+5)/10" | bc`
+					if [ $acktimeout -gt 372 ]
+					then
+						acktimeout=372
+					fi
+					if [ $acktimeout -lt 64 ]
+					then
+						acktimeout=64
+					fi
+					/usr/sbin/iwpriv $1 acktimeout $acktimeout
+					#modified by zhaoenjuan for the acktimeout calling path
+				fi
+			fi
+		else
+			if [ "$2" != "get" ]
+			then
+				echo "acktimeout <radio> <set|get> [distance]"
+				exit 0
+			else
+				acktimeout=`iwpriv $1 get_acktimeout | awk -F: '{print $2}'`
+				distance=`echo "$acktimeout $a $b $c" | awk '{printf("%d\n", (sqrt($3*$3-4*$2*($4-$1))-$3)/2/$2+0.5)}'`
+				echo "The distance is $distance."
+			fi
+		fi
+	fi
+fi
+
+
+		

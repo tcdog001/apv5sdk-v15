@@ -1,0 +1,19 @@
+# file: nvm/nvmoffsets.txt
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+4 HEADERVERSION
+4 IMAGEROMADDR
+4 IMAGEADDR
+4 IMAGELENGTH
+4 IMAGECHECKSUM
+4 ENTRYPOINT
+1 HEADERMINORVERSION
+1 IMAGETYPE
+2 IGNOREMASK
+4 RESERVED [2]
+4 NEXTHEADER
+4 HEADERCHECKSUM
+

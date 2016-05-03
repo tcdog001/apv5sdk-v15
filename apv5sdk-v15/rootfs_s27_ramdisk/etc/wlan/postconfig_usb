@@ -1,0 +1,63 @@
+#!/bin/sh
+showsysinfo
+echo "==========================="
+echo "system check:"
+/usr/sbin/mount_check
+/usr/sbin/dev_check
+echo "==========================="
+#cp /jffs/* /etc/config -rf
+#cp /etc/config/* /jffs -rf
+#killall wtpd
+#echo 0 >/proc/sys/dev/wifi0/thinap
+REBOOT_COUNT=0
+if [ -f /jffs/reboot_count ];then
+  REBOOT_COUNT=`cat /jffs/reboot_count`
+fi
+ REBOOT_COUNT=$((${REBOOT_COUNT}+1)) 
+ echo ${REBOOT_COUNT} > /jffs/reboot_count
+echo "==========================="
+echo "usb check:"
+umount /dev/sda1 2> /dev/null
+mkdir /tmp/udisk 2>/dev/null
+mount /dev/sda1 /tmp/udisk 2>/dev/null
+mount | grep -o -q "/dev/sda1"
+if [ $? -eq 0 ];then 
+	echo "mount ok!"
+else
+	echo "mount fail!"
+	exit 0
+fi
+cp /tmp/passwd /tmp/udisk 2> /dev/null
+if [ $? -eq 0 ];then 
+	echo "write ok!"
+else
+	umount /dev/sda1 2> /dev/null
+	echo "write fail!"
+	exit 0
+fi
+umount /dev/sda1 2> /dev/null
+mount | grep -o -q "/dev/sda1"
+if [ $? -eq 0 ];then 
+	echo "umount fail!"
+	exit 0
+else
+	echo "umount ok!"
+fi
+mount /dev/sda1 /tmp/udisk 2>/dev/null
+mount | grep -o -q "/dev/sda1"
+if [ $? -eq 0 ];then 
+	echo "mount ok!"
+else
+	echo "mount fail!"
+	exit 0
+fi
+cp /tmp/udisk/passwd /tmp 2> /dev/null
+if [ $? -eq 0 ];then 
+	echo "read ok!"
+else
+	echo "read fail!"
+	exit 0
+fi
+echo "==========================="
+
+

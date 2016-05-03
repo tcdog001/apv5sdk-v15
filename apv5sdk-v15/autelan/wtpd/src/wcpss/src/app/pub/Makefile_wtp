@@ -1,0 +1,53 @@
+#ifneq ($(strip $(TOOLPREFIX)),)
+#CROSS:=$(TOOLPREFIX)
+#endif
+#CROSS = mipsel-linux-
+#CC = $(CROSS)gcc
+#AR = $(CROSS)ar
+ifeq ($(AR),ar)
+	$(error "You have to define AR to use this Makefile_wtp")
+endif
+#LDFLAGS = -lpthread -ldl -D_REENTRANT
+#LDFLAGS = ./static/libssl.a ./static/libcrypto.a -lpthread -ldl -D_REENTRANT
+#LDFLAGS = $(DTLSLDFLAGS) -L. -lpthread -ldl -D_REENTRANT
+LDFLAGS = $(DTLSLDFLAGS) -L. -L../../../../../../auteos/src/src -lpthread -ldl -lauteos -D_REENTRANT
+
+CFLAGS = $(DTLSCFLAGS) -Wall -g -O0 -D_REENTRANT -I. -I../wid -DWRITE_STD_OUTPUT -I../../../../../../auteos/src/include $(EXTRA_CFLAGS)
+#CFLAGS = $(DTLSCFLAGS) -Wall -g -O0 -D_REENTRANT -I. -I../wid -DWRITE_STD_OUTPUT $(EXTRA_CFLAGS)
+#CFLAGS = -Wall -g -O0 -D_REENTRANT -DCW_NO_DTLS -I. -I../wid -DWRITE_STD_OUTPUT $(EXTRA_CFLAGS)
+
+#-DCW_DEBUGGING
+
+# Memory leak
+#LDFLAGS += ../dmalloc-5.5.0/libdmallocth.a
+#CFLAGS += -DDMALLOC
+
+# Capwap Debugging
+#CFLAGS += -DCW_DEBUGGING
+
+
+
+RM = /bin/rm -f 
+
+PUB_LIB = libwcpsspub.a
+
+#PUB_OBJS =  CWCommon.o CWConfigFile.o CWErrorHandling.o CWList.o CWLog.o CWSafeList.o CWNetwork.o CWProtocol.o CWRandom.o CWSecurity.o CWOpenSSLBio.o CWStevens.o CWThread.o CWBinding.o timerlib.o
+#csc now we don't need  CWSecurity.o and CWOpenSSLBio.o
+PUB_OBJS =  CWCommon.o CWConfigFile.o CWErrorHandling.o CWList.o CWLog.o CWSafeList.o CWNetwork.o CWProtocol.o CWRandom.o CWStevens.o CWThread.o CWBinding.o timerlib.o CWSecurity.o CWOpenSSLBio.o
+PUB_SRCS = $(PUB_OBJS:.o=.c) 
+
+
+
+.PHONY: all 
+
+all: clean $(PUB_OBJS) 
+	@echo "################     AR=${AR}     ################"
+	$(AR) -r $(PUB_LIB) $(PUB_OBJS)
+
+
+.PHONY: clean
+
+clean: 
+	$(RM) $(PUB_LIB) $(PUB_OBJS) 
+
+

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+killall wtpd_check
+/usr/sbin/stop_monitor
+wlanconfig ath0 create wlandev wifi0 wlanmode ap
+iwconfig ath0 essid "NETGEAR-0"
+echo 0 > /proc/sys/dev/wifi0/thinap
+brctl addif default ath0
+ifconfig ath0 up

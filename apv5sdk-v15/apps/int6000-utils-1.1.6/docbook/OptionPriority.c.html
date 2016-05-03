@@ -1,0 +1,402 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			OptionPriority.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='OptionIdentity.c.html' title=' OptionIdentity.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='OptionSecurity.c.html' title=' OptionSecurity.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed OptionPriority (signed margin, const char * style);
+ *   
+ *   page.h
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef OPTIONPRIORITY_SOURCE
+#define OPTIONPRIORITY_SOURCE
+
+#include &lt;stdio.h&gt;
+
+#include &quot;../tools/format.h&quot;
+#include &quot;../cgi/page.h&quot;
+#include &quot;../cgi/session.h&quot;
+
+static const char * labels [CAPS] = 
+
+{
+	&quot;CAP 0&quot;,
+	&quot;CAP 1&quot;,
+	&quot;CAP 2&quot;,
+	&quot;CAP 3&quot; 
+};
+
+static const signed values [CAPS] = 
+
+{
+	0,
+	1,
+	2,
+	3 
+};
+
+/*====================================================================*
+ *   
+ *   signed checkbox (signed margin, const char * style, const char * label, signed check);
+ *   
+ *   page.h
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+signed checkbox (signed margin, const char * style, const char * label, signed check) 
+
+{
+	output (margin, &quot;&lt;input type='checkbox' class='%s' name='%s' %s/&gt;&quot;, style, label, (check)? &quot;checked&quot;: &quot;&quot;);
+	return (margin);
+}
+
+/*====================================================================*
+ *   
+ *   signed dropbox (signed margin, const char * label, signed value, const char * labels [], const signed values [], signed count);
+ *
+ *   page.h
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   margin is the indent level;
+ *   label is the control name as a string;
+ *   value is the control value in the range 0 through count-1;
+ *   labels [] is a list of lables to display;
+ *   count is the number of dropbox items;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed dropbox (signed margin, const char * style, const char * label, signed value, const char * labels [], const signed values [], signed count) 
+
+{
+	unsigned index = 0;
+	output (margin++, &quot;&lt;select class='%s' name='%s'&gt;&quot;, style, label);
+	while (index &lt; count) 
+	{
+		char * state;
+		if (index == value) 
+		{
+			state = &quot;selected&quot;;
+		}
+		else 
+		{
+			state = &quot;&quot;;
+		}
+		output (margin++, &quot;&lt;option class='%s' value='%d' %s&gt;&quot;, style, values [index], state);
+		output (margin, &quot;%s&quot;, labels [index]);
+		output (margin--, &quot;&lt;/option&gt;&quot;);
+		index++;
+	}
+	output (margin--, &quot;&lt;/select&gt;&quot;);
+	return (margin);
+}
+
+/*====================================================================*
+ *   
+ *   signed VLANTags (signed margin, const char * style);
+ * 
+ *   print a vertcal array of 8 VLAN tag selectors with title;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed VLANTags (signed margin, const char * style) 
+
+{
+	extern struct session session;
+	unsigned tag = 0;
+	output (margin++, &quot;&lt;fieldset class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;legend class='%s'&gt;&quot;, style);
+	output (margin, &quot;%s&quot;, &quot;VLAN Tags&quot;);
+	output (margin--, &quot;&lt;/legend&gt;&quot;);
+	output (margin++, &quot;&lt;table class='%s'&gt;&quot;, style);
+
+#if 1
+
+	while (tag &lt; TAGS) 
+	{
+		char label [36];
+		output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+		snprintf (label, sizeof (label), &quot;%s%d&quot;, FIELD_VLAN, tag);
+		output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+		output (margin, &quot;Tag%d&quot;, tag);
+		output (margin--, &quot;&lt;/th&gt;&quot;);
+		output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+		margin = dropbox (margin, style, label, session.QoS.VLAN [tag], labels, values, CAPS);
+		output (margin--, &quot;&lt;/td&gt;&quot;);
+		output (margin--, &quot;&lt;/tr&gt;&quot;);
+		tag++;
+	}
+
+#else
+
+	while (tag &lt; (TAGS&gt;&gt;1)) 
+	{
+		char label [36];
+		output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+		snprintf (label, sizeof (label), &quot;%s%d&quot;, FIELD_VLAN, tag);
+		output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+		output (margin, &quot;Tag%d&quot;, tag);
+		output (margin--, &quot;&lt;/th&gt;&quot;);
+		output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+		margin = dropbox (margin, style, label, session.tag [tag], labels, values, CAPS);
+		output (margin--, &quot;&lt;/td&gt;&quot;);
+		snprintf (label, sizeof (label), &quot;%s%d&quot;, style, tag + (TAGS&gt;&gt;1));
+		output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+		output (margin, &quot;Tag%d&quot;, tag + (TAGS&gt;&gt;1));
+		output (margin--, &quot;&lt;/th&gt;&quot;);
+		output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+		margin = dropbox (margin, style, label, session.tag [tag + (TAGS&gt;&gt;1)], labels, values, CAPS);
+		output (margin--, &quot;&lt;/td&gt;&quot;);
+		output (margin--, &quot;&lt;/tr&gt;&quot;);
+		tag++;
+	}
+
+#endif
+
+	output (margin--, &quot;&lt;/table&gt;&quot;);
+	output (margin--, &quot;&lt;/fieldset&gt;&quot;);
+	return (margin);
+}
+
+/*====================================================================*
+ *   
+ *   signed TOSBits (signed margin, const char * style);
+ *
+ *   print a vertical array of 8 TOS bit selectors with title;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed TOSBits (signed margin, const char * style) 
+
+{
+	extern struct session session;
+	unsigned bit = 0;
+	output (margin++, &quot;&lt;fieldset class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;legend class='%s'&gt;&quot;, style);
+	output (margin, &quot;%s&quot;, &quot;TOS Bits&quot;);
+	output (margin--, &quot;&lt;/legend&gt;&quot;);
+	output (margin++, &quot;&lt;table class='%s'&gt;&quot;, style);
+
+#if 1
+
+	while (bit &lt; BITS) 
+	{
+		char label [36];
+		output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+		snprintf (label, sizeof (label), &quot;%s%d&quot;, FIELD_TOS, bit);
+		output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+		output (margin, &quot;Bit%d&quot;, bit);
+		output (margin--, &quot;&lt;/th&gt;&quot;);
+		output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+		margin = dropbox (margin, style, label, session.QoS.ToS [bit], labels, values, CAPS);
+		output (margin--, &quot;&lt;/td&gt;&quot;);
+		output (margin--, &quot;&lt;/tr&gt;&quot;);
+		bit++;
+	}
+
+#else
+
+	while (bit &lt; (BITS&gt;&gt;1)) 
+	{
+		char label [36];
+		output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+		snprintf (label, sizeof (label), &quot;%s%d&quot;, FIELD_TOS, bit);
+		output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+		output (margin, &quot;Bit%d&quot;, bit);
+		output (margin--, &quot;&lt;/th&gt;&quot;);
+		output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+		margin = dropbox (margin, style, label, session.tos [bit], labels, values, CAPS);
+		output (margin--, &quot;&lt;/td&gt;&quot;);
+		snprintf (label, sizeof (label), &quot;%s%d&quot;, style, bit + (BITS&gt;&gt;1));
+		output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+		output (margin, &quot;Bit%d&quot;, bit + (BITS&gt;&gt;1));
+		output (margin--, &quot;&lt;/th&gt;&quot;);
+		output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+		margin = dropbox (margin, style, label, session.tos [bit + (BITS&gt;&gt;1)], labels, values, CAPS);
+		output (margin--, &quot;&lt;/td&gt;&quot;);
+		output (margin--, &quot;&lt;/tr&gt;&quot;);
+		bit++;
+	}
+
+#endif
+
+	output (margin--, &quot;&lt;/table&gt;&quot;);
+	output (margin--, &quot;&lt;/fieldset&gt;&quot;);
+	return (margin);
+}
+
+/*====================================================================*
+ *   
+ *   signed TimeToLive (signed margin, const char * style);
+ *
+ *   print a vertical array of 8 TOS bit selectors with title;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed TimeToLive (signed margin, const char * style) 
+
+{
+	extern struct session session;
+	unsigned ttl = 0;
+	output (margin++, &quot;&lt;fieldset class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;legend class='%s' title='10-65000msec'&gt;&quot;, style);
+	output (margin, &quot;%s&quot;, &quot;Priority TTL&quot;);
+	output (margin--, &quot;&lt;/legend&gt;&quot;);
+	output (margin++, &quot;&lt;table class='%s'&gt;&quot;, style);
+	while (ttl &lt; TTLS) 
+	{
+		char label [36];
+		snprintf (label, sizeof (label), &quot;%s%d&quot;, FIELD_TTL, ttl);
+		output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+		output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+		output (margin, &quot;CA%d&quot;, ttl);
+		output (margin--, &quot;&lt;/th&gt;&quot;);
+		output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+		output (margin, &quot;&lt;input type='text' class='%s' name='%s' value='%d'/&gt;&quot;, style, label, session.QoS.TTL [ttl]);
+		output (margin--, &quot;&lt;/td&gt;&quot;);
+		output (margin--, &quot;&lt;/tr&gt;&quot;);
+		ttl++;
+	}
+	output (margin--, &quot;&lt;/table&gt;&quot;);
+	output (margin--, &quot;&lt;/fieldset&gt;&quot;);
+	return (margin);
+}
+
+/*====================================================================*
+ *   
+ *   signed ChannelPriority (signed margin, const char * style);
+ *
+ *   print a vertical array of 8 TOS bit selectors with title;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed ChannelPriority (signed margin, const char * style) 
+
+{
+	extern struct session session;
+	session.QoS.method [0] &gt;&gt;= 1;
+	session.QoS.method [1] &gt;&gt;= 1;
+	output (margin++, &quot;&lt;fieldset class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;legend class='%s'&gt;&quot;, style);
+	output (margin, &quot;%s&quot;, &quot;Prioritize Using&quot;);
+	output (margin--, &quot;&lt;/legend&gt;&quot;);
+	output (margin++, &quot;&lt;table class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	margin = checkbox (margin, style, FIELD_PRI &quot;0&quot;, session.QoS.method [0]);
+	output (margin++, &quot;&lt;label class='%s'&gt;&quot;, style);
+	output (margin, &quot;%s&quot;, &quot;VLAN Tags&quot;);
+	output (margin--, &quot;&lt;/label&gt;&quot;);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin--, &quot;&lt;/tr&gt;&quot;);
+	output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	margin = checkbox (margin, style, FIELD_PRI &quot;1&quot;, session.QoS.method [1]);
+	output (margin++, &quot;&lt;label class='%s'&gt;&quot;, style);
+	output (margin, &quot;%s&quot;, &quot;Traffic Class&quot;);
+	output (margin--, &quot;&lt;/label&gt;&quot;);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin--, &quot;&lt;/tr&gt;&quot;);
+	output (margin--, &quot;&lt;/table&gt;&quot;);
+	output (margin--, &quot;&lt;/fieldset&gt;&quot;);
+	return (margin);
+}
+
+/*====================================================================*
+ *
+ *--------------------------------------------------------------------*/
+
+signed OptionPriority (signed margin, const char * style) 
+
+{
+	output (margin++, &quot;&lt;div class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;table class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	margin = VLANTags (margin, FIELD_VLAN);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	margin = TOSBits (margin, FIELD_TOS);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	margin = TimeToLive (margin, FIELD_TTL);
+	margin = ChannelPriority (margin, FIELD_PRI);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin--, &quot;&lt;/tr&gt;&quot;);
+	output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin, &quot;&lt;input type='submit' class='%s' name='%s' value='%s' title=' Apply QoS Parameters '/&gt;&quot;, style, SUBMIT_ACTION, ACTION_PRIORITIZE);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin, &quot;%s&quot;, &quot;&amp;nbsp;&quot;);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin--, &quot;&lt;/tr&gt;&quot;);
+	output (margin--, &quot;&lt;/table&gt;&quot;);
+	output (margin--, &quot;&lt;/div&gt;&quot;);
+	return (margin);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='OptionIdentity.c.html' title=' OptionIdentity.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='OptionSecurity.c.html' title=' OptionSecurity.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

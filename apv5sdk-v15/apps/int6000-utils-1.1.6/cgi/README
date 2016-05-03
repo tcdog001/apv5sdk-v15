@@ -1,0 +1,68 @@
+This folder contains experimental infrastructure for a CGI based interface to the toolkit. It is 
+incomplete and not ready for any particular application. It is included in the toolkit so that it
+does not get separated from toolkit components.
+
+The components in this folder are not automatically compiled or installed by the top level Makefile.
+You must cd into this folder and run 'make install'. Before installing, edit vaiabled WWW and BIN in
+this Makefile to identify the website folders on your system. 
+
+You must setup your webserver to support CGI and specify intellon.cgi as the index page. Currently,
+the only files needed are:
+
+	intellon.cgi
+	intellon.css
+	intellon.gif
+
+The main program file, intellon.cgi automatically creates session variable intellon.dat, if  missing;
+Make sure that the apache user can write to the CGI folder folder;
+
+There are some constants near the top of file page.h that you may want to change when moving or renaming
+files; Also, you may need to change the interface name ETHDEVICE in intellon.c;
+
+TO DO LIST
+----------
+
+1. Add dropbox to select and change ethernet interface at runtime;
+2. Improve presentation of error messages;
+3. Implement Priority Menu options;
+
+OVERVIEW
+--------
+
+The program has the following global variables:
+
+struct channel channel contains everything needed to send and receive raw ethernet frames; 
+
+struct session session contains state variables needed from one session to the next; it is read from
+file intellon.dat when the program starts and is written to intellon.dat when the program ends;
+
+struct tab tabs contains the names, function addresses and tool tip text for the menu division; there
+must be one function implemented for each menu tab;
+
+struct _scan_ message contains the message body provided by the CGI interface; the message format
+is "multipart/form-data" for those interested in searching the RFCs for more information; this
+structure is used to scan the message for message parts; 
+
+struct _scan_ content contains individual message parts extracted from the message body; message 
+parts contain field values and file content automatically downloaded by the form; message parts
+are used to update portions of the session structure;
+
+The page is rendered as one form having at least five divisions; Rendering is donw by writing to 
+stdout using function output (in most cases) to indent the text; The basic program flow is this:
+
+1. Load the session variable by reading intellon.dat into the structure body; 
+2. Edit the session variable by reading the multipart message parts and replacing session structure values;
+3. Act on values set within the message structure using structure member "action" as the guide;
+4. Render the header including the logo division and form start;
+5. Render the menu based on struct tab tabs; disable the current button;
+6. Render the body based on struct tab tabs;
+7. Render the unit selection devision to list available and selected devices based on the session variable;
+8. Rendor the footer including the logo division and form end;
+9. Peek into the session variable; (optional)
+10 Save the session variable to intellon.dat
+
+Manually running program intellon.cgi with option -s will print a fresh stylesheet so that you can tinker
+with the settings; 
+
+charles.maier@intellon.com
+

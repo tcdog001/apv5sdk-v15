@@ -1,0 +1,239 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_tr069=`config_read /config/administrator/tr069`
+xml_tr069_enable=`config_getoption "$xml_tr069" enable`
+xml_tr069_acs=`config_getoption "$xml_tr069" acs`
+xml_tr069_localport=`config_getoption "$xml_tr069" port`
+xml_tr069_message_enable=`config_getoption "$xml_tr069" pollenable`
+xml_tr069_poll=`config_getoption "$xml_tr069" pollinterval`
+xml_tr069_suser=`config_getoption "$xml_tr069" suser`
+xml_tr069_spass=`config_getoption "$xml_tr069" spass`
+xml_tr069_suser_r=`config_getoption "$xml_tr069" suser_r`
+xml_tr069_spass_r=`config_getoption "$xml_tr069" spass_r`
+
+
+
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js admin_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script type="text/javascript">
+	var flag="<%= $xml_session_lang %>";
+ init_mmenu(flag);
+	init_adminmenu(flag);
+	init_remote(flag);
+	      
+function Ip() {
+   a = document.getElementById("suser");
+   b = document.getElementById("spass");
+   c = document.getElementById("suser_r");
+   d = document.getElementById("spass_r");
+   if (a.value != "" && b.value == ""){
+   	  	alert(tr069_password_alert);
+   	  	b.focus();
+   	  	return false;
+   }
+   if (c.value != "" && d.value == ""){
+   	  	alert(tr069_password_alert_r);
+   	  	d.focus();
+   	  	return false;
+   }
+   overlayer();        
+} 
+
+function shielding(){
+  
+}        
+</script>
+</head>
+<body onLoad="shielding()">
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_administration8.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return Ip()">
+<div align="center">
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0">
+					      <tr>
+					        <td align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(tr069_bs)</script></b></td>
+					      </tr>
+					      
+					      <tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+					      
+					      <tr>
+					      <td align="left" height="24" width="280" bordercolor="#ffffff"><script language="javascript">replace(tr069_enablestatus)</script>&nbsp;</td>
+				        <td align="left" width="370" bordercolor="#ffffff">
+				          <input type="radio" <% webui_radiobutton_check "$xml_tr069_enable" "1" %> name="tr069enable" value="1" onClick="shielding()" /><script language="javascript">replace(tr069_enable)</script>
+				        &nbsp;&nbsp; <input type="radio" <% webui_radiobutton_check "$xml_tr069_enable" "0" %> name="tr069enable" value="0" onClick="shielding()" /><script language="javascript">replace(tr069_disable)</script>
+				        </td> 
+				        </tr>
+
+								<tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(tr069_acsurl)</script></td>
+					        <td align="left" bordercolor="#ffffff"><label>
+					          <input type="text" name="acs" value="<%= "$xml_tr069_acs" %>" />
+					        </label></td>
+					      </tr>
+					      
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(tr069_localport)</script></td>
+					        <td align="left" bordercolor="#ffffff"><label>
+					          <input type="text" name="lport" value="<%= "$xml_tr069_localport" %>" />
+					        </label></td>
+					      </tr>
+					      
+
+					      
+					      <tr>
+					      <td align="left" height="24" width="280" bordercolor="#ffffff"><script language="javascript">replace(tr069_mesgenable)</script>&nbsp;</td>
+				        <td align="left" width="370" bordercolor="#ffffff">
+				          <input type="radio" <% webui_radiobutton_check "$xml_tr069_message_enable" "1" %> name="tr069menable" value="1" onClick="shielding()" /><script language="javascript">replace(tr069_enable)</script>
+				        &nbsp;&nbsp; <input type="radio" <% webui_radiobutton_check "$xml_tr069_message_enable" "0" %> name="tr069menable" value="0" onClick="shielding()" /><script language="javascript">replace(tr069_disable)</script>
+				        </td> 
+				        </tr>
+					      
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(tr069_pollinterval)</script></td>
+					        <td align="left" bordercolor="#ffffff"><label>
+					          <input type="text" name="poll" value="<%= "$xml_tr069_poll" %>" />
+					        </label></td>
+					      </tr>
+								
+					      <tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+					      
+					      <tr>
+					        <td align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(tr069_safe)</script></b></td>
+					      </tr>
+					      
+					      <tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+										      
+					      <tr>
+					      <td align="left" height="24" width="280" bordercolor="#ffffff"><script language="javascript">replace(tr069_sslenable)</script>&nbsp;</td>
+				        <td align="left" width="370" bordercolor="#ffffff">
+				          <input type="radio" <% webui_radiobutton_check "$xml_tr069_ssl_enable" "yes" %> name="tr069sslenable" value="yes" onClick="shielding()" /><script language="javascript">replace(tr069_enable)</script>
+				        &nbsp;&nbsp; <input type="radio" <% webui_radiobutton_check "$xml_tr069_ssl_enable" "no" %> name="tr069sslenable" value="no" onClick="shielding()" /><script language="javascript">replace(tr069_disable)</script>
+				        </td> 
+				        </tr>
+					      
+					      <tr>
+								<td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(tr069_certupload)</script>&nbsp;</td>
+								<td bordercolor="#ffffff" align="left"><input type="file" name="uploadfile">&nbsp;<script language="javascript">replace(tr069_upload)</script></td>
+							</tr>
+					      
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(tr069_username)</script></td>
+					        <td align="left" bordercolor="#ffffff"><label>
+					          <input type="text" name="suser" id="suser" value="<%= "$xml_tr069_suser" %>" />
+					        </label></td>
+					      </tr>
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(tr069_passwd)</script></td>
+					        <td align="left" bordercolor="#ffffff"><label>
+					          <input type="text" name="spass" id="spass" value="<%= "$xml_tr069_spass" %>" />
+					        </label>
+					        <label></label></td>
+				        </tr>
+					      
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(tr069_username_remote)</script></td>
+					        <td align="left" bordercolor="#ffffff"><label>
+					          <input type="text" name="suser_r" id="suser_r" value="<%= "$xml_tr069_suser_r" %>" />
+					        </label></td>
+					      </tr>
+					      
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(tr069_passwd_remote)</script></td>
+					        <td align="left" bordercolor="#ffffff"><label>
+					          <input type="text" name="spass_r" id="spass_r" value="<%= "$xml_tr069_spass_r" %>" />
+					        </label>
+					        <label></label></td>
+					      </tr>
+					      
+					      <tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+								
+								<tr>
+					        <td align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(tr069_download)</script></b></td>
+					      </tr>
+					      
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(tr069_fileserverip)</script></td>
+					        <td align="left" bordercolor="#ffffff"><input type="text" name="fsever" value="<%= "$xml_tr069_fserver" %>" /></td>
+					      </tr>
+					      
+					     <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(tr069_username)</script></td>
+					        <td align="left" bordercolor="#ffffff"><label>
+					          <input type="text" name="fuser" value="<%= "$xml_tr069_fuser" %>" />
+					        </label></td>
+					      </tr>
+					      
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(tr069_passwd)</script></td>
+					        <td align="left" bordercolor="#ffffff"><label>
+					          <input type="text" name="fpass" value="<%= "$xml_tr069_fpass" %>" />
+					        </label>
+					        <label></label></td>
+					      </tr>
+					      
+					      <tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+					      </table>
+		            <table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+					      <tr>
+					        <td align="center" height="40" valign="middle" colspan="2"><label>
+					          <script language="javascript">replace(remote_apply)</script>
+					        </label></td>
+					      </tr>
+					      <tr>
+					        <td align="right"   colspan="2"><script language="javascript">replace(tr069_help)</script></td>
+					      </tr>
+  </table>
+</div>
+<input type="hidden" value="TR069 Apply" name="SERVLET">
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

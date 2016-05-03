@@ -1,0 +1,243 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			intellon.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='intellon-snmp2.c.html' title=' intellon-snmp2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='ipv4spec.c.html' title=' ipv4spec.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   intellon.c - intellon powerline device manager;
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdlib.h&gt;
+#include &lt;errno.h&gt; 
+#include &lt;sys/poll.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;sys/ioctl.h&gt;
+#include &lt;net/if.h&gt;
+#if defined (__APPLE__)
+#include &lt;sys/types.h&gt;
+#endif
+#include &lt;net/if_arp.h&gt;
+#include &lt;netinet/in.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/format.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../ether/channel.h&quot;
+#include &quot;../scan/scan.h&quot;
+#include &quot;../cgi/session.h&quot;
+#include &quot;../cgi/page.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../cgi/DivisionHeader.c&quot;
+#include &quot;../cgi/DivisionOption.c&quot;
+#include &quot;../cgi/DivisionDevice.c&quot;
+#include &quot;../cgi/DivisionFooter.c&quot;
+#include &quot;../cgi/status.c&quot;
+#include &quot;../cgi/session.c&quot;
+#include &quot;../cgi/SessionLoad.c&quot;
+#include &quot;../cgi/SessionEdit.c&quot;
+#include &quot;../cgi/SessionTask.c&quot;
+#include &quot;../cgi/SessionPeek.c&quot;
+#include &quot;../cgi/SessionSave.c&quot;
+#include &quot;../cgi/stylesheet.c&quot;
+#include &quot;../cgi/OptionTopology.c&quot;
+#include &quot;../cgi/OptionIdentity.c&quot;
+#include &quot;../cgi/OptionSecurity.c&quot;
+#include &quot;../cgi/OptionPriority.c&quot;
+#include &quot;../cgi/OptionFirmware.c&quot;
+#include &quot;../cgi/CGILocalPLD.c&quot;
+#include &quot;../cgi/CGIWriteMOD.c&quot;
+#include &quot;../cgi/CGIFlashMOD.c&quot;
+#include &quot;../cgi/CGISetKey.c&quot;
+#include &quot;../cgi/CGIRestore.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../int6k/chipset.c&quot;
+#include &quot;../int6k/EthernetHeader.c&quot;
+#include &quot;../int6k/IntellonHeader.c&quot;
+#include &quot;../int6k/UnwantedPacket.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../crypt/SHA256Reset.c&quot;
+#include &quot;../crypt/SHA256Write.c&quot;
+#include &quot;../crypt/SHA256Block.c&quot;
+#include &quot;../crypt/SHA256Fetch.c&quot;
+#include &quot;../crypt/HPAVKeyDAK.c&quot;
+#include &quot;../crypt/HPAVKeyNMK.c&quot;
+#include &quot;../crypt/HPAVKeyNID.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../pib/pibcodes.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../nvm/nvmspan.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../tools/output.c&quot;
+#include &quot;../tools/hexstring.c&quot;
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/hexencode.c&quot;
+#include &quot;../tools/checksum_32.c&quot;
+#include &quot;../tools/hexdump.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/filepart.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ether/channel.c&quot;
+#include &quot;../ether/openchannel.c&quot;
+#include &quot;../ether/readpacket.c&quot;
+#include &quot;../ether/sendpacket.c&quot;
+#include &quot;../ether/closechannel.c&quot;
+#include &quot;../ether/anynic.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../scan/scan.c&quot;
+#endif
+
+/*====================================================================*
+ *
+ *--------------------------------------------------------------------*/
+
+const char * program_name = &quot;&quot;;
+
+/*====================================================================*
+ *
+ *   struct tab tabs [TABS]; 
+ *
+ *   page.h
+ *
+ *   each tab consists of a function pointer, name and text; you can
+ *   add or remove tabs here and adjust TABS in page.h;each tab needs
+ *   it's own function;
+ *  
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+struct tab tabs [TABS] = 
+
+{
+	{
+		OptionTopology,
+		OPTION_TOPOLOGY,
+		&quot;Network Topology&quot; 
+	},
+	{
+		OptionIdentity,
+		OPTION_IDENTITY,
+		&quot;Device Identity&quot; 
+	},
+	{
+		OptionSecurity,
+		OPTION_SECURITY,
+		&quot;Device Security&quot; 
+	},
+	{
+		OptionPriority,
+		OPTION_PRIORITY,
+		&quot;Channel Priority&quot; 
+	},
+	{
+		OptionFirmware,
+		OPTION_FIRMWARE,
+		&quot;Device Firmware and Configuration&quot; 
+	}
+};
+
+/*====================================================================*
+ *
+ *   int main (int argc, const char * argv []);
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv [], const char * envp []) 
+
+{
+	extern struct session session;
+	extern struct channel channel;
+	extern struct tab tabs [TABS];
+	signed margin = 0;
+	signed tab = 0;
+	program_name = filepart (*argv);
+	while ((--argc) &amp;&amp; (*++argv));
+	SessionLoad (SESSION_DAT);
+	channel.name = session.source;
+	openchannel (&amp;channel);
+	SessionEdit ();
+	SessionTask ();
+	margin = DivisionHeader (margin, STYLE_HEADER);
+	margin = DivisionOption (margin, STYLE_OPTION);
+	for (tab = 0; tab &lt; TABS; tab++) 
+	{
+		if (!strcmp (tabs [tab].name, session.option)) 
+		{
+			margin = tabs [tab].form (margin, STYLE_ACTION);
+		}
+	}
+	margin = DivisionDevice (margin, STYLE_DEVICE);
+	margin = DivisionFooter (margin, STYLE_FOOTER);
+	SessionSave (SESSION_DAT);
+//	SessionPeek ();
+	closechannel (&amp;channel);
+	return (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='intellon-snmp2.c.html' title=' intellon-snmp2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='ipv4spec.c.html' title=' ipv4spec.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

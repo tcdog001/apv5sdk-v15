@@ -1,0 +1,2 @@
+net/wireless/wext.c:360: warning: large integer implicitly truncated to unsigned type
+net/wireless/wext.c:361: warning: large integer implicitly truncated to unsigned type

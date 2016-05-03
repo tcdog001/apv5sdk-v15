@@ -1,0 +1,9 @@
+LDFLAGS=-s
+LIBPATH=../../libmxml-0.9.1/src
+
+all:
+	rm -f xmlconf
+	${CC} ${LDFLAGS} -Wall xmlconf.c -o xmlconf ${LIBPATH}/lib/libmxml.a -I${LIBPATH}/include
+
+clean:
+	rm -f xmlconf

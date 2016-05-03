@@ -1,0 +1,23 @@
+CFLAGS = -g -Wall -DDEBUG -DDEBUG_LEVEL=3
+PKGCONFIG = pkg-config
+SOAP_CFLAGS = `$(PKGCONFIG) gsoap --cflags`
+SOAP_LDFLAGS = `$(PKGCONFIG) gsoap --libs`
+LDFLAGS = $(SOAP_LDFLAGS) -lpthread
+CPPFLAGS = $(SOAP_CFLAGS)
+CPPFLAGS +=`$(PKG_CONFIG) curl-config --cflags`
+LDFLAGS +=`$(PKG_CONFIG) curl-config --libs`
+
+OBJ = stdsoap2.o StubC.o dom.o Fault.o downloadmanager.o
+EXE = downloadmanager
+CC = gcc 
+
+all: $(OBJ) $(EXE)
+
+$(EXE): $(OBJ)
+	$(CC) $(LDFLAGS) -o $@ $^
+%.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $< 
+
+
+clean:
+	-rm -f $(OBJ) $(EXE)

@@ -1,0 +1,4 @@
+Assembler messages:
+Warning: A different -mtune was already specified, is now mips32r2
+Warning: A different -mtune was already specified, is now 74kc
+Warning: A different -mtune was already specified, is now mips32r2

@@ -1,0 +1,2 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/mlme/ieee80211_mlme_ap.c: In function 'ieee80211_mlme_recv_assoc_request':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/mlme/ieee80211_mlme_ap.c:77: warning: unused variable 'node_leave'

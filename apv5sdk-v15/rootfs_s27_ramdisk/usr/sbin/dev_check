@@ -1,0 +1,16 @@
+#!/bin/sh
+
+IFCONFIG=/sbin/ifconfig
+${IFCONFIG} wifi0  1>/dev/null 2>&1
+if [ $? -eq 0 ];then
+    echo "wireless device check: wifi0 is OK!"
+else
+    echo "wireless device check: wifi0 is not exists!"
+fi
+
+${IFCONFIG} wifi1  1>/dev/null 2>&1
+if [ $? -eq 0 ];then
+    echo "wireless device check: wifi1 is OK!"
+else
+    echo "wireless device check: wifi1 is not exists!"
+fi

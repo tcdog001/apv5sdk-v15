@@ -1,0 +1,42 @@
+PWD := ${shell pwd}
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR =src
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR = /tmp/changzhimin-rootfs
+endif
+
+ifndef KERNELDIR
+KERNELDIR := $(PWD)/../../ap83sdk/linux/kernels/mips-linux-2.6.15
+endif 
+
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.15/net
+
+TARGET_CROSS := mips-linux-uclibc-
+
+
+
+MAKE_ARGS:= \
+	KERNELPATH="$(KERNELDIR)" \
+	CROSS_COMPILE="$(TARGET_CROSS)" \
+
+all:pro_ctl_mod install
+
+# lijiyong add for woc
+ifeq ($(AQ_TYPE), AQ2000CN)
+pro_ctl_mod:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.cavium && mv ${PKG_BUILD_DIR}/Makefile.cavium ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) AQ2000CN=1	
+	echo "AQ2000CN finished"
+endif
+
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean
+	
+install:pro_ctl_mod
+	mkdir -p $(INSTALLDIR)
+	cd $(PKG_BUILD_DIR) && \
+	cp -f pro_ctl_mod.ko $(INSTALLDIR)/pro_ctl_mod.ko
+

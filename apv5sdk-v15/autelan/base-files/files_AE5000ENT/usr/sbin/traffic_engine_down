@@ -1,0 +1,30 @@
+#!/bin/sh
+
+wifi="$1"
+mode="$2"
+value="$3"
+
+if [ ${wifi}  -eq 0 ];then
+case ${mode} in
+	0)
+		 echo ${value} > /proc/sys/dev/wifi0/cache_factor_b_wifi0
+	;;
+	1)
+		 echo ${value} > /proc/sys/dev/wifi0/cache_factor_g_wifi0
+	;;
+	2)
+		echo ${value} > /proc/sys/dev/wifi0/cache_factor_n_wifi0
+esac
+else if [ ${wifi} -eq 1 ];then
+case ${mode} in
+        0)
+                 echo ${value} > /proc/sys/dev/wifi0/cache_factor_b_wifi1
+        ;;
+        1)
+                 echo ${value} > /proc/sys/dev/wifi0/cache_factor_g_wifi1
+        ;;
+        2)
+                echo ${value} > /proc/sys/dev/wifi0/cache_factor_n_wifi1
+esac
+fi
+fi

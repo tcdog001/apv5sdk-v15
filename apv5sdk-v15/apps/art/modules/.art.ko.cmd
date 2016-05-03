@@ -1,0 +1,1 @@
+cmd_/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/apps/art/modules/art.ko := mips-linux-uclibc-ld -r  -m elf32btsmip  --build-id -o /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/apps/art/modules/art.ko /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/apps/art/modules/art.o /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/apps/art/modules/art.mod.o

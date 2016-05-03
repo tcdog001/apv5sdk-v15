@@ -1,0 +1,43 @@
+#!/bin/sh
+. /usr/lib/web/xmlconf.sh
+. /usr/lib/web/constant.sh
+
+if [ "$1" == "" -o "$2" == "" ]; then
+	echo "Usage: manager_vap_conf vap_num manager_enable"
+	echo "Example: manager_vap_conf 1 yes (1 is vap1)"
+	exit
+fi
+
+vap_num=$1
+manager_enable=$2
+xml_vap=`config_read /config/network/vap${vap_num}`
+xml_vap=`config_setoption "$xml_vap" ismanager "$manager_enable"`
+
+if [ $manager_enable == "yes" ]; then
+	xml_vap=`config_setoption "$xml_vap" forward2 "no"`
+	config_write /config/network/vap${vap_num} "$xml_vap"
+	
+	xml_vap_vlan=`config_read /config/network/vap${vap_num}/vlan`
+	xml_vap_vlanenable=`config_getoption "$xml_vap_vlan" enable`
+	xml_vap_vlanid=`config_getoption "$xml_vap_vlan" vid`
+	WLIF=`expr $vap_num - 1`
+	if [ "$xml_vap_vlanenable" == "0" ];then
+			$BRCTL delif $BRLAN ath$WLIF > /dev/null 2>&1
+	else
+			$BRCTL delif br$xml_vap_vlanid ath$WLIF > /dev/null 2>&1
+	fi
+else
+	xml_vap=`config_setoption "$xml_vap" forward2 "yes"`
+	config_write /config/network/vap${vap_num} "$xml_vap"
+	
+	xml_vap_vlan=`config_read /config/network/vap${vap_num}/vlan`
+	xml_vap_vlanenable=`config_getoption "$xml_vap_vlan" enable`
+	xml_vap_vlanid=`config_getoption "$xml_vap_vlan" vid`
+	WLIF=`expr $vap_num - 1`
+	if [ "$xml_vap_vlanenable" == "0" ];then
+			$BRCTL addif $BRLAN ath$WLIF > /dev/null 2>&1
+	else
+			$BRCTL addif br$xml_vap_vlanid ath$WLIF > /dev/null 2>&1
+	fi
+fi
+

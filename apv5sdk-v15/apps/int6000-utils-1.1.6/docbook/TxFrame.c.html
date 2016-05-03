@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			TxFrame.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='Traffic.c.html' title=' Traffic.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='UnwantedPacket.c.html' title=' UnwantedPacket.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   size_t ihpapi_TxFrame (size_t bufferLen, uint8_t buffer []);
+ *
+ *   ihpapi.h
+ *
+ *   Encode buffer with remaining data to be transmitted and return
+ *   the number of bytes encoded or 0 on an encoding error;
+ *
+ *   Byte ordering has been taken care by the encoders;
+ *
+ *   internal state information is stored in the StateInfo structure
+ *   defined in ihp.h;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon HomePlug AV Application Programming Interface;
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration and evaluation only; Not for production use;
+ *
+ *   Contributor(s): 
+ *	Alex Vasquez, alex.vasquez@intellon.com
+ *	Charles Maier, charles.maier@intellon.com
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef TXFRAME_SOURCE
+#define TXFRAME_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;string.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;ihpapi.h&quot;
+#include &quot;ihp.h&quot;
+
+struct SeqCB scb;
+ 
+size_t ihpapi_TxFrame (size_t bufferLen, uint8_t buffer []) 
+
+{
+
+	TxInfo * tcb = &amp;scb.tcb;
+	size_t offset = 0;
+
+#if INTELLON_SAFEMODE
+ 
+	if (tcb-&gt;OSA == (uint8_t *)(0)) 
+	{
+		errno = EFAULT;
+		return (0);
+	}
+	if (tcb-&gt;ODA == (uint8_t *)(0)) 
+	{
+		errno = EFAULT;
+		return (0);
+	}
+	if (buffer == (uint8_t *)(0)) 
+	{
+		errno = EFAULT;
+		return (0);
+	}
+
+#endif
+ 
+	if (!tcb-&gt;txok) 
+	{
+		return (0);
+	}
+	tcb-&gt;txok = false;
+	offset += EncodeEthernetHeader (buffer + offset, bufferLen - offset, tcb-&gt;ODA, tcb-&gt;OSA);
+	offset += EncodeIntellonHeader (buffer + offset, bufferLen - offset, tcb-&gt;MMTYPE);
+	if (tcb-&gt;hdrlen) 
+	{
+		memcpy (buffer + offset, &amp;tcb-&gt;hdr, tcb-&gt;hdrlen);
+		offset += tcb-&gt;hdrlen;
+	}
+	if (tcb-&gt;datalen) 
+	{
+		memcpy (buffer + offset, tcb-&gt;data, tcb-&gt;datalen);
+		offset += tcb-&gt;datalen;
+	}
+	if (tcb-&gt;tlrlen) 
+	{
+		memcpy (buffer + offset, &amp;tcb-&gt;trailer, tcb-&gt;tlrlen);
+		offset += tcb-&gt;tlrlen;
+	}
+	if (offset &lt; IHPAPI_ETHER_MIN_LEN) 
+	{
+		memset (buffer + offset, 0, IHPAPI_ETHER_MIN_LEN - offset);
+		offset = IHPAPI_ETHER_MIN_LEN;
+	}
+	return (offset);
+}
+
+#endif
+ 
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='Traffic.c.html' title=' Traffic.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='UnwantedPacket.c.html' title=' UnwantedPacket.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

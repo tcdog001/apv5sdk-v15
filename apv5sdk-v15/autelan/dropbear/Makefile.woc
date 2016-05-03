@@ -1,0 +1,122 @@
+#PKG_INFO
+PKG_NAME:=dropbear
+PKG_VERSION:=0.50
+PKG_RELEASE:=2
+PKG_BUILD_DIR:=src
+
+#command rep
+CPDIR := cp -r
+CP := cp -fpR
+MKDIR := mkdir -p
+MV := mv
+STRIP = $(TARGET_CROSS)strip
+
+#configure option
+FPIC := -fPIC
+TARGET_CROSS ?= mips-linux-uclibc-
+TARGET_CC ?= $(TARGET_CROSS)gcc
+TARGET_CFLAGS =
+EXTRA_CFLAGS =
+TARGET_CPPFLAGS = $(CAVIUM_CPPFLAGS)
+EXTRA_CFLAGS =
+TARGET_LDFLAGS = $(CAVIUM_LDFLAGS)
+EXTRA_CFLAGS =
+LDFLAGS = $(TARGET_LDFLAGS) $(EXTRA_LDFLAGS)
+GNU_TARGET_NAME ?= mips-linux
+DISABLE_NLS ?= --disable-nls
+TARGET_CONFIGURE_OPTS ?= \
+  AR=$(TARGET_CROSS)ar \
+  AS="$(TARGET_CC) -c $(TARGET_CFLAGS)" \
+  LD=$(TARGET_CROSS)ld \
+  NM=$(TARGET_CROSS)nm \
+  CC="$(TARGET_CC)" \
+  GCC="$(TARGET_CC)" \
+  CXX=$(TARGET_CROSS)g++ \
+  RANLIB=$(TARGET_CROSS)ranlib \
+  STRIP=$(TARGET_CROSS)strip \
+  OBJCOPY=$(TARGET_CROSS)objcopy \
+  OBJDUMP=$(TARGET_CROSS)objdump \
+  SIZE=$(TARGET_CROSS)size
+
+CONFIGURE_VARS = \
+                $(TARGET_CONFIGURE_OPTS) \
+                CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CXXFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CPPFLAGS="$(TARGET_CPPFLAGS) $(EXTRA_CPPFLAGS)" \
+                LDFLAGS="$(TARGET_LDFLAGS) $(EXTRA_CPPFLAGS)" \
+
+CONFIGURE_ARGS = \
+                --target=$(GNU_TARGET_NAME) \
+                --host=$(GNU_TARGET_NAME) \
+                --build=$(GNU_HOST_NAME) \
+                --program-prefix="" \
+                --program-suffix="" \
+                --prefix=/usr \
+                --exec-prefix=/usr \
+                --bindir=/usr/bin \
+                --sbindir=/usr/sbin \
+                --libexecdir=/usr/lib \
+                --sysconfdir=/etc \
+                --datadir=/usr/share \
+                --localstatedir=/var \
+                --mandir=/usr/man \
+                --infodir=/usr/info \
+                $(DISABLE_NLS) \
+                ac_cv_func_malloc_0_nonnull=yes
+
+CONFIGURE_ARGS += \
+	--with-shared \
+	--disable-pam \
+	--enable-openpty \
+	--enable-syslog \
+	--disable-shadow \
+	--disable-lastlog \
+	--disable-utmp \
+	--disable-utmpx \
+	--disable-wtmp \
+	--disable-wtmpx \
+	--disable-loginfunc \
+	--disable-pututline \
+	--disable-pututxline \
+	--disable-zlib
+
+.PHONY: all
+all: configure compile install
+
+.PHONY: configure
+configure:
+	( cd $(PKG_BUILD_DIR) && \
+	  $(CONFIGURE_VARS) \
+	  ./configure \
+	  $(CONFIGURE_ARGS) \
+	);
+
+.PHONY: compile
+compile:
+	$(MAKE) -C $(PKG_BUILD_DIR) \
+		$(TARGET_CONFIGURE_OPTS) \
+		LD="$(TARGET_CC)" \
+		PROGRAMS="dropbear dbclient dropbearkey scp" \
+		MULTI=1 SCPPROGRESS=1
+
+.PHONY: install
+install:	
+	@echo "installing dropbear"
+	$(MKDIR) $(ROOTFSDIR)/jffs/dropbear
+	$(MKDIR) $(ROOTFSDIR)/usr/sbin
+	$(CP) $(PKG_BUILD_DIR)/dropbearmulti $(ROOTFSDIR)/usr/sbin/dropbear
+	$(MKDIR) $(ROOTFSDIR)/usr/bin
+	ln -sf ../sbin/dropbear $(ROOTFSDIR)/usr/bin/scp
+	ln -sf ../sbin/dropbear $(ROOTFSDIR)/usr/bin/ssh
+	ln -sf ../sbin/dropbear $(ROOTFSDIR)/usr/bin/dbclient
+	ln -sf ../sbin/dropbear $(ROOTFSDIR)/usr/bin/dropbearkey
+	$(MKDIR) $(ROOTFSDIR)/etc/config/
+	$(CP) ./files/dropbear.config $(ROOTFSDIR)/etc/config/dropbear
+	$(CP) ./files/shells $(ROOTFSDIR)/etc
+	$(MKDIR) $(ROOTFSDIR)/etc/init.d/
+	$(CP) ./files/dropbear.init $(ROOTFSDIR)/etc/init.d/dropbear 
+	$(MKDIR) $(ROOTFSDIR)/usr/lib/ipkg/info/ 
+	$(CP) ./files/dropbear.conffiles $(ROOTFSDIR)/usr/lib/ipkg/info
+	$(CP) $(ROOTFSDIR)/../../ar11nsdk/build/gcc-3.4.4-2.16.1/$(TOOLARCH)/lib/libutil.so.0 $(ROOTFSDIR)/usr/lib
+	$(CP) $(ROOTFSDIR)/../../ar11nsdk/build/gcc-3.4.4-2.16.1/$(TOOLARCH)/lib/libutil.so $(ROOTFSDIR)/usr/lib
+	$(CP) $(ROOTFSDIR)/../../ar11nsdk/build/gcc-3.4.4-2.16.1/$(TOOLARCH)/lib/libutil-0.9.28.so $(ROOTFSDIR)/usr/lib

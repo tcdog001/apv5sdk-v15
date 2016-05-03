@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			setnvm.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='sdram.7.html' title=' sdram.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='setpib.7.html' title=' setpib.7 '>NEXT</a>]
+			</div>
+<pre>
+setnvm(7)                             Intellon Linux Toolkit                            setnvm(7)
+
+NAME
+       setnvm - Intellon Image File Mangler
+
+SYNOPSIS
+       setnvm [options] file [file] [...]
+
+DESCRIPTION
+       Set  special  fields of the image header for every image in an Intellon image file. Do not
+       use this program without Intellon support because it  can  easily  render  an  image  file
+       invalid  or,  worse,  render  a powerline device inoperable. Detailed information on field
+       values has been omitted on purpose. If you have to ask then you should  probably  not  use
+       this program.
+
+       Use  program  chknvm with the -v option to inspect image file contents. If a file contains
+       images that should not have their Type or Omit fields changed,  use  program  nvmsplit  to
+       break  out the images, change those that need it then use program nvmmerge to combine them
+       again.
+
+       This program is part of the Intellon Linux Toolkit. See the ilt man page for  an  overview
+       and installation instructions.
+
+OPTIONS
+       -t imagetype
+              Set  the  Image  Type field for every image in the file. This 8-bit value indicates
+              the nature of the image and is used by Intellon firmware and  application  software
+              to  determine  if an image should be downloaded and executed. Values can be entered
+              in decimal, binary or hexadecimal. Binary values must be  prefixed  with  &quot;0b&quot;  and
+              hexadecimal  values  must  be  prefixed with &quot;0x&quot;. The imagetype must be one of the
+              following values:
+
+               0 NVM_IMAGE_GENERIC
+               1 NVM_IMAGE_CONFIG_SYNOPSIS
+               2 NVM_IMAGE_CONFIG_DENALI
+               3 NVM_IMAGE_APPLET_DENALI
+               4 NVM_IMAGE_FIRMWARE
+               5 NVM_IMAGE_OASCLIENT
+               6 NVM_IMAGE_CUSTOM
+               7 NVM_IMAGE_MEMCTL
+
+       -o hostmask
+              Set the Image Omit field for every image in the file. This 16-bit value is a bitmap
+              of  Intellon  platforms  that  the image does not support. Values may be entered in
+              decimal, binary or hexadecimal. Binary values must be prefixed with &quot;0b&quot;  and  hex‐
+              adecimal  values  must be prefixed with &quot;0x&quot;. The hostmask may be the logical OR of
+              any of the following values:
+
+               1 INT6000
+               2 INT6300
+               4 INT6400
+
+       -q     Suppress printing of routine messages. This option has no effect at this time.  All
+              error messages are printed.
+
+       -v     Print image headers on stdout as they are processed.
+
+       -?, --help
+              Print  program  help  summary  on  stdout.  This option takes precedence over other
+              options on the command line.
+
+       -!, --version
+              Print program version information on stdout.  This  option  takes  precedence  over
+              other  options  on  the  command  line. Usethis option when sending screen dumps to
+              Intellon Technical Support so that they know exactly which  version  of  the  Linux
+              Toolkit you are using.
+
+ARGUMENTS
+       file   The name of an Intellon image file. By convention, Intellon Image files have a .nvm
+              file extension but this program does not enforce  this  convention.  Invalid  image
+              files will be rejected causing the output to be incomplete.
+
+EXAMPLES
+       None.
+
+DISCLAIMER
+       Firmware  file structure and content is proprietary to Intellon Corporation, Ocala FL USA.
+       Consequently, public information is not available. Intellon Corporation reserves the right
+       to  change file structure or content in future firmware releases without any obligation to
+       notify or compensate users of this program.
+
+SEE ALSO
+       chknvm(7), int6kf(7), int6ktest(7), nvmmerge(7), nvmsplit(7), setpib(7)
+
+CREDITS
+        Charles Maier &lt;charles.maier@intellon.com&gt;
+
+int6000-utils-linux             Intellon Corporation, Ocala FL USA                      setnvm(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='sdram.7.html' title=' sdram.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='setpib.7.html' title=' setpib.7 '>NEXT</a>]
+			</div>
+		</body>
+	</html>

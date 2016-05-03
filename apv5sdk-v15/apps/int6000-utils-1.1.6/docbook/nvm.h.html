@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			nvm.h
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='number.h.html' title=' number.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='nvram.h.html' title=' nvram.h '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   nvm.h - nvm file format definitions and declarations;
+ *
+ *   The Boot ROM reads a linked list of NVM headers containing 
+ *   information about the size, location and execution address 
+ *   of various software images;
+ *
+ *   See INT6300 Boot ROM Software Design Specification for more 
+ *   information; the document may not be available to some
+ *   customers so don't push it;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef NVM_HEADER
+#define NVM_HEADER
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdint.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/types.h&quot;
+
+/*====================================================================*
+ *   nvm constants;
+ *--------------------------------------------------------------------*/
+
+#define NVM_LEGACY 1
+#define NVM_LATEST 1
+
+#define NVM_SILENCE    	(1 &lt;&lt; 0)
+#define NVM_VERBOSE   	(1 &lt;&lt; 1)
+#define NVM_BASENAME   	(1 &lt;&lt; 2)
+#define NVM_TRACE 	(1 &lt;&lt; 3)
+#define NVM_SDRAM 	(1 &lt;&lt; 4)
+#define NVM_VERSION 	(1 &lt;&lt; 5)
+#define NVM_FINAL 	(1 &lt;&lt; 6)
+
+/*====================================================================*
+ *   nvm constants;
+ *--------------------------------------------------------------------*/
+
+#define NVM_HEADER_VERSION 0x60000000
+#define NVM_HEADER_MINOR_VERSION 1 
+
+#define NVM_CHIPSET_INT6000 (1 &lt;&lt; 0)
+#define NVM_CHIPSET_INT6300 (1 &lt;&lt; 1)
+#define NVM_CHIPSET_INT6400 (1 &lt;&lt; 2)
+
+#define NVM_IMAGE_GENERIC 0
+#define NVM_IMAGE_CONFIG_SYNOPSIS 1
+#define NVM_IMAGE_CONFIG_DENALI 2
+#define NVM_IMAGE_APPLET_DENALI 3
+#define NVM_IMAGE_FIRMWARE 4
+#define NVM_IMAGE_OASCLIENT 5
+#define NVM_IMAGE_CUSTOM 6
+#define NVM_IMAGE_MEMCTL 7
+
+/*====================================================================*
+ *   nvm variables; 
+ *--------------------------------------------------------------------*/
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+typedef struct __packed header_nvm 
+
+{
+	uint32_t HEADERVERSION;
+	uint32_t IMAGEROMADDR;
+	uint32_t IMAGEADDR;
+	uint32_t IMAGELENGTH;
+	uint32_t IMAGECHECKSUM;
+	uint32_t ENTRYPOINT;
+	uint8_t HEADERMINORVERSION;
+	uint8_t IMAGETYPE;
+	uint16_t IGNOREMASK;
+	uint32_t RESERVED [2];
+	uint32_t NEXTHEADER;
+	uint32_t HEADERCHECKSUM;
+}
+
+header_nvm;
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+/*====================================================================*
+ *   nvm functions;
+ *--------------------------------------------------------------------*/
+
+signed nvmspan (const void * memory);
+void nvmpeek (struct header_nvm * header_nvm);
+signed nvmfile (struct _file_ *file);
+
+/*====================================================================*
+ *   
+ *--------------------------------------------------------------------*/
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='number.h.html' title=' number.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='nvram.h.html' title=' nvram.h '>NEXT</a>]
+			</div>
+		</body>
+	</html>

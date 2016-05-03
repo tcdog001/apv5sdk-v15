@@ -1,0 +1,19 @@
+#!/bin/sh
+
+PRO_CTL_UTIL=/usr/bin/pro_ctl_util
+
+case $1 in
+  sysled) 
+		if [ "$2" == "enable" ];then
+    	$PRO_CTL_UTIL -b 17
+    else if [ "$2" == "disable" ];then
+      $PRO_CTL_UTIL -d 17
+    else if [ "$2" == "blink" ];then
+      $PRO_CTL_UTIL -u 17	
+    else 
+    	echo "wrong input" 		
+		fi
+		fi
+		fi
+        ;;	
+esac        

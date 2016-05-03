@@ -1,0 +1,125 @@
+#!/bin/sh
+touch 3
+FIRMWARE_FILE=new_firmware.bin
+
+if [ -z $1 ] || [ ! -f $1 ]; then
+	logger -s "$0 <firmware-file> [skip_error_check]"
+	exit 1
+fi
+
+cd /tmp
+#
+# Move the firmware to current directory
+#
+mv $1 $FIRMWARE_FILE
+
+#
+# Give enough time for PHP/WEB GUI to redirect the client
+sleep 1
+
+#
+# Kill all the processes
+#
+# Sync everything from cache before (having no references) killing.
+/bin/sync
+
+killall syslogd snmpd hostapd wpa_supplicant dropbear telnetd udhcpc dnsmasq sys_reset nmbd lighttpd php ntpclient klogd configd sleep factoryreset arpnotice telnetd
+sleep 1
+touch 9
+# Everthing is dead now sync again.
+/bin/sync
+
+#
+# Keep essential binaries and libraries in memory as we are going to erase the flash
+#
+touch /jffs/sysrebootflag
+mkdir  -p bin
+mkdir  -p lib
+mkdir  -p dev
+mkdir  -p tmp
+mkdir  -p etc
+mkdir  -p sbin
+mkdir  -p proc
+mkdir  -p oldroot
+mkdir  -p newroot
+mkdir  -p usr
+mkdir  -p var
+mkdir  -p usr/bin
+mkdir  -p usr/sbin
+
+# binaries
+#cp -f /usr/bin/flash_erase bin
+#cp -f /usr/sbin/flash_erase bin
+#cp -a /usr/local/bin/firmware-upgrade-stage2 bin
+cp -a /usr/sbin/autelan-firmware-upgrade-stage2 bin
+cp -a /usr/sbin/update_img_tool bin
+cp -f /bin/busybox bin
+
+cp -a /bin/echo bin
+cp -a /bin/cp bin
+cp -a /bin/sleep bin
+cp -a /bin/sync bin
+cp -a /bin/kill bin
+cp -a /bin/tar bin
+cp -a /bin/dd bin
+cp -a /bin/rm bin
+cp -a /bin/mount bin
+cp -a /bin/umount bin
+cp -a /bin/sh bin
+cp -a /bin/ash bin
+cp -a /bin/cat bin
+cp -a /usr/bin/logger bin
+
+cp -a /sbin/pivot_root sbin
+cp -a /sbin/reboot sbin
+cp -a /sbin/sysreboot sbin
+cp -a /sbin/wrcpuutil sbin
+cp -a /sbin/init sbin
+
+cp -a /usr/bin/killall usr/bin
+cp -a /usr/bin/[ usr/bin
+cp -a /usr/sbin/chroot usr/sbin
+
+# libraries
+
+cp -a /lib/ld-uClibc-0.9.28.so lib
+cp -a /lib/ld-uClibc.so.0 lib
+cp -a /lib/libc.so.0 lib
+cp -a /lib/libcrypt-0.9.28.so lib
+cp -a /lib/libcrypt.so.0 lib
+cp -a /lib/libm-0.9.28.so lib
+cp -a /lib/libm.so.0 lib
+cp -a /lib/libuClibc-0.9.28.so lib
+cp -a /lib/libgcc_s.so.1 lib
+
+cp -a /etc/* etc
+
+cp -a /tmp/passwd etc
+
+sleep 2
+touch 10
+# 
+# Generate a new /etc/inittab
+#
+echo '::sysinit:/bin/autelan-firmware-upgrade-stage2 '$FIRMWARE_FILE > etc/inittab
+echo '::restart:/sbin/init'>> etc/inittab
+# 
+# Change the root of FS to /tmp
+#
+
+./sbin/pivot_root . oldroot
+cd /
+mount -t proc proc /proc
+mount -t tmpfs tmpfs /dev
+cp /oldroot/dev . -rf
+
+touch 11
+
+
+# 
+# Restart the init daemon
+#
+
+#echo 'Before sending HUP & SIGQUIT to init' >> /messages
+
+exec ./usr/sbin/chroot . /bin/sh -c 'kill -HUP 1; sleep 3; kill -SIGQUIT 1' <dev/console >dev/console 2>&1

@@ -1,0 +1,36 @@
+#!/bin/sh
+. /usr/lib/web/xmlconf.sh
+
+#
+#usage()
+#
+usage()
+{
+	echo "set_countrycode [wifiID] [countrycode]"
+	exit 1
+}
+
+if [ ! $# -eq 2 ];then
+	usage
+fi
+
+INTERFACE_ID=$1
+COUNTRY_CODE=$2
+
+echo "countrycode:$COUNTRY_CODE"
+if [ ${COUNTRY_CODE} == "CN" ];then
+	REGION=Asia	
+fi
+if [ ${COUNTRY_CODE} == "US" ];then
+	REGION=none
+fi
+echo "wifi${INTERFACE_ID} region:${REGION}"
+
+CONFIG_XML=/etc/config/config.xml
+country=`config_read "/config/network/country/wifi${INTERFACE_ID}"`
+echo ${country} | grep ${REGION} > /dev/null 2>&1
+if [ $? -ne 0 ];then
+	country=`config_setoption "$country" region "${REGION}"`
+	config_write "/config/network/country/wifi${INTERFACE_ID}" "$country"
+fi
+

@@ -1,0 +1,176 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			page.h
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='nvram.h.html' title=' nvram.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='pcap-bpf.h.html' title=' pcap-bpf.h '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   page.h - page related definitions and declarations;
+ *
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SUBMIT_HEADER
+#define SUBMIT_HEADER
+ 
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;unistd.h&gt;
+#include &lt;stdint.h&gt;
+ 
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/types.h&quot;
+ 
+/*====================================================================*
+ *   constants;
+ *--------------------------------------------------------------------*/
+
+#define PAGE_PATH &quot;/cgi-bin/intellon.cgi&quot;
+#define PAGE_NAME &quot;Intellon Embedded Device Manager&quot;
+#define PAGE_STYLESHEET &quot;/styles/cgi.css&quot;
+#define PAGE_LOGO_PATH &quot;/images/intellon.gif&quot;
+#define PAGE_LOGO_TEXT &quot;Intellon Corporation, Ocala FL USA&quot;
+ 
+#define SUBMIT_OPTION &quot;option&quot;
+#define SUBMIT_ACTION &quot;action&quot;
+#define SUBMIT_SOURCE &quot;source&quot;
+#define SUBMIT_DEVICE &quot;device&quot;
+#define SUBMIT_RETURN &quot;return&quot;
+
+#define OPTION_TOPOLOGY &quot;Topology&quot;
+#define OPTION_IDENTITY &quot;Identity&quot;
+#define OPTION_SECURITY &quot;Security&quot;
+#define OPTION_PRIORITY &quot;Priority&quot;
+#define OPTION_FIRMWARE &quot;Firmware&quot;
+
+#define ACTION_NETWORK &quot;Change&quot;
+#define ACTION_PRIORITIZE &quot;Prioritize&quot;
+#define ACTION_CONFIGURE &quot;Configure&quot;
+#define ACTION_UPGRADE &quot;Upgrade&quot;
+#define ACTION_DEFAULT &quot;Restore&quot;
+#define ACTION_RETURN &quot;Return&quot;
+#define ACTION_SOURCE &quot;Source&quot;
+#define ACTION_DEVICE &quot;Device&quot;
+
+#define STYLE_HEADER &quot;header&quot;
+#define STYLE_OPTION &quot;option&quot;
+#define STYLE_ACTION &quot;action&quot;
+#define STYLE_STATUS &quot;status&quot;
+#define STYLE_DEVICE &quot;device&quot;
+#define STYLE_SOURCE &quot;source&quot;
+#define STYLE_FOOTER &quot;footer&quot;
+#define STYLE_PEEK &quot;peek&quot;
+#define STYLE_FILE &quot;file&quot;
+#define STYLE_PWD &quot;pwd&quot;
+
+#define FIELD_DPW &quot;dpw&quot;
+#define FIELD_DAK &quot;dak&quot;
+#define FIELD_NPW &quot;npw&quot;
+#define FIELD_NMK &quot;nmk&quot;
+#define FIELD_PIB &quot;pib&quot;
+#define FIELD_NVM &quot;nvm&quot;
+#define FIELD_VLAN &quot;vlan&quot;
+#define FIELD_QOS &quot;qos&quot;
+#define FIELD_TOS &quot;tos&quot;
+#define FIELD_TTL &quot;ttl&quot;
+#define FIELD_PRI &quot;pri&quot;
+#define FIELD_KEY &quot;key&quot;
+
+#define TABS 5
+#define CAPS 4
+#define TTLS 4
+#define TAGS 8
+#define BITS 8
+ 
+/*====================================================================*
+ *   option tab structure;
+ *--------------------------------------------------------------------*/
+ 
+typedef struct tab 
+
+{
+	signed (* form) (signed margin, const char * style);
+	const char * name;
+	const char * text;
+}
+
+FORM;
+
+/*====================================================================*
+ *   generic form division functions;
+ *--------------------------------------------------------------------*/
+
+#ifdef __GNUC__
+ 
+__attribute__ ((format (printf, 3, 4)))
+
+#endif
+ 
+void status (int status, errno_t number, const char *format, ...);
+signed report (signed margin, errno_t number, const char * format, ...);
+
+/*====================================================================*
+ *   standard form division;
+ *--------------------------------------------------------------------*/
+ 
+signed DivisionHeader (signed margin, const char * style);
+signed DivisionOption (signed margin, const char * style);
+signed DivisionDevice (signed margin, const char * style);
+signed DivisionFooter (signed margin, const char * style);
+
+/*====================================================================*
+ *   special form divisions;
+ *--------------------------------------------------------------------*/
+ 
+signed OptionTopology (signed margin, const char * style);
+signed OptionIdentity (signed margin, const char * style);
+signed OptionSecurity (signed margin, const char * style);
+signed OptionPriority (signed margin, const char * style);
+signed OptionFirmware (signed margin, const char * style);
+
+/*====================================================================*
+ *   generic form control functions;
+ *--------------------------------------------------------------------*/
+ 
+signed stylesheet (signed margin);
+
+/*====================================================================*
+ *
+ *--------------------------------------------------------------------*/
+
+#endif
+ 
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='nvram.h.html' title=' nvram.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='pcap-bpf.h.html' title=' pcap-bpf.h '>NEXT</a>]
+			</div>
+		</body>
+	</html>

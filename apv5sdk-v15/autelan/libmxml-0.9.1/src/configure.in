@@ -1,0 +1,117 @@
+dnl
+dnl Configuration in file for MXML project
+dnl (C) 2003 Giancarlo Niccolai (giancarlo@niccolai.ws)
+dnl $Id: configure.in,v 1.3 2003/08/06 13:53:03 jonnymind Exp $
+dnl
+dnl Released under LGPL 2.0 license
+
+dnl--------------------------------
+dnl Begin of script
+dnl
+
+AC_INIT(src)
+
+AC_REVISION($Revision: 1.3 $)
+AC_CANONICAL_HOST
+
+dnl suggested position for automake
+AM_INIT_AUTOMAKE(libmxml,  0.9.1)
+
+AM_CONFIG_HEADER( config.h )
+AC_PROG_MAKE_SET
+
+
+dnl--------------------------------
+dnl Checks for programs.
+dnl
+
+AC_CHECK_PROG( SHELL, bash, /bin/bash, /bin/sh )
+AC_PROG_AWK
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_ISC_POSIX
+
+dnl
+dnl Provide shared libraries on demand
+dnl
+#AC_DISABLE_SHARED       dnl have --enable-shared to build it
+#AC_PROG_LIBTOOL
+
+
+dnl--------------------------------
+dnl Checks for header files.
+dnl
+
+AC_STDC_HEADERS
+
+dnl--------------------------------
+dnl Function checking
+dnl
+
+AC_FUNC_FNMATCH   dnl for path searches
+AC_FUNC_VPRINTF
+
+dnl--------------------------------
+dnl Custom parameters
+dnl
+
+AC_ARG_ENABLE(debug,
+   [  --enable-debug    Turn on debugging],
+   [case "${enableval}" in
+      yes) echo "Turning on debugging"; enable_debug=yes ;;
+      no)  echo "Turning off debugging"; enable_debug=no ;;
+      *) AC_MSG_ERROR(bad value ${enableval} for --enable-debug) ;;
+   esac],
+   [echo "Turning off debugging"; debug=no])
+
+
+AC_ARG_ENABLE(tests,
+   [  --enable-tests    Enable compilation of test(s) programs],
+   [case "${enableval}" in
+      yes) echo "Enabling compilation of tests"; enable_tests=yes ;;
+      no)  echo "Disabling compilation of tests"; enable_tests=no ;;
+      *) AC_MSG_ERROR(bad value ${enableval} for --enable-tests) ;;
+   esac],
+   [echo "Disabling compilation of tests"; enable_tests=no])
+
+AC_ARG_ENABLE(doc,
+   [  --enable-doc   Enable compilation of test(s) programs],
+   [case "${enableval}" in
+      yes) echo "Enabling compilation of documentation"; enable_doc=yes ;;
+      no)  echo "Disabling compilation of documentation"; enable_doc=no ;;
+      *) AC_MSG_ERROR(bad value ${enableval} for --enable-doc) ;;
+   esac],
+   [echo "Disabling compilation of documentation"; enable_doc=no])
+
+dnl--------------------------------
+dnl Define variables
+dnl
+
+AC_SUBST(SUBDIRS)
+AC_SUBST(TOPDIR)
+AC_SUBST(CFLAGS)
+AC_SUBST(RANLIB)
+AC_SUBST(enable_doc)
+
+SUBDIRS="lib test doc"
+RANLIB=ranlib
+
+if test x$enable_debug = xyes; then
+   CFLAGS="-g -DDEBUG"
+else
+   CFLAGS="-O2"
+fi
+
+dnl--------------------------------
+dnl settings for makefiles
+dnl
+AM_CONDITIONAL(BUILD_LT, test x$enable_shared = xyes )
+AM_CONDITIONAL(BUILD_TESTS, test x$enable_tests = xyes )
+
+
+dnl--------------------------------
+dnl OUTPUT
+dnl
+
+AC_OUTPUT([Makefile lib/Makefile test/Makefile doc/Makefile] )

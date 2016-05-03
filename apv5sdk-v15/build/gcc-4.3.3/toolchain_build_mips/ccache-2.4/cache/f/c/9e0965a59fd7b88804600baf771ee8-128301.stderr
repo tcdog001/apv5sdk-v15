@@ -1,0 +1,17 @@
+In file included from shell/conf_file_opt.h:25,
+                 from shell/conf_file_opt.c:8:
+shell/mxml.h:27: warning: function declaration isn't a prototype
+shell/mxml.h:32: warning: function declaration isn't a prototype
+shell/mxml.h:37: warning: function declaration isn't a prototype
+shell/mxml.h:64: warning: function declaration isn't a prototype
+shell/mxml.h:137: warning: function declaration isn't a prototype
+shell/conf_file_opt.c: In function 'getnode':
+shell/conf_file_opt.c:72: warning: unused variable 'fp'
+shell/conf_file_opt.c: In function 'getoption':
+shell/conf_file_opt.c:103: warning: passing argument 2 of 'mxml_iterator_scan_node' discards qualifiers from pointer target type
+shell/conf_file_opt.c: In function 'setoption':
+shell/conf_file_opt.c:138: warning: passing argument 2 of 'mxml_iterator_scan_node' discards qualifiers from pointer target type
+shell/conf_file_opt.c: In function 'setnode':
+shell/conf_file_opt.c:192: warning: passing argument 2 of 'mxml_write' discards qualifiers from pointer target type
+shell/conf_file_opt.c:160: warning: unused variable 'st_iter'
+shell/conf_file_opt.c:158: warning: unused variable 'tmp'

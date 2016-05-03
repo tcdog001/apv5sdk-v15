@@ -1,0 +1,70 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_wan=`config_read /config/network/wan`
+xml_wan_select=`config_getoption "$xml_wan" wan_select`
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>WAN Connection</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+</head>
+
+<body bgcolor="#efefef">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1"><a href="wan_status.htm" target="MainFrame">Status</a></td>
+          <td class="top1"><a href="3g_wan_setting.htm" target="MainFrame">3G WAN Setting</a></td>
+		  <td class="top1"><a href="802.11_wan_setting.htm" target="MainFrame">802.11 WAN Setting</a></td>
+		  <td class="top1">WAN selection</td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">WAN Setting -->WAN Selection</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form name="form1" method="post" action="<%= $action_cgi %>" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="WAN Selection">WAN Selection</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150"><input type="radio" <% webui_radiobutton_check "$xml_wan_select" "3g" %> name="wan_select" value="3g"/></td>
+          <td class="td_style" width="350">3G WAN</td>
+        </tr>
+		<tr>
+          <td class="td_style"><input type="radio" <% webui_radiobutton_check "$xml_wan_select" "80211" %> name="wan_select" value="80211"/></td>
+          <td class="td_style">80211WAN </td>
+        </tr>
+		<tr>
+          <td class="td_style"><input type="radio" <% webui_radiobutton_check "$xml_wan_select" "auto" %> name="wan_select" value="auto" /></td>
+          <td class="td_style">
+		    Auto Selection
+		  </td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><input id="but" type="submit" name="wan_select_commit" value="Submit"/></td>
+  </tr>
+</table>
+</div>
+<input type="hidden" value="Wan Apply" name="SERVLET">
+</form>
+</body>
+</html>

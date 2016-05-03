@@ -1,0 +1,187 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+ xml_syslogserver=`config_read /config/system/log` 
+ xml_syslogserver_enable=`config_getoption "$xml_syslogserver" enable`
+ xml_syslogserver_sip=`config_getoption "$xml_syslogserver" sip`
+ xml_syslogserver_sport=`config_getoption "$xml_syslogserver" sport`
+ xml_syslogserver_upenable=`config_getoption "$xml_syslogserver" upenable`
+ xml_syslogserver_upip=`config_getoption "$xml_syslogserver" upip`
+ xml_syslogserver_uptime=`config_getoption "$xml_syslogserver" uptime`
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js admin_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+var flag="<%= $xml_session_lang %>";
+ init_mmenu(flag);
+	init_adminmenu(flag);
+	init_slog(flag);
+function Ip() {
+    var reg = /^(\d{1,2}|1\d\d|2[0-1]\d|2[0-2][0-3])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+    var x = document.all.ServerIP;
+    var y = document.all.ServerPort;
+    var value = parseInt(y.value);
+    var reg1 = /^[0-9]{0,5}$/;    
+        
+		if(x.value==""&&document.all.enablesls.checked==true){
+				alert(slog_alert_serverip);
+				x.focus(); 
+				return false; 
+	  }
+        
+	  if (!reg.test(x.value)&&x.value!="") {
+				alert(slog_alert_serverip_c);
+				this.focus();
+				return false;
+	  }  
+	  
+	  
+    if (!reg1.test(y.value)){
+        alert(y.name + slog_alert_illchar);
+				y.focus();
+				return false;
+     }
+     else
+       if (value < 10 || value > 65535){
+						alert(y.name + slog_alert_range);
+						y.focus();
+						return false;
+       }	 
+       overlayer();
+}
+
+</script>
+</head>
+<body>
+	<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_administration6.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="action.cgi" onsubmit="return Ip()">
+<div align="center">
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+				      <tr>
+				        <td colspan="2" height="24"  bordercolor="#ffffff"><label>
+				          <textarea name="messages" cols="100" rows="10"><% 
+				         
+										if [ -f "/var/log/messages.0" ];then
+								 		  cat "/var/log/messages.0"
+										fi
+								   		if [ -f "/var/log/messages" ]; then
+										  cat "/var/log/messages" 
+										fi
+								 	 %></textarea>
+				        </label></td>
+				      </tr>
+				      
+				      <tr>
+				        <td colspan="2" align="center" height="24"  bordercolor="#ffffff"><label>
+				          <script language="javascript">replace(slog_refresh)</script>
+				          <script language="javascript">replace(slog_saveas)</script>
+				        </label></td>
+				      </tr>
+					  
+					    <tr>
+							<td colspan="2" height="10">
+							</td>
+							</tr>
+				
+				      <tr>
+				        <td align="center"  height="24"  bordercolor="#ffffff">
+				          <script language="javascript">replace(slog_enable)</script>&nbsp;<input type="checkbox" <% webui_checkbox_check "$xml_syslogserver_enable" "yes" %> name="enablesls" value="yes" onclick="document.all.ServerIP.focus()"/>
+				         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+				        <td bordercolor="#ffffff">&nbsp;</td>
+				      </tr>
+				      
+				      <tr>
+				        <td align="center"  height="24"  bordercolor="#ffffff"><script language="javascript">replace(slog_sip)</script>&nbsp;  
+				          <label>
+				          <input type="text" name="ServerIP" value="<%= "$xml_syslogserver_sip" %>" />
+				        </label></td>
+				        <td bordercolor="#ffffff">&nbsp;</td>
+				      </tr>
+				      
+				      <tr>
+				        <td align="center"  height="24"  bordercolor="#ffffff"><script language="javascript">replace(slog_sport)</script>&nbsp; 
+				          <label>
+				          <input type="text" name="ServerPort" value="<%= "$xml_syslogserver_sport" %>" />
+				        </label>&nbsp;</td>
+				        <td bordercolor="#ffffff">&nbsp;</td>
+				      </tr>
+				      
+				      <tr>
+							<td colspan="2" height="10">
+							</td>
+							</tr>
+				      
+				      <tr>
+				        <td align="center"  height="24"  bordercolor="#ffffff">
+				          <script language="javascript">replace(slog_uploadslog)</script>&nbsp;<input type="checkbox" <% webui_checkbox_check "$xml_syslogserver_upenable" "yes" %> name="enableup" value="yes" onclick="document.all.upip.focus()"/>
+				         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+				        <td bordercolor="#ffffff">&nbsp;</td>
+				      </tr>
+				      
+				      <tr>
+				        <td align="center"  height="24"  bordercolor="#ffffff"><script language="javascript">replace(slog_uploadsip)</script>&nbsp;  
+				          <label>
+				          <input type="text" name="upip" value="<%= "$xml_syslogserver_upip" %>" />
+				        </label></td>
+				        <td bordercolor="#ffffff">&nbsp;</td>
+				      </tr>
+				      
+				      <tr>
+				        <td align="center"  height="24"  bordercolor="#ffffff"> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<script language="javascript">replace(slog_interval)</script>&nbsp; 
+				          <label>
+				          <input type="text" name="uptime" value="<%= "$xml_syslogserver_uptime" %>" /><script language="javascript">replace(slog_unit)</script>
+				        </label>&nbsp;</td>
+				        <td bordercolor="#ffffff">&nbsp;</td>
+				      </tr>
+				      
+				      <tr>
+							<td colspan="2" height="10">
+							</td>
+							</tr>
+				      </table>
+		          <table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+				      <tr>
+				       <td align="center" height="40" valign="middle" colspan="2"><label>
+				          <script language="javascript">replace(slog_apply)</script>
+				        </label></td>
+				      </tr>
+				      <tr>
+				        <td align="right"   colspan="2"><script language="javascript">replace(slog_help)</script></td>
+				      </tr>
+</table>
+</div>
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

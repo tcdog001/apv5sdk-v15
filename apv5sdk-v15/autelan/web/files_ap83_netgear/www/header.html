@@ -1,0 +1,109 @@
+<html >
+<head>
+<script type="text/javascript" src="include/scripts/prototype.js?code=6153137"></script>
+<script type="text/javascript" src="include/scripts/prototype-ext.js?code=6153137"></script>
+<script type="text/javascript" src="include/scripts/browser-ext.js?code=6153137"></script>
+<script type="text/javascript" src="include/scripts/common.js?code=6153137"></script>
+<script type="text/javascript" src="include/scripts/menu.js?code=6153137"></script>
+<link rel="stylesheet" href="include/css/default.css?code=6153137" type="text/css">
+<link rel="stylesheet" href="include/css/style.css?code=6153137" type="text/css">
+<link rel="stylesheet" href="include/css/fonts.css?code=6153137" type="text/css">
+<link rel="stylesheet" href="include/css/layout.css?code=6153137" type="text/css">
+<script>
+var _initiateMenu = true;
+</script>
+</head>
+<body style="background: #FFFFFF; margin: 0px;">
+<form name="navForm" action="header.php" method="post">
+	<input type="hidden" name="menu1" id="menu1" value="Configuration">
+	<input type="hidden" name="menu2" id="menu2" value="System">
+	<input type="hidden" name="menu3" id="menu3" value="Basic">
+	<input type="hidden" name="menu4" id="menu4" value="General">
+	<input type="hidden" name="mode7" id="mode7" value="">
+	<input type="hidden" name="mode8" id="mode8" value="">
+	<input type="hidden" name="mode9" id="mode9" value="">
+	<input type="hidden" id="logout">
+  <!-- start main Frame -->
+<table class="tableStyle" style="margin: 0px;">
+	<tr class="topAlign">
+    	<td class="leftEdge"></td>
+		<td valign="top">
+			<table class="tableStyle">
+				<tr>
+					<td style="width: 8px;"><img src="images/clear.gif" width="8"/></td>
+					<td>
+						<table class="tableStyle" style="margin-top: 8px;">
+							<tr>
+								<td class="logoNetGear space50Percent topAlign"><img src="images/clear.gif" width="150" height="50"/></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td><img src="images/clear.gif" width="8"/></td>
+					<td>
+						<table class="tableStyle">
+							<tr>
+								<td class="bottomAlign">
+									<table class="tableStyle">
+										<tr>
+											<td class="spacer80Percent bottomAlign" id="tabs">
+												<ul class="tabs" id="primaryNav">
+													<li style="background: url(../../images/tab_r_A.gif) no-repeat right top;"><a href="javascript:prepareURL('','','','BasicSetting','');" target="master"  style="background: url(../../images/tab_l_A.gif) no-repeat left top; color: #FFFFFF;">BasicSetting</a></li>
+													<li ><a href="javascript:prepareURL('','','','Wireless','');" target="master" >Wireless</a></li>
+													<li ><a href="javascript:prepareURL('','','','Interface','');" target="master" >Interface</a></li>
+													<li ><a href="javascript:prepareURL('','','','Network','');" target="master" >Network</a></li>
+													<li ><a href="javascript:prepareURL('','','','QoS','');" target="master" >QoS</a></li>
+													<li ><a href="javascript:prepareURL('','','','Adminstration','');" target="master" >Adminstration</a></li>
+													<li ><a href="javascript:prepareURL('','','','Status','');" target="master" >Status</a></li>
+													<li ><a href="javascript:prepareURL('','','','Help','');" target="master" >Help</a></li>
+													<li ><a href="javascript:prepareURL('','','','Logout','');" target="master" >Logout</a></li>
+												</ul>
+											</td>
+											<td class="loginActionCell spacer20Percent rightHAlign padding5LeftRight" style="display:none"><a href="javascript:void(0);"><img src="images/logout_button.gif" style="border:0px; margin-right: 7px; margin-bottom: 4px; float:right;" onclick="processLogout();"></a></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr class="background-blue">
+					<td><img src="images/clear.gif" width="8"/></td>
+					<td class="padding7Top spacer100Percent">
+						<div class="submenu" submenu="yes">
+							<ul id="secondaryNav">
+								<li><a href="javascript:prepareURL('','','LAN Setting','BasicSetting','');" target="master"  style="color: #ffa400;">System</a>&nbsp;<img src="images/tab_separator.gif" class="separatorImage">&nbsp;</li>
+								<li><a href="javascript:prepareURL('','','DNS Server','BasicSetting','');" target="master" >IP</a>&nbsp;<img src="images/tab_separator.gif" class="separatorImage">&nbsp;</li>
+								<li><a href="javascript:prepareURL('','','NTP Server','BasicSetting','');" target="master" >Wireless</a>&nbsp;<img src="images/tab_separator.gif" class="separatorImage">&nbsp;</li>
+								<li><a href="javascript:prepareURL('','','RADIUS','Wireless','');" target="master" >Security</a>&nbsp;<img src="images/tab_separator.gif" class="separatorImage">&nbsp;</li>
+								<li><a href="javascript:prepareURL('','','MacFilter','Wireless','');" target="master" >Security</a>&nbsp;<img src="images/tab_separator.gif" class="separatorImage">&nbsp;</li>
+								<li><a href="javascript:prepareURL('','','WDS','Wireless','');" target="master" >Security</a>&nbsp;<img src="images/tab_separator.gif" class="separatorImage">&nbsp;</li>
+								<li><a href="javascript:prepareURL('','','RogueAPDetect','Wireless','');" target="master" >Security</a>&nbsp;<img src="images/tab_separator.gif" class="separatorImage">&nbsp;</li>
+								<li><a href="javascript:prepareURL('','','Advance','Wireless','');" target="master" >Security</a>&nbsp;<img src="images/tab_separator.gif" class="separatorImage">&nbsp;</li>
+								<li><a href="javascript:prepareURL('','','Intelligent','Wireless','');" target="master" >Wireless Bridge</a></li>
+							</ul>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td class="rightEdge"></td>
+	</tr>
+	<tr class="topAlign">
+    	<td valign="top" class="leftBodyNotch topAlign"></td>
+	    <td>
+	    	<table class="tableStyle">
+				<tr class="topAlign">
+					<td class="leftNextBodyNotch"><img src="images/clear.gif" width="11" height="16"/></td>
+					<td class="middleBodyNotch spacer100Percent"></td>
+			        <td class="rightNextBodyNotch"><img src="images/clear.gif" width="11"/></td>
+				</tr>
+	    	</table>
+	    </td>
+	    <td class="rightBodyNotch"></td>
+	  </tr>
+</table>
+</form>
+</body>
+</html>

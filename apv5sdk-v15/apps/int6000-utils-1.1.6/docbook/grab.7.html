@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			grab.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='getpib.7.html' title=' getpib.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='hpav.7.html' title=' hpav.7 '>NEXT</a>]
+			</div>
+<pre>
+grab(7)                                    Motley Tools                                   grab(7)
+
+NAME
+       grab - byte grabber
+
+SYNOPSIS
+       grab [options] file [file] [...]
+
+       grab [options] [&lt;stdin] [&gt;stdout]
+
+DESCRIPTION
+       Extract a range of bytes from a file.
+
+OPTIONS
+       -l length
+              The  number  of  consective  bytes to read. The length may be expressed in decimal,
+              hexadecimal or binary. Decimal is the default. Hexadecimal values  start  with  0x.
+              Binary  values  start  with 0b. If offset plus length exceeds the file size then an
+              error will occur.
+
+       -o offset
+              The file offset of the first byte read. The offset may be expressed in  hexadecimal
+              or binary. Hexadecimal is the default. Binary values start with 0b.  If offset plus
+              length exceeds the file size then an error will occur.
+
+       -q     Enable quiet mode which has not effect.
+
+       -s     Display the output as a text string instead of a hexadecimal character  stream.  If
+              the  selected  data  contains  control  characters then output may be unreadable or
+              cause unwanted console behavior.
+
+       -v     Enable verbose mode which has no effect.
+
+       -?,--help
+              Print program help summary on stdout.  This  option  takes  precedence  over  other
+              options on the command line.
+
+       -!,--version
+              Print  program  version  information  on  stdout. This option takes precedence over
+              other options on the command line. Usethis option  when  sending  screen  dumps  to
+              Intellon  Technical  Support  so  that they know exactly which version of the Linux
+              Toolkit you are using.
+
+ARGUMENTS
+       file   A filename. No assumptions are made based on filename and no  filename  conventions
+              are enforced. More than one filename may appear on the command line. If no filename
+              appears then input is read from stdin.
+
+EXAMPLES
+       None.
+
+SEE ALSO
+       odd(7), odc(7), odx(7),
+
+CREDITS
+        Charles Maier &lt;cmaier@cmassoc.net&gt;
+
+cmassoc-tools-1.6.2                                                                       grab(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='getpib.7.html' title=' getpib.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='hpav.7.html' title=' hpav.7 '>NEXT</a>]
+			</div>
+		</body>
+	</html>

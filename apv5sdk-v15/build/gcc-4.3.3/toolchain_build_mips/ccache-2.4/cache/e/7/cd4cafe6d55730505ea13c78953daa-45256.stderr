@@ -1,0 +1,2 @@
+cmd_pll.c: In function 'do_srifpll':
+cmd_pll.c:47: warning: assignment from incompatible pointer type

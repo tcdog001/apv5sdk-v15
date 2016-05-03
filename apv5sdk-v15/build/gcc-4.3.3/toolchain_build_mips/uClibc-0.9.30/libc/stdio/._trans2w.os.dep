@@ -1,0 +1,194 @@
+libc/stdio/_trans2w.os: libc/stdio/_trans2w.c include/libc-symbols.h \
+  include/bits/uClibc_arch_features.h libc/stdio/_stdio.h \
+  include/features.h include/bits/uClibc_config.h include/sys/cdefs.h \
+  include/libc-internal.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include/stddef.h \
+  include/bits/stackinfo.h include/assert.h include/errno.h \
+  include/bits/errno.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/linux/errno.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/asm/errno.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/asm-generic/errno-base.h \
+  include/bits/uClibc_errno.h \
+  libpthread/linuxthreads.old/sysdeps/pthread/tls.h include/fcntl.h \
+  include/bits/fcntl.h include/sgidefs.h include/sys/types.h \
+  include/bits/types.h include/bits/wordsize.h \
+  include/bits/kernel_types.h include/bits/typesizes.h \
+  include/bits/pthreadtypes.h include/bits/sched.h include/time.h \
+  include/endian.h include/bits/endian.h include/sys/select.h \
+  include/bits/select.h include/bits/sigset.h include/bits/time.h \
+  include/sys/sysmacros.h include/bits/uio.h include/sys/stat.h \
+  include/bits/stat.h include/limits.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3//include-fixed/limits.h \
+  include/bits/posix1_lim.h include/bits/local_lim.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/linux/limits.h \
+  include/bits/uClibc_local_lim.h include/bits/posix2_lim.h \
+  include/bits/xopen_lim.h include/bits/stdio_lim.h include/signal.h \
+  include/bits/signum.h include/bits/siginfo.h include/bits/sigaction.h \
+  include/bits/sigcontext.h include/bits/sigstack.h include/ucontext.h \
+  include/sys/ucontext.h include/bits/sigthread.h include/stdint.h \
+  include/stdio.h include/bits/uClibc_stdio.h include/bits/uClibc_mutex.h \
+  include/pthread.h include/sched.h include/bits/uClibc_clk_tck.h \
+  include/bits/initspin.h include/bits/uClibc_pthread.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include/stdarg.h \
+  include/stdlib.h include/bits/waitflags.h include/bits/waitstatus.h \
+  include/alloca.h include/string.h include/unistd.h \
+  include/bits/posix_opt.h include/bits/environments.h \
+  include/bits/confname.h include/bits/getopt.h include/ctype.h \
+  include/bits/uClibc_touplow.h
+
+include/libc-symbols.h:
+
+include/bits/uClibc_arch_features.h:
+
+libc/stdio/_stdio.h:
+
+include/features.h:
+
+include/bits/uClibc_config.h:
+
+include/sys/cdefs.h:
+
+include/libc-internal.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include/stddef.h:
+
+include/bits/stackinfo.h:
+
+include/assert.h:
+
+include/errno.h:
+
+include/bits/errno.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/linux/errno.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/asm/errno.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/asm-generic/errno-base.h:
+
+include/bits/uClibc_errno.h:
+
+libpthread/linuxthreads.old/sysdeps/pthread/tls.h:
+
+include/fcntl.h:
+
+include/bits/fcntl.h:
+
+include/sgidefs.h:
+
+include/sys/types.h:
+
+include/bits/types.h:
+
+include/bits/wordsize.h:
+
+include/bits/kernel_types.h:
+
+include/bits/typesizes.h:
+
+include/bits/pthreadtypes.h:
+
+include/bits/sched.h:
+
+include/time.h:
+
+include/endian.h:
+
+include/bits/endian.h:
+
+include/sys/select.h:
+
+include/bits/select.h:
+
+include/bits/sigset.h:
+
+include/bits/time.h:
+
+include/sys/sysmacros.h:
+
+include/bits/uio.h:
+
+include/sys/stat.h:
+
+include/bits/stat.h:
+
+include/limits.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3//include-fixed/limits.h:
+
+include/bits/posix1_lim.h:
+
+include/bits/local_lim.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/linux/limits.h:
+
+include/bits/uClibc_local_lim.h:
+
+include/bits/posix2_lim.h:
+
+include/bits/xopen_lim.h:
+
+include/bits/stdio_lim.h:
+
+include/signal.h:
+
+include/bits/signum.h:
+
+include/bits/siginfo.h:
+
+include/bits/sigaction.h:
+
+include/bits/sigcontext.h:
+
+include/bits/sigstack.h:
+
+include/ucontext.h:
+
+include/sys/ucontext.h:
+
+include/bits/sigthread.h:
+
+include/stdint.h:
+
+include/stdio.h:
+
+include/bits/uClibc_stdio.h:
+
+include/bits/uClibc_mutex.h:
+
+include/pthread.h:
+
+include/sched.h:
+
+include/bits/uClibc_clk_tck.h:
+
+include/bits/initspin.h:
+
+include/bits/uClibc_pthread.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include/stdarg.h:
+
+include/stdlib.h:
+
+include/bits/waitflags.h:
+
+include/bits/waitstatus.h:
+
+include/alloca.h:
+
+include/string.h:
+
+include/unistd.h:
+
+include/bits/posix_opt.h:
+
+include/bits/environments.h:
+
+include/bits/confname.h:
+
+include/bits/getopt.h:
+
+include/ctype.h:
+
+include/bits/uClibc_touplow.h:
+cmd_libc_stdio__trans2w.os := /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/bin/mips-linux-uclibc-gcc -c libc/stdio/_trans2w.c -o libc/stdio/_trans2w.os -include include/libc-symbols.h -Wall -Wstrict-prototypes -fno-strict-aliasing -march=mips32r2 -mtune=mips32r2 -mabi=32 -fno-stack-protector -fno-builtin -nostdinc -Iinclude -I. -Ilibc/sysdeps/linux/mips -fno-asm -msoft-float -DUCLIBC_INTERNAL -std=gnu99 -Os -funit-at-a-time -fno-tree-loop-optimize -fno-tree-dominator-opts -fno-strength-reduce -mno-split-addresses -Ilibpthread/linuxthreads.old/sysdeps/unix/sysv/linux/mips -Ilibpthread/linuxthreads.old/sysdeps/mips -Ilibpthread/linuxthreads.old/sysdeps/unix/sysv/linux -Ilibpthread/linuxthreads.old/sysdeps/pthread -Ilibpthread/linuxthreads.old -Ilibpthread -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/ -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3//include-fixed -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include -DNDEBUG "-mno-split-addresses" -fPIC -MT libc/stdio/_trans2w.os -MD -MP -MF libc/stdio/._trans2w.os.dep

@@ -1,0 +1,218 @@
+#!/bin/sh
+#
+# source library
+#
+if [ -f /jffs/AQ21mpci_*.e2p  ];then
+	cp /jffs/AQ21mpci_*.e2p /tmp/update_file.c
+	rm -f /jffs/AQ21mpci_*.e2p 
+	#avrutil -e
+fi 
+#
+# logo
+#
+mkdir /tmp/logo
+if [ -f /jffs/.OEM/.company_name ] && [ -f /jffs/.OEM/.logo/.logo.jpg ];then
+	cp /jffs/.OEM/.logo/.logo.jpg /tmp/logo/logo.jpg
+else
+	productType=`/usr/sbin/showsysinfo 2>/dev/null|awk -F':' '/Device Type/{print $2}' 2>/dev/null|cut     -b 1-4 2>/dev/null`
+	if [ "$productType" == "AP26" ];then
+		cp /www/image/xj-AP2600.jpg /tmp/logo/logo.jpg
+	elif [ "$productType" == "AP24" ];then
+		cp /www/image/xj-AP2400.jpg /tmp/logo/logo.jpg
+	elif [ "$productType" == "FH-A" ];then
+		cp /www/image/xh.jpg /tmp/logo/logo.jpg
+	elif [ "$productType" == "AQ20" ];then
+		cp /www/image/autelan.jpg /tmp/logo/logo.jpg
+	elif [ "$productType" == "R200" ];then
+		cp /www/image/datang.jpg /tmp/logo/logo.jpg
+	else
+		cp /www/image/autelan.jpg /tmp/logo/logo.jpg
+	fi
+fi
+#prepare for passwd
+if [ ! -e /jffs/passwd ];then
+    cp /etc/wlan/etc/passwd /jffs/
+fi
+ln -sf /jffs/passwd /tmp/passwd
+/etc/init.d/mini_httpd start
+
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+. /usr/lib/web/sysinit.sh
+. /usr/lib/web/function.sh
+. /etc/wlan/vendor_setup.sh
+if [ ! -e /etc/config/config.xml ]; then
+     cp -f /etc/defaults/config.xml /etc/config/config.xml
+else
+     /usr/sbin/config_check2
+     if [ ! $? -eq 0 ];then
+        cp -f /etc/defaults/config.xml /etc/config/config.xml
+     fi
+fi
+
+if [ -d /jffs/hostapd ];then
+	echo "hostapd config dir ok"
+else
+	mkdir /jffs/hostapd
+fi
+#
+# load the entire configuration
+#
+local xml_config=`config_read /config`
+#
+# hostname
+#
+echo "$HOST_NAME" > /proc/sys/kernel/hostname
+if [ -f /jffs/.OEM/.company_name ];then
+	echo "`cat /jffs/.OEM/.company_name`" > /proc/sys/kernel/hostname
+fi
+
+#prepare config.wtp for wtpd
+if [ ! -f /jffs/config.wtp ];then
+	cp -f /etc/wlan/config.wtp /jffs/config.wtp 
+fi
+	cp -f /jffs/config.wtp /tmp/config.wtp
+
+#vendor setup
+#
+if [ -d /jffs/.OEM/.default ];then
+	if [ -f /jffs/.OEM/.default/.def_user  ];then
+		if [ -f /jffs/.OEM/.default/.def_pass  ];then
+			vendor_user=`cat /jffs/.OEM/.default/.def_user`
+			vendor_pass=`cat /jffs/.OEM/.default/.def_pass`
+			vendor_user_setup "${vendor_user}" "${vendor_pass}"
+			sys_user_setup
+		fi
+	fi
+	if [ -f /jffs/.OEM/.default/.def_ssid ];then
+		vendor_ssid=`cat /jffs/.OEM/.default/.def_ssid`
+		vendor_ssid_setup "${vendor_ssid}"
+	fi
+	if [ -f /jffs/.OEM/.default/.def_wmode ];then
+		vendor_wmode=`cat /jffs/.OEM/.default/.def_wmode`
+		vendor_wmode_setup ${vendor_wmode}
+	fi
+	if [ -d /jffs/.OEM/.default_set ];then
+		rm -rf /jffs/.OEM/.default_set
+	fi
+	mv /jffs/.OEM/.default /jffs/.OEM/.default_set
+fi
+
+
+#
+# LAN & WLAN
+#
+touch /tmp/resolv.conf
+cp -f /etc/snmpd.conf /tmp >/dev/null 2>&1
+cp -f /etc/qos.conf /tmp >/dev/null 2>&1
+cp -f /etc/ac_snmp.conf /tmp >/dev/null 2>&1
+cp -f /etc/snmp_agent.conf /tmp >/dev/null 2>&1
+cp -f /etc/syslog.conf /tmp >/dev/null 2>&1
+sys_user_setup
+#route_forward_conf
+sys_lan_setup
+sys_dns_setup
+#sys_3g_wan_setup
+xml_config=`config_read /config/system`
+xml_system_mode=`config_getoption "$xml_config" workmode`
+if [ $xml_system_mode == 1 ]; then
+	sysctl -w dev.wifi0.thinap=0
+	sys_ntp_setup
+	sys_vlan_startsetup
+	sys_wlan_setup
+	sys_security_startsetup
+	sys_macfilter_startsetup
+	sys_advanceset_startsetup
+	sys_wds_setup
+	sys_stp_setup
+	wired_if_conf
+	wireless_if_conf
+	SysLogServer_conf
+	snmp_conf
+	#tr069_conf
+	dhcpserver_conf
+	dhcpsnooping_conf
+#	adminsec_conf
+	#netfilter_conf
+	intelligence_conf
+	sys_url_filter
+	locate_conf
+	#led set
+	#avrutil -B
+#	setled sysled enable
+	sys_lan_setup
+	route_forward_conf
+    wtpd_enable
+    /usr/sbin/linkcheck eth0 >/dev/null 2>&1 &
+    /usr/sbin/linkcheck eth1 >/dev/null 2>&1 &
+else
+	sysctl -w dev.wifi0.thinap=1
+	if [ ! -f /jffs/process_text ];then
+		cp -f /etc/wlan/process_text /jffs
+	fi
+	if [ -f /jffs/wtp.log.txt ];then
+	    echo "wtp.log.txt ok"
+	else
+		cp -f /etc/wlan/wtp.log.txt /jffs
+	fi
+	sys_lan_setup
+	route_forward_conf
+	if [ ! -f /jffs/config.wtp ];then
+		cp -f /etc/wlan/config.wtp /jffs
+	fi
+    cp -f /jffs/config.wtp /tmp
+	#####################################################
+	if [ -f /jffs/double_channel_f ]; then
+	
+		if [ ! -f /jffs/config_bak.wtp ];then
+			if [ -f /etc/wlan/config_bak.wtp ]; then
+				cp -f /etc/wlan/config_bak.wtp /jffs
+			else
+				cp -f /etc/wlan/config.wtp /jffs/config_bak.wtp
+			fi
+		fi
+		cp /jffs/config_bak.wtp  /tmp
+		
+		if [ -f /sbin/wtpd_bak ]; then
+			cp /sbin/wtpd_bak  /tmp/wtpd
+			cp /sbin/wtpd_bak  /tmp
+			if [ -f /tmp/config_bak.wtp ]; then
+				/tmp/wtpd -t host -rt host -cp 32768 -dp 32769  > /dev/null 2>&1 &
+				#/tmp/wtpd_bak -t backup -rt backup -cp 42768 -dp 42769  > /dev/null 2>&1 &
+			fi
+		fi
+	else
+		if [ -f /tmp/config.wtp ];then
+			wtpd > /dev/null 2>&1 &
+		fi
+	fi
+    #####################################################
+	
+	/usr/sbin/wtpd_check &
+	/etc/init.d/mini_httpd start
+	#/usr/bin/iperf -s -u -b 100M &
+	#/usr/bin/iperf -s &
+	if [ -x /jffs/shell  ]; then
+                /jffs/shell
+        fi
+fi
+sleep 3
+if [ ! -f /jffs/double_channel_f ]; then
+	/usr/sbin/ap_monitor &
+fi
+
+/etc/init.d/dropbear start
+##### wapi start #####
+#mkdir -p /tmp/web
+#cp /web/* /tmp/web 1>/dev/null 2>&1
+#/sbin/mini_httpd -u root -p 8080 -d /web
+#/web/ias /web/cgi-bin/AS.conf 1>/dev/null 2>&1
+#sleep 2
+#cp -f /tmp/web/as.cer /web
+##### wapi end #####
+/etc/wlan/factoryreset > /dev/null 2>&1 &
+/etc/wlan/arpnotice > /dev/null 2>&1 &
+#/usr/sbin/linkcheck eth0 >/dev/null 2>&1 &
+#/usr/sbin/linkcheck eth1 >/dev/null 2>&1 &
+#/usr/sbin/mod_check
+#ln -sf /sbin /usr/sbin

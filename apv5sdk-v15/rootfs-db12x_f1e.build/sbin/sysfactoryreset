@@ -1,0 +1,12 @@
+#!/bin/sh
+DEFAULT_SYS_CONF=/etc/defaults/config.xml
+SYS_CONF=/jffs/config.xml
+DEFAULT_THINAP_CONF=/etc/wlan/config.wtp
+THINAP_CONF=/jffs/config.wtp
+
+cp -rf ${DEFAULT_SYS_CONF} ${SYS_CONF}
+cp -rf ${DEFAULT_THINAP_CONF} ${THINAP_CONF}
+
+if [ -d /jffs/.OEM/.default_set ];then
+	mv /jffs/.OEM/.default_set /jffs/.OEM/.default
+fi

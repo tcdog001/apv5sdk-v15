@@ -1,0 +1,91 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Intellon Toolkit</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><meta name="keywords" content="
+				int6k 
+				, 
+				powerline 
+				"><link rel="start" href="index.html" title="Intellon INT6000 Linux Toolkit"><link rel="up" href="ch07.html" title="Chapter 7.  Embedded Applications"><link rel="prev" href="ch07s05.html" title="Ramdisk"><link rel="next" href="ch07s07.html" title="HTTP Interface"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">
+			Intellon Toolkit
+			</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s05.html">Prev</a> </td><th width="60%" align="center">Chapter 7. 
+		Embedded Applications
+		</th><td width="20%" align="right"> <a accesskey="n" href="ch07s07.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="AMiLDA-toolkit"></a>
+			Intellon Toolkit
+			</h2></div></div></div><p>
+			The Intellon Linux Toolkit may be installed as part of the <span class="productname">AMiLDA</span>™ environment when space permits. The toolkit needs the <span class="productname">Linux</span>™ kernel and <span class="productname">uClib</span>™ library to function;  however, the toolkit web interface also needs an <acronym class="acronym">HTTP</acronym> server with <acronym class="acronym">CGI</acronym> enabled. The web interfaces is an independent application that does not rely on any other toolkit programs for proper operation.
+			</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="AMiLDA-integration"></a>
+				Integration
+				</h3></div></div></div><p>
+				This section explains how to integrate and cross-compile the Intellon Linux Toolkit for the <span class="productname">ADM5120</span>™. It assumes that you have installed the <span class="productname">Edimax</span>™ toolchain and <span class="productname">AMiLDA</span>™ distribution as described in the <a class="link" href="ch07s03.html#AMiLDA-compiling" title="Compiling">Compiling</a> section.
+				</p><div class="orderedlist"><ol type="1"><li><p>
+						Obtain the latest version of the Intellon Linux Toolkit archive and save it anwhere that your prefer. The archive filename will reflect the toolkit version and so <code class="filename">int6000-utils-x.x.x</code>,  used here, refers to whatever version you have. 
+						</p></li><li><p>
+						Extract the toolkit into folder <code class="filename">/usr/src/AMiLDA/apps</code>. The resulting folder should have the same name as the archive file and not overwrite previous versions. You may either keep or discard earlier versions, depending on your requirements.
+						</p><pre class="screen">
+# tar -vzxf int6000-utils-x.x.x.tar.gz -C /usr/src/AMiLDA/apps
+# ls /usr/src/AMiLDA/apps
+</pre></li><li><p>
+						From folder <code class="filename">/usr/src/AMiLDA/apps</code>, create a symbolic link to the new toolkit folder. This link allows scripts to access the correct version of the toolkit using a constant pathname so make sure the link is correct. A common problem is forgetting to set this link correctly.
+						</p><pre class="screen">
+# ln -fs int6000-utils-x.x.x linux
+</pre></li><li><p>
+						Edit file <code class="filename">/usr/src/AMiLDA/app/linux/make.def</code>. Uncomment the two lines that define symbols <code class="constant">CROSS</code> and <code class="constant">CROSS_LINUX</code>. The standard definitions assume that you installed the <span class="productname">Edimax</span>™ toolchain as described in the <a class="link" href="ch07s03.html#AMiLDA-compiling" title="Compiling">Compiling</a> section. If not then change the definitions to reflect the actual location.
+						</p><pre class="screen">
+# file: make.def
+
+# ====================================================================
+# Edimax Hardware;
+# --------------------------------------------------------------------
+
+PLATFORM=-D_ADM5120_
+MODEL=-D_6104KP_
+ENDIAN=-D_LITTLE_ENDIAN_
+GATEWAY=y
+
+# ====================================================================
+# AMiLDA Software; uncomment these lines when cross-compiling;
+# --------------------------------------------------------------------
+
+# CROSS=/export/tools/mipsel-linux-uclibc/bin/mipsel-uclibc-
+# CROSS_LINUX=/export/tools/bin/mipsel-linux-
+
+# ====================================================================
+# toolchain;
+# --------------------------------------------------------------------
+
+CC=$(CROSS)gcc
+STRIP=$(CROSS)strip
+LD=$(CROSS)ld
+AR=$(CROSS)ar
+RANLIB=$(CROSS)ranlib
+CAS=$(CROSS)gcc -c
+CPP=$(CROSS)gcc -E
+
+# ====================================================================
+# folders;
+# --------------------------------------------------------------------
+
+BIN=/usr/local/bin
+MAN=/usr/share/man/man7
+WWW=/home/www
+
+# ====================================================================
+# permissions;
+# --------------------------------------------------------------------
+
+OWNER=0
+GROUP=0
+</pre></li><li><p>
+						From folder <code class="filename">/usr/src/AMiLDA/apps/linux</code>, cross-compile the toolkit using the cross-compile toolchain that you defined in the previous step. Save build errors and warnings to file <code class="filename">compile.log</code> then inspect the file afterwards. Warnings are permitted but errors are not. You should have virtually no warnings.
+						</p><pre class="screen">
+# make clean
+# make 2&gt; compile.log
+# cat compile.log
+</pre></li></ol></div><p>
+				The toolkit is now cross-compiled for the <span class="productname">ADM5120</span>™. There is no need to re-compile unless you make changes. Subsequent <span class="productname">AMiLDA</span>™ compilation will automatically compile the toolkit via dependencies defined in file <code class="filename">/usr/src/AMiLDA/apps/Makefile</code>.
+				</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="AMiLDA-configuration"></a>
+				Configuration
+				</h3></div></div></div><p>
+				To be continued ...
+				</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s05.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s07.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">
+			Ramdisk
+			 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 
+			HTTP Interface
+			</td></tr></table></div></body></html>

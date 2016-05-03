@@ -1,0 +1,2 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_recv.c: In function 'ath_rx_process':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_recv.c:1001: warning: statement with no effect

@@ -1,0 +1,51 @@
+.TH flashtest 7a "Intellon Corporation" "int6400-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+flashtest - NVRAM Diagnostic Applet
+.SH SYNOPSIS
+.BR int6ktest
+.BR flashtest.nvm
+.RI [ ... ]
+.SH PURPOSE
+This diagnostic applet runs in TCM and performs a connectivity and data integrity test of onboard NVRAM. The test consists of the five sub-tests described below. Each sub-test depends on successful completion of the previous one. Progress and status messages appear on the local host console. Control returns to the Bootloader and NVRAM is left in an erased state on successful completion. 
+.SH PREREQUISITES
+Bootloader software must be running. SDRAM need not be configured prior to execution.
+.SH SUBTESTS
+All LEDs will blink 6 times after each test passes and 9 times after all tests have completed successfully. 
+.TP 
+.B 1 - JDEC ID Test
+Read JEDEC ID and compare it to known compatible 2mb and 4mb NVRAMs. All LEDS will flash on failure. Falure indicates an open or a short on any on the four SPI lines. This test completes quickly.
+.TP
+.B 2 - Bulk Erase
+Performs a bulk erase and verifies that all locations contain 0xFF. All LEDs will flash on failure. Failure probably indicates a bad component. This test may take about 20 seconds to complete.
+.TP 
+.B 3 - Write/Read Data Test
+Write the first 8 bytes of flash sector 0 with a floating 0 pattern and writes the next 8 bytes with a 1's fill pattern. then read the patterns back. All LEDs will flash on failure. Failure indicates a bad NVRAM. This test completes quickly.
+.TP 
+.B 4 - Read/Write Address Test
+Write the first location of the next 8 sectors with a progressive data patternsuch that the first location of sector 1 is written with 1 then the first location of sector 2 is written with 2 and so on. Data is read and verified. All LEDS will flash on failure. Failure indicates a bad NVRAM. This test completes quickly.
+.TP 
+.B 5 - Sector Erase Test
+Sequentially erase all sectors. After each sector is erased, confirm that remaining sectiors retain data. Failure indicates a bad NVRAM. This test takes about 10 seconds to complete.
+.SH DISCLAIMER
+Intellon image file structure and content is proprietary to Intellon Corporation, Ocala FL USA. Consequently, public information is not available. Intellon Corporation reserves the right to change file structure or content in future firmware releases without any obligation to notify or compensate users of this program. This applet is reserved for use by Intellon Field Application Engineers. Intellon makes no claims concerning the reliability of this applet or the suitability of this applet for any particular purpose.
+.SH EXAMPLES
+The following example uses program \fBint6ktest\fR to download and execute applet \fBmemctl.nvm\fR then applet \fBflashtest.nvm\fR in order. Applet \fBmemctl.nvm\fR configures SDRAM before executing \fBflashtest\fR.
+.PP
+   # int6ktest flashtest.nvm
+   eth1 00:B0:52:00:00:01 Write Memory (00001000:4708)
+   eth1 00:B0:52:00:00:01 Wrote flashtest.nvm
+   eth1 00:B0:52:00:00:01 Start flashtest.nvm (0)
+   eth1 00:B0:52:00:00:01 0x00 JEDEC ID: 0x202015
+   eth1 00:B0:52:00:00:01 0x00 JEDEC ID test - Pass
+   eth1 00:B0:52:00:00:01 0x00 Bulk Erase test - Pass
+   eth1 00:B0:52:00:00:01 0x00 Write/Read Data test - Pass
+   eth1 00:B0:52:00:00:01 0x00 Write/Read Addr test - Pass
+   eth1 00:B0:52:00:00:01 0x00 Sector Erase test - Pass
+.SH SEE ALSO
+.BR int6ktest ( 7 ),
+.BR marchloop ( 7 ),
+.BR memburst ( 7 )
+.SH CREDITS
+ John Byron <john.byron@intellon.com>
+
+

@@ -1,0 +1,86 @@
+.TH int6kmod 7 "Intellon Corporation" "int6000-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+int6kmod - Intellon Module Management Utility
+.SH SYNOPSIS
+.BR int6kmod
+.RI [ options ] 
+.RI [ device ] 
+.RI [ device ] 
+[...]
+.SH DESCRIPTION
+Read or write an Intellon module file to or from a device using VS_MODULE_OPERATION messages.
+.PP
+This program is part of the Intellon Linux Toolkit. See the \fBilt\fR man page for an overview and installation instructions.
+.SH OPTIONS
+.TP
+.RB - e
+Redirects stderr messages to stdout. By convention status and error messages are printed on stderr while primary program output is printed on stdout. This option prints all output on stdout in cases where this is desired.
+.TP
+-\fBi \fIinterface\fR
+Select the host Ethernet interface. All requests are sent via this interface and only reponses received via this interface are recognized. The default interface is \fBeth1\fR because most people use \fBeth0\fR as their principle network connection; however, if environment string "PLC" is defined then it takes precedence over the default interface. This option then takes precedence over either default.
+.TP
+-\fBm \fIfilename\fR
+Read the specified module from NVRAM and write it to a file. The module is identified by module and sub-module using options \fB-t\fR and \fB-s\fR. Runtime firmware will report an error if the module is not available.
+.TP
+-\fBM \fIfilename\fR
+Read the named module file and download it to the device NVRAM. The module is assigned to a module and sub-module identifier using options \fB-t\fR and \fB-s\fR. Runtime firmware will reject modules having invalid module and sub-mocule idetnifiers. As implemented, int6kmod will reject files exceeding 1400 bytes but this restriction will be removed in later versions. 
+.TP
+.RB - q
+Suppresses status messages on stderr. 
+.TP
+-\fBs \fIsub-module-id\fR
+The sub-module identifier expressed as a 16-bit deciaml, hexadecimal or binary value. This identifier indicates a specific module with the module class specified using option \fB-t\fR. Any 16-bit value is permitted but only certain values will be accepted by device firmware. The default value is \fB0x0000\fR.
+.TP
+-\fBS \fIsession-id\fR
+The session identifier expressed as a 32-bit hexadecimal value. Any 32-bit value is permitted except for 0x00000000 and 0xFFFFFFFF. The program will use a default value when this option is omitted.
+.TP
+-\fBt \fImodule-id\fR
+The module identifier expressed as a 16-bit decimal, hexadecimal or binary value. This identifier indicates the module type or class. Option \fB-s\fR indicates the specific member of a module class. Any 16-bit value is permitted but only certain values will be accepted by device firmware. The default value is \fB0x0000\fR.
+.TP
+-\fBv\fR
+Print additional information on stdout. In particular, this option dumps incoming and outgoing packets which can be saved as text files for reference.
+.TP
+.RB - w
+Write settings to the device instead of reading settings from the device. If omitted then settings are read from the device and displayed. If present, the user should specify all settings to avoid writing default values to the device.
+.TP
+.RB - ? ,-- help
+Print program help summary on stdout. This option takes precedence over other options on the command line. 
+.TP
+.RB - ? ,-- version
+Print program version information on stdout. This option takes precedence over other options on the command line. Use this option when sending screen dumps to Intellon Technical Support so that they know exactly which version of the Linux Toolkit you are using.
+.SH ARGUMENTS
+.TP
+.IR device
+The MAC address of some powerline device. More than one address may be specified on the command line. If more than one address is specified then operations are performed on each device in turn. The default address is \fBlocal\fR. See \fBDEVICES\fR for information.
+.SH DEVICES
+Powerline devices use Ethernet Media Access Control (MAC) addresses. A MAC address is a 48-bit value entered as 12 hexadecimal digits in upper, lower or mixed character case. Octets may be separated with colons for clarity. For example, "00b052000001", "00:b0:52:00:00:01" and "00b052:000001" are valid and equivalent.
+.PP
+The following MAC addresses are special and may be entered by name instead of number.
+.TP
+.BR all
+Same as "broadcast".
+.TP
+.BR broadcast
+A synonym for the Ethernet broadcast address, \fBFF:FF:FF:FF:FF:FF\fR. All devices, whether local, remote or foreign recognize messages sent to this address.  A remote device is any device at the far end of a powerline connection. A foreign device is any device not manufactured by Intellon.
+.TP
+.BR local
+A synonym for the Intellon vendor specific Local Management Address (LMA), \fB00:B0:52:00:00:01\fR. All local Intellon devices recognize this address but remote and foreign devices do not. A remote device is any device at the far end of a powerline connection. A foreign device is any device not manufactured by Intellon.
+.SH REFERENCES
+See the Intellon HomePlug AV Firmware Technical Reference Manual for more information.
+.SH DISCLAIMER
+Intellon HomePlug AV Vendor Specific Management Message structure and content is proprietary to Intellon Corporation, Ocala FL USA. Consequently, public information is not available. Intellon Corporation reserves the right to modify message structure or content in future firmware releases without any obligation to notify or compensate users of this program.
+.SH EXAMPLES
+The following command reads module file \fBabc.bin\fR and writes it to the local device. The module identifier \fB0x1000\fR to indicate that it is an \fBMDIO Init\fR module. The sub-module identifer will default to \fB0x0000\fR. The session identifier will default to some static value determined by the program. The operation takes place in three steps. The last step may take 2 or 3 seconds to complete.
+.PP
+   # int6kmod -M abc.bin -t 0x1000 
+   eth1 00:B0:52:00:00:01 Request Session
+   eth1 00:B0:52:BE:EF:03 Granted
+   eth1 00:B0:52:00:00:01 Write abc.bin
+   eth1 00:B0:52:BE:EF:03 Written
+   eth1 00:B0:52:00:00:01 Commit Modules
+   eth1 00:B0:52:BE:EF:03 Committed
+None.
+.SH SEE ALSO
+.BR ilt ( 7 )
+.SH CREDITS
+ Charles Maier <charles.maier@intellon.com>

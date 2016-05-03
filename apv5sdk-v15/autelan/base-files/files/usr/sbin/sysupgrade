@@ -1,0 +1,26 @@
+#!/bin/sh
+########################################
+#system upgrad tool for web GUI,AQ2010
+#parameter numbers check and usage
+if [ $# -ne 1 ] ;then
+	echo "Usage: sysupgrade [SYSTEM-FILENAME]"
+	exit 1
+fi
+
+############################################
+/usr/sbin/stop_monitor
+
+#if file exist 
+if [ -e $1 ]; then
+	echo "file exist!"
+	cat /www/reboot.htm >/dev/null
+	cat /sbin/sysreboot >/dev/null
+#	cp /usr/sbin/update_img_tool /tmp/
+ #   	(free&&date&&/tmp/update_img_tool if=$1 ke=/dev/mtdblock1 fs=/dev/mtdblock2&&free&&date)>/tmp/sysupgradelog 2>&1
+	cp /usr/sbin/autelan-firmware-upgrade-web /tmp/
+	echo 0 > /proc/sys/dev/wifi0/monitor_process    
+	killall wtpd_check
+	(free&&date&&/tmp/autelan-firmware-upgrade-web $1 &&free&&date)>/tmp/sysupgradelog 2>&1
+   	 mv /tmp/sysupgradelog /jffs/sysupgradelog
+fi
+

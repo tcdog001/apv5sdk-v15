@@ -1,0 +1,2 @@
+LzmaDecode.c: In function 'LzmaDecodeProperties':
+LzmaDecode.c:127: warning: implicit declaration of function 'printf'

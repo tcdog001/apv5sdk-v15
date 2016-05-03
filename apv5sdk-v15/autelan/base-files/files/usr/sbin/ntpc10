@@ -1,0 +1,6 @@
+set_crontab "ntpclient" m1 "-h $1 -s"
+set_crontab "sleep 10 && ntpclient" m1 "-h $1 -s"
+set_crontab "sleep 20 && ntpclient" m1 "-h $1 -s"
+set_crontab "sleep 30 && ntpclient" m1 "-h $1 -s"
+set_crontab "sleep 40 && ntpclient" m1 "-h $1 -s"
+set_crontab "sleep 50 && ntpclient" m1 "-h $1 -s"

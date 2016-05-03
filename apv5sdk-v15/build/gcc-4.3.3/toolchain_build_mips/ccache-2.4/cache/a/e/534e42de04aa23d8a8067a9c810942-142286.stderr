@@ -1,0 +1,5 @@
+rgps.c: In function 'print_gpsinfo':
+rgps.c:239: warning: comparison between pointer and integer
+rgps.c: In function 'WEBQuest':
+rgps.c:635: warning: passing argument 1 of 'strlen' makes pointer from integer without a cast
+rgps.c:635: warning: passing argument 2 of 'memcpy' makes pointer from integer without a cast

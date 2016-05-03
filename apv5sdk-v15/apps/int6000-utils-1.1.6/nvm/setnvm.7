@@ -1,0 +1,66 @@
+.TH setnvm 7 "Intellon Corporation, Ocala FL USA" "int6000-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+setnvm - Intellon Image File Mangler
+.SH SYNOPSIS
+.BR setnvm
+.RI [ options ]
+.IR file
+.RI [ file ]
+[...]
+.SH DESCRIPTION
+Set special fields of the image header for every image in an Intellon image file. Do not use this program without Intellon support because it can easily render an image file invalid or, worse, render a powerline device inoperable. Detailed information on field values has been omitted on purpose. If you have to ask then you should probably not use this program.   
+.PP
+Use program \fBchknvm\fR with the \fB-v\fR option to inspect image file contents. If a file contains images that should not have their Type or Omit fields changed, use program \fBnvmsplit\fR to break out the images, change those that need it then use program \fBnvmmerge\fR to combine them again.
+.PP
+This program is part of the Intellon Linux Toolkit. See the \fBilt\fR man page for an overview and installation instructions.
+.SH OPTIONS
+.TP
+\fB-t \fIimagetype\fR
+Set the \fBImage Type\fR field for every image in the file. This 8-bit value indicates the nature of the image and is used by Intellon firmware and application software to determine if an image should be downloaded and executed. Values can be entered in decimal, binary or hexadecimal. Binary values must be prefixed with "0b" and hexadecimal values must be prefixed with "0x". The \fBimagetype\fR must be one of the following values: 
+
+ 0 NVM_IMAGE_GENERIC 
+ 1 NVM_IMAGE_CONFIG_SYNOPSIS 
+ 2 NVM_IMAGE_CONFIG_DENALI 
+ 3 NVM_IMAGE_APPLET_DENALI 
+ 4 NVM_IMAGE_FIRMWARE 
+ 5 NVM_IMAGE_OASCLIENT 
+ 6 NVM_IMAGE_CUSTOM 
+ 7 NVM_IMAGE_MEMCTL 
+
+.TP
+\fB-o \fIhostmask\fR
+Set the \fBImage Omit\fR field for every image in the file. This 16-bit value is a bitmap of Intellon platforms that the image \fBdoes not\fR support. Values may be entered in decimal, binary or hexadecimal. Binary values must be prefixed with "0b" and hexadecimal values must be prefixed with "0x". The \fBhostmask\fR may be the logical OR of any of the following values:
+
+ 1 INT6000 
+ 2 INT6300 
+ 4 INT6400
+.TP
+\fB\-q\fR
+Suppress printing of routine messages. This option has no effect at this time. All error messages are printed.
+.TP
+\fB\-v\fR
+Print image headers on stdout as they are processed.
+.TP
+\fB-?\fR, \fB--help\fR
+Print program help summary on stdout. This option takes precedence over other options on the command line. 
+.TP
+\fB-!\fR, \fB--version\fR
+Print program version information on stdout. This option takes precedence over other options on the command line. Usethis option when sending screen dumps to Intellon Technical Support so that they know exactly which version of the Linux Toolkit you are using.
+.SH ARGUMENTS
+.TP
+\fIfile\fR
+The name of an Intellon image file. By convention, Intellon Image files have a \fB.nvm\fR file extension but this program does not enforce this convention. Invalid image files will be rejected causing the output to be incomplete.
+.SH EXAMPLES
+None.
+.SH DISCLAIMER
+Firmware file structure and content is proprietary to Intellon Corporation, Ocala FL USA. Consequently, public information is not available. Intellon Corporation reserves the right to change file structure or content in future firmware releases without any obligation to notify or compensate users of this program.
+.SH SEE ALSO
+.BR chknvm ( 7 ),
+.BR int6kf ( 7),
+.BR int6ktest ( 7),
+.BR nvmmerge ( 7 ),
+.BR nvmsplit ( 7 ),
+.BR setpib ( 7 )
+.SH CREDITS
+ Charles Maier <charles.maier@intellon.com>
+

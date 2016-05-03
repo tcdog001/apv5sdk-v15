@@ -1,0 +1,63 @@
+#!/bin/sh
+
+if [ -z $1 ] || [ ! -f $1 ]; then
+	logger -s "$0 <firmware-file>"
+	exit 1
+fi
+
+cd /tmp
+touch 3
+echo "Extracting the firmware files."
+
+tar zxvf $1
+
+echo "Checking for firmware file contents."
+[ ! -e vmlinux.bin.gz ] || [ ! -e rootfs.squashfs ] || [ ! -e kernel.md5 ] || [ ! -e root_fs.md5 ] || [ ! -e vmlinux.info ]
+if [ $? -ne 1 ]; then
+	logger -s "Invalid firmware file"
+	rm -f $1
+	exit 2
+fi
+echo "test."
+[ -e xhpb44os20010201 ]
+if [ $? -eq 1 ]; then
+	rm -f /jffs/config.xml
+	rm -f /jffs/config.wtp
+	rm -f /jffs/preconfig
+	rm -f /jffs/config.ap83
+else
+	rm -f xhpb44os20010201
+fi	
+#Due to some limitaton of GUI we cant delete it as of now.
+#rm -fr $1
+touch 4
+md5sum -c kernel.md5 < vmlinux.bin.gz
+if [ $? -ne 0 ]; then
+	logger -s "ERROR: invalid md5sum of vmlinux.gz.uImage"
+	cat kernel.md5 | logger -s
+	rm -f $1
+	exit 1
+fi
+touch 5
+md5sum -c root_fs.md5  < rootfs.squashfs
+if [ $? -ne 0 ]; then
+	logger -s "ERROR: invalid md5sum of rootfs.squashfs"
+	cat root_fs.md5 | logger -s
+	rm -f $1
+	exit 1
+fi
+#ghy add for pb44 enty point
+FLAG="`cat vmlinux.info | awk -F': 0x' '/entry/{print $2}'`"
+ENTRY="`/usr/bin/pro_ctl_util -B|awk -F':' '/entry/{print $2}'`"
+if [ "$FLAG" == "$ENTRY" ];then
+	echo $FLAG > /tmp/log
+else
+	/usr/bin/pro_ctl_util -F $FLAG
+fi
+sleep 1
+#if [ $? -ne 0 ]; then
+#	echo "wrcpuutil write entry point error"
+#	exit 1
+#fi
+touch 6
+rm -f kernel.md5 root_fs.md5

@@ -1,0 +1,10 @@
+prefix=/home/mary/project/ltemodule/demo/install
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: qmi
+Description: QMI library
+Version: 1.0.0
+Libs: -L${libdir} -lqmi_client_qmux -lqmi -lqmiidl -lqmiservices -lqcci_legacy
+Cflags: -I${includedir}/qmi

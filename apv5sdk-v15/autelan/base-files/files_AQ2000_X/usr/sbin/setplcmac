@@ -1,0 +1,35 @@
+#!/bin/sh
+
+VERSION="$(basename $0) ver.1.0"
+USAGE="usage: $(basename $0) <cnu mac address, format: xx:xx:xx:xx:xx:xx>"
+DESCRIPTION="description: set the cnu mac, must give a mac"
+
+if [ $# -lt 1 ];then
+  echo "${USAGE}" >&2
+  echo "${DESCRIPTION}" >&2
+  exit 1
+fi
+
+MAC=$1
+PIB=/tmp/tmp.pib
+ETH=default
+
+ifconfig eth0 down
+
+ampinit -p ${PIB} local -i ${ETH}
+if [ ${?} != 0 ];then
+	ifconfig eth0 up
+	exit 1
+fi
+modpib ${PIB} -M ${MAC}
+if [ ${?} != 0 ];then
+	ifconfig eth0 up
+	exit 1
+fi
+ampinit -C 2 -P ${PIB} -i ${ETH} -D $(int6kid)
+if [ ${?} != 0 ];then
+	ifconfig eth0 up
+	exit 1
+fi
+
+ifconfig eth0 up

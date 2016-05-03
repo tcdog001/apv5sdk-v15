@@ -1,0 +1,2 @@
+cmd_ethreg.c:69: warning: 'rd_value' defined but not used
+cmd_ethreg.c:70: warning: 'phyaddr' defined but not used

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ $1 = "enable" ];then
+echo 1 > /proc/sys/dev/wifi0/ath_txq_stuck_enable
+echo "check engine enable successfully"
+else
+echo 0 > /proc/sys/dev/wifi0/ath_txq_stuck_enable
+echo "check engine disable successfully"
+fi

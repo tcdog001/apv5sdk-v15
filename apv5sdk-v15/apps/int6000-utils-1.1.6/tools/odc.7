@@ -1,0 +1,36 @@
+.TH odc 7 "" "cmassoc-tools-1.5.10" "Motley Tools"
+.SH NAME
+odc - object driven compare
+.SH SYNOPSIS
+.BR odc 
+.RI [ options ]
+.IR file
+.IR file
+.RI [> stdout ]
+.SH DESCRIPTION
+Compare two binary files, object by object, and print the objects that differ on stdout for analysis. This program requires an object definition file that lists the length and symbols for file objects.
+.SH OPTIONS
+.TP
+-\fBf\fI definitions\fR
+The name of the object definition file. This file lists the length, symbol and description of individual objects in order of occurance. If this option is omitted then object definitions are read from stdin. The file is not modified by this program. See the \fBodd\fR man page for an example of an object definition file.
+.TP
+.RB - ? ,-- help
+Print program help summary on stdout. This option takes precedence over other options on the command line. 
+.TP
+.RB - ! ,-- version
+Print program version information on stdout. This option takes precedence over other options on the command line. Usethis option when sending screen dumps to Intellon Technical Support so that they know exactly which version of the Linux Toolkit you are using.
+.SH ARGUMENTS
+.TP
+.IR file
+The name of a binary file. Two binary files are needed for comparison and both should conform to the object definition file for the comarison to be meaningful.
+.SH EXAMPLES
+The following example compares file \fBabc.bin\fR and \fBdef.bin\fR and prints objects that are different in hexdump format. Objects are defined in \fBobjects.txt\fR and read using \fB-f\fR.
+.PP
+   # odc -f objects.txt abc.bin def.bin
+.SH SEE ALSO
+.BR grab ( 7 ),
+.BR odd ( 7 ),
+.BR odx ( 7 )
+.SH CREDITS
+ Nathan Houghton <nathan@brainwerk.org>
+ Charles Maier <cmaier@cmassoc.net>

@@ -1,0 +1,52 @@
+#!/bin/sh
+SHOWSYSINFO=/usr/sbin/showsysinfo
+COMPANY_NAME="`${SHOWSYSINFO} | awk -F':' '/Company Name/{print $2}'`" 
+if [ `echo $COMPANY_NAME|grep -o -i -e 'DATANG'` ];then
+	Temp_COMPANY_NAME=DATANG
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'HONGXIN'` ];then
+	Temp_COMPANY_NAME=HONGXIN
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'FIBERHOME'` ];then
+	Temp_COMPANY_NAME=HONGXIN
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'COMBA'` ];then
+	Temp_COMPANY_NAME=COMBA
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'Alcatel'` ];then
+	Temp_COMPANY_NAME=Alcatel
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'sunnada'` ];then
+	Temp_COMPANY_NAME=sunnada
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'Postcom'` ];then
+	Temp_COMPANY_NAME=Postcom
+else
+	Temp_COMPANY_NAME=Autelan
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+case $Temp_COMPANY_NAME in
+	DATANG )
+		TIME="Thu Jan 5 10:14:22 UTC 2012"
+		;;
+	HONGXIN )
+		TIME="Wed Jan 18 9:28:42 UTC 2012"
+		;;
+	COMBA )
+		TIME="Tue Jan 10 10:34:13 UTC 2012"
+		;;
+	Alcatel )
+		TIME="Fri Dec 16 11:21:37 UTC 2011"
+		;;
+	sunnada | Postcom | Autelan)
+		TIME="Fri Jan 6 10:14:22 UTC 2012"
+		;;
+esac
+
+if [ -f /jffs/.time ];then
+    if [ ! -z "`cat /jffs/.time`" ];then
+    	TIME=`cat /jffs/.time`
+    fi
+fi
+echo "${TIME}"
+

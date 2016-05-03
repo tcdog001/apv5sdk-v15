@@ -1,0 +1,8 @@
+config2cfg.c
+nvram.c
+nvrampeek.c
+sdram.c
+sdramfile.c
+sdramfileA.c
+sdrampeek.c
+sdramtext.c

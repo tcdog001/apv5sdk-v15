@@ -1,0 +1,15 @@
+base referer
+rect $structsoap__dom__element.html 540,511 671,537
+rect $structsoap__plist.html 19,48 91,75
+rect $structsoap__pblk.html 175,111 249,137
+rect $structsoap__nlist.html 176,201 248,228
+rect $struct_namespace.html 171,252 253,279
+rect $structsoap__xlist.html 176,343 248,369
+rect $structsoap__attribute.html 165,433 259,460
+rect $structsoap__ilist.html 179,524 245,551
+rect $structsoap__mime.html 172,575 252,601
+rect $structsoap__plugin.html 171,665 253,692
+rect $structsoap__cookie.html 169,756 255,783
+rect $structsoap__clist.html 176,847 248,873
+rect $structsoap__blist.html 176,937 248,964
+rect $structsoap__dime.html 173,988 251,1015

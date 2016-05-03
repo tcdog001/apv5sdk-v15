@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			FactoryDefaults.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='EthernetHeader.c.html' title=' EthernetHeader.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='FactoryDefaults2.c.html' title=' FactoryDefaults2.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   signed FactoryDefaults (struct int6k * int6k);
+ * 
+ *   int6k.h
+ *
+ *   This plug-in for program int6k restores factory defaults using 
+ *   a VS_FAC_DEFAULT message;
+ *
+ *   See the HomePlugAV Firmware Technical Reference Manual
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Nathan Houghton, nathan.houghton@intellon.com
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef FACTORYDEFAULTS_SOURCE
+#define FACTORYDEFAULTS_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;memory.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/error.h&quot;
+
+signed FactoryDefaults (struct int6k * int6k) 
+
+{
+
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_fac_defaults_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+	}
+	* confirm = (struct vs_fac_defaults_confirm *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	Request (int6k, &quot;Restore Factory Defaults&quot;);
+	memset (message, 0, sizeof (struct message));
+	EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message-&gt;intellon, (VS_FAC_DEFAULT | MMTYPE_REQ));
+	int6k-&gt;packetsize = ETHER_MIN_LEN;
+	if (SendMME (int6k) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, INT6K_CANTSEND);
+		return (-1);
+	}
+	while (ReadMME (int6k, (VS_FAC_DEFAULT | MMTYPE_CNF)) &gt; 0) 
+	{
+		if (confirm-&gt;MSTATUS) 
+		{
+			Failure (int6k, INT6K_WONTDOIT);
+			continue;
+		}
+		Confirm (int6k, &quot;Restoring ...&quot;);
+	}
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='EthernetHeader.c.html' title=' EthernetHeader.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='FactoryDefaults2.c.html' title=' FactoryDefaults2.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

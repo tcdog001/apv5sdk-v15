@@ -1,0 +1,246 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_ip=`config_read /config/firewall/ipfilter`
+xml_ip_status=`config_getoption "$xml_ip" status`
+xml_ip_count=`config_getoption "$xml_ip" rule_count`
+
+xml_ip1_start=`config_getoption "$xml_ip" ipaddr1_start`
+xml_ip1_end=`config_getoption "$xml_ip" ipaddr1_end`
+xml_ip2_start=`config_getoption "$xml_ip" ipaddr2_start`
+xml_ip2_end=`config_getoption "$xml_ip" ipaddr2_end`
+xml_ip3_start=`config_getoption "$xml_ip" ipaddr3_start`
+xml_ip3_end=`config_getoption "$xml_ip" ipaddr3_end`
+xml_ip4_start=`config_getoption "$xml_ip" ipaddr4_start`
+xml_ip4_end=`config_getoption "$xml_ip" ipaddr4_end`
+xml_ip5_start=`config_getoption "$xml_ip" ipaddr5_start`
+xml_ip5_end=`config_getoption "$xml_ip" ipaddr5_end`
+xml_ip6_start=`config_getoption "$xml_ip" ipaddr6_start`
+xml_ip6_end=`config_getoption "$xml_ip" ipaddr6_end`
+xml_ip7_start=`config_getoption "$xml_ip" ipaddr7_start`
+xml_ip7_end=`config_getoption "$xml_ip" ipaddr7_end`
+xml_ip8_start=`config_getoption "$xml_ip" ipaddr8_start`
+xml_ip8_end=`config_getoption "$xml_ip" ipaddr8_end`
+xml_ip9_start=`config_getoption "$xml_ip" ipaddr9_start`
+xml_ip9_end=`config_getoption "$xml_ip" ipaddr9_end`
+xml_ip10_start=`config_getoption "$xml_ip" ipaddr10_start`
+xml_ip10_end=`config_getoption "$xml_ip" ipaddr10_end`
+
+sys_default_NAT
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Firewall</title>
+<style>
+#ip_table{
+	border:solid 1px #000000;
+}
+</style>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<script language="javascript" src="JAS.js">
+</script>
+<script language="javascript" >
+function addrulecount()
+{
+	if(ip_table.rows.length<12)
+	{
+		var count=parseInt(document.all.rule_num.value)+1;
+		document.all.rule_num.value = count;
+	}
+}
+function delrulecount()
+{
+	if(ip_table.rows.length>3)
+	{
+		var count=parseInt(document.all.rule_num.value)-1;
+		document.all.rule_num.value = count;
+	}
+}
+function initrulecount()
+{
+	if( document.all.rule_num.value == "0")
+		document.all.rule_num.value = "1";
+}
+/*********************************************/
+/*control of firewall.htm                   */
+/*********************************************/
+
+var ip_count="<%= $xml_ip_count %>";
+var ip_status="<%= $xml_ip_status %>";
+var ip_arr=["<%= $xml_ip1_start %>","<%= $xml_ip1_end %>","<%= $xml_ip2_start %>","<%= $xml_ip2_end %>","<%= $xml_ip3_start %>","<%= $xml_ip3_end %>","<%= $xml_ip4_start %>","<%= $xml_ip4_end %>","<%= $xml_ip5_start %>","<%= $xml_ip5_end %>","<%= $xml_ip6_start %>","<%= $xml_ip6_end %>","<%= $xml_ip7_start %>","<%= $xml_ip7_end %>","<%= $xml_ip8_start %>","<%= $xml_ip8_end %>","<%= $xml_ip9_start %>","<%= $xml_ip9_end %>","<%= $xml_ip10_start %>","<%= $xml_ip10_end %>"];
+var num = 1;
+var i = 0;
+function iptable_insRow(obj)
+{
+	if( obj == "first entry")
+	{
+		for( i=0; i<ip_count; i++)
+		{
+			var td1 = "ip1_address" + String(i+1);
+			var td2 = "ip2_address" + String(i+1);
+			var row_num = "ip_tr" + String(i+1);
+	
+			var newRow = document.getElementById('ip_table').insertRow(ip_table.rows.length-1);
+        		newRow.id = row_num;
+			var cell0 = newRow.insertCell(0);
+			cell0.className = "td_style";
+			cell0.innerHTML="&nbsp;";
+			var cell1 = newRow.insertCell(1);
+			cell1.className = "td_style";
+			cell1.innerHTML="<table width='350' border='0'><tr><td width=90><input type=text name='" + td1 +"' value='" + ip_arr[2*i] + "' style='height:12px; width:88px'/></td><td width='260'><input type='text' name='" + td2 +"' value='"+ ip_arr[2*i+1] +"' style='height:12px; width:88px'/></td></tr></table>";
+		}
+		if (i==0)
+			num = 1;
+		else
+			num = i ;
+			
+		if( ip_status == "enable")
+		{
+			for(var i=1;i<ip_table.rows.length;i++)
+				document.getElementById("ip_table").rows[i].style.display="";
+		}
+		else
+		{
+			for(var i=1;i<ip_table.rows.length;i++)
+				document.getElementById("ip_table").rows[i].style.display="none";
+		}
+	}
+	else
+	{
+		num = num + 1;
+		if(ip_table.rows.length<12)
+		{
+			var td1 = "ip1_address" + String(num);
+			var td2 = "ip2_address" + String(num);
+			var row_num = "ip_tr" + String(num);
+	
+			var newRow = document.getElementById('ip_table').insertRow(ip_table.rows.length-1);
+        		newRow.id = row_num;
+			var cell0 = newRow.insertCell(0);
+			cell0.className = "td_style";
+			cell0.innerHTML="&nbsp;";
+			var cell1 = newRow.insertCell(1);
+			cell1.className = "td_style";
+			cell1.innerHTML="<table width='350' border='0'><tr><td width=90><input type=text name='" + td1 +"' style='height:12px; width:88px'/></td><td width='260'><input type='text' name='" + td2 +"' style='height:12px; width:88px'/></td></tr></table>";
+		}
+		else
+		{
+			num = num - 1;
+	  		alert("Max number of fiter IP is 10!");
+	 	}
+	}
+	  
+}
+
+function ip_radio_display(obj)
+{
+	if(parseInt(obj) == 1)
+	{
+		for(var i=1;i<ip_table.rows.length;i++)
+			document.getElementById("ip_table").rows[i].style.display="none";
+	}
+	else
+	{
+		for(var i=1;i<ip_table.rows.length;i++)
+			document.getElementById("ip_table").rows[i].style.display="";
+			
+		if( ip_table.rows.length<3 )
+		{
+			var row_num = "ip_tr1";
+	
+			var newRow = document.getElementById('ip_table').insertRow(ip_table.rows.length-1);
+        		newRow.id = row_num;
+			var cell0 = newRow.insertCell(0);
+			cell0.className = "td_style";
+			cell0.innerHTML="&nbsp;";
+			var cell1 = newRow.insertCell(1);
+			cell1.className = "td_style";
+			cell1.innerHTML="<table width='350' border='0'><tr><td width=90><input type=text name='ip1_address1' style='height:12px; width:88px'/></td><td width='260'><input type='text' name='ip2_address1' style='height:12px; width:88px'/></td></tr></table>";
+		}
+	}
+}
+
+function iptable_delRow(){
+	num = num - 1;
+	if(ip_table.rows.length>3)
+	 	document.getElementById('ip_table').deleteRow(ip_table.rows.length-2);
+	else
+	{
+		num = num + 1;
+		alert("There must be at least one ip-filter entry!");
+	}
+}
+</script>
+</head>
+
+<body bgcolor="#efefef" onload='iptable_insRow("first entry")'>
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1">IP</td>
+		  <td class="top1"><a href="mac.htm" target="MainFrame">MAC</a></td>
+		  <td class="top1"><a href="url.htm" target="MainFrame">URL</a></td>
+		  <td class="top1"><a href="dos.htm" target="MainFrame">DoS</a></td>
+		  <td class="top1"><a href="port_forwarding.htm" target="MainFrame">Virtual server</a></td>
+		  <td class="top1"><a href="ip_forwarding.htm" target="MainFrame">DMZ</a></td>
+		  <td class="top1"><a href="upnp.htm" target="MainFrame">upnp</a></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">Firewall-->IP Filter</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form method="post" name=form_ip action="<%= $firewall_action_cgi %>" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="IP Filter illustration">IP Filter</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table id="ip_table" width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">IP Address filter </td>
+          <td class="td_style" width="350">
+		    <table width="350" border="0">
+              <tr>
+                <td width="60"><input type="radio" <% webui_radiobutton_check "$xml_ip_status" "disable" %> name="ip_address_filter" value="disable" onclick="ip_radio_display(1);"/>Disable</td>
+                <td width="290"><input type="radio" <% webui_radiobutton_check "$xml_ip_status" "enable" %> name="ip_address_filter" value="enable" onclick="ip_radio_display(2);initrulecount();"/>Enable</td>
+              </tr>
+            </table>
+		  </td>
+        </tr>
+			
+	<tr style="display:none">
+          <td class="td_style">&nbsp;</td>
+          <td class="td_style">
+	    <table width="130" border="0">
+              <tr>
+                <td><input id="but" type="button" name="insert_one_row" value="Add" onclick='addrulecount();iptable_insRow("click");'/></td>
+                <td><input id="but" type="button" name="delete_one_row" value="Delete" onclick="delrulecount();iptable_delRow();"/>
+              </tr>
+            </table>
+	  </td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><input id="but" type="submit" name="ip_filter_commit" value="Submit"/></td>
+  </tr>
+</table>
+<input type="hidden" value="IP filter" name="SERVLET">
+<input type="hidden" value="<%= $xml_ip_count %>" name="rule_num">
+</form>
+</div>
+</body>
+</html>

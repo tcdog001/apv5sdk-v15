@@ -1,0 +1,9 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/GobiUSBNet.c: In function 'str2mac':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/GobiUSBNet.c:89: warning: passing argument 1 of 'printk' makes pointer from integer without a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/GobiUSBNet.c: In function 'rmnet_ip_type_trans':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/GobiUSBNet.c:230: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/GobiUSBNet.c:241: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/GobiUSBNet.c: In function 'Gobinet_disconnect':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/GobiUSBNet.c:1463: warning: 'return' with a value, in function returning void
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/GobiUSBNet.c:1475: warning: 'return' with a value, in function returning void
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/GobiUSBNet.c:1482: warning: 'return' with a value, in function returning void

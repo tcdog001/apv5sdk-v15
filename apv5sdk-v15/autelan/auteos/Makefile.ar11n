@@ -1,0 +1,46 @@
+#OCTEON_ROOT ?= ${TOPDIR}/ap83sdk/build
+OCTEON_ROOT ?= ${TOPDIR}/build
+ROOTFSDIR ?= /home/shark/builddir/rootfs
+
+PKG_NAME := auteos
+PKG_RELEASEi := 1.0
+PKG_BUILD_DIR := src
+
+#CAVIUM_CPPFLAGS ?= -I$(OCTEON_ROOT)/gcc-3.4.4-2.16.1/build_mips_nofpu/mips-linux-uclibc/sys-include
+#CAVIUM_LDFLAGS ?= -L$(OCTEON_ROOT)/gcc-3.4.4-2.16.1/build_mips_nofpu/mips-linux-uclibc/lib
+#CAVIUM_CPPFLAGS ?= -I$(OCTEON_ROOT)/gcc-4.3.3/build_mips/staging_dir/usr/mips-linux-uclibc/sys-include -I$(OCTEON_ROOT)/gcc-4.3.3/build_mips/staging_dir/usr/mips-linux-uclibc/sys-include/bits 
+CAVIUM_CPPFLAGS ?= -I$(OCTEON_ROOT)/gcc-4.3.3/build_mips/staging_dir/usr/mips-linux-uclibc/sys-include
+#CAVIUM_CPPFLAGS ?= -I$(OCTEON_ROOT)/gcc-4.3.3/build_mips/staging_dir/usr/include
+CAVIUM_LDFLAGS ?= -L$(OCTEON_ROOT)/gcc-4.3.3/build_mips/staging_dir/usr/mips-linux-uclibc/lib
+#EXTRA_LDFLAGS := -L$(ROOTFSDIR)/../libmxml-0.9.1/src/lib -lmxml
+EXTRA_LDFLAGS := -L$(TOPDIR)/autelan/libmxml-0.9.1/src/lib -lmxml
+CPPFLAGS := $(CAVIUM_CPPFLAGS)
+#EXTRA_CPPFLAGS := -I$(ROOTFSDIR)/../libmxml-0.9.1/src/include
+EXTRA_CPPFLAGS := -I$(TOPDIR)/autelan/libmxml-0.9.1/src/include
+
+TARGET_CROSS ?=  mips-linux-uclibc-
+CC := $(TARGET_CROSS)gcc
+LD := $(TARGET_CROSS)ld
+AR := $(TARGET_CROSS)ar
+
+CP := cp -fpR
+
+.PHONY: all
+all: compile install
+
+.PHONY: compile
+compile:
+	$(MAKE) -C $(PKG_BUILD_DIR)/src -f Makefile.ap83 \
+		EXTRA_LDFLAGS="$(EXTRA_LDFLAGS)" \
+		CPPFLAGS=$(CPPFLAGS) \
+		EXTRA_CPPFLAGS=$(EXTRA_CPPFLAGS) \
+		CC=$(CC) \
+		AR=$(AR)
+
+.PHONY: install
+install:
+	$(CP) $(PKG_BUILD_DIR)/src/libauteos.so $(ROOTFSDIR)/lib
+	
+.PHONY: clean
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR)/src clean

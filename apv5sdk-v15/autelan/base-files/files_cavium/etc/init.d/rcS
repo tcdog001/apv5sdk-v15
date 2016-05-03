@@ -1,0 +1,85 @@
+#!/bin/sh
+
+start()
+{
+echo "Mounting file systems"
+mount -a
+
+mount -rw -t jffs2 /dev/mtdblock6 /etc/config
+mount -rw -t jffs2 /dev/mtdblock6 /jffs
+#mknod /dev/avrmod c 10 131 >dev/null 2>&1
+
+mkdir -p /jffs/hostapd/
+#ln -s /etc/config /jffs
+
+#by liuyanbo
+  ln -sf /tmp/resolv.conf.auto /etc/resolv.conf
+        
+#add by changzhimin for ppp module
+if [ -e /etc/ppp ];then
+	ln -sf /etc/resolv.conf	/etc/ppp/resolv.conf
+	mkdir -p /var/lock
+fi
+	if [  ! -x /jffs/emu_sta ]; then
+		cp -f /etc/wlan/emu_sta /etc/config
+	fi
+	if [ ! -f /etc/config/config.xml ]; then
+		cp -f /etc/defaults/config.xml /etc/config
+	fi
+		
+	if [ ! -f /etc/config/version ]; then
+		xml_upsystem_version="`cat /etc/version/version`"
+		echo $xml_upsystem_version > /etc/config/version
+	fi
+        if [ -e /etc/config/config.xml ];then
+	        /usr/sbin/xmlupgrade
+        fi
+	cp -f /etc/defaults/session.xml /tmp
+	if [ -f /jffs/system ];then
+		echo "AP"
+	else
+		cp -f /etc/wlan/system /etc/config
+	fi
+
+	if [ -x /jffs/preconfig ];then
+		/jffs/preconfig
+	else
+		cp -f /etc/wlan/preconfig /jffs
+		/jffs/preconfig
+	fi
+	if [ -x /jffs/config ];then
+		/jffs/config
+	else
+		cp -f /etc/wlan/config /jffs
+		/jffs/config
+	fi
+	if [ -x /jffs/postconfig ];then
+		/jffs/postconfig
+	else
+		cp -f /etc/wlan/postconfig /jffs
+		/jffs/postconfig
+	fi
+	/usr/sbin/iwevent & 
+	/sbin/rate-stat &
+}
+
+stop()
+{
+    true
+}
+
+case "$2" in
+  boot)
+        start
+        ;;
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  *)
+        echo "Usage: $0 {boot|start|stop}"
+        exit 1
+esac
+

@@ -1,0 +1,144 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_config=`config_read /config/network/wds`
+xml_wds_enable=`config_getoption "$xml_config" wdsenable`
+xml_wds_if=`config_getoption "$xml_config" wdsif`
+xml_wds_mac=`config_getoption "$xml_config" wdsmac`
+
+for vap_allnum in `seq $NUM_ap`
+do
+	eval "xml_wlan_config_vap${vap_allnum}=\`config_read /config/network/vap${vap_allnum}\`"
+	eval "xml_wlan_vap${vap_allnum}_enable=\`config_getoption \"\$xml_wlan_config_vap${vap_allnum}\" create\`"
+	eval "xml_wlan_vap${vap_allnum}_wlanmode=\`config_getoption \"\$xml_wlan_config_vap${vap_allnum}\" wlanmode\`"
+done
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js wireless_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	var allvap_num="<%= $NUM_ap %>";
+	var vapname="<%= $xml_wds_if %>";
+var array_vapcreate=["<%= $xml_wlan_vap1_enable %>","<%= $xml_wlan_vap2_enable %>","<%= $xml_wlan_vap3_enable %>","<%= $xml_wlan_vap4_enable %>","<%= $xml_wlan_vap5_enable %>","<%= $xml_wlan_vap6_enable %>","<%= $xml_wlan_vap7_enable %>","<%= $xml_wlan_vap8_enable %>","<%= $xml_wlan_vap9_enable %>","<%= $xml_wlan_vap10_enable %>","<%= $xml_wlan_vap11_enable %>","<%= $xml_wlan_vap12_enable %>","<%= $xml_wlan_vap13_enable %>","<%= $xml_wlan_vap14_enable %>","<%= $xml_wlan_vap15_enable %>","<%= $xml_wlan_vap16_enable %>",];
+var array_wlanmode=["<%= $xml_wlan_vap1_wlanmode %>","<%= $xml_wlan_vap2_wlanmode %>","<%= $xml_wlan_vap3_wlanmode %>","<%= $xml_wlan_vap4_wlanmode %>","<%= $xml_wlan_vap5_wlanmode %>","<%= $xml_wlan_vap6_wlanmode %>","<%= $xml_wlan_vap7_wlanmode %>","<%= $xml_wlan_vap8_wlanmode %>","<%= $xml_wlan_vap9_wlanmode %>","<%= $xml_wlan_vap10_wlanmode %>","<%= $xml_wlan_vap11_wlanmode %>","<%= $xml_wlan_vap12_wlanmode %>","<%= $xml_wlan_vap13_wlanmode %>","<%= $xml_wlan_vap14_wlanmode %>","<%= $xml_wlan_vap15_wlanmode %>","<%= $xml_wlan_vap16_wlanmode %>",];
+	init_mmenu(flag);
+	init_wiremenu(flag);
+	init_wds(flag);
+function valvalidate()
+{
+    	overlayer();
+}	
+
+function vapname_display()
+{
+	for(var i = 1;i <= allvap_num;i++)
+	{
+		if(array_wlanmode[i-1] == "ap" || array_wlanmode[i-1] == "root" )
+		{
+			if(array_vapcreate[i-1] == "yes")
+			{
+				var tmp_vapname="vap"+i;
+				if(vapname == tmp_vapname)
+				{
+				 		document.write("<option value='"+tmp_vapname+"' selected='selected' >"+tmp_vapname+"</option>");
+				}
+				else
+				{
+					  document.write("<option value='"+tmp_vapname+"' >"+tmp_vapname+"</option>");
+				}
+		  }
+		}
+	}
+}
+</script>
+</head>
+<body>
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_wireless6.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form id="general" name="general"method="post" action="<%= $action_cgi %>" onsubmit="return valvalidate()">
+<div align="center">
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0">
+							<tr>
+							<td  align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(wds_name)</script>&nbsp;</b></td>
+						</tr>
+							
+							<tr>
+							<td colspan="2" height="10">
+							</td>
+							</tr>
+							
+							<tr>
+							<td  align="right" height="24" width="280" bordercolor="#ffffff"><script language="javascript">replace(wds_prop)</script>&nbsp;</td>
+							<td align="left"  width="370" bordercolor="#ffffff">
+							<input type="radio" <% webui_radiobutton_check "$xml_wds_enable" "yes" %> name="wdsenable" value="yes"><script language="javascript">replace(wds_enable)</script> &nbsp;
+							<input type="radio" <% webui_radiobutton_check "$xml_wds_enable" "no" %> name="wdsenable" value="no"><script language="javascript">replace(wds_disable)</script>&nbsp;
+							</td>
+							</tr>
+							
+							<tr>
+							<td align="right" height="24" bordercolor="#ffffff" ><script language="javascript">replace(wds_derived)</script>&nbsp;</td>
+							<td  bordercolor="#ffffff" >
+							<select name="vapname" >
+							<script language="JavaScript" type="text/javascript">vapname_display()</script>
+							</select>	&nbsp;
+							<script language="JavaScript" type="text/javascript">replace(wds_attention)</script>
+							</td>
+							</tr>
+							
+							<tr>
+							<td align="right" height="24" bordercolor="#ffffff" ><script language="javascript">replace(wds_setmac)</script>&nbsp;</td>
+							<td  bordercolor="#ffffff" >
+							<input type="text" name="wds_mac" value="<%= $xml_wds_mac  %>">&nbsp;(MAC: xx:xx:xx:xx:xx:xx)
+							</td>
+							</tr>
+							
+							<tr>
+							<td colspan="2" height="10">
+							</td>
+							</tr>
+              </table>
+		          <table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+							<tr>
+							<td align="center" height="40" valign="middle" colspan="2"><script language="javascript">replace(wds_apply)</script>&nbsp;</td>
+							</tr>
+							<tr>
+				        <td align="right"   colspan="2"><script language="javascript">replace(wds_help)</script></td>
+				      </tr>
+</table>
+</div>
+<input type="hidden" value="WDS Setup" name="SERVLET" >
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

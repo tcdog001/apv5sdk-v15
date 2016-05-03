@@ -1,0 +1,36 @@
+
+                        Minimal XML library 1.0
+
+                           - I N S T A L L -
+
+                          Giancarlo Niccolai
+
+
+
+Under posix compliant systems, a
+   ./configure
+   make
+   make install
+
+should be enough. Remember to set prefix for configure to a suitable path:
+
+   ./configure --prefix=/my/favourites/libs
+
+the lib will be installed under the /lib dir of the "prefix".
+
+
+To install from CVS do
+   aclocal
+   automake -a
+   autoconf
+
+
+before doing other install steps. "automake -a" is important, as it will
+create the standard GNU support utilities to do a clean configure/make
+process.
+
+
+To enable debuging symbols add --enable-debug, and to make also tests
+(linked against static library) do --enable-tests.
+
+Dynamic libraries can be built by passing --enabled-shared to configure

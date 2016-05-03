@@ -1,0 +1,196 @@
+#!/bin/sh
+
+VERSION="$(basename $0) ver.1.0"
+USAGE="Usage: $(basename $0) <eth0|eth1> <port1|port2|...> <uplink|downlink> <rate|no>"
+DESCRIPTION="Description: get or set the specified port's rate limitiation,if only have eth and port args,$(basename $0) will print the rate limitation"
+
+if [ $# -lt 2 ];then
+	echo "${USAGE}" >&2
+	echo "${DESCRIPTION}" >&2
+	exit 1
+fi
+
+ETH=
+PORT=
+K=1024
+M=$((1024 * 1024))
+
+UPLINKRATE=-1
+DOWNLINKRATE=-1
+
+case "${1}" in
+	eth0 | eth1)
+		ETH="${1}"
+		;;
+	*)
+		echo "${USAGE}" >&2
+		echo "${DESCRIPTION}" >&2
+		exit 1
+		;;
+esac
+
+case "${2}" in
+	port1 | port2 | port3 | port4)
+		PORT=`echo "${2}" | grep -o '[0-9]'`
+		;;
+	*)
+		echo "${USAGE}" >&2
+		echo "${DESCRIPTION}" >&2
+		exit 1
+		;;
+esac
+
+if [ -z "${3}" ]; then
+		UREGVAL=`ethreg -i ${ETH} -p 15 0x10c | awk '{print $5}'`
+		DEGVAL=`ethreg -i ${ETH} -p 15 0x120 | awk '{print $5}'`
+		RATEVAL=$(((${DEGVAL} & 0xffff0000) / 0x10000 ))
+		if [ $((${UREGVAL} & 0x800000)) -ne $((0x800000)) -o ${RATEVAL} -eq $((0x7fff)) ]; then
+			echo "uplink: no"
+		else
+			RATEVALKBPS=$((${RATEVAL} * 32 ))
+			if [ ${RATEVALKBPS} -ge 1024 ]; then
+				echo "uplink: ${RATEVALKBPS}Kbps/$((${RATEVALKBPS} / 1024))Mbps"
+			else
+				echo "uplink: ${RATEVALKBPS}Kbps"
+			fi
+		fi
+
+		RATEVAL=$((${UREGVAL} & 0xffff))
+		if [ ${RATEVAL} -eq $((0x7fff)) ]; then
+			echo "downlink: no"
+		else
+			RATEVALKBPS=$((${RATEVAL} * 32 ))
+			if [ ${RATEVALKBPS} -ge 1024 ]; then
+				echo "downlink: ${RATEVALKBPS}Kbps/$((${RATEVALKBPS} / 1024))Mbps"
+			else
+				echo "downlink: ${RATEVALKBPS}Kbps"
+			fi
+		fi
+		exit 0
+fi
+
+if [ $# -ge 4 ]; then
+shift 2
+else
+	echo "${USAGE}" >&2
+	echo "${DESCRIPTION}" >&2
+	exit 1
+fi
+
+while [ $# -gt 1 ]; do
+	case "${1}" in
+		uplink)
+			if [ "${2}" = "no" ]; then
+				UPLINKRATE=$((0x7fff))
+			else
+				case `echo ${2}|grep -o '[a-zA-Z]'` in
+					[kK] )
+						RATEVAL=`echo ${2}|grep -o '[0-9]*'`
+						if [ -n "${RATEVAL}" ]; then
+							if [ ${RATEVAL} -ge 0 -a ${RATEVAL} -lt $M ]; then
+								UPLINKRATE=$(( ${RATEVAL} / 32 ))
+							else
+								echo "ERROR: limiting rate MUST be less than 100M" >&2
+								exit 1
+							fi
+						else
+							echo "${USAGE}" >&2
+							echo "${DESCRIPTION}" >&2
+							exit 1
+						fi
+						;;
+					[mM] )
+						RATEVAL=`echo ${2}|grep -o '[0-9]*'`
+						if [ -n "${RATEVAL}" ]; then
+							if [ ${RATEVAL} -ge 0 -a ${RATEVAL} -lt $K ]; then
+								UPLINKRATE=$(( ${RATEVAL} * 1024 / 32 ))
+							else
+								echo "ERROR: limiting rate MUST be less than 100M" >&2
+								exit 1
+							fi
+						else
+							echo "${USAGE}" >&2
+							echo "${DESCRIPTION}" >&2
+							exit 1
+						fi
+						;;
+					*) 
+						echo "${USAGE}" >&2
+						echo "${DESCRIPTION}" >&2
+						exit 1
+						;;
+				esac
+			fi
+			;;
+		downlink)
+			if [ "${2}" = "no" ]; then
+				DOWNLINKRATE=$((0x7fff))
+			else
+				case `echo ${2}|grep -o '[a-zA-Z]'` in
+					[kK] )
+						RATEVAL=`echo ${2}|grep -o '[0-9]*'`
+						if [ -n "${RATEVAL}" ]; then
+							if [ -n ${RATEVAL} -a ${RATEVAL} -ge 0 -a ${RATEVAL} -lt $M ]; then
+								DOWNLINKRATE=$(( ${RATEVAL} / 32 ))
+							else
+								echo "ERROR: limiting rate MUST be less than 100M" >&2
+								exit 1
+							fi
+						else
+							echo "${USAGE}" >&2
+							echo "${DESCRIPTION}" >&2
+							exit 1
+						fi
+						;;
+					[mM] )
+						RATEVAL=`echo ${2}|grep -o '[0-9]*'`
+						if [ -n "${RATEVAL}" ]; then
+							if [ -n ${RATEVAL} -a ${RATEVAL} -ge 0 -a ${RATEVAL} -lt $K ];then
+								DOWNLINKRATE=$(( ${RATEVAL} * 1024 / 32 ))
+							else
+								echo "ERROR: limiting rate MUST be less than 100M" >&2
+								exit 1
+							fi
+						else
+							echo "${USAGE}" >&2
+							echo "${DESCRIPTION}" >&2
+							exit 1
+						fi
+						;;
+					*) 
+						echo "${USAGE}" >&2
+						echo "${DESCRIPTION}" >&2
+						exit 1
+						;;
+				esac
+			fi
+			;;
+		*)
+			echo "${USAGE}" >&2
+			echo "${DESCRIPTION}" >&2
+			exit 1
+			;;
+	esac
+	shift 2
+done
+
+if [ ${UPLINKRATE} -ne -1 ]; then
+	OLDVAL=`ethreg -i ${ETH} -p 15 0x10c | awk '{print $5}'`
+	if [ ${UPLINKRATE} -eq $((0x7fff)) ]; then
+		NEWVAL=$(( ${OLDVAL} & 0xff7fffff ))
+	else
+		NEWVAL=$(( ${OLDVAL} | 0x00800000 ))
+	fi
+	ethreg -i ${ETH} -p 15 0x10c=${NEWVAL}
+
+	OLDVAL=`ethreg -i ${ETH} -p 15 0x120 | awk '{print $5}'`
+	NEWVAL=$(( (${UPLINKRATE} * 0x10000) + (${OLDVAL} & 0xffff) ))
+	ethreg -i ${ETH} -p 15 0x120=${NEWVAL}
+fi
+
+if [ ${DOWNLINKRATE} -ne -1 ]; then
+	OLDVAL=`ethreg -i ${ETH} -p 15 0x10c | awk '{print $5}'`
+	NEWVAL=$(( ((${OLDVAL} & 0xffff0000) | 0x00100000 ) + ${DOWNLINKRATE} ))
+	ethreg -i ${ETH} -p 15 0x10c=${NEWVAL}
+fi
+ 

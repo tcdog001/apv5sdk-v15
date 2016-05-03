@@ -1,0 +1,16 @@
+In file included from shell/mxml_iterator.c:12:
+shell/mxml.h:27: warning: function declaration isn't a prototype
+shell/mxml.h:32: warning: function declaration isn't a prototype
+shell/mxml.h:37: warning: function declaration isn't a prototype
+shell/mxml.h:64: warning: function declaration isn't a prototype
+shell/mxml.h:137: warning: function declaration isn't a prototype
+shell/mxml_iterator.c: In function 'mxml_iterator_new':
+shell/mxml_iterator.c:16: warning: implicit declaration of function 'malloc'
+shell/mxml_iterator.c:16: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_iterator.c: In function 'mxml_iterator_destroy':
+shell/mxml_iterator.c:39: warning: implicit declaration of function 'free'
+shell/mxml_iterator.c:39: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_iterator.c: In function 'mxml_iterator_clone':
+shell/mxml_iterator.c:67: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_iterator.c: In function 'mxml_iterator_scan_node':
+shell/mxml_iterator.c:211: warning: implicit declaration of function 'strcmp'

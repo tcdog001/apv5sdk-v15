@@ -1,0 +1,10 @@
+xyzModem.c: In function 'zm_flush':
+xyzModem.c:266: warning: unused variable 'p'
+xyzModem.c: In function 'xyzModem_get_hdr':
+xyzModem.c:384: warning: pointer targets in passing argument 2 of 'CYGACC_COMM_IF_GETC_TIMEOUT' differ in signedness
+xyzModem.c:390: warning: pointer targets in passing argument 2 of 'CYGACC_COMM_IF_GETC_TIMEOUT' differ in signedness
+xyzModem.c:408: warning: pointer targets in passing argument 2 of 'CYGACC_COMM_IF_GETC_TIMEOUT' differ in signedness
+xyzModem.c:415: warning: pointer targets in passing argument 2 of 'CYGACC_COMM_IF_GETC_TIMEOUT' differ in signedness
+xyzModem.c: In function 'xyzModem_stream_open':
+xyzModem.c:515: warning: pointer targets in passing argument 1 of 'parse_num' differ in signedness
+xyzModem.c:455: warning: unused variable 'console_chan'

@@ -1,0 +1,35 @@
+#!/bin/sh
+
+IWPRIV=/usr/sbin/iwpriv
+ANTENNA_FILE=/jffs/antenna
+
+#usage()
+#usage
+usage()
+{
+    echo "usage:"
+    echo "          setantenna350 ath.[m]-[n] antenna [0/1/none]"
+    echo "                                        0: inside 1:outside none:read from file"
+    exit 1
+}
+
+if [ $# != 3 ];then
+	usage
+fi
+
+WLANNAME=$1
+WIFI_ID="`echo ${WLANNAME} | awk -F '[.-]' '{print $2}'`"
+
+if [ "$3" == "none" ]; then
+	if [ -f ${ANTENNA_FILE}${WIFI_ID} ];then
+		ANTENNA="`cat ${ANTENNA_FILE}${WIFI_ID}`"
+	else
+		ANTENNA=0
+	fi
+else
+	ANTENNA=$3
+fi
+
+echo ${ANTENNA} > ${ANTENNA_FILE}${WIFI_ID}
+${IWPRIV} ${WLANNAME} antenna ${ANTENNA}
+

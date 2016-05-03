@@ -1,0 +1,686 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			coqos_add.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='copytoken.c.html' title=' copytoken.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='coqos_info.c.html' title=' coqos_info.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   coqos_add.c - Add MCMSA Stream
+ *
+ *   this program sends and receives raw ethernet frames and so needs
+ *   root priviledges; if you install it using &quot;chmod 555&quot; and &quot;chown 
+ *   root:root&quot; then you must login as root to run it; otherwise, you 
+ *   can install it using &quot;chmod 4555&quot; and &quot;chown root:root&quot; so that 
+ *   anyone can run it; the program will refuse to run until you get
+ *   things right;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Bill Wike &lt;bill.wike@intellon.com&gt;
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *      Abdel Younes &lt;younes@leacom.fr&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*&quot;
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;limits.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/symbol.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../coqos/coqos.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/basespec.c&quot;
+#include &quot;../tools/uintspec.c&quot;
+#include &quot;../tools/hexdump.c&quot;
+#include &quot;../tools/hexencode.c&quot;
+#include &quot;../tools/bytespec.c&quot;
+#include &quot;../tools/ipv4spec.c&quot;
+#include &quot;../tools/ipv6spec.c&quot;
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/typename.c&quot;
+#include &quot;../tools/endian.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/synonym.c&quot;
+#include &quot;../tools/lookup.c&quot;
+#include &quot;../tools/assist.c&quot;
+#include &quot;../tools/expect.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../int6k/Request.c&quot;
+#include &quot;../int6k/Confirm.c&quot;
+#include &quot;../int6k/Failure.c&quot;
+#include &quot;../int6k/Display.c&quot;
+#include &quot;../int6k/ReadMME.c&quot;
+#include &quot;../int6k/SendMME.c&quot;
+#include &quot;../int6k/devices.c&quot;
+#include &quot;../int6k/EthernetHeader.c&quot;
+#include &quot;../int6k/IntellonHeader.c&quot;
+#include &quot;../int6k/UnwantedPacket.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ether/channel.c&quot;
+#include &quot;../ether/openchannel.c&quot;
+#include &quot;../ether/closechannel.c&quot;
+#include &quot;../ether/readpacket.c&quot;
+#include &quot;../ether/sendpacket.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../mme/MMECode.c&quot;
+#endif
+
+/*====================================================================*
+ *   constants;    
+ *--------------------------------------------------------------------*/
+
+#define CONTROLS 2
+#define VOLATILITIES 2
+#define ACTIONS 4
+#define OPERANDS 2
+#define OPERATORS 2
+#define FIELDS 21
+
+#define CONTROL &quot;control&quot;
+#if 0
+#define VOLATILITY &quot;volatility&quot;
+#endif
+#define ACTION &quot;action&quot;
+#define OPERAND &quot;operand&quot;
+#define FIELD &quot;field&quot;
+#define OPERATOR &quot;operator&quot;
+
+/*====================================================================*
+ *   program variables;
+ *--------------------------------------------------------------------*/
+
+#define CONTROL_ADD 0x00
+#define CONTROL_REM 0x01
+
+static struct _code_ controls [CONTROLS] = 
+
+{
+	{
+		CONTROL_ADD,
+		&quot;Add&quot; 
+	},
+	{
+		CONTROL_REM,
+		&quot;Rem&quot; 
+	}
+};
+
+#if 0
+#define VOLATILITY_TEMP 0x00
+#define VOLATILITY_PERM 0x01
+
+static struct _code_ volatilities [VOLATILITIES] = 
+
+{
+	{
+		VOLATILITY_TEMP,
+		&quot;Temp&quot; 
+	},
+	{
+		VOLATILITY_PERM,
+		&quot;Perm&quot; 
+	}
+};
+#endif
+
+#define ACTION_CAP0 0x00
+#define ACTION_CAP1 0x01
+#define ACTION_CAP2 0x02
+#define ACTION_CAP3 0x03
+
+static struct _code_ actions [ACTIONS] = 
+
+{
+	{
+		ACTION_CAP0,
+		&quot;CAP0&quot; 
+	},
+	{
+		ACTION_CAP1,
+		&quot;CAP1&quot; 
+	},
+	{
+		ACTION_CAP2,
+		&quot;CAP2&quot; 
+	},
+	{
+		ACTION_CAP3,
+		&quot;CAP3&quot; 
+	},
+};
+
+#define OPERAND_ALL 0x00
+#define OPERAND_ANY 0x01
+
+static struct _code_ operands [OPERANDS] = 
+
+{
+	{
+		OPERAND_ALL,
+		&quot;All&quot; 
+	},
+	{
+		OPERAND_ANY,
+		&quot;Any&quot; 
+	}
+};
+
+#define FIELD_ETH_DA 0x00
+#define FIELD_ETH_SA 0x01
+#define FIELD_VLAN_UP 0x02
+#define FIELD_VLAN_ID 0x03
+#define FIELD_IPV4_TOS 0x04
+#define FIELD_IPV4_PROT 0x05
+#define FIELD_IPV4_SA 0x06
+#define FIELD_IPV4_DA 0x07
+#define FIELD_IPV6_TC 0x08
+#define FIELD_IPV6_FL 0x09
+#define FIELD_IPV6_SA 0x0A
+#define FIELD_IPV6_DA 0x0B
+#define FIELD_TCP_SP 0x0C
+#define FIELD_TCP_DP 0x0D
+#define FIELD_UDP_SP 0x0E
+#define FIELD_UDP_DP 0x0F
+#define FIELD_IP_SP 0xE0
+#define FIELD_IP_DP 0xE1
+#define FIELD_HPAV_MME 0xE2
+#define FIELD_ETH_TYPE 0xE3
+#define FIELD_TCP_ACK 0xE4
+
+static struct _code_ fields [FIELDS] = 
+
+{
+	{
+		FIELD_ETH_DA,
+		&quot;EthDA&quot; 
+	},
+	{
+		FIELD_ETH_SA,
+		&quot;EthSA&quot; 
+	},
+	{
+		FIELD_VLAN_UP,
+		&quot;VLANUP&quot; 
+	},
+	{
+		FIELD_VLAN_ID,
+		&quot;VLANID&quot; 
+	},
+	{
+		FIELD_IPV4_TOS,
+		&quot;IPv4TOS&quot; 
+	},
+	{
+		FIELD_IPV4_PROT,
+		&quot;IPv4PROT&quot; 
+	},
+	{
+		FIELD_IPV4_SA,
+		&quot;IPv4SA&quot; 
+	},
+	{
+		FIELD_IPV4_DA,
+		&quot;IPv4DA&quot; 
+	},
+	{
+		FIELD_IPV6_TC,
+		&quot;IPv6TC&quot; 
+	},
+	{
+		FIELD_IPV6_FL,
+		&quot;IPv6FL&quot; 
+	},
+	{
+		FIELD_IPV6_SA,
+		&quot;IPv6SA&quot; 
+	},
+	{
+		FIELD_IPV6_DA,
+		&quot;IPv6DA&quot; 
+	},
+	{
+		FIELD_TCP_SP,
+		&quot;TCPSP&quot; 
+	},
+	{
+		FIELD_TCP_DP,
+		&quot;TCPDP&quot; 
+	},
+	{
+		FIELD_UDP_SP,
+		&quot;UDPSP&quot; 
+	},
+	{
+		FIELD_UDP_DP,
+		&quot;UDPDP&quot; 
+	},
+	{
+		FIELD_IP_SP,
+		&quot;IPSP&quot; 
+	},
+	{
+		FIELD_IP_DP,
+		&quot;IPDP&quot; 
+	},
+	{
+		FIELD_HPAV_MME,
+		&quot;MME&quot; 
+	},
+	{
+		FIELD_ETH_TYPE,
+		&quot;ET&quot; 
+	},
+	{
+		FIELD_TCP_ACK,
+		&quot;TCPACK&quot; 
+	}
+};
+
+#define OPERATOR_IS 0x00
+#define OPERATOR_NOT 0x01
+
+static struct _code_ operators [OPERATORS] = 
+
+{
+	{
+		OPERATOR_IS,
+		&quot;Is&quot; 
+	},
+	{
+		OPERATOR_NOT,
+		&quot;Not&quot; 
+	}
+};
+
+/*====================================================================*
+ *
+ *   signed add_conn (struct int6k * int6k, struct connection * connection);
+ *
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Bill Wike &lt;bill.wike@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed add_conn (struct int6k * int6k, struct connection * connection) 
+
+{
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_add_conn_req 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		struct connection connection;
+	}
+	* request = (struct vs_add_conn_req *)(int6k-&gt;message);
+	struct __packed vs_add_conn_cnf 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint32_t REQ_ID;
+		uint8_t MSTATUS;
+		uint16_t ERR_REC_CODE;
+		uint32_t RSVD;
+		uint16_t CID;
+		uint8_t REJECT_MAC [ETHER_ADDR_LEN];
+		uint16_t CSPEC_VERSION;
+		uint8_t CONN_CAP;
+		uint8_t CONN_COQOS_PRIO;
+		uint16_t CONN_RATE;
+		uint32_t CONN_TTL;
+	}
+	* confirm = (struct vs_add_conn_cnf *)(int6k-&gt;message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	Request (int6k, &quot;Add COQOS connection&quot;);
+	memset (int6k-&gt;message, 0, sizeof (struct message));
+	EthernetHeader (&amp;int6k-&gt;message-&gt;ethernet, int6k-&gt;channel-&gt;peer, int6k-&gt;channel-&gt;host);
+	IntellonHeader (&amp;int6k-&gt;message-&gt;intellon, (VS_ADD_CONN | MMTYPE_REQ));
+	memcpy (&amp;request-&gt;connection, connection, sizeof (struct connection));
+	memcpy (&amp;request-&gt;connection.rules.CLASSIFIERS [request-&gt;connection.rules.NUM_CLASSIFIERS], &amp;request-&gt;connection.cspec, sizeof (request-&gt;connection.cspec));
+	int6k-&gt;packetsize = sizeof (struct vs_add_conn_req);
+	if (SendMME (int6k) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, INT6K_CANTSEND);
+		return (-1);
+	}
+	while (ReadMME (int6k, (VS_ADD_CONN | MMTYPE_CNF)) &lt;= 0) 
+	{
+		if (confirm-&gt;MSTATUS) 
+		{
+			Failure (int6k, &quot;Device won't add connection&quot;);
+			return (-1);
+		}
+		Confirm (int6k, &quot;Setting ...&quot;);
+	}
+	return (0);
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char * argv[]);
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	extern struct channel channel;
+	extern const struct _term_ devices [];
+	static const char *optv [] = 
+	{
+		&quot;ei:qv&quot;,
+		&quot;action priority destination rate ttl operand condition [...] [device] [...]\n\n          where condition is field operator value&quot;,
+		&quot;CoQos Stream Utility&quot;,
+		&quot;e\tredirect stderr messages to stdout&quot;,
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		&quot;i n\thost interface number [2]&quot;,
+
+#else
+
+		&quot;i s\thost interface name [&quot; CHANNEL_ETHDEVICE &quot;]&quot;,
+
+#endif
+
+		&quot;q\tquiet - suppress routine messages&quot;,
+		&quot;v\tverbose messages&quot;,
+		(const char *) (0) 
+	};
+
+#include &quot;../int6k/int6k-struct.c&quot;
+
+	struct connection connection;
+	struct rule * rule = (struct rule *)(&amp;connection.rules.CLASSIFIERS);
+	uint16_t * word;
+	uint8_t * byte;
+	signed code;
+	signed c;
+	if (getenv (PLCDEVICE)) 
+	{
+#if defined (WINPCAP) || defined (LIBPCAP)
+		channel.id = atoi (getenv (PLCDEVICE));
+#else
+		channel.name = strdup (getenv (PLCDEVICE));
+#endif
+	}
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'e':
+			dup2 (STDOUT_FILENO, STDERR_FILENO);
+			break;
+		case 'i':
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+			channel.id = atoi (optarg);
+
+#else
+
+			channel.name = optarg;
+
+#endif
+
+			break;
+		case 'q':
+			_setbits (channel.flags, CHANNEL_SILENCE);
+			_setbits (int6k.flags, INT6K_SILENCE);
+			break;
+		case 'v':
+			_setbits (channel.flags, CHANNEL_VERBOSE);
+			_setbits (int6k.flags, INT6K_VERBOSE);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+
+#ifndef WIN32
+
+/*
+ *      raw packets require root priviledges on linux; one does not have to be
+ *      root when this program is installed setuid using 'chown root:root' and 
+ *      'chmod 4555';
+ */
+
+	if (geteuid ()) 
+	{
+		error (1, EPERM, INT6K_NEEDROOT);
+	}
+
+#endif
+
+	memset (&amp;connection, 0, sizeof (connection));
+	if ((code = lookup (*argv++, actions, ACTIONS)) == -1) 
+	{
+		assist (*--argv, ACTION, actions, ACTIONS, stderr);
+	}
+	connection.cspec.CONN_CAP = (uint8_t)(code);
+	argc--;
+	if (!argc) 
+	{
+		error (1, ECANCELED, &quot;Expected Priority: 0-15&quot;);
+	}
+	connection.cspec.CONN_COQOS_PRIO = (uint8_t)(uintspec (*argv++, 0, 15));
+	argc--;
+	if (!argc) 
+	{
+		error (1, ECANCELED, &quot;Expected Destination MAC Address&quot;);
+	}
+	if (!hexencode (connection.APP_DA, sizeof (connection.APP_DA), synonym (*argv++, devices, DEVICES))) 
+	{
+		error (1, errno, &quot;Invalid MAC=[%s]&quot;, *--argv);
+	}
+	argc--;
+	if (!argc) 
+	{
+		error (1, ECANCELED, &quot;Expected Data Rate: 10-9000 (kbps)&quot;);
+	}
+	connection.cspec.CONN_RATE = (uint16_t)(uintspec (*argv++, 1, 9000));
+	argc--;
+	if (!argc) 
+	{
+		error (1, ECANCELED, &quot;Expected TTL: 10000-2000000 (microseconds)&quot;);
+	}
+	connection.cspec.CONN_TTL = (uint32_t)(uintspec (*argv++, 10000, 2000000));
+	argc--;
+	if ((code = lookup (*argv++, operands, OPERANDS)) == -1) 
+	{
+		assist (*--argv, OPERAND, operands, OPERANDS, stderr);
+	}
+	connection.rules.MOPERAND = (uint8_t)(code);
+	argc--;
+	while ((*argv) &amp;&amp; (lookup (*argv, controls, CONTROLS) == -1)) 
+	{
+		if ((code = lookup (*argv++, fields, FIELDS)) == -1) 
+		{
+			assist (*--argv, FIELD, fields, FIELDS, stderr);
+		}
+		rule-&gt;CR_ID = (uint8_t)(code);
+		argc--;
+		if ((code = lookup (*argv++, operators, OPERATORS)) == -1) 
+		{
+			assist (*--argv, OPERATOR, operators, OPERATORS, stderr);
+		}
+		rule-&gt;CR_OPERAND = (uint8_t)(code);
+		argc--;
+		if (!argc || !*argv) 
+		{
+			error (1, ENOTSUP, &quot;Have %s '%s' without any value&quot;, OPERATOR, *--argv);
+		}
+		switch (rule-&gt;CR_ID) 
+		{
+		case FIELD_ETH_SA:
+		case FIELD_ETH_DA:
+			bytespec (*argv++, rule-&gt;CR_VALUE, ETHER_ADDR_LEN);
+			break;
+		case FIELD_IPV4_SA:
+		case FIELD_IPV4_DA:
+			ipv4spec (*argv++, rule-&gt;CR_VALUE);
+			break;
+		case FIELD_IPV6_SA:
+		case FIELD_IPV6_DA:
+			ipv6spec (*argv++, rule-&gt;CR_VALUE);
+			break;
+		case FIELD_VLAN_UP:
+		case FIELD_IPV4_TOS:
+		case FIELD_IPV4_PROT:
+			byte = (uint8_t *)(rule-&gt;CR_VALUE);
+			*byte = (uint8_t)(basespec (*argv++, 0, sizeof (uint8_t)));
+			break;
+		case FIELD_VLAN_ID:
+		case FIELD_TCP_SP:
+		case FIELD_TCP_DP:
+		case FIELD_UDP_SP:
+		case FIELD_UDP_DP:
+		case FIELD_IP_SP:
+		case FIELD_IP_DP:
+			word = (uint16_t *)(rule-&gt;CR_VALUE);
+			*word = (uint16_t)(basespec (*argv++, 0, sizeof (uint16_t)));
+			*word = htons (*word);
+			break;
+		case FIELD_ETH_TYPE:
+			word = (uint16_t *)(rule-&gt;CR_VALUE);
+			*word = (uint16_t)(basespec (*argv++, 0, sizeof (uint16_t)));
+			*word = HTOLE16 (*word);
+			break;
+		case FIELD_HPAV_MME:
+			bytespec (*argv++, rule-&gt;CR_VALUE, sizeof (uint8_t) + sizeof (uint16_t));
+			byte = (uint8_t *)(rule-&gt;CR_VALUE);
+			endian (++byte, sizeof (uint16_t));
+			break;
+		case FIELD_IPV6_TC:
+		case FIELD_IPV6_FL:
+		case FIELD_TCP_ACK:
+		default:
+			error (1, ENOTSUP, &quot;Field '%s' (0x%02X)&quot;, argv [-2], rule-&gt;CR_ID);
+			break;
+		}
+		connection.rules.NUM_CLASSIFIERS++;
+		if (connection.rules.NUM_CLASSIFIERS &gt; 3) 
+		{
+			error (1, ENOTSUP, &quot;Too many classification rules (3 max)&quot;);
+		}
+		rule++;
+		argc--;
+	}
+	connection.cspec.CSPEC_VERSION = 0x0001;
+	openchannel (&amp;channel);
+	if (!(int6k.message = malloc (sizeof (struct message)))) 
+	{
+		error (1, errno, INT6K_ERR_MEMORY);
+	}
+	if (!argc) 
+	{
+		add_conn (&amp;int6k, &amp;connection);
+	}
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		if (!hexencode (channel.peer, sizeof (channel.peer), synonym (*argv, devices, DEVICES))) 
+		{
+			error (1, errno, INT6K_BAD_MAC, *argv);
+		}
+		add_conn (&amp;int6k, &amp;connection);
+		argc--;
+		argv++;
+	}
+	free (int6k.message);
+	closechannel (&amp;channel);
+	exit (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='copytoken.c.html' title=' copytoken.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='coqos_info.c.html' title=' coqos_info.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

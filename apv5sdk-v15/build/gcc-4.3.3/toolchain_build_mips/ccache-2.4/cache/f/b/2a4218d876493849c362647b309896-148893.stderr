@@ -1,0 +1,6 @@
+ntpclient.c: In function 'check_source':
+ntpclient.c:213: warning: cast increases required alignment of target type
+ntpclient.c: At top level:
+ntpclient.c:337: warning: function declaration isn't a prototype
+ntpclient.c: In function 'primary_loop':
+ntpclient.c:427: warning: pointer targets in passing argument 6 of 'recvfrom' differ in signedness

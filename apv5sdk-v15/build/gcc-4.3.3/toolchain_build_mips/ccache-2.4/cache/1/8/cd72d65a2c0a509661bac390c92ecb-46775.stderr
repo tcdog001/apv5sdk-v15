@@ -1,0 +1,4 @@
+LzmaWrapper.c: In function 'lzma_inflate':
+LzmaWrapper.c:149: warning: comparison between pointer and integer
+LzmaWrapper.c: At top level:
+LzmaWrapper.c:46: warning: 'dpos' defined but not used

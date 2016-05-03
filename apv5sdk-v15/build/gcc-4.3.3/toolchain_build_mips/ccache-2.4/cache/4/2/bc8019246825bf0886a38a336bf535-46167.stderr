@@ -1,0 +1,18 @@
+upgrade.c: In function 'part_osenv_read':
+upgrade.c:24: warning: implicit declaration of function 'partool_show_byname_api'
+upgrade.c:26: warning: implicit declaration of function 'partool_clean'
+upgrade.c: In function 'part_osenv_write':
+upgrade.c:40: warning: implicit declaration of function 'partool_new'
+upgrade.c: At top level:
+upgrade.c:49: warning: function declaration isn't a prototype
+upgrade.c:75: warning: function declaration isn't a prototype
+upgrade.c: In function 'start_newsystem':
+upgrade.c:80: warning: pointer targets in passing argument 1 of 'strcmp' differ in signedness
+upgrade.c:83: warning: pointer targets in passing argument 1 of 'strcmp' differ in signedness
+upgrade.c:94: warning: pointer targets in passing argument 1 of 'strcmp' differ in signedness
+upgrade.c:94: warning: pointer targets in passing argument 1 of 'strcmp' differ in signedness
+upgrade.c:94: warning: pointer targets in passing argument 1 of 'strcmp' differ in signedness
+upgrade.c:98: warning: pointer targets in passing argument 2 of 'part_osenv_write' differ in signedness
+upgrade.c:112: warning: pointer targets in passing argument 1 of 'strcmp' differ in signedness
+upgrade.c: In function 'crc_flash':
+upgrade.c:158: warning: 'return' with a value, in function returning void

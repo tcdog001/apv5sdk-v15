@@ -1,0 +1,41 @@
+#!/bin/sh
+
+if [ -z $1 ]; then
+	logger -s "$0 [netboot]"
+	exit 1
+fi
+
+sync
+/bin/sleep 1
+echo "*** Unmounting existing file systems"
+/bin/umount /oldroot/dev/pts
+/bin/umount /oldroot/proc
+#/bin/umount /oldroot/etc
+#/bin/umount /oldroot/var
+/bin/umount -l /oldroot/
+
+echo "*** Erasing / Copying kernel image to flash (/dev/mtd4)"
+#flashcp vmlinux.gz.uImage /dev/mtd4
+dd if=vmlinux.gz.uImage of=/dev/mtdblock4
+if [ $? -ne 0 ];
+then
+	logger -s "ERROR: failed to copy kernel image"
+	rm -f $FIRMWARE_FILE
+        /usr/bin/led-op 1
+	exit 3
+fi
+
+echo "*** Erasing / Copying rootfs image to flash (/dev/mtd5)"
+#flashcp rootfs.squashfs /dev/mtd5
+dd if=rootfs.squashfs of=/dev/mtdblock5
+if [ $? -ne 0 ];
+then
+	logger -s "ERROR: failed to copy rootfs image"
+	rm -f $FIRMWARE_FILE
+        /usr/bin/led-op 1
+	exit 4
+fi
+
+/bin/sleep 1
+echo i > /proc/kes_debug_flag
+/sbin/reboot

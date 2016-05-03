@@ -1,0 +1,27 @@
+#!/bin/sh
+
+MD5_FILE=/jffs/checksum
+MD5SUM=/usr/bin/md5sum
+CONFIG_FILE=/jffs/config.xml
+
+#if [ -f ${MD5_FILE} ];then
+#	val_org=`cat ${MD5_FILE}`
+#	val_now=`${MD5SUM} ${CONFIG_FILE} | awk '{print $1}'`
+#	if [ ! "${val_org}" == "${val_now}" ];then
+#	exit 1	
+#	fi
+#fi
+
+. /usr/lib/web/constant.sh                                              
+. /usr/lib/web/xmlconf.sh                                               
+config_info=`config_read /config/system`
+config_workmode=`config_getoption "${config_info}" workmode` 
+config_info=`config_read /config/network/lan`
+config_ipaddr=`config_getoption "${config_info}" ipaddr`
+
+if [ -z "${config_workmode}" ] || [ -z "${config_ipaddr}" ];then
+	exit 1
+fi
+ 
+
+ 

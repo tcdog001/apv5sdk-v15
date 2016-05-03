@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo 1 > /proc/sys/dev/wifi0/stop_transmit
+sleep 10
+echo 0 > /proc/sys/dev/wifi0/stop_transmit

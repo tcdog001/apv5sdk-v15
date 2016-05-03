@@ -1,0 +1,288 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_config=`config_read /config/system`
+xml_time_timezone=`config_getoption "$xml_config" timezone`
+xml_timeupdate=`config_getoption "$xml_config" timeupdate`
+xml_time_usedefault=`config_getoption "$xml_config" timeserver_usedefault`
+xml_time_timeserverdefault=`config_getoption "$xml_config" timeserverdefault`
+xml_time_timeserver1=`config_getoption "$xml_config" timeserver1`
+xml_time_timeserver2=`config_getoption "$xml_config" timeserver2`
+sys_currenttime=`sys_get_currenttime`
+
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js basic_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+    function Ip() {
+    var reg = /^(\d{1,2}|1\d\d|2[0-1]\d|2[0-2][0-3])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+    var x = document.all.timeserver1;
+    var y = document.all.timeserver2;    
+        
+		if(document.all.usedefault[1].checked == true){
+			  if(x.value == ""){
+		      alert(alert_ntp_server1_null);
+		      x.focus(); 
+		      return false;
+		    }      
+		
+      
+		    if (!reg.test(x.value)&&x.value!="") {
+				     alert(alert_ntp_server1_error);
+				     x.focus();
+				     return false;
+			  }
+			  
+			  if (!reg.test(y.value)&&y.value!="") {
+				     alert(alert_ntp_server2_error);
+				     y.focus();
+				     return false;
+			  }
+	  }	  	 
+	  overlayer();	 
+}
+
+function shielding(){
+   if(document.all.usedefault[0].checked == true){      
+	  document.getElementById("a1").style.display="none";
+	  document.getElementById("a2").style.display="none";
+	  }
+	else if(document.all.usedefault[1].checked == true){
+	  document.getElementById("a1").style.display="";
+	  document.getElementById("a2").style.display="";
+	  document.all.timeserver1.focus(); 
+	  }
+    
+}
+
+</script>
+</head>
+<body onload="shielding()">
+	<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_basicsetup2.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+<tr>
+<td align="center"  bordercolor="white">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return Ip()">
+<div align="center">
+		<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+			<tr>
+			<td width="100%"  colspan="2" height="22" width="650" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(ntp_tz)</script></b></td>
+			</tr>
+			
+			<tr >
+          <td colspan="2" height="10" > 
+          </td>
+      </tr>
+			
+			<tr>
+			<td  height="24" bordercolor="#ffffff"><script language="javascript">replace(ntp_time)</script></td>
+			<td  bordercolor="#ffffff">
+			<select name="timezone">
+			<option value="UTC12" <% webui_listbox_select "$xml_time_timezone" "UTC12" %>>
+			UTC-12:00 Kwajalein</option>
+			<option value="UTC11" <% webui_listbox_select "$xml_time_timezone" "UTC11" %>>
+			UTC-11:00 Midway Island, Samoa</option>
+			<option value="UTC10" <% webui_listbox_select "$xml_time_timezone" "UTC10" %>>
+			UTC-10:00 Hawaii</option>
+			<option value="NAST9NADT,M3.2.0/2,M11.1.0/2" <% webui_listbox_select "$xml_time_timezone" "NAST9NADT,M3.2.0/2,M11.1.0/2" %>>
+			UTC-09:00 Alaska</option>
+			<option value="PST8PDT,M3.2.0/2,M11.1.0/2" <% webui_listbox_select "$xml_time_timezone" "PST8PDT,M3.2.0/2,M11.1.0/2" %>>
+			UTC-08:00 Pacific Time</option>
+			<option value="UTC7" <% webui_listbox_select "$xml_time_timezone" "UTC7" %>>
+			UTC-07:00 Arizona</option>
+			<option value="MST7MDT,M3.2.0/2,M11.1.0/2" <% webui_listbox_select "$xml_time_timezone" "MST7MDT,M3.2.0/2,M11.1.0/2" %>>
+			UTC-07:00 Mountain Time</option>
+			<option value="UTC6" <% webui_listbox_select "$xml_time_timezone" "UTC6" %>>
+			UTC-06:00 Mexico</option>
+			<option value="CST6CDT,M3.2.0/2,M11.1.0/2" <% webui_listbox_select "$xml_time_timezone" "CST6CDT,M3.2.0/2,M11.1.0/2" %>>
+			UTC-06:00 Central Time</option>
+			<option value="UTC5" <% webui_listbox_select "$xml_time_timezone" "UTC5" %>>
+			UTC-05:00 Colombia, Panama</option>
+			<option value="EST5EDT,M3.2.0/2,M11.1.0/2" <% webui_listbox_select "$xml_time_timezone" "EST5EDT,M3.2.0/2,M11.1.0/2" %>>
+			UTC-05:00 Eastern Time</option>
+			<option value="VET4:30" <% webui_listbox_select "$xml_time_timezone" "VET4:30" %>>
+			UTC-04:30 Venezuela</option>
+			<option value="BOT4" <% webui_listbox_select "$xml_time_timezone" "BOT4" %>>
+			UTC-04:00 Bolivia</option>
+			<option value="AST4ADT,M3.2.0/2,M11.1.0/2" <% webui_listbox_select "$xml_time_timezone" "AST4ADT,M3.2.0/2,M11.1.0/2" %>>
+			UTC-04:00 Atlantic Time</option>
+			<option value="BRWST4BRWDT,M10.3.0/0,M2.5.0/0" <% webui_listbox_select "$xml_time_timezone" "BRWST4BRWDT,M10.3.0/0,M2.5.0/0" %>>
+			UTC-04:00 Brazil West</option>
+			<option value="NST3:30NDT,M3.2.0/0:01,M11.1.0/0:01" <% webui_listbox_select "$xml_time_timezone" "NST3:30NDT,M3.2.0/0:01,M11.1.0/0:01" %>>
+			UTC-03:30 Newfoundland</option>
+			<option value="WGST3WGDT,M3.5.6/22,M10.5.6/23" <% webui_listbox_select "$xml_time_timezone" "WGST3WGDT,M3.5.6/22,M10.5.6/23" %>>
+			UTC-03:00 Greenland</option>
+			<option value="BRST3BRDT,M10.3.0/0,M2.5.0/0" <% webui_listbox_select "$xml_time_timezone" "BRST3BRDT,M10.3.0/0,M2.5.0/0" %>>
+			UTC-03:00 Brazil East</option>
+			<option value="UTC3" <% webui_listbox_select "$xml_time_timezone" "UTC3" %>>
+			UTC-03:00 Guyana</option>
+			<option value="UTC2" <% webui_listbox_select "$xml_time_timezone" "UTC2" %>>
+			UTC-02:00 Mid-Atlantic</option>
+			<option value="STD1DST,M3.5.0/2,M10.5.0/2" <% webui_listbox_select "$xml_time_timezone" "STD1DST,M3.5.0/2,M10.5.0/2" %>>
+			UTC-01:00 Azores</option>
+			<option value="UTC0" <% webui_listbox_select "$xml_time_timezone" "UTC0" %>>
+			UTC+00:00 Gambia, Liberia, Morocco</option>
+			<option value="GMT0BST,M3.5.0/2,M10.5.0/2" <% webui_listbox_select "$xml_time_timezone" "GMT0BST,M3.5.0/2,M10.5.0/2" %>>
+			UTC+00:00 England</option>
+			<option value="UTC-1" <% webui_listbox_select "$xml_time_timezone" "UTC-1" %>>
+			UTC+01:00 Tunisia</option>
+			<option value="CET-1CEST,M3.5.0/2,M10.5.0/3" <% webui_listbox_select "$xml_time_timezone" "CET-1CEST,M3.5.0/2,M10.5.0/3" %>>
+			UTC+01:00 France, Germany, Italy, Poland, Sweden</option>
+			<option value="UTC-2" <% webui_listbox_select "$xml_time_timezone" "UTC-2" %>>
+			UTC+02:00 South Africa</option>
+			<option value="STD-2DST,M3.5.0/2,M10.5.0/2" <% webui_listbox_select "$xml_time_timezone" "STD-2DST,M3.5.0/2,M10.5.0/2" %>>
+			UTC+02:00 Greece, Ukraine, Romania, Turkey, Latvia</option>
+			<option value="UTC-3" <% webui_listbox_select "$xml_time_timezone" "UTC-3" %>>
+			UTC+03:00 Iraq, Jordan, Kuwait</option>
+			<option value="EET-2EEST-3,M3.5.0/3,M10.5.0/4" <% webui_listbox_select "$xml_time_timezone" "EET-2EEST-3,M3.5.0/3,M10.5.0/4" %>>
+			UTC+03:00 Finland</option>
+			<option value="UTC-4" <% webui_listbox_select "$xml_time_timezone" "UTC-4" %>>
+			UTC+04:00 Armenia</option>
+			<option value="UTC-5" <% webui_listbox_select "$xml_time_timezone" "UTC-5" %>>
+			UTC+05:00 Pakistan, Russia</option>
+			<option value="UTC-5:30" <% webui_listbox_select "$xml_time_timezone" "UTC-5:30" %>>
+			UTC+05:30 Bombay, Calcutta, Madras, New Delhi</option>
+			<option value="UTC-6" <% webui_listbox_select "$xml_time_timezone" "UTC-6" %>>
+			UTC+06:00 Bangladesh, Russia</option>
+			<option value="UTC-7" <% webui_listbox_select "$xml_time_timezone" "UTC-7" %>>
+			UTC+07:00 Thailand, Russia</option>
+			<option value="UTC-8" <% webui_listbox_select "$xml_time_timezone" "UTC-8" %>>
+			UTC+08:00 China, Hong Kong, Western Australia, Singapore, Taiwan, Russia</option>
+			<option value="UTC-9" <% webui_listbox_select "$xml_time_timezone" "UTC-9" %>>
+			UTC+09:00 Japan, Korea</option>
+			<option value="ACST-9:30ACDT,M10.1.0/2,M4.1.0/3" <% webui_listbox_select "$xml_time_timezone" "ACST-9:30ACDT,M10.1.0/2,M4.1.0/3" %>>
+			UTC+09:30 South Australia</option>
+			<option value="UTC-10" <% webui_listbox_select "$xml_time_timezone" "UTC-10" %>>
+			UTC+10:00 Guam, Russia</option>
+			<option value="STD-10DST,M10.5.0/2,M3.5.0/2" <% webui_listbox_select "$xml_time_timezone" "STD-10DST,M10.5.0/2,M3.5.0/2" %>>
+			UTC+10:00 Australia</option>
+			<option value="UTC-11" <% webui_listbox_select "$xml_time_timezone" "UTC-11" %>>
+			UTC+11:00 Solomon Islands</option>
+			<option value="UTC-12" <% webui_listbox_select "$xml_time_timezone" "UTC-12" %>>
+			UTC+12:00 Fiji</option>
+			<option value="NZST-12NZDT,M9.5.0/2,M4.1.0/3" <% webui_listbox_select "$xml_time_timezone" "NZST-12NZDT,M9.5.0/2,M4.1.0/3" %>>
+			UTC+12:00 New Zealand</option>
+			</select>
+			</td>
+			</tr>
+			
+			<tr >
+          <td colspan="2" height="10" > 
+          </td>
+      </tr>
+			
+			<tr>
+			<td height="24" bordercolor="#ffffff" ><script language="javascript">replace(ntp_update)</script></td>
+			<td  bordercolor="#ffffff">
+			<select name="update">
+			<option value="-1" <% webui_listbox_select "$xml_timeupdate" "-1" %>>
+			Never</option>
+			<option value="0" <% webui_listbox_select "$xml_timeupdate" "0" %>>
+			Only at startup</option>
+			<option value="1" <% webui_listbox_select "$xml_timeupdate" "1" %>>
+			Every hour</option>
+			<option value="2" <% webui_listbox_select "$xml_timeupdate" "2" %>>
+			Every 2 hour</option>
+			<option value="4" <% webui_listbox_select "$xml_timeupdate" "4" %>>
+			Every 4 hour</option>
+			<option value="6" <% webui_listbox_select "$xml_timeupdate" "6" %>>
+			Every 6 hour</option>
+			<option value="8" <% webui_listbox_select "$xml_timeupdate" "8" %>>
+			Every 8 hour</option>
+			<option value="12" <% webui_listbox_select "$xml_timeupdate" "12" %>>
+			Every 12 hour</option>
+			<option value="24" <% webui_listbox_select "$xml_timeupdate" "24" %>>
+			Every 24 hour</option>
+			</select>
+			</td>
+			</tr>
+			
+			<tr >
+          <td colspan="2" height="10" > 
+          </td>
+      </tr>
+      
+      <tr >
+          <td colspan="2" height="10" > 
+          </td>
+      </tr>
+			
+			<tr>
+			<td colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(ntp_ts)</script></b></td>
+			</tr>
+			
+			
+			<tr>
+			<td colspan="2" bordercolor="#ffffff" height="24">
+			<input type="radio" <% webui_radiobutton_check "$xml_time_usedefault" "yes" %> name="usedefault" value="yes" onclick="shielding();" ><script language="javascript">replace(ntp_defs)</script> (<%= "$xml_time_timeserverdefault" %>)</td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" bordercolor="#ffffff" height="24">
+			<input type="radio" <% webui_radiobutton_check "$xml_time_usedefault" "no" %> name="usedefault" value="no" onclick="shielding();"><script language="javascript">replace(ntp_cuss)</script></td>
+			</tr>
+
+			<tr id="a1" >
+			<td colspan="2" bordercolor="#ffffff" height="24">
+			<script language="javascript">replace(ntp_s1)</script>&nbsp;<input type="text" name="timeserver1" id="timeserver1" value="<%= "$xml_time_timeserver1" %>"  ></td>
+			</tr>
+
+			<tr id="a2">
+			<td colspan="2" bordercolor="#ffffff" height="24">
+			<script language="javascript">replace(ntp_s2)</script>&nbsp;<input type="text" name="timeserver2" id="timeserver2" value="<%= "$xml_time_timeserver2" %>"  ></td>
+			</tr>
+      
+      <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+      
+			<tr>
+			<td colspan="2" bordercolor="#ffffff" height="24"><script language="javascript">replace(ntp_ct)</script>&nbsp;<%= "$sys_currenttime" %></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+       </table>
+		  <table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+		  <tr>
+		   <td  align="center" height="40" valign="middle" colspan="2"><script language="javascript">replace(ntp_apply)</script>&nbsp;</td>
+		  </tr>
+		  <tr>
+        <td align="right"   colspan="2"><script language="javascript">replace(ntp_help)</script></td>
+      </tr>
+		 </table>
+</div>
+<input type="hidden" value="NTP Setup" name="SERVLET">
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+
+<%in page_footer.htm %>
+</body>
+</html>
+

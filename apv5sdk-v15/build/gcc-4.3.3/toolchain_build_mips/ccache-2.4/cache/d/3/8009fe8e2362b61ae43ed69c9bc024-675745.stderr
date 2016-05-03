@@ -1,0 +1,2 @@
+drivers/serial/ath_hs-uart.c: In function 'ath_hs_uart_init':
+drivers/serial/ath_hs-uart.c:36: warning: unused variable 'serial_inited'

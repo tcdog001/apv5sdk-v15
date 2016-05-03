@@ -1,0 +1,69 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_config=`config_read /config/network/lan`
+xml_lan_proto=`config_getoption "$xml_config" proto`
+xml_lan_ipaddr=`config_getoption "$xml_config" ipaddr`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="JavaScript">
+function reboot()
+{
+    var ipaddr="<%= $xml_lan_proto %>";
+    if(ipaddr == "static"){
+        setTimeout("top.open('http://<%= $xml_lan_ipaddr %>/index.htm', '_top')", (120 * 1000));
+    }
+    else 
+    {
+         setTimeout("alert('Lan IP address may be changed,you may reconnect using the new IP address!')",(60 * 1000));
+         setTimeout("top.open('http://<%= $HTTP_HOST %>/index.htm', '_top')", (60 * 1000));
+    }
+}
+</script>
+</head>
+<body onload="reboot()">
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="10">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<%in panel_action_status.htm %>
+<div align="center">
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+<tr>
+<td colspan="2" height="10"></td>
+</tr>
+
+<tr>
+<td colspan="2" bordercolor="#ffffff" align="center">Please wait 120 seconds for reboot</td>
+</tr>
+
+<tr>
+<td colspan="2" height="10"></td>
+</tr>
+</table>
+</div>
+</td>
+</tr>
+<tr>
+			<td  height="10">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

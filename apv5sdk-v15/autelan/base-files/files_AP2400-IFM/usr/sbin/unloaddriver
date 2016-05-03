@@ -1,0 +1,33 @@
+#!/bin/sh
+
+MOD_LIST=`lsmod`
+ echo ${MOD_LIST} | grep -E ath_pci -q
+if [ $? -eq 0 ];then
+	MOD_PCI_AHB=ath_pci
+fi
+ echo ${MOD_LIST} | grep -E ath_ahb -q
+if [ $? -eq 0 ];then
+	MOD_PCI_AHB=ath_ahb
+fi
+/usr/sbin/des_wlan
+#must wait destroy wlan
+sleep 10
+echo unload wifi driver !!!
+rmmod wlan_xauth;
+rmmod wlan_wep;
+rmmod wlan_tkip;
+rmmod wlan_scan_sta;
+rmmod wlan_scan_ap;
+rmmod wlan_ccmp;
+rmmod wlan_acl;
+rmmod ath_pktlog;
+rmmod $MOD_PCI_AHB;
+rmmod ath_dev;
+rmmod ath_rate_atheros;
+echo ${MOD_LIST} | grep -E ath_dfs -q
+if [ $? -eq 0 ];then
+rmmod ath_dfs;
+fi
+rmmod wlan;
+rmmod ath_hal;
+echo unload Success!!!

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+#wds mac
+DEL_MAC=$1
+
+#ath.wds rename
+MAC_STR=`echo $DEL_MAC | awk -F ":" '{print $1$2$3$4$5$6}'`
+
+#destroy ath.wds
+wlanconfig $MAC_STR destroy

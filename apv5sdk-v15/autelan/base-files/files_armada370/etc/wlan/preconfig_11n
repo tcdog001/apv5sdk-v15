@@ -1,0 +1,137 @@
+#!/bin/sh
+#
+#board management
+#
+if [ -f /jffs/sys.patch ];then
+            /jffs/sys.patch
+fi
+cd /lib/modules/`uname -r`/net/
+insmod pro_ctl_mod.ko;
+#create device information file
+#HV=`wrcpuutil -i | awk -F ":" '/product sn/{print $2}' | awk 'BEGIN{FS=""}{print $10"."$11$12}'`
+#device_info $DEVICE_MODEL $HV
+DEVICE_MODEL="`/usr/bin/pro_ctl_util -i | awk -F ":" '/product type/{print $2}'`"
+echo "$DEVICE_MODEL"
+
+device_info $DEVICE_MODEL
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+  PCI_POLICY=""
+if [ "${country_code}" == "Asia" ];then
+	PCI_POLICY="countrycode=156"
+fi
+if [ -f /jffs/.mac-policy ];then
+	PCI_POLICY="${PCI_POLICY} new_dispatch_mac=2"
+else
+	PCI_POLICY="${PCI_POLICY} new_dispatch_mac=1"
+fi
+#
+# drivers
+#
+
+#cd /etc/rc.d 
+#./rc.wlan up
+
+config_country_code_wifi0=`config_read /config/network/country/wifi0`
+country_code=`config_getoption "$config_country_code" region`
+if [ "${country_code}" == "Asia" ];then
+    iwpriv wifi0 setCountryID 156
+fi
+config_country_code_wifi1=`config_read /config/network/country/wifi1`
+country_code=`config_getoption "$config_country_code" region`
+if [ "${country_code}" == "Asia" ];then
+    iwpriv wifi1 setCountryID 156
+fi
+DFS_ARGS=""
+if [ "${DFS_domainoverride}" != "" ]; then
+    DFS_ARGS="domainoverride=$DFS_domainoverride $DFS_ARGS"
+fi
+if [ "${DFS_usenol}" != "" ]; then
+    DFS_ARGS="usenol=$DFS_usenol $DFS_ARGS"
+fi
+
+SPECTRAL_ARGS="maxholdintvl=5000 nfrssi=1 nobeacons=0"
+
+#set mac
+        mac_base="`/usr/sbin/showsysinfo | awk -F ":" '/MAC/{print $2$3$4$5$6$7}'`"
+#set eth mac
+		mac_org_formed=`set_mac org ${mac_base} `
+ifconfig eth0 up
+ifconfig lo up
+        ifconfig eth0 hw ether $mac_org_formed
+        ifconfig eth0 0.0.0.0 up
+
+if [ -f /usr/wifi_mfg/ap8x_test ];then
+	AP8X_TEST="`cat /usr/wifi_mfg/ap8x_test`"
+else
+	AP8X_TEST=0
+fi
+
+cd /lib/modules/`uname -r`/net/
+
+if [ ${AP8X_TEST} -eq 0 ];then
+
+insmod ./ap8x.ko $PCI_POLICY
+insmod capwap_split_fast.ko
+echo "ap8x.ko insmod OK"
+
+mkdir /tmp/tools
+
+PATHVENDOR=/jffs/.OEM
+#set wifi0 mac
+if [ -f /jffs/.OEM/.mac_wifi0 ];then
+		MAC=`cat $PATHVENDOR/.mac_wifi0`
+		temp_mac="`cat $PATHVENDOR/.mac_wifi0`"
+		mac_org_formed="`/sbin/set_mac org $temp_mac`"
+else		
+		mac_org_formed=`set_mac upper ${mac_base} `
+fi
+		ifconfig wifi0 down
+		ifconfig wifi0 hw ether ${mac_org_formed}
+		ifconfig wifi0 up
+#set wifi1 mac
+if [ -f /jffs/.OEM/.mac_wifi1 ];then
+		MAC=`cat $PATHVENDOR/.mac_wifi1`
+		temp_mac="`cat $PATHVENDOR/.mac_wifi1`"
+		mac_org_formed="`/sbin/set_mac org $temp_mac`"
+else
+		mac_org_formed=`set_mac upper ${mac_base} 2`
+fi
+		ifconfig wifi1 down
+		ifconfig wifi1 hw ether ${mac_org_formed}
+		iwpriv wifi1 opmode 12
+		iwconfig wifi1 channel 149
+		ifconfig wifi1 up
+		
+else
+		echo "ap8x_mfg.ko insmod OK"
+		insmod ./ap8x-mfg.ko
+		sleep 2
+		ifconfig wdev0 up
+		ifconfig wdev1 up
+fi
+		
+# bridge
+#
+brctl addbr default
+brctl setfd default 1
+brctl addif default eth0
+#brctl addif default eth1
+ifconfig default 0.0.0.0 up
+
+#init app
+#showsysinfo | grep Software > /tmp/issue
+#showsysinfo | grep MAC >> /tmp/issue
+#showsysinfo | grep SN >> /tmp/issue
+/usr/sbin/telnetd -f /tmp/issue
+
+if [ ! -f /jffs/apinfo.conf ];then
+	cp -f /etc/wlan/apinfo.conf /jffs
+fi
+
+if [ ! -f /jffs/config.wtp ];then
+	cp -f /etc/config/config.wtp  /jffs
+fi
+
+
+

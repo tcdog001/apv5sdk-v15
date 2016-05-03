@@ -1,0 +1,24 @@
+#!/usr/bin/haserl
+<html>
+	<head>
+		<title>Access Security</title>
+	</head>
+	<body>
+		<br>Here configure packet filtering that the packet is forwarded by the AP.
+The main configuration parameters: 
+1. Default Policy; when the packet does not match all the rules, the data packet will match the default strategy 
+2. Filter Type ; include MAC, IP and Advance. 3-4 parameters can be configured in MAC type, 5-6 parameters can be configured in IP type, 3-11 parameters can be configured in Advance type.
+3. src MAC/mask; 
+4. dst MAC/mask; 
+5. src IP/mask; 
+6. dst IP/mask; 
+7. Input; interface when packets enter the AP (vap or eth). 
+8. Output; interface when packets out the AP (vap or eth). 
+9. Datagram Type; 
+10. src port; when the packet protocol type is TCP or UDP ,this port can be configured. 
+11. dst port; when the packet protocol type is TCP or UDP , this port can be configured. 
+12. When the conditions to meet the objectives of the above; when packets match the rules above configuration , the rule¡¯s goal will be execute.
+
+
+	</body>
+</html>

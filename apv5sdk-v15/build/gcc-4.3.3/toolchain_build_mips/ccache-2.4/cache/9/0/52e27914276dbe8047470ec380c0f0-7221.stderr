@@ -1,0 +1,4 @@
+ar7240_serial.c: In function 'serial_init':
+ar7240_serial.c:66: warning: unused variable 'cpu_freq'
+ar7240_serial.c:66: warning: unused variable 'ddr_freq'
+ar7240_serial.c:66: warning: unused variable 'ahb_freq'

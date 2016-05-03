@@ -1,0 +1,175 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			WaitForAssoc.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='VersionInfo2.c.html' title=' VersionInfo2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='WaitForReset.c.html' title=' WaitForReset.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed WaitForAssoc (struct int6k * int6k);
+ *
+ *   int6k.h
+ *
+ *   poll the device using VS_NW_INFO messages and examine confirmation
+ *   messages until the device reports that a network exists and has at
+ *   least one station present on that network; return 0 if the device
+ *   associates within the allotted time or -1 if it does not or if 
+ *   transmission errors occur;
+ *
+ *   retry is number of times to poll the device before returing an 
+ *   error to indicate that the device di not associate in the allotted
+ *   time; timer is the time between poll attempts;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef WAITFORASSOC_SOURCE
+#define WAITFORASSOC_SOURCE
+
+#include &lt;unistd.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;memory.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/memory.h&quot;
+
+signed WaitForAssoc (struct int6k * int6k) 
+
+{
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed station 
+	{
+		uint8_t DA [ETHER_ADDR_LEN];
+		uint8_t TEI;
+		uint8_t BDA [ETHER_ADDR_LEN];
+		uint8_t AVGTX;
+		uint8_t AVGRX;
+	}
+	* station;
+	struct __packed network 
+	{
+		uint8_t NID [HPAVKEY_NID_LEN];
+		uint8_t SNID;
+		uint8_t TEI;
+		uint8_t ROLE;
+		uint8_t CCO_MACADDR [6];
+		uint8_t CCO_TEI;
+		uint8_t NUMSTAS;
+		struct station station [1];
+	}
+	* network;
+	struct __packed networks 
+	{
+		uint8_t NUMAVLNS;
+		struct network network [1];
+	}
+	* networks = (struct networks *) (&amp;message-&gt;content);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	static byte broadcast [ETHER_ADDR_LEN] = 
+	{
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF 
+	};
+	unsigned retry = int6k-&gt;retry;
+	signed networkcount;
+	signed stationcount;
+	Request (int6k, &quot;Wait for Assoc&quot;);
+	while (retry--) 
+	{
+		memset (message, 0, sizeof (struct message));
+		EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+		IntellonHeader (&amp;message-&gt;intellon, (VS_NW_INFO | MMTYPE_REQ));
+		int6k-&gt;packetsize = ETHER_MIN_LEN;
+		if (SendMME (int6k) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+			return (-1);
+		}
+		while (ReadMME (int6k, (VS_NW_INFO | MMTYPE_CNF)) &gt; 0) 
+		{
+			network = (struct network *)(&amp;networks-&gt;network);
+			networkcount = networks-&gt;NUMAVLNS;
+			while (networkcount-- &gt; 0) 
+			{
+				station = (struct station *)(&amp;network-&gt;station);
+				stationcount = network-&gt;NUMSTAS;
+				while (stationcount-- &gt; 0) 
+				{
+					if (memcmp (station-&gt;DA, broadcast, sizeof (broadcast))) 
+					{
+						return (0);
+					}
+					station++;
+				}
+				network = (struct network *)(station);
+			}
+		}
+		if (retry) 
+		{
+			SLEEP (int6k-&gt;timer);
+		}
+	}
+	return (-1);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='VersionInfo2.c.html' title=' VersionInfo2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='WaitForReset.c.html' title=' WaitForReset.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,69 @@
+#!/bin/sh
+
+#vapcreate wifi mode channel rate extoffset cwmmode
+
+WIFI="${1}"
+MODE="${2}"
+CHANNEL="${3}"
+RATE="${4}"
+if [  -z $5 ];then
+	EXTOFFSET="0"
+else
+	EXTOFFSET="${5}"
+fi
+
+if [  -z $6 ];then
+	CWMMODE=1
+else
+	CWMMODE="${6}"
+fi
+
+#get txpower
+if [ "${WIFI}" == "wifi1" ];then
+	TXPOWER=20
+else
+	if [ -f /jffs/tx-offset ];then
+		OFFSET=`cat /jffs/tx-offset`
+		TXPOWER=$((27-${OFFSET}))
+	else
+		TXPOWER=20
+	fi
+fi
+
+wlanconfig ath0 destroy
+wlanconfig ath0 create wlandev ${WIFI} wlanmode ap
+
+ifconfig ath0 up
+ifconfig ath0 down
+
+sleep 1
+
+iwconfig ath0 essid "tp_test" 
+
+if [ "${MODE}" == "11ng" ]||[ "${MODE}" == "11na" ];then
+	/usr/sbin/ar11nmode ath0 ${MODE} ${EXTOFFSET} ${CWMMODE}
+else
+	if [ "${MODE}" == 11a ];then
+		iwconfig ath0 channel 0
+		iwpriv ath0 pureg 0
+		iwpriv ath0 mode 11a
+	fi
+	if [ "${MODE}" == 11bg ];then
+		iwconfig ath0 channel 0
+		iwpriv ath0 pureg 0
+		iwpriv ath0 mode 11g
+	fi
+	if [ "${MODE}" == 11g ];then
+		iwconfig ath0 channel 0
+		iwpriv ath0 pureg 1
+		iwpriv ath0 mode 11g
+	fi
+fi
+
+iwconfig ath0 channel ${CHANNEL}
+iwconfig ath0 txpower ${TXPOWER}
+
+#iwconfig ath0 rate "${RATE}"
+ifconfig ath0 up
+
+

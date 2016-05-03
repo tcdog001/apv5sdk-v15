@@ -1,0 +1,1449 @@
+-- **********************************************************************
+-- * AUTELAN-AP-MIB  Designed by sunyushuang
+-- **********************************************************************
+AUTELAN-AP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+MODULE-IDENTITY, OBJECT-TYPE,
+NOTIFICATION-TYPE,Integer32, Counter32 FROM SNMPv2-SMI
+DisplayString , MacAddress, RowStatus,
+TruthValue FROM SNMPv2-TC
+MODULE-COMPLIANCE, OBJECT-GROUP,
+NOTIFICATION-GROUP FROM SNMPv2-CONF
+ifIndex FROM RFC1213-MIB
+apProject FROM  AP-GROUP-SMI;
+
+-- **********************************************************************
+-- * MODULE IDENTITY
+-- **********************************************************************
+autelanAp  MODULE-IDENTITY
+LAST-UPDATED "200812150000Z"
+ORGANIZATION "AUTELAN AP GROUP"
+CONTACT-INFO
+" E-mail: bc05007@163.com "
+DESCRIPTION
+"The MIB module for AP entities."
+::={apProject  1} 
+
+apInfo    OBJECT IDENTIFIER ::={autelanAp 1}
+
+
+
+-- **********************************************************************
+-- * AP Config Table
+-- **********************************************************************
+apConfigTable   OBJECT-TYPE
+SYNTAX SEQUENCE OF ApConfigEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+::= { apInfo 1 }
+
+apConfigEntry OBJECT-TYPE
+SYNTAX ApConfigEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in the apConfigTable. "
+INDEX {ifIndex}
+::= { apConfigTable 1 }
+
+ApConfigEntry ::=
+SEQUENCE {
+SSIDEnabled              TruthValue,
+SSIDHidden               TruthValue,
+StaIsolate      	 TruthValue,
+EAPAuthenSupport         TruthValue,
+apMaxSimultUsers         Integer32,
+apBGmode                 Integer32,
+apConnectUsers           INTEGER,
+UsrReqJoinCount          INTEGER,
+apRespUserCount          INTEGER,
+UsrJoinSucCount          INTEGER,
+apUsrTotalTime           INTEGER,
+ap80211stats             OCTET STRING,
+apUtilResource		 OCTET STRING,
+vapFlag              	 OCTET STRING,
+vapTraffic           	 OCTET STRING,
+everyNodeFlag        	 OCTET STRING,
+everyNodeTraffic     	 OCTET STRING,
+specificNodeFlag      	 OCTET STRING,
+specificNodeTraffic   	 OCTET STRING,
+SnrBSSIDTxSignalPkts     INTEGER,
+SnrBSSIDRxSignalPkts     INTEGER,
+SnrBSSIDSignalPkts       INTEGER,
+RadioIfIndex		INTEGER,
+SSIDindex		INTEGER,
+BSSID			MacAddress,
+apFloodDetect   		TruthValue,
+apSpoofDetect   		TruthValue,
+apWKIVDectect       	TruthValue,
+apClearAttackHistory	 TruthValue,
+apClearIllegalHistory 	 TruthValue,
+apClearAttackStatistics     TruthValue
+}
+
+SSIDEnabled  OBJECT-TYPE
+SYNTAX  TruthValue {enable(1),disable(0)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry 1}
+
+SSIDHidden  OBJECT-TYPE
+SYNTAX  TruthValue {hide(1),nohide(0)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry 2}
+
+StaIsolate  OBJECT-TYPE
+SYNTAX  TruthValue {isolate(1),noisolate(0)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry 3}
+
+EAPAuthenSupport  OBJECT-TYPE
+SYNTAX  TruthValue {enable(1),disable(0)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry 4}
+
+
+apMaxSimultUsers OBJECT-TYPE
+SYNTAX   Integer32
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+""
+::= {apConfigEntry  5}
+
+
+apBGmode  OBJECT-TYPE
+SYNTAX   INTEGER{IEEE80211a(1),IEEE80211b(2),IEEE80211g(4),IEEE80211bg(6),IEEE80211an(8),IEEE80211gn(16)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry 6}
+
+apConnectUsers OBJECT-TYPE
+SYNTAX  INTEGER
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+""
+::= {apConfigEntry  7}
+
+UsrReqJoinCount  OBJECT-TYPE
+SYNTAX  INTEGER 
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry  8}
+
+
+apRespUserCount  OBJECT-TYPE
+SYNTAX  INTEGER 
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry  9}
+
+
+UsrJoinSucCount  OBJECT-TYPE
+SYNTAX  INTEGER 
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry 10}
+
+apUsrTotalTime  OBJECT-TYPE
+SYNTAX  INTEGER 
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry 11}
+
+ap80211stats   OBJECT-TYPE
+SYNTAX OCTET  STRING(SIZE(0..32))
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+""
+::= {apConfigEntry 12}
+
+apUtilResource   OBJECT-TYPE
+SYNTAX OCTET  STRING(SIZE(0..32))
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+""
+::= {apConfigEntry 13}
+vapFlag   OBJECT-TYPE
+SYNTAX OCTET  STRING(SIZE(0..32))
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+""
+::= {apConfigEntry 14}
+
+
+vapTraffic    OBJECT-TYPE
+SYNTAX OCTET  STRING(SIZE(0..32))
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+""
+::= {apConfigEntry   15}
+
+everyNodeFlag   OBJECT-TYPE
+SYNTAX OCTET  STRING(SIZE(0..32))
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+""
+::= {apConfigEntry   16}
+
+
+everyNodeTraffic   OBJECT-TYPE
+SYNTAX OCTET  STRING(SIZE(0..32))
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+""
+::= {apConfigEntry  17}
+
+
+specificNodeFlag   OBJECT-TYPE
+SYNTAX OCTET  STRING(SIZE(0..32))
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+""
+::= {apConfigEntry 18}
+
+specificNodeTraffic    OBJECT-TYPE
+SYNTAX OCTET  STRING(SIZE(0..32))
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+""
+::= {apConfigEntry   19}
+
+
+SnrBSSIDTxSignalPkts  OBJECT-TYPE
+SYNTAX   Integer32
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry   20}
+
+SnrBSSIDRxSignalPkts OBJECT-TYPE
+SYNTAX   Integer32
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry   21}
+
+SnrBSSIDSignalPkts  OBJECT-TYPE
+SYNTAX   Integer32
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry   22}
+
+RadioIfIndex		 OBJECT-TYPE
+SYNTAX   INTEGER
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry   23}
+
+SSIDindex    OBJECT-TYPE
+SYNTAX   INTEGER
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry   24}
+
+
+BSSID		OBJECT-TYPE
+SYNTAX   MacAddress
+MAX-ACCESS  read-only
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry   25}
+
+
+apFloodDetectSwitch   	 OBJECT-TYPE
+SYNTAX  TruthValue {on(1),off(0)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry     26}
+
+
+apSpoofDetectSwitch  	 OBJECT-TYPE
+SYNTAX  TruthValue {on(1),off(0)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry     27}
+
+
+apWKIVDectectSwitch      OBJECT-TYPE
+SYNTAX  TruthValue {on(1),off(0)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry     28}
+
+
+apClearAttackHistory	 OBJECT-TYPE
+SYNTAX  TruthValue  {no(0),yes(1)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry     29}
+
+apClearIllegalHistory 	OBJECT-TYPE
+SYNTAX  TruthValue  {no(0),yes(1)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry     30}
+
+apClearAttackStatistics     OBJECT-TYPE
+SYNTAX  TruthValue {no(0),yes(1)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+" "
+::= {apConfigEntry     31}
+
+-- **********************************************************************
+-- * AP SecurityConfigTable
+-- **********************************************************************
+
+apSecurityConfigTable OBJECT-TYPE
+SYNTAX SEQUENCE OF ApSecurityConfigEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"ap Configuration attributes. In tablular form to
+allow for multiple instances on an agent."
+::= {apInfo  2}
+
+apSecurityConfigEntry OBJECT-TYPE
+SYNTAX ApSecurityConfigEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex}
+::= { apSecurityConfigTable 1 }
+
+ApSecurityConfigEntry ::=SEQUENCE {
+apSecurityType    INTEGER,
+apwpaAuthMode     INTEGER,
+apwpaCipher       INTEGER,
+apwpaKeyValue     OCTET STRING,
+apwepAuthMode     INTEGER,
+apwepKeyType      INTEGER,
+apwepBitLevel     INTEGER,
+apwepKeyNum       INTEGER,
+apwepKeyValue     OCTET STRING}
+
+apSecurityType OBJECT-TYPE
+SYNTAX  INTEGER{none(1),opensystem(2),sharedkey(3),dot1X(4),wpapsk(5),wpa2psk(6),wparadius(7),wpa2radius(8),wapi(9)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+""
+::= {apSecurityConfigEntry 1}
+
+apwpaAuthMode   OBJECT-TYPE
+SYNTAX  INTEGER{psk(1),dot1x(2)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+""
+::= {apSecurityConfigEntry 2}
+
+apwpaCipher  OBJECT-TYPE
+SYNTAX  INTEGER{tkip(1),aesccmp(2)}
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+""
+::= {apSecurityConfigEntry 3}
+
+apwpaKeyValue  OBJECT-TYPE
+SYNTAX  OCTET  STRING(SIZE(0..32))
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+""
+::= {apSecurityConfigEntry 4}
+
+apwepAuthMode   OBJECT-TYPE
+SYNTAX   INTEGER{opensystem(1),sharedkey(2),dot1X(3)}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+" "
+::= { apSecurityConfigEntry 5 }
+
+apwepKeyType  OBJECT-TYPE
+SYNTAX    INTEGER{assic(1),hex(2)}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+" "
+::= { apSecurityConfigEntry 6}
+
+apwepBitLevel OBJECT-TYPE
+SYNTAX    INTEGER{wep40(64),wep104(128),wep128(152)}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+" "
+::= { apSecurityConfigEntry 7}
+
+apwepKeyNum  OBJECT-TYPE
+SYNTAX   INTEGER{key1(1),key2(2),key3(3),key4(4)}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+" "
+::= { apSecurityConfigEntry 8}
+
+apwepKeyValue  OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE(0..32))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+" "
+::= { apSecurityConfigEntry 9}
+
+
+-- **********************************************************************
+-- * AP ClientAddressTable
+-- **********************************************************************
+
+apStatMacAddrTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApStatMacAddrEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo 3 }
+
+apStatMacAddrEntry OBJECT-TYPE
+SYNTAX ApStatMacAddrEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apStatMacAddrIndex}
+::= { apStatMacAddrTable 1 }
+
+ApStatMacAddrEntry ::=SEQUENCE {
+apStatMacAddrIndex  Integer32,
+apStatMacAddrValue  MacAddress}
+
+apStatMacAddrIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apStatMacAddrEntry 1}
+
+apStatMacAddrValue  OBJECT-TYPE
+SYNTAX  MacAddress
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apStatMacAddrEntry 2}
+
+
+-- **********************************************************************
+-- * apStatRxPowerTable
+-- **********************************************************************
+
+apStatRxPowerTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApStatRxPowerEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo 4 }
+apStatRxPowerEntry  OBJECT-TYPE
+SYNTAX ApStatRxPowerEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apStatRxPowerIndex}
+::= { apStatRxPowerTable 1 }
+
+ApStatRxPowerEntry   ::=SEQUENCE {
+apStatRxPowerIndex  Integer32,
+apStatRxPowerValue  Integer32}
+
+apStatRxPowerIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apStatRxPowerEntry 1}
+
+apStatRxPowerValue  OBJECT-TYPE
+SYNTAX  Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apStatRxPowerEntry 2}
+
+
+-- **********************************************************************
+-- *apStatUpTimeTable
+-- **********************************************************************
+apStatUpTimeTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApStatUpTimeEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo  5}
+
+apStatUpTimeEntry  OBJECT-TYPE
+SYNTAX ApStatUpTimeEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apStatUpTimeIndex}
+::= { apStatUpTimeTable 1 }
+
+ApStatUpTimeEntry   ::=SEQUENCE {
+apStatUpTimeIndex  Integer32,
+apStatUpTimeValue  TimeTicks}
+
+apStatUpTimeIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apStatUpTimeEntry 1}
+
+apStatUpTimeValue  OBJECT-TYPE
+SYNTAX  TimeTicks
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apStatUpTimeEntry 2}
+
+
+-- **********************************************************************
+-- * apStatTxSpeedTable
+-- **********************************************************************
+apStatTxSpeedTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApStatTxSpeedEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo 6 }
+
+apStatTxSpeedEntry  OBJECT-TYPE
+SYNTAX ApStatTxSpeedEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apStatTxSpeedIndex}
+::= { apStatTxSpeedTable  1 }
+
+ApStatTxSpeedEntry   ::=SEQUENCE {
+apStatTxSpeedIndex  Integer32,
+apStatTxSpeedValue  Integer32}
+
+apStatTxSpeedIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apStatTxSpeedEntry 1}
+
+apStatTxSpeedValue  OBJECT-TYPE
+SYNTAX  Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apStatTxSpeedEntry 2}
+
+
+-- **********************************************************************
+-- * apStatRxSpeedTable
+-- **********************************************************************
+
+apStatRxSpeedTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApStatRxSpeedEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo  7}
+apStatRxSpeedEntry  OBJECT-TYPE
+SYNTAX ApStatRxSpeedEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apStatRxSpeedIndex}
+::= { apStatRxSpeedTable 1 }
+
+ApStatRxSpeedEntry   ::=SEQUENCE {
+apStatRxSpeedIndex   Integer32,
+apStatRxSpeedValue   Integer32}
+
+apStatRxSpeedIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apStatRxSpeedEntry 1}
+
+apStatRxSpeedValue  OBJECT-TYPE
+SYNTAX   Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apStatRxSpeedEntry 2}
+
+
+
+
+-- **********************************************************************
+-- * apStationSpeedTable
+-- **********************************************************************
+
+apStationSpeedTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApStationSpeedEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo   8 }
+
+apStationSpeedEntry  OBJECT-TYPE
+SYNTAX ApStationSpeedEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apStationSpeedIndex}
+::= { apStationSpeedTable 1 }
+
+ApStationSpeedEntry   ::=SEQUENCE {
+apStationSpeedIndex   Integer32,
+apStationSpeedValue   Integer32}
+
+apStationSpeedIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apStationSpeedEntry 1}
+
+apStationSpeedValue  OBJECT-TYPE
+SYNTAX   Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apStationSpeedEntry 2}
+
+
+-- **********************************************************************
+-- * apStatTxTraffic
+-- **********************************************************************
+apStatTxTrafficTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApStatTxTrafficEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo  9}
+
+apStatTxTrafficEntry  OBJECT-TYPE
+SYNTAX ApStatTxTrafficEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apStatTxTrafficIndex}
+::= { apStatTxTrafficTable 1 }
+
+ApStatTxTrafficEntry   ::=SEQUENCE {
+apStatTxTrafficIndex  Integer32,
+apStatTxTrafficValue  Integer32}
+
+apStatTxTrafficIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apStatTxTrafficEntry 1}
+
+apStatTxTrafficValue  OBJECT-TYPE
+SYNTAX  Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apStatTxTrafficEntry 2}
+
+
+-- **********************************************************************
+-- *apStatRxTrafficTable
+-- **********************************************************************
+
+apStatRxTrafficTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApStatRxTrafficEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo  10 }
+apStatRxTrafficEntry  OBJECT-TYPE
+SYNTAX ApStatRxTrafficEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apStatRxTrafficIndex}
+::= { apStatRxTrafficTable 1 }
+
+ApStatRxTrafficEntry   ::=SEQUENCE {
+apStatRxTrafficIndex  Integer32,
+apStatRxTrafficValue  Integer32}
+
+apStatRxTrafficIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apStatRxTrafficEntry 1}
+
+apStatRxTrafficValue  OBJECT-TYPE
+SYNTAX  Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apStatRxTrafficEntry 2}
+
+-- **********************************************************************
+-- *apStatTrafficTable
+-- **********************************************************************
+
+apStationTrafficTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApStationTrafficEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo  11}
+apStationTrafficEntry  OBJECT-TYPE
+SYNTAX ApStationTrafficEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apStationTrafficIndex}
+::= { apStationTrafficTable 1 }
+
+ApStationTrafficEntry   ::=SEQUENCE {
+apStationTrafficIndex  Integer32,
+apStationTrafficValue  Integer32}
+
+apStationTrafficIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apStationTrafficEntry 1}
+
+apStationTrafficValue  OBJECT-TYPE
+SYNTAX  Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apStationTrafficEntry 2}
+
+-- **********************************************************************
+-- * apStatRxErrPksTable
+-- **********************************************************************
+
+apStatRxErrPksTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApStatRxErrPksEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo 12 }
+
+apStatRxErrPksEntry  OBJECT-TYPE
+SYNTAX ApStatRxErrPksEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apStatRxErrPksIndex}
+::= { apStatRxErrPksTable 1 }
+
+ApStatRxErrPksEntry   ::=SEQUENCE {
+apStatRxErrPksIndex  Integer32,
+apStatRxErrPksValue  Integer32}
+
+apStatRxErrPksIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apStatRxErrPksEntry 1}
+
+apStatRxErrPksValue  OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apStatRxErrPksEntry 2}
+
+
+-- **********************************************************************
+-- * apStatRxErrPksTable
+-- **********************************************************************
+
+apStatRxSucPksTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApStatRxErrPksEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo 13}
+
+apStatRxSucPksEntry  OBJECT-TYPE
+SYNTAX ApStatRxSucPksEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apStatRxSucPksIndex}
+::= { apStatRxSucPksTable 1 }
+
+ApStatRxSucPksEntry   ::=SEQUENCE {
+apStatRxSucPksIndex  Integer32,
+apStatRxSucPksValue  Integer32}
+
+apStatRxSucPksIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apStatRxSucPksEntry 1}
+
+apStatRxSucPksValue  OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apStatRxSucPksEntry 2}
+
+
+-- **********************************************************************
+-- * apTxSignalPktsTable
+-- **********************************************************************
+
+apTxSignalPktsTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApTxSignalPktsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo 14 }
+
+apTxSignalPktsEntry  OBJECT-TYPE
+SYNTAX ApTxSignalPktsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apTxSignalPktsIndex}
+::= { apTxSignalPktsTable 1 }
+
+ApTxSignalPktsEntry   ::=SEQUENCE {
+apTxSignalPktsIndex  Integer32,
+apTxSignalPktsValue  Integer32}
+
+apTxSignalPktsIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apTxSignalPktsEntry 1}
+
+apTxSignalPktsValue  OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apTxSignalPktsEntry 2}
+
+-- **********************************************************************
+-- * apTxSignalPktsTable
+-- **********************************************************************
+
+apRxSignalPktsTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApRxSignalPktsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo 15}
+
+apRxSignalPktsEntry  OBJECT-TYPE
+SYNTAX ApRxSignalPktsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apRxSignalPktsIndex}
+::= { apRxSignalPktsTable 1 }
+
+ApRxSignalPktsEntry   ::=SEQUENCE {
+apRxSignalPktsIndex  Integer32,
+apRxSignalPktsValue  INTEGER}
+
+apRxSignalPktsIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apRxSignalPktsEntry 1}
+
+apRxSignalPktsValue  OBJECT-TYPE
+SYNTAX INTEGER
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apRxSignalPktsEntry 2}
+
+
+
+-- **********************************************************************
+-- * apSignalPktsTable
+-- **********************************************************************
+
+apSignalPktsTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApSignalPktsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo 16}
+
+apSignalPktsEntry  OBJECT-TYPE
+SYNTAX ApSignalPktsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apSignalPktsIndex}
+::= { apSignalPktsTable 1 }
+
+ApSignalPktsEntry   ::=SEQUENCE {
+apSignalPktsIndex  Integer32,
+apSignalPktsValue  INTEGER}
+
+apSignalPktsIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={apSignalPktsEntry 1}
+
+apSignalPktsValue  OBJECT-TYPE
+SYNTAX INTEGER
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={apSignalPktsEntry 2}
+
+
+
+-- **********************************************************************
+-- *staWMMAttrTable
+-- **********************************************************************
+
+staWMMAttrTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF StaWMMAttrEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo 17}
+
+staWMMAttrEntry  OBJECT-TYPE
+SYNTAX  StaWMMAttrEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,staWMMAttrIndex}
+::= {staWMMAttrTable  1 }
+
+StaWMMAttrEntry   ::=SEQUENCE {
+staWMMAttrIndex  Integer32,
+staWMMAttrValue  INTEGER}
+
+staWMMAttrIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={staWMMAttrEntry  1}
+
+staWMMAttrValue  OBJECT-TYPE
+SYNTAX    INTEGER{WMMSta(1),NonWMMSta(0)}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={staWMMAttrEntry  2}
+
+
+
+-- **********************************************************************
+-- *staIPAddressTable
+-- **********************************************************************
+
+staIPAddressTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF StaIPAddressEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo 18}
+
+staIPAddressEntry  OBJECT-TYPE
+SYNTAX  StaIPAddressEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,staIPAddressIndex}
+::= {staIPAddressTable  1 }
+
+StaIPAddressEntry   ::=SEQUENCE {
+staIPAddressIndex  Integer32,
+staIPAddressValue  IpAddress}
+
+staIPAddressIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={staIPAddressEntry  1}
+
+staIPAddressValue  OBJECT-TYPE
+SYNTAX    IpAddress
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={staIPAddressEntry  2}
+
+
+-- **********************************************************************
+-- *StaPowerSaveModeTable
+-- **********************************************************************
+
+staPowerSaveModeTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF StaPowerSaveModeEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo  19}
+
+staPowerSaveModeEntry  OBJECT-TYPE
+SYNTAX  StaPowerSaveModeEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,staPowerSaveModeIndex}
+::= {staPowerSaveModeTable  1 }
+
+StaPowerSaveModeEntry   ::=SEQUENCE {
+staPowerSaveModeIndex  Integer32,
+staPowerSaveModeValue  INTEGER}
+
+staPowerSaveModeIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={staPowerSaveModeEntry  1}
+
+staPowerSaveModeValue  OBJECT-TYPE
+SYNTAX    INTEGER{Active(1),Powersave(0)}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+::={staPowerSaveModeEntry  2}
+
+
+-- **********************************************************************
+-- *staUplinkMaxRate
+-- **********************************************************************
+
+staUplinkMaxRateTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF StaUplinkMaxRateEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo  20}
+
+staUplinkMaxRateEntry  OBJECT-TYPE
+SYNTAX  StaUplinkMaxRateEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,staUplinkMaxRateIndex}
+::= {staUplinkMaxRateTable  1 }
+
+StaUplinkMaxRateEntry   ::=SEQUENCE {
+staUplinkMaxRateIndex  Integer32,
+staUplinkMaxRateValue  INTEGER}
+
+staUplinkMaxRateIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={staUplinkMaxRateEntry  1}
+
+staUplinkMaxRateValue  OBJECT-TYPE
+SYNTAX    INTEGER
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+""
+::={staUplinkMaxRateEntry  2}
+
+
+-- **********************************************************************
+-- *staDwlinkMaxRate
+-- **********************************************************************
+
+staDwlinkMaxRateTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF StaDwlinkMaxRateEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo  21}
+
+staDwlinkMaxRateEntry  OBJECT-TYPE
+SYNTAX  StaDwlinkMaxRateEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,staDwlinkMaxRateIndex}
+::= {staDwlinkMaxRateTable  1 }
+
+StaDwlinkMaxRateEntry   ::=SEQUENCE {
+staDwlinkMaxRateIndex  Integer32,
+staDwlinkMaxRateValue  INTEGER}
+
+staDwlinkMaxRateIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+::={staDwlinkMaxRateEntry  1}
+
+staDwlinkMaxRateValue  OBJECT-TYPE
+SYNTAX    INTEGER
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+""
+::={staDwlinkMaxRateEntry  2}
+
+
+-- **********************************************************************
+-- * apStationInfoTable
+-- **********************************************************************
+
+apStationInfoTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApStationInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::= { apInfo   22}
+
+apStationInfoEntry  OBJECT-TYPE
+SYNTAX ApStationInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex,apStationInfoIndex}
+::= { apStationInfoTable 1 }
+
+ApStationInfoEntry   ::=SEQUENCE {
+apStationInfoIndex  Integer32,
+StaRadioMode  	 INTEGER,
+StaRadioChannel  	 INTEGER,
+StaVlanId   	     	  INTEGER,
+StaSSIDName       	  OCTET STRING,
+StaAuthenMode    	  INTEGER,
+StaSecurityCiphers    INTEGER
+}
+
+apStationInfoIndex  OBJECT-TYPE
+SYNTAX Integer32(1..20)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" "
+::={apStationInfoEntry 1}
+
+
+StaRadioMode  OBJECT-TYPE
+SYNTAX   INTEGER{dot11a(1),dot11b(2),dot11g(4),dot11bg(6),dot11an(8),dot11gn(16)}
+MAX-ACCESS  read-only
+STATUS current
+DESCRIPTION
+" "
+::={apStationInfoEntry  2 }
+
+
+StaRadioChannel   OBJECT-TYPE
+SYNTAX   INTEGER
+MAX-ACCESS  read-only
+STATUS current
+DESCRIPTION
+" "
+::={apStationInfoEntry  3 }
+
+
+StaVlanId     OBJECT-TYPE
+SYNTAX   INTEGER
+MAX-ACCESS  read-only
+STATUS current
+DESCRIPTION
+" "
+::={apStationInfoEntry  4}
+
+
+StaSSIDName   OBJECT-TYPE
+SYNTAX  OCTET STRING (SIZE(0..32))
+MAX-ACCESS  read-only
+STATUS current
+DESCRIPTION
+""
+::={apStationInfoEntry  5}
+
+
+StaAuthenMode  OBJECT-TYPE
+SYNTAX   INTEGER{none(1),opensystem(2),sharedkey(3),dot1x(4),wpapsk(5),wpa2psk(6),wapi(7)}
+MAX-ACCESS  read-only
+STATUS current
+DESCRIPTION
+""
+::={apStationInfoEntry  6}
+
+
+StaSecurityCiphers   OBJECT-TYPE
+SYNTAX   INTEGER{none(1),wep40(2),wep104(3),tkip(4),aesccmp(5),wapi(6)}
+MAX-ACCESS  read-only
+STATUS current
+DESCRIPTION
+""
+::={apStationInfoEntry  7}
+
+
+
+-- **********************************************************************
+-- * apRadioChannelTable
+-- **********************************************************************
+
+apRadioChannelTable  OBJECT-TYPE
+SYNTAX SEQUENCE OF ApRadioChannelEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+::= { apInfo  23}
+
+apRadioChannelEntry OBJECT-TYPE
+SYNTAX ApRadioChannelEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"  "
+INDEX {ifIndex}
+::= { apRadioChannelTable  1 }
+
+ApRadioChannelEntry ::=SEQUENCE {
+ChanAutoSelectEnable    INTEGER,
+RadioChannelConfig    	INTEGER,
+RadioChannelUsing		INTEGER,
+TransmitSpeedConfig      OCTET STRING, 
+MaxTxPwrLvl 			INTEGER,
+PwrAttRange		       INTEGER,
+AntennaGain    	       INTEGER,
+PowerMgmtEnable          TruthValue,
+MaxStationNumPermitted  INTEGER
+}
+
+
+ChanAutoSelectEnable   OBJECT-TYPE
+SYNTAX    INTEGER{on(1),off(0)}
+MAX-ACCESS   read-write
+STATUS current
+DESCRIPTION
+ " "
+::={apRadioChannelEntry  1}
+
+RadioChannelConfig    	OBJECT-TYPE
+SYNTAX   INTEGER
+MAX-ACCESS    read-write
+STATUS current
+DESCRIPTION
+ " "
+::={apRadioChannelEntry  2}
+
+RadioChannelUsing		OBJECT-TYPE
+SYNTAX   INTEGER
+MAX-ACCESS    read-only
+STATUS current
+DESCRIPTION
+ " "
+::={apRadioChannelEntry  3}
+
+TransmitSpeedConfig      OBJECT-TYPE
+SYNTAX   OCTET STRING (SIZE(0..32))
+MAX-ACCESS  read-write
+STATUS current
+DESCRIPTION
+ " "
+::={apRadioChannelEntry  4}
+
+MaxTxPwrLvl     OBJECT-TYPE
+SYNTAX   INTEGER
+MAX-ACCESS  read-only
+STATUS current
+DESCRIPTION
+ " "
+::={apRadioChannelEntry  5}
+
+
+PwrAttRange	 OBJECT-TYPE
+SYNTAX   INTEGER
+MAX-ACCESS  read-only
+STATUS current
+DESCRIPTION
+ " "
+::={apRadioChannelEntry  6}
+
+AntennaGain    	       OBJECT-TYPE
+SYNTAX    INTEGER
+MAX-ACCESS  read-only
+STATUS current
+DESCRIPTION
+ " "
+::={apRadioChannelEntry  7}
+
+PowerMgmtEnable            OBJECT-TYPE
+SYNTAX    TruthValue{open(1),close(0)}
+MAX-ACCESS  read-only
+STATUS current
+DESCRIPTION
+ " "
+::={apRadioChannelEntry  8}
+
+MaxStationNumPermitted     OBJECT-TYPE
+SYNTAX    INTEGER
+MAX-ACCESS  read-write
+STATUS current
+DESCRIPTION
+ " "
+::={apRadioChannelEntry  9}
+
+
+END
+

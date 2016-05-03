@@ -1,0 +1,14 @@
+In file included from shell/mxml_path.c:12:
+shell/mxml.h:27: warning: function declaration isn't a prototype
+shell/mxml.h:32: warning: function declaration isn't a prototype
+shell/mxml.h:37: warning: function declaration isn't a prototype
+shell/mxml.h:64: warning: function declaration isn't a prototype
+shell/mxml.h:137: warning: function declaration isn't a prototype
+shell/mxml_path.c: In function 'mxml_node_get_path_new':
+shell/mxml_path.c:24: warning: implicit declaration of function 'strlen'
+shell/mxml_path.c:28: warning: implicit declaration of function 'malloc'
+shell/mxml_path.c:28: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_path.c:36: warning: implicit declaration of function 'strcpy'
+shell/mxml_path.c:36: warning: incompatible implicit declaration of built-in function 'strcpy'
+shell/mxml_path.c:40: warning: implicit declaration of function 'free'
+shell/mxml_path.c:40: warning: incompatible implicit declaration of built-in function 'free'

@@ -1,0 +1,2 @@
+http.c:216: warning: conflicting types for 'http_send_redirect_to_noauth'
+http.c:114: warning: previous implicit declaration of 'http_send_redirect_to_noauth' was here

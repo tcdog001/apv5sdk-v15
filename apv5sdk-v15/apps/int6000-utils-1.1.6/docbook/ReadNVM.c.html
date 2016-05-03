@@ -1,0 +1,239 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			ReadNVM.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='ReadMME2.c.html' title=' ReadMME2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='ReadPIB.c.html' title=' ReadPIB.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed ReadNVM (struct int6k *int6k);
+ *   
+ *   int6k.h
+ *   
+ *   Read MAC Software Image from the device using as many VS_RD_MOD 
+ *   messages as needed; Write image blocks to file as as they are 
+ *   read;
+ *
+ *   the object here here is to read NVM from RAM in 1024 byte blocks 
+ *   until MOFFSET exceeds the image length; 
+ *
+ *   MOFFSET and MLENGTH fields occupy different offsets in REQ and 
+ *   CNF messages; we exploit that by initializing CNF message and 
+ *   copying them into the REQ message before each read; 
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *      Nathan Houghton &lt;nathan.houghton@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef READNVM_SOURCE
+#define READNVM_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;memory.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../nvm/nvm.h&quot;
+
+signed ReadNVM (struct int6k *int6k) 
+
+{
+
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_rd_mod_request 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MODULEID;
+		uint8_t MACCESS;
+		uint16_t MLENGTH;
+		uint32_t MOFFSET;
+		uint8_t MSECRET [16];
+	}
+	* request = (struct vs_rd_mod_request *) (message);
+	struct __packed vs_rd_mod_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint8_t RES [3];
+		uint8_t MODULEID;
+		uint8_t RESERVED;
+		uint16_t MLENGTH;
+		uint32_t MOFFSET;
+		uint32_t CHKSUM;
+		uint8_t BUFFER [INT6K_BLOCKSIZE];
+	}
+	* confirm = (struct vs_rd_mod_confirm *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	uint32_t header = 0;
+	uint32_t extent = 0;
+	uint32_t offset = 0;
+	signed length = INT6K_BLOCKSIZE;
+	Request (int6k, &quot;Read Firmware from Device&quot;);
+	if (lseek (int6k-&gt;nvm.file, 0, SEEK_SET)) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't home %s&quot;, filepart (int6k-&gt;nvm.name));
+		return (1);
+	}
+	memset (message, 0, sizeof (struct message));
+	do 
+	{
+		EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+		IntellonHeader (&amp;message-&gt;intellon, (VS_RD_MOD | MMTYPE_REQ));
+		int6k-&gt;packetsize = ETHER_MIN_LEN;
+		request-&gt;MODULEID = VS_MODULE_MAC;
+		request-&gt;MLENGTH = HTOLE16 (length);
+		request-&gt;MOFFSET = HTOLE32 (offset);
+		if (SendMME (int6k) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+			return (-1);
+		}
+		if (ReadMME (int6k, (VS_RD_MOD | MMTYPE_CNF)) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+			return (-1);
+		}
+		if (confirm-&gt;MSTATUS) 
+		{
+			Failure (int6k, INT6K_WONTDOIT);
+			return (-1);
+		}
+
+#if 1
+
+		if (LE16TOH (confirm-&gt;MLENGTH) != length) 
+		{
+			Failure (int6k, INT6K_ERR_LENGTH);
+			return (-1);
+		}
+		if (LE32TOH (confirm-&gt;MOFFSET) != offset) 
+		{
+			Failure (int6k, INT6K_ERR_OFFSET);
+			return (-1);
+		}
+
+#else
+
+		if (LE16TOH (confirm-&gt;MLENGTH) != length) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), 0, INT6K_ERR_LENGTH);
+			length = INT6K_BLOCKSIZE;
+			offset = 0;
+			continue;
+		}
+		if (LE32TOH (confirm-&gt;MOFFSET) != offset) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), 0, INT6K_ERR_OFFSET);
+			length = INT6K_BLOCKSIZE;
+			offset = 0;
+			continue;
+		}
+
+#endif
+
+		length = LE16TOH (confirm-&gt;MLENGTH);
+		offset = LE32TOH (confirm-&gt;MOFFSET);
+		if (checksum_32 (confirm-&gt;BUFFER, length, confirm-&gt;CHKSUM)) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;Bad Packet Checksum&quot;);
+			return (-1);
+		}
+		if (offset == extent) 
+		{
+			struct header_nvm * header_nvm = (struct header_nvm *)(confirm-&gt;BUFFER);
+			if (checksum_32 (header_nvm, sizeof (struct header_nvm), 0)) 
+			{
+				error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;Bad Header Checksum&quot;);
+				return (-1);
+			}
+			if (header_nvm-&gt;HEADERVERSION != NVM_HEADER_VERSION) 
+			{
+				error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;Bad Header Version&quot;);
+				return (-1);
+			}
+			extent += sizeof (struct header_nvm);
+			extent += LE32TOH (header_nvm-&gt;IMAGELENGTH);
+			header = LE16TOH (header_nvm-&gt;NEXTHEADER);
+		}
+		if ((offset + length) &gt; extent) 
+		{
+			length = extent - offset;
+		}
+		if (lseek (int6k-&gt;nvm.file, offset, SEEK_SET) != offset) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't seek %s&quot;, filepart (int6k-&gt;nvm.name));
+			return (-1);
+		}
+		if (write (int6k-&gt;nvm.file, confirm-&gt;BUFFER, length) &lt; length) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't save %s&quot;, filepart (int6k-&gt;nvm.name));
+			return (-1);
+		}
+		offset += length;
+		length = 1024;
+	}
+	while ((header) || (offset &lt; extent));
+	Confirm (int6k, &quot;Read %s&quot;, int6k-&gt;nvm.name);
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='ReadMME2.c.html' title=' ReadMME2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='ReadPIB.c.html' title=' ReadPIB.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

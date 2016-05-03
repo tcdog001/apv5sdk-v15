@@ -1,0 +1,28 @@
+#!/bin/sh
+TYPE="${1}"
+FAULT_DES=""
+RES=0
+
+ifconfig wifi0 1>/dev/null 2>&1
+if [ ! $? -eq 0 ];then
+	RES=$((${RES}+1))
+	FAULT_DES="wifi0"
+fi
+
+if [ "${TYPE}" == "apv2" ];then
+	ifconfig wifi1 1>/dev/null 2>&1
+	if [ ! $? -eq 0 ];then
+		RES=$((${RES}+1))
+		FAULT_DES_TMP="${FAULT_DES} wifi1"
+		FAULT_DES="${FAULT_DES_TMP}"
+	fi
+fi
+
+echo -n "&result: "
+if [ ${RES} -eq 0 ];then
+	echo "0&"
+else
+	echo "1&"
+	echo "&fault: ${FAULT_DES} error !!!&"
+fi
+

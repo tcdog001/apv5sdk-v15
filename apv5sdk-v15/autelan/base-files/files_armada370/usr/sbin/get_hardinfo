@@ -1,0 +1,46 @@
+#!/bin/sh
+
+WRCPUUTIL=/usr/bin/pro_ctl_util
+PRODUCT_TYPE="`$WRCPUUTIL -i|awk -F':' '/product type/{print $2}'`"
+#CPU_TYPE="`cat /proc/cpuinfo |awk -F':' '/system type/{print $2}'`"
+#hardinfo mach AP_TYPE
+
+	CPU_TYPE="AMCC APM82181"
+       AP_FLASH_TYPE="WINBOND W25Q128BV16"
+       AP_FLASH_SIZE=16M
+       AP_MEM_TYPE=NT5TU64M16DG-AC
+       AP_MEM_SIZE=256M
+       AP_ETH_NUM=1
+       AP_UP_SPEED=1000M
+
+if [ -d /jffs/.hardinfo ];then
+	if [ -f /jffs/.hardinfo/cpu_type ];then
+		CPU_TYPE=`cat /jffs/.hardinfo/cpu_type`
+	fi
+	if [ -f /jffs/.hardinfo/flash_type ];then
+		AP_FLASH_TYPE=`cat /jffs/.hardinfo/flash_type`
+	fi
+	if [ -f /jffs/.hardinfo/flash_size ];then
+		AP_FLASH_SIZE=`cat /jffs/.hardinfo/flash_size`
+	fi
+	if [ -f /jffs/.hardinfo/mem_type ];then
+		AP_MEM_TYPE=`cat /jffs/.hardinfo/mem_type`
+	fi
+	if [ -f /jffs/.hardinfo/mem_size ];then
+		AP_MEM_SIZE=`cat /jffs/.hardinfo/mem_size`
+	fi
+	if [ -f /jffs/.hardinfo/eth_num ];then
+		AP_ETH_NUM=`cat /jffs/.hardinfo/eth_num`
+	fi
+	if [ -f /jffs/.hardinfo/up_speed ];then
+		AP_UP_SPEED=`cat /jffs/.hardinfo/up_speed`
+	fi
+fi
+
+echo cpu_type:$CPU_TYPE
+echo flash_type:$AP_FLASH_TYPE 
+echo flash_size:$AP_FLASH_SIZE
+echo mem_type:$AP_MEM_TYPE
+echo mem_size:$AP_MEM_SIZE
+echo eth_num:$AP_ETH_NUM
+echo up_speed:$AP_UP_SPEED

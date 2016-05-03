@@ -1,0 +1,63 @@
+#!/bin/sh
+IWPRIV=/usr/sbin/iwpriv
+IWCONFIG=/usr/sbin/iwconfig
+#
+#usage()
+#
+usage()
+{
+	echo "Usage:"
+	echo "	 ar11nmode {interface} {workmode} {extoffset} {cwmmode}"
+	echo "      	   workmode: 11na/11ng"
+	echo "      	   extoffset: -1/0/1  -1(down) 0(no) 1(up)"
+	echo "      	   cwmmode: 0/1/2  0(ht20) 1(ht20/40) 2(ht40)"
+}
+
+if [ ! $# -eq 4 ];then
+	usage
+	exit 1
+fi
+
+INTERFACE=$1
+
+WORK_MODE="$2"
+if [ ! "${WORK_MODE}" = "11ng" ] && [ ! "${WORK_MODE}" = "11na" ];then
+	echo "error: work mode error!"
+	usage
+	exit 1
+fi
+[ "${WORK_MODE}" == "11ng" ] && WORK_MODE=11NG
+[ "${WORK_MODE}" == "11na" ] && WORK_MODE=11NA
+
+
+EXT_OFFSET=$3
+if [ ! ${EXT_OFFSET} -eq -1 ] && [ ! 0${EXT_OFFSET} -eq 0 ] && [ ! 0${EXT_OFFSET} -eq 1 ];then
+	echo "error: extoffset error !"
+	usage
+	exit 1
+fi
+
+CWMMODE=$4
+
+case ${CWMMODE} in
+	0)
+		EXT_OFFSET=0
+		WORK_MODE="${WORK_MODE}HT20"	
+	;;
+	1|2)
+		if [ ${EXT_OFFSET} -eq -1 ];then
+			WORK_MODE="${WORK_MODE}HT40MINUS"
+		else
+			WORK_MODE="${WORK_MODE}HT40PLUS"
+		fi
+	;;
+	*)
+		echo "error: cwmmode error !"
+		usage
+		exit 1
+	;;
+esac
+
+${IWCONFIG} ${INTERFACE} channel 0
+${IWPRIV} ${INTERFACE} mode ${WORK_MODE}
+${IWPRIV} ${INTERFACE} cwmmode ${CWMMODE}

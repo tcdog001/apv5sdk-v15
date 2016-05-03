@@ -1,0 +1,21 @@
+In file included from ag934x.c:12:
+ag934x_phy.h: In function 'ag7240_phy_setup':
+ag934x_phy.h:24: warning: implicit declaration of function 'athr_phy_setup'
+ag934x_phy.h: In function 'ag7240_phy_link':
+ag934x_phy.h:53: warning: implicit declaration of function 'athr_phy_is_up'
+ag934x_phy.h: In function 'ag7240_phy_duplex':
+ag934x_phy.h:81: warning: implicit declaration of function 'athr_phy_is_fdx'
+ag934x_phy.h: In function 'ag7240_phy_speed':
+ag934x_phy.h:109: warning: implicit declaration of function 'athr_phy_speed'
+ag934x.c: In function 'ag7240_mii_setup':
+ag934x.c:135: warning: unused variable 'revid_val'
+ag934x.c: In function 'ag7240_check_link':
+ag934x.c:335: warning: pointer targets in passing argument 2 of 'ag7240_phy_link' differ in signedness
+ag934x.c:336: warning: pointer targets in passing argument 2 of 'ag7240_phy_duplex' differ in signedness
+ag934x.c:337: warning: pointer targets in passing argument 2 of 'ag7240_phy_speed' differ in signedness
+ag934x.c:333: warning: unused variable 'fdx'
+ag934x.c: In function 'ag7240_mac_addr_loc':
+ag934x.c:520: warning: unused variable 'flash_info'
+ag934x.c: In function 'ag7240_enet_initialize':
+ag934x.c:617: warning: passing argument 2 of 'miiphy_register' from incompatible pointer type
+ag934x.c:617: warning: passing argument 3 of 'miiphy_register' from incompatible pointer type

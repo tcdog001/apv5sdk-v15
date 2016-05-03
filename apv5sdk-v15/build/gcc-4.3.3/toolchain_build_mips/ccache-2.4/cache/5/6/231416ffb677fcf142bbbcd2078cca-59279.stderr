@@ -1,0 +1,2 @@
+cmd_mii.c: In function 'do_mac':
+cmd_mii.c:668: warning: pointer targets in passing argument 2 of 'write_buff' differ in signedness

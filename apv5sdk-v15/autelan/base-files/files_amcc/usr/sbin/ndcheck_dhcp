@@ -1,0 +1,37 @@
+#!/bin/sh
+INTERVAL=10
+NeighborDeadInterval_one_third=0
+NeighborDeadInterval_two_third=0
+
+while :
+do
+	if [ -f /jffs/ndcheck_dhcp_enable ];then
+		local NeighborDeadInterval=`cat /proc/sys/dev/wifi0/thinap_check_threshold`
+		local NeighborDeadCount=`cat /proc/sys/dev/wifi0/thinap_check_timer`
+		NeighborDeadInterval=$((${NeighborDeadInterval}-6))
+		
+		if [ $NeighborDeadInterval -lt 6 ] ; then
+            NeighborDeadInterval=6
+			
+        fi
+		
+		NeighborDeadInterval_one_third=$((${NeighborDeadInterval}/3))
+		NeighborDeadInterval_two_third=$((${NeighborDeadInterval_one_third}*2))
+			
+		if [ ${NeighborDeadCount} -eq ${NeighborDeadInterval_one_third}  ];then
+			killall udhcpc
+			/sbin/udhcpc -i default -t 3 -b > /dev/null 2>&1 &
+		elif [ ${NeighborDeadCount} -eq ${NeighborDeadInterval_two_third}  ];then
+			killall udhcpc
+			/sbin/udhcpc -i default -t 3 -b > /dev/null 2>&1 &
+		fi
+		
+	#	if [ -f /tmp/conf_wtpd/gEchoInterval ];then
+	#		INTERVAL=`cat /tmp/conf_wtpd/gEchoInterval`
+	#		if [ $INTERVAL -eq 0 ] ; then
+	#			INTERVAL=10
+	#		fi
+	#	fi
+	fi
+        sleep ${INTERVAL}	
+done

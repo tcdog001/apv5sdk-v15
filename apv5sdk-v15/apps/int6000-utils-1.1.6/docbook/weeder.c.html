@@ -1,0 +1,361 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			weeder.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='version.c.html' title=' version.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='xmlattribute.c.html' title=' xmlattribute.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   weeder.c - Weeder Solid State Relay Control program;
+ *
+ *.  Intellon Linux Toolkit;
+ *:  Snapshot 2006-2008 by Intellon Corporation; charles.maier@intellon.com;
+ *;  For demonstration or evaluation only; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+#if defined (__linux__)
+#	include &lt;sys/io.h&gt;
+#	include &lt;termios.h&gt;
+#elif defined (__APPLE__)
+#	include &lt;sys/io.h&gt;
+#	include &lt;termios.h&gt;
+#elif defined (WIN32)
+#	include &lt;windows.h&gt;
+#else
+#error &quot;Unknown Environment&quot;
+#endif
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/putoptv.h&quot;
+#include &quot;../tools/version.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/symbol.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/error.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/uintspec.c&quot;
+#include &quot;../tools/synonym.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/error.c&quot;
+#endif
+
+/*====================================================================*
+ *   program constants;
+ *--------------------------------------------------------------------*/
+
+#define MODES 2
+#define UNITS &quot;BACDE&quot;
+#define CHARS 7
+#define WAIT 10 
+
+#ifdef WIN32
+#	define DEVICE &quot;com1:&quot;
+#	define SLEEP(n) Sleep(n)
+#else
+#	define DEVICE &quot;/dev/ttyS0&quot;
+#	define SLEEP(n) usleep((n)*1000)
+#endif
+
+#define WEEDER_SILENCE (1 &lt;&lt; 0)
+#define WEEDER_VERBOSE (1 &lt;&lt; 1)
+
+/*====================================================================*
+ *   program variables;
+ *--------------------------------------------------------------------*/
+
+static const struct _term_ modes [MODES] = 
+
+{
+	{
+		&quot;off&quot;,
+		&quot;0&quot; 
+	},
+	{
+		&quot;on&quot;,
+		&quot;1&quot; 
+	}
+};
+
+/*====================================================================*
+ *
+ *   void function0 (struct _file_ * port, const char * units, unsigned wait, unsigned echo);
+ *
+ *   send echo command to Weeder Solid State Relay modules B then A;
+ *   Standard Intellon relay modules were wired in reverse order for 
+ *   some reason;
+ *
+ *.  Intellon Linux Toolkit;
+ *:  Snapshot 2006-2008 by Intellon Corporation; charles.maier@intellon.com;
+ *;  For demonstration or evaluation only; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static void function0 (struct _file_ * port, const char * units, unsigned wait, unsigned echo) 
+
+{
+	char buffer [10];
+	signed length = 0;
+	buffer [length++] = *units++;
+	buffer [length++] = 'X';
+	buffer [length++] = '0' + (echo &amp; 1);
+	buffer [length++] = '\r';
+	if (write (port-&gt;file, buffer, length) &lt; length) 
+	{
+		error (1, errno, &quot;Can't write to %s&quot;, port-&gt;name);
+	}
+	SLEEP (wait);
+	length = 0;
+	buffer [length++] = *units++;
+	buffer [length++] = 'X';
+	buffer [length++] = '0' + (echo &amp; 1);
+	buffer [length++] = '\r';
+	if (write (port-&gt;file, buffer, length) &lt; length) 
+	{
+		error (1, errno, &quot;Can't write to %s&quot;, port-&gt;name);
+	}
+	SLEEP (wait);
+	return;
+}
+
+/*====================================================================*
+ *
+ *   void function1 (struct _file_ * port, const char * units, unsigned wait, unsigned mode, unsigned data);
+ *
+ *   send write command to Weeder Solid State Relay modules B then A;
+ *   Standard Intellon relay modules were wired in reverse order for 
+ *   some reason;
+ *
+ *.  Intellon Linux Toolkit;
+ *:  Snapshot 2006-2008 by Intellon Corporation; charles.maier@intellon.com;
+ *;  For demonstration or evaluation only; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static void function1 (struct _file_ * port, const char * units, unsigned wait, unsigned mode, unsigned data) 
+
+{
+	char buffer [10];
+	signed length = 0;
+	buffer [length++] = *units++;
+	buffer [length++] = 'W';
+	buffer [length++] = '0' + (mode &amp; 1);
+	buffer [length++] = '0';
+	buffer [length++] = '0';
+	while (length &lt; CHARS) 
+	{
+		buffer [length++] = '0' + (data &amp; 1);
+		data &gt;&gt;= 1;
+	}
+	buffer [length++] = '\r';
+	if (write (port-&gt;file, buffer, length) &lt; length) 
+	{
+		error (1, errno, &quot;Can't write to %s&quot;, port-&gt;name);
+	}
+	SLEEP (wait);
+	length = 0;
+	buffer [length++] = *units++;
+	buffer [length++] = 'W';
+	while (length &lt; CHARS) 
+	{
+		buffer [length++] = '0' + (data &amp; 1);
+		data &gt;&gt;= 1;
+	}
+	buffer [length++] = '\r';
+	if (write (port-&gt;file, buffer, length) &lt; length) 
+	{
+		error (1, errno, &quot;Can't write to %s&quot;, port-&gt;name);
+	}
+	SLEEP (wait);
+	return;
+}
+
+/*====================================================================*
+ *
+ *   int main (int argc, const char * argv []);
+ *
+ *
+ *
+ *.  Intellon Linux Toolkit;
+ *:  Snapshot 2006-2008 by Intellon Corporation; charles.maier@intellon.com;
+ *;  For demonstration or evaluation only; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	static const char *optv [] = 
+	{
+		&quot;e:m:o:p:iqvw:&quot;,
+		&quot;&quot;,
+		&quot;control Weeder programmable attenuator module&quot;,
+		&quot;e n\techo is (n) [0]&quot;,
+		&quot;m n\tmode is (n) [1]&quot;,
+		&quot;o s\tunit order is (s) [&quot; UNITS &quot;]&quot;,
+		&quot;p f\tport is (f) [&quot; DEVICE &quot;]&quot;,
+		&quot;q\tquiet mode&quot;,
+		&quot;v\tverbose mode&quot;,
+		&quot;w n\twait (n) millseconds [10]&quot;,
+		(const char *) (0) 
+	};
+	struct _file_ port = 
+	{
+		-1,
+		DEVICE 
+	};
+
+#if defined (__linux__)
+
+	struct termios termios;
+
+#elif defined (WIN32)
+
+	HANDLE hSerial;
+	DCB dcbSerial = 
+	{
+		0 
+	};
+
+#else
+#error &quot;Unknown environment&quot;
+#endif
+
+	const char * units = UNITS;
+	unsigned wait = WAIT;
+	unsigned echo = 0;
+	unsigned mode = 1;
+	unsigned data = 0;
+	flag_t flags = (flag_t)(0);
+	signed c;
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch (c) 
+		{
+		case 'e':
+			echo = (unsigned)(uintspec (synonym (optarg, modes, MODES), 0, 1));
+			break;
+		case 'm':
+			mode = (unsigned)(uintspec (synonym (optarg, modes, MODES), 0, 1));
+			break;
+		case 'o':
+			units = optarg;
+			break;
+		case 'p':
+			port.name = optarg;
+			break;
+		case 'w':
+			wait = (unsigned)(uintspec (optarg, 5, 100));
+			break;
+		case 'q':
+			_setbits (flags, WEEDER_SILENCE);
+			break;
+		case 'v':
+			_setbits (flags, WEEDER_VERBOSE);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	if ((argc) &amp;&amp; (*argv)) 
+	{
+		data = (unsigned)(uintspec (*argv, 0, 0x7F));
+	}
+
+#if defined (WIN32)
+
+	hSerial = CreateFile (port.name, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (hSerial == INVALID_HANDLE_VALUE) 
+	{
+		error (1, 0, &quot;Can't open %s&quot;, port.name);
+	}
+	dcbSerial.DCBlength = sizeof (dcbSerial);
+	if (!GetCommState (hSerial, &amp;dcbSerial)) 
+	{
+		error (1, 0, &quot;Can't read %s state&quot;, port.name);
+	}
+	dcbSerial.BaudRate = CBR_9600;
+	dcbSerial.ByteSize = 8;
+	dcbSerial.StopBits = ONESTOPBIT;
+	dcbSerial.Parity = NOPARITY;
+	if (!SetCommState (hSerial, &amp;dcbSerial)) 
+	{
+		error (1, 0, &quot;Can't save %s state&quot;, port.name);
+	}
+	CloseHandle (hSerial);
+	if ((port.file = open (port.name, O_RDWR)) == -1) 
+	{
+		error (1, errno, &quot;Can't open %s&quot;, port.name);
+	}
+
+#elif defined (__linux__)
+
+	if ((port.file = open (port.name, O_RDWR|O_NOCTTY|O_NDELAY)) == -1) 
+	{
+		error (1, 0, &quot;Can't open %s&quot;, port.name);
+	}
+	tcgetattr (port.file, &amp;termios);
+	termios.c_cflag = CS8;
+	cfsetospeed (&amp;termios, B9600);
+	tcsetattr (port.file, TCSANOW, &amp;termios);
+
+#else
+#error &quot;Unknown environment&quot;
+#endif
+
+	function0 (&amp;port, units, wait, echo);
+	function1 (&amp;port, units, wait, mode, data);
+	close (port.file);
+	exit (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='version.c.html' title=' version.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='xmlattribute.c.html' title=' xmlattribute.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

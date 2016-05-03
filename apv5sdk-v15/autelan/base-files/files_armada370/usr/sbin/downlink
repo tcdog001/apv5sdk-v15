@@ -1,0 +1,3 @@
+#!/bin/sh
+#pro_ctl_util -d 13
+pro_ctl_util -d 22

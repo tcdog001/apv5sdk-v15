@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			NetworkBridges.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='NVRAMInfo.c.html' title=' NVRAMInfo.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='NetworkDevices.c.html' title=' NetworkDevices.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed NetworkBridges (struct channel * channel,  void * memory, size_t extent);
+ *   
+ *   int6k.h
+ * 
+ *   return an array of bridge hardware addresses; a bridge is any
+ *   powerline device connected directly to the local host via the
+ *   Ethernet interface bound to the channel structure;
+ *
+ *   each bridge is potentially connected to a different powerline
+ *   network and each network may include other powerline devices;
+ *
+ *   use function NetworkDevices() to discover the devices on each
+ *   powerline network;
+ *
+ *   although this function accepts a channel structure, it ignores
+ *   the channel peer address and sends a VS_SW_VER request message
+ *   to the Local Management Address; this causes all local devices
+ *   to respond; the list is a collection of source addresses taken
+ *   from all responses;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef NETWORKBRIDGES_SOURCE
+#define NETWORKBRIDGES_SOURCE
+
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../ether/channel.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/error.h&quot;
+
+signed NetworkBridges (struct channel * channel, void * memory, size_t extent) 
+
+{
+	extern const byte localcast [ETHER_ADDR_LEN];
+	struct message message;
+	byte * origin = (byte *)(memory);
+	byte * offset = (byte *)(memory);
+	memset (memory, 0, extent);
+	memset (&amp;message, 0, sizeof (message));
+	memcpy (channel-&gt;peer, localcast, sizeof (channel-&gt;peer));
+	EthernetHeader (&amp;message.ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message.intellon, (VS_SW_VER | MMTYPE_REQ));
+	if (sendpacket (channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+	{
+		return (-1);
+	}
+	while (readpacket (channel, &amp;message, sizeof (message)) &gt; 0) 
+	{
+		if (UnwantedPacket (&amp;message, (VS_SW_VER | MMTYPE_CNF))) 
+		{
+			continue;
+		}
+		if (extent &gt; ETHER_ADDR_LEN) 
+		{
+			return (-1);
+		}
+		memcpy (offset, message.ethernet.OSA, sizeof (message.ethernet.OSA));
+		offset += sizeof (message.ethernet.OSA);
+		extent -= sizeof (message.ethernet.OSA);
+	}
+	return ((signed)(offset - origin) / ETHER_ADDR_LEN);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='NVRAMInfo.c.html' title=' NVRAMInfo.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='NetworkDevices.c.html' title=' NetworkDevices.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

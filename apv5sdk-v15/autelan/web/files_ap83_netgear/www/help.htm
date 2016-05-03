@@ -1,0 +1,255 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js help_info.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript"> 
+	var flag="<%= $xml_session_lang %>";
+	init_mmenu(flag);
+	init_help(flag);
+      function openWin(u, w, h) { 
+            var l = (screen.width - w) / 2; 
+            var t = (screen.height - h) / 2; 
+            var s = 'width=' + w + ', height=' + h + ', top=' + t + ', left=' + l; 
+            s += ', toolbar=no, scrollbars=yes, menubar=no, location=no, resizable=no'; 
+            open(u, '', s); 
+      } 
+</script> 
+
+
+</head>
+<body>
+<%in menu_help.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="login.cgi">
+<div align="center">
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+       <tr>
+        <td width="100%" align="left" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(help_bs)</script></b></td>
+      </tr>
+      
+      <tr>
+			<td  height="10">
+			</td>
+			</tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_lanset)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_dns)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_ntp)</script></td>
+      </tr>
+      
+      <tr>
+			<td  height="10">
+			</td>
+			</tr>
+      
+      <tr>
+        <td width="100%" align="left" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(help_wl)</script></b></td>
+      </tr>
+      
+      <tr>
+			<td  height="10">
+			</td>
+			</tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_wirelessinfo)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_wirelessset)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_sec)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_radius)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_mac)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_wds)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_rogue)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_adv)</script></td>
+      </tr>
+      
+      <tr>
+			<td  height="10">
+			</td>
+			</tr>
+			
+			<tr>
+        <td width="100%" align="left" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(help_interface)</script></b></td>
+      </tr>
+	 
+	 <tr>
+			<td  height="10">
+			</td>
+			</tr>
+	 
+	   <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_wdif)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_wlif)</script></td>
+      </tr>
+      <tr>
+			<td  height="10">
+			</td>
+			</tr>
+      
+	  <tr>
+        <td width="100%" align="left" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(help_advset)</script></b></td>
+      </tr>
+	 
+	 <tr>
+			<td  height="10">
+			</td>
+			</tr>
+	 
+	   <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_route)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_stp)</script></td>
+      </tr>
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_vlan)</script></td>
+      </tr>
+      
+      <tr>
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_dhcpserver)</script></td>
+      </tr>
+      <tr>
+			<td  height="10">
+			</td>
+			</tr>	
+      
+      <tr>
+        <td width="100%" align="left" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(help_wmm)</script></b></td>
+      </tr>
+	 
+	 <tr>
+			<td  height="10">
+			</td>
+			</tr>
+	 
+	   <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_qos)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_qosqueue)</script></td>
+      </tr>
+      
+      <tr>
+			<td  height="10">
+			</td>
+			</tr>	
+      
+	   <tr>
+        <td width="100%" align="left" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(help_admin)</script></b></td>
+      </tr>
+      
+      <tr>
+			<td  height="10">
+			</td>
+			</tr>
+      
+	   <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_firm)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_workmode)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_backup)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_diag)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_operate)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_chgpwd)</script></td>
+      </tr>
+      
+	    <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_remote)</script></td>
+      </tr>
+      
+      <tr>
+        <td align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(help_syslog)</script></td>
+      </tr>
+      
+      
+      <tr>
+			<td  height="10">
+			</td>
+			</tr>
+      
+      
+    
+      
+</table>
+</div>
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

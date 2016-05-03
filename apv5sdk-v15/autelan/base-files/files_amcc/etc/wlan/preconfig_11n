@@ -1,0 +1,143 @@
+#!/bin/sh
+#
+#board management
+#
+if [ -f /jffs/sys.patch ];then
+            /jffs/sys.patch
+fi
+cd /lib/modules/2.6.36/net/
+insmod pro_ctl_mod.ko;
+#create device information file
+#HV=`wrcpuutil -i | awk -F ":" '/product sn/{print $2}' | awk 'BEGIN{FS=""}{print $10"."$11$12}'`
+#device_info $DEVICE_MODEL $HV
+#DEVICE_MODEL="`/usr/bin/pro_ctl_util -i | awk -F ":" '/product type/{print $2}'`"
+DEVICE_MODEL="`/usr/sbin/showsysinfo | awk -F ":" '/Device Type/{print $2}'`"
+echo "$DEVICE_MODEL"
+
+device_info $DEVICE_MODEL
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+  PCI_POLICY=""
+if [ "${country_code}" == "Asia" ];then
+	PCI_POLICY="countrycode=156"
+fi
+if [ -f /jffs/.mac-policy ];then
+	PCI_POLICY="${PCI_POLICY} new_dispatch_mac=2"
+else
+	PCI_POLICY="${PCI_POLICY} new_dispatch_mac=1"
+fi
+#
+# drivers
+#
+
+#cd /etc/rc.d 
+#./rc.wlan up
+
+config_country_code_wifi0=`config_read /config/network/country/wifi0`
+country_code=`config_getoption "$config_country_code" region`
+if [ "${country_code}" == "Asia" ];then
+    iwpriv wifi0 setCountryID 156
+fi
+config_country_code_wifi1=`config_read /config/network/country/wifi1`
+country_code=`config_getoption "$config_country_code" region`
+if [ "${country_code}" == "Asia" ];then
+    iwpriv wifi1 setCountryID 156
+fi
+DFS_ARGS=""
+if [ "${DFS_domainoverride}" != "" ]; then
+    DFS_ARGS="domainoverride=$DFS_domainoverride $DFS_ARGS"
+fi
+if [ "${DFS_usenol}" != "" ]; then
+    DFS_ARGS="usenol=$DFS_usenol $DFS_ARGS"
+fi
+
+SPECTRAL_ARGS="maxholdintvl=5000 nfrssi=1 nobeacons=0"
+
+cd /lib/modules/2.6.36/net/
+insmod adf.ko
+insmod asf.ko
+insmod ath_hal.ko
+insmod ath_rate_atheros.ko
+insmod ath_spectral.ko $SPECTRAL_ARGS
+insmod ath_dfs.ko $DFS_ARGS
+insmod hst_tx99.ko
+insmod ath_dev.ko $PCI_POLICY
+insmod umac.ko
+insmod wlan_me.ko
+insmod ath_pktlog.ko
+insmod capwap_split_fast.ko
+echo "capwap_split_fast.ko insmod OK"
+#chenxf add for upgrading boot through linux
+insmod physmap_of.ko
+#chenxf add end
+#caizhibang add begin
+insmod kes.ko
+if [ $? -eq 0 ];then
+	cat /proc/kes_dmsg > /tmp/kes_dmsg.log
+	cat /proc/kes_debug > /tmp/kes_debug.log
+	cat /proc/kes_traps > /tmp/kes_traps.log
+	echo 1 > /proc/kes_dmsg_switch
+	echo 1 > /proc/kes_debug_switch
+else
+	touch /tmp/kes_load_failed
+fi
+#End:caizhibang add for kes 2013-03-05>
+mkdir /tmp/tools
+cd /tmp/tools
+tar -xzvf /sbin/debug.tgz
+
+# insmod etho
+#cd /lib/modules/2.6.31/net/
+#insmod athrs_gmac.ko
+# loopback
+#i
+ifconfig lo 127.0.0.1
+
+#set mac
+        mac_base="`/usr/sbin/showsysinfo | awk -F ":" '/MAC/{print $2$3$4$5$6$7}'`"
+#set eth mac
+		mac_org_formed=`set_mac org ${mac_base} `
+        ifconfig eth0 down
+        ifconfig eth0 hw ether $mac_org_formed
+        ifconfig eth0 0.0.0.0 up
+
+PATHVENDOR=/jffs/.OEM
+#set wifi0 mac
+if [ -f /jffs/.OEM/.mac_wifi0 ];then
+#		MAC=`cat $PATHVENDOR/.mac_wifi0`
+		temp_mac="`cat $PATHVENDOR/.mac_wifi0`"
+		mac_org_formed="`/sbin/set_mac org $temp_mac`"
+else		
+		mac_org_formed=`set_mac upper ${mac_base} `
+fi
+		ifconfig wifi0 down
+		ifconfig wifi0 hw ether ${mac_org_formed}
+#set wifi1 mac
+if [ -f /jffs/.OEM/.mac_wifi1 ];then
+#		MAC=`cat $PATHVENDOR/.mac_wifi1`
+		temp_mac="`cat $PATHVENDOR/.mac_wifi1`"
+		mac_org_formed="`/sbin/set_mac org $temp_mac`"
+else
+		mac_org_formed=`set_mac upper ${mac_base} 2`
+fi
+		ifconfig wifi1 down
+		ifconfig wifi1 hw ether ${mac_org_formed}
+# bridge
+#
+brctl addbr default
+brctl setfd default 1
+brctl addif default eth0
+brctl addif default eth1
+ifconfig default 0.0.0.0 up
+
+#init app
+showsysinfo | grep Software > /tmp/issue
+showsysinfo | grep MAC >> /tmp/issue
+showsysinfo | grep SN >> /tmp/issue
+/usr/sbin/telnetd -f /tmp/issue
+
+if [ ! -f /jffs/apinfo.conf ];then
+	cp -f /etc/wlan/apinfo.conf /jffs
+fi
+#add by zhaoej for the question of WBS-41 
+echo 1 > /proc/sys/vm/panic_on_oom 

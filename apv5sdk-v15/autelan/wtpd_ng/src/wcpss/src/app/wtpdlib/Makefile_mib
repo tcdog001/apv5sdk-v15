@@ -1,0 +1,59 @@
+#ifneq ($(strip $(TOOLPREFIX)),)
+#CROSS:=$(TOOLPREFIX)
+#endif
+#CROSS = mipsel-linux-
+#CC = $(CROSS)gcc
+#AR = $(CROSS)ar
+ifeq ($(AR),ar)
+	$(error "You have to define AR to use this Makefile_wtp")
+endif
+#LDFLAGS = -lpthread -ldl -D_REENTRANT
+#LDFLAGS = ./static/libssl.a ./static/libcrypto.a -lpthread -ldl -D_REENTRANT
+LDFLAGS = $(DTLSLDFLAGS) -L. -lpthread -ldl -D_REENTRANT
+
+CFLAGS = $(DTLSCFLAGS) -Wall -g -O0 -D_REENTRANT -I. -I../wid -DWRITE_STD_OUTPUT $(EXTRA_CFLAGS)
+#CFLAGS = -Wall -g -O0 -D_REENTRANT -DCW_NO_DTLS -I. -I../wid -DWRITE_STD_OUTPUT $(EXTRA_CFLAGS)
+
+#-DCW_DEBUGGING
+
+# Memory leak
+#LDFLAGS += ../dmalloc-5.5.0/libdmallocth.a
+#CFLAGS += -DDMALLOC
+
+# Capwap Debugging
+#CFLAGS += -DCW_DEBUGGING
+
+
+
+RM = /bin/rm -f 
+
+PUB_LIB = libwtpdmib.a
+
+PUB_OBJS = wtpd_mib.o
+PUB_SRCS =  wtpd_mib.c
+
+
+WTPD_PLATFORM_LIB  = libwtpdplatform.a
+WTPD_PLATFORM_OBJS = wtpd_platform.o
+WTPD_PLATFORM_SRCS = wtpd_platform.c
+ 
+
+WTPD_PRODUCT_LIB  = libwtpdproduct.a
+WTPD_PRODUCT_OBJS = wtpd_product.o
+WTPD_PRODUCT_SRCS = wtpd_product.c
+
+.PHONY: all 
+
+all: clean  $(PUB_OBJS) $(WTPD_PLATFORM_OBJS) ${WTPD_PRODUCT_OBJS}
+	@echo "################     AR=${AR}     ################"
+	$(AR) -r $(PUB_LIB) $(PUB_OBJS)
+	$(AR) -r $(WTPD_PLATFORM_LIB) $(WTPD_PLATFORM_OBJS)
+	$(AR) -r $(WTPD_PRODUCT_LIB) $(WTPD_PRODUCT_OBJS)
+
+
+.PHONY: clean
+
+clean: 
+	$(RM) $(PUB_LIB) $(PUB_OBJS) ${WTPD_PLATFORM_LIB} $(WTPD_PLATFORM_OBJS) $(WTPD_PRODUCT_LIB) $(WTPD_PRODUCT_OBJS)
+
+

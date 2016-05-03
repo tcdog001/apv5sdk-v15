@@ -1,0 +1,13 @@
+# Makefile for busybox
+#
+# Copyright (C) 1999-2005 by Erik Andersen <andersen@codepoet.org>
+#
+# Licensed under the GPL v2, see the file LICENSE in this tarball.
+
+lib-y:=
+lib-$(CONFIG_ASH)			+= ash.o
+lib-$(CONFIG_HUSH)			+= hush.o
+lib-$(CONFIG_LASH)			+= lash.o
+lib-$(CONFIG_MSH)			+= msh.o splash.o ap_interface.o conf_file_opt.o mxml_attribute.o mxml_document.o mxml_error.o mxml_file.o mxml_index.o mxml_iterator.o mxml_node.o mxml_output.o mxml_path.o mxml_refil.o mxml_sgs.o
+
+lib-$(CONFIG_FEATURE_COMMAND_EDITING)	+= cmdedit.o

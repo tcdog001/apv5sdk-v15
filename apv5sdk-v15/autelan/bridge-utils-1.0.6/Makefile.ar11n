@@ -1,0 +1,121 @@
+.NOTPARALLEL:
+
+ifndef ROOTFSDIR
+ROOTFSDIR := /home/shark/builddir/rootfs
+endif
+
+PKG := bridge-utils-
+VERSION := 1.0.6
+DIR := src
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE),amcc)
+CC := powerpc-apm-linux-gnu-gcc 
+GNU_TARGET_NAME ?= powerpc-apm-linux
+else
+CC := mips-linux-uclibc-gcc
+GNU_TARGET_NAME ?= mips-linux
+endif
+#wangyu add end
+TOOLCHAIN_ABI ?= -mabi=32
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE), amcc)
+ARCH ?= "powerpc"
+else
+ARCH ?= "mips"
+endif
+#wangyu add end
+CP := cp -fpR
+INSTALL_DIR := $(DIR)/_install
+TARGET_BIN :=brctl
+TARGET_PATH := $(DIR)/brctl/$(TARGET_BIN)
+
+#configure option
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE), amcc)
+TARGET_CROSS ?= powerpc-apm-linux-gnu-
+else
+TARGET_CROSS ?= mips-linux-uclibc-
+endif
+#wangyu add end
+TARGET_CC ?= $(TARGET_CROSS)gcc
+TARGET_CPPFLAGS = 
+TARGET_LDFLAGS = 
+EXTRA_CPPFLAGS =  
+EXTRA_LDFLAGS = 
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE), amcc)
+GNU_TARGET_NAME ?= powerpc-apm-linux 
+else
+GNU_TARGET_NAME ?= mips-linux
+endif
+#wangyu add end
+TARGET_CONFIGURE_OPTS ?= \
+  AR=$(TARGET_CROSS)ar \
+  AS="$(TARGET_CC) -c $(TARGET_CFLAGS)" \
+  LD=$(TARGET_CROSS)ld \
+  NM=$(TARGET_CROSS)nm \
+  CC="$(TARGET_CC)" \
+  GCC="$(TARGET_CC)" \
+  CXX=$(TARGET_CROSS)g++ \
+  RANLIB=$(TARGET_CROSS)ranlib \
+  STRIP=$(TARGET_CORSS)strip \
+  OBJCOPY=$(TARGET_CROSS)objcopy \
+  OBJDUMP=$(TARGET_CROSS)objdump \
+  SIZE=$(TARGET_CORSS)size
+
+CONFIGURE_VARS = \
+                $(TARGET_CONFIGURE_OPTS) \
+                CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CXXFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CPPFLAGS="$(TARGET_CPPFLAGS) $(EXTRA_CPPFLAGS)" \
+                LDFLAGS="$(TARGET_LDFLAGS) $(EXTRA_LDFLAGS)" \
+
+CONFIGURE_ARGS = \
+                --target=$(GNU_TARGET_NAME) \
+                --host=$(GNU_TARGET_NAME) \
+                --build=$(GNU_HOST_NAME) \
+                --program-prefix="" \
+                --program-suffix="" \
+                --prefix=/usr \
+                --exec-prefix=/usr \
+                --bindir=/usr/bin \
+                --sbindir=/usr/sbin \
+                --libexecdir=/usr/lib \
+                --sysconfdir=/etc \
+                --datadir=/usr/share \
+                --localstatedir=/var \
+                --mandir=/usr/man \
+                --infodir=/usr/info \
+
+.PHONY: all
+all: configure build install 
+
+.PHONY: configure
+configure:
+	( cd $(DIR) && \
+  	  $(CONFIGURE_VARS) \
+  	  ./configure \
+  	  $(CONFIGURE_ARGS) \
+  	 );
+
+
+.PHONY: build
+build:
+	${MAKE} -C $(DIR) \
+		CROSS_COMPILE=$(TARGET_CROSS) \
+		EXTRA_CFLAGS=$(TOOLCHAIN_ABI) \
+		ARCH=$(ARCH) \
+		IPKG_ARCH=$(ARCH) 
+
+.PHONY:uninstall
+uninstall:
+		rm -rf  $(PREFIX)/usr/sbin/$(TARGET_BIN)
+
+.PHONY: install
+install:
+		cp $(TARGET_PATH) $(PREFIX)/usr/sbin
+	
+.PHONY: clean
+clean:	
+	${MAKE} -C $(DIR) clean
+

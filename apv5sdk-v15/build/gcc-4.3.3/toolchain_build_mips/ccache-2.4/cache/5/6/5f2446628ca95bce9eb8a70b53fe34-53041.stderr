@@ -1,0 +1,6 @@
+../src/mxml_iterator.c: In function 'mxml_iterator_new':
+../src/mxml_iterator.c:16: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_iterator.c: In function 'mxml_iterator_destroy':
+../src/mxml_iterator.c:39: warning: incompatible implicit declaration of built-in function 'free'
+../src/mxml_iterator.c: In function 'mxml_iterator_clone':
+../src/mxml_iterator.c:67: warning: incompatible implicit declaration of built-in function 'malloc'

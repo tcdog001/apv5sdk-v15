@@ -1,0 +1,6 @@
+net.c: In function 'NetLoop':
+net.c:516: warning: label 'skip_netloop' defined but not used
+net.c: In function 'NetStartAgain':
+net.c:645: warning: integer overflow in expression
+net.c: In function 'PingStart':
+net.c:821: warning: integer overflow in expression

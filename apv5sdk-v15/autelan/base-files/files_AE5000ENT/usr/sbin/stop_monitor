@@ -1,0 +1,15 @@
+#!/bin/sh
+
+PRO_CTL_UTIL=/usr/bin/pro_ctl_util
+MONITOR_SWITCH=/proc/sys/dev/wifi0/monitor_process
+THINAP_STATE=/proc/sys/dev/wifi0/thinap_state
+AP_MONITOR=ap_monitor
+
+KILLALL=/usr/bin/killall
+
+if [ -f ${MONITOR_SWITCH} ];then
+	echo 0 > /proc/sys/dev/wifi0/monitor_process
+fi
+${KILLALL} ap_monitor
+${KILLALL} wtpd_check
+echo 2 > ${THINAP_STATE}

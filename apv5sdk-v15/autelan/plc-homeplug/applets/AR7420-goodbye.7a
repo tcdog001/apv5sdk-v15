@@ -1,0 +1,20 @@
+.TH AR7420-goodbye 7a "June 2012" "plc-utils-2.1.1" "Qualcomm Atheros Powerline Toolkit"
+.SH NAME
+goodbye.nvm - simple demonstration applet
+.SH SYNOPSIS
+.BR plctest  
+.BR goodbye.nvm
+.RI [ ... ]
+.SH PURPOSE
+This applet runs, prints a basic message on the console then loops until terminated by reseting the powerline device. It can be used to demonstrate \fBplctest\fR program functionality where one or more applets are to be chained together to form sequence. This applet, together with applet \fBhello.nvm\fR can be ordered and/or merged to illustrate various sequences.
+.SH PREREQUISITES
+This applet runs on the AR7420 chipset. Bootloader software must be running. SDRAM need not be configured. You must use program \fBplctest\fR to load and execute it.
+.SH DISCLAIMER
+Qualcomm Atheros image file structure and content is proprietary to Qualcomm Atheros, Ocala FL USA. Consequently, public information is not available. Qualcomm Atheros reserves the right to change file structure or content in future firmware releases without any obligation to notify or compensate users of this program. This applet is reserved for use by Qualcomm Atheros Engineers for internal use. Qualcomm Atheros makes no claims concerning the reliability of this applet or the suitability of this applet for any particular purpose.
+.SH EXAMPLES
+.SH SEE ALSO
+.BR applets ( 7 ),
+.BR hello ( 7 )
+.SH CREDITS
+ John Byron <john.byron@qca.qualcomm.com>
+

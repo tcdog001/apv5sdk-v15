@@ -1,0 +1,507 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+
+for vap_num in `seq $NUM_ap`
+do
+	    xml_vap=`config_read /config/network/vap${vap_num}`
+	    eval xml_wlan_vap${vap_num}_enable=`config_getoption "$xml_vap" create`
+	    eval xml_wlan_vap${vap_num}_up=`config_getoption "$xml_vap" enable`
+	    eval xml_vap_enable=\$xml_wlan_vap${vap_num}_enable
+	    [ "$xml_vap_enable" == "yes" ]&&{
+	    	eval xml_wlan_vap${vap_num}_ssid=\"`config_getoption "$xml_vap" ssid`\"
+		    eval xml_wlan_vap${vap_num}_wlanmode=`config_getoption "$xml_vap" wlanmode`
+		    eval xml_wlan_vap${vap_num}_security=`config_getoption "$xml_vap" security`
+		    eval xml_wlan_vap${vap_num}_wifi=`config_getoption "$xml_vap" wifi`
+		    eval wifi_name="$"xml_wlan_vap${vap_num}_wifi
+		    eval wifi_devmode="$"DEVMODE_${wifi_name}
+		    xml_wifi_vap=`config_read /config/network/$wifi_name`
+		    wlan_region=`config_getoption "$xml_wifi_vap" region`
+		    eval xml_wlan_vap${vap_num}_modeg=`config_getoption "$xml_wifi_vap" mode`
+		    eval xml_wlan_vap${vap_num}_modea=`config_getoption "$xml_wifi_vap" modea`
+		    eval xml_wlan_vap${vap_num}_moden=`config_getoption "$xml_wifi_vap" moden`
+		    eval xml_wifi_vap${vap_num}_channelg=`config_getoption "$xml_wifi_vap" channel1`
+		    eval xml_wifi_vap${vap_num}_channelb=`config_getoption "$xml_wifi_vap" channel`
+		    eval xml_wifi_vap${vap_num}_channela=`config_getoption "$xml_wifi_vap" channela`
+		    
+		    if [ "$wifi_devmode" == "bg"  ]; then
+		    	eval xml_wlan_vap${vap_num}_mode="$"xml_wlan_vap${vap_num}_modeg	
+		    elif [ "$wifi_devmode" == "abg" ]; then
+		    	eval xml_wlan_vap${vap_num}_mode="$"xml_wlan_vap${vap_num}_modea	
+		    else
+		    	eval xml_wlan_vap${vap_num}_mode="$"xml_wlan_vap${vap_num}_moden
+		    fi
+		    
+		    eval wlan_mode="$"xml_wlan_vap${vap_num}_mode
+		   	if [ "$wlan_mode" == "11b" -o "$wlan_mode" == "11g" -o "$wlan_mode" == "bg" -o  "$wlan_mode" == "11ng" ]; then
+		   		if [ "$wlan_region" == "Asia" -o "$wlan_region" == "Europe" ]; then
+		    		eval xml_wifi_vap${vap_num}_channel="$"xml_wifi_vap${vap_num}_channelg
+		    	elif [ "$wlan_region" == "America" ]; then
+		    		eval xml_wifi_vap${vap_num}_channel="$"xml_wifi_vap${vap_num}_channelb
+		    	else
+		    		eval xml_wifi_vap${vap_num}_channel=auto
+		    	fi
+		    else
+		    	eval xml_wifi_vap${vap_num}_channel="$"xml_wifi_vap${vap_num}_channela
+		    fi
+		  }
+done
+
+change_c()
+{
+     if [ $1 == "0" ];then
+     	echo "auto"
+     else
+     	echo "$1"
+     fi
+}
+wifi_status()
+{
+	if [ "$DEV_wifi1" == "enable" ];then
+		  echo "<option value=\"wifi1\" >wifi1</option>"										
+	fi
+}
+
+vap_status()
+{
+	if [ "$DEV_wifi1" == "enable" ];then
+		  echo "<option value=\"vap9\" >vap9</option>"
+		  echo "<option value=\"vap10\" >vap10</option>"
+		  echo "<option value=\"vap11\" >vap11</option>"
+		  echo "<option value=\"vap12\" >vap12</option>"
+		  echo "<option value=\"vap13\" >vap13</option>"
+		  echo "<option value=\"vap14\" >vap14</option>"
+                  echo "<option value=\"vap15\" >vap15</option>"
+		  echo "<option value=\"vap16\" >vap16</option>"										
+	fi
+}
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js wireless_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	var array_vapct=["<%= $xml_wlan_vap1_enable %>","<%= $xml_wlan_vap2_enable %>","<%= $xml_wlan_vap3_enable %>","<%= $xml_wlan_vap4_enable %>","<%= $xml_wlan_vap5_enable %>","<%= $xml_wlan_vap6_enable %>","<%= $xml_wlan_vap7_enable %>","<%= $xml_wlan_vap8_enable %>","<%= $xml_wlan_vap9_enable %>","<%= $xml_wlan_vap10_enable %>","<%= $xml_wlan_vap11_enable %>","<%= $xml_wlan_vap12_enable %>","<%= $xml_wlan_vap13_enable %>","<%= $xml_wlan_vap14_enable %>","<%= $xml_wlan_vap15_enable %>","<%= $xml_wlan_vap16_enable %>",];
+	var vap_count="<%= $NUM_ap %>";
+	var array_vapup=["<%= $xml_wlan_vap1_up %>","<%= $xml_wlan_vap2_up %>","<%= $xml_wlan_vap3_up %>","<%= $xml_wlan_vap4_up %>","<%= $xml_wlan_vap5_up %>","<%= $xml_wlan_vap6_up %>","<%= $xml_wlan_vap7_up %>","<%= $xml_wlan_vap8_up %>","<%= $xml_wlan_vap9_up %>","<%= $xml_wlan_vap10_up %>","<%= $xml_wlan_vap11_up %>","<%= $xml_wlan_vap12_up %>","<%= $xml_wlan_vap13_up %>","<%= $xml_wlan_vap14_up %>","<%= $xml_wlan_vap15_up %>","<%= $xml_wlan_vap16_up %>",];
+	init_mmenu(flag);
+	init_wiremenu(flag);
+	init_winfo(flag);
+function valvalidate()
+{     
+	 var x;
+	 var y;
+   x = document.getElementById("vapname");    
+   for (var i = 1;i <= vap_count;i++){
+   	  y = "vap" + i;
+   	  if (x.value == y && array_vapct[i-1] == "yes"){
+         if (!confirm(y + winfo_vap_create_alert1 + y +winfo_vap_create_alert2))
+      	     return false;	
+      }                 
+   }
+   
+    	overlayer();
+}
+
+function dev_check()
+{
+		 for(var i = 1;i <= vap_count;i++)
+		 {
+		 		if(array_vapct[i-1] == "yes")
+		 		{
+		 			var tr_enable = "tr" + i;
+		 			document.getElementById(tr_enable).style.display="";
+		 		}
+		 }
+}
+
+function delvap(btobject)
+{
+	 document.all.vapdel.value=document.all.vapdel.value+btobject.name+"%";
+	 document.all.dvap.value="dvap";
+	 var myTr = getParent(btobject,"TR");   
+	 if(myTr != false)
+	 {
+		   myTr.style.display="none";	   
+	 } 
+	 overlayer();
+	 document.form1.action="action.cgi";
+	 document.form1.submit();
+}
+
+function getParent(myElement,myTagName)
+{
+   
+	if(myElement.tagName == "BODY")
+	{
+	    
+	    return false;
+	}
+	
+	if(myElement.tagName == myTagName)
+	{
+	    return myElement;
+	}
+	else
+	{
+	    return getParent(myElement.parentElement,myTagName);
+	}
+}
+
+</script>
+
+</head>
+<body onLoad="dev_check()">
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_wireless.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+  <div align="center">
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0">
+	<tr>
+		<td bordercolor="#456f95">						
+      <table  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+      <tr bgcolor="#456f95">
+      	<td  align="center" width="30" height="22" bordercolor="#456f95">&nbsp;</td>
+        <td  align="center" width="80" bordercolor="#456f95"><b><script language="javascript">replace(winfo_wifi)</script></b></td>
+        <td  align="center" width="80" bordercolor="#456f95"><b><script language="javascript">replace(winfo_vap)</script></b></td>
+        <td  align="center" width="80" bordercolor="#456f95"><b><script language="javascript">replace(winfo_ssid)</script></b></td>
+        <td  align="center" width="70" bordercolor="#456f95"><b><script language="javascript">replace(winfo_enable)</script></b></td>
+        <td  align="center" width="60" bordercolor="#456f95"><b><script language="javascript">replace(winfo_chan)</script></b></td>
+        <td  align="center" width="80" bordercolor="#456f95"><b><script language="javascript">replace(winfo_mode)</script></b></td>
+        <td  align="center" width="80" bordercolor="#456f95"><b><script language="javascript">replace(winfo_wmode)</script></b></td>
+        <td  align="center" width="60" bordercolor="#456f95">&nbsp;</td>
+        <td  align="center" width="30" bordercolor="#456f95">&nbsp;</td>
+      </tr>
+      
+    <tr>
+			<td  height="5">
+			</td>
+			</tr>
+      
+      <tr id="tr1" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap1_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap1</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap1_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap1_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap1_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap1_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap1_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button0)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+      
+      <tr id="tr2" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap2_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap2</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap2_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap2_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap2_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap2_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap2_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button1)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+      
+      <tr id="tr3" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap3_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap3</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap3_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap3_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap3_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap3_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap3_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button2)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+      
+      <tr id="tr4" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap4_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap4</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap4_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap4_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap4_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap4_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap4_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button3)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+     
+      <tr id="tr5" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff" >&nbsp;<%= "$xml_wlan_vap5_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff" >vap5</td>
+        <td  align="center" bordercolor="#ffffff" >&nbsp;<%= "$xml_wlan_vap5_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff" >&nbsp;<%= "$xml_wlan_vap5_up" %></td>
+        <td  align="center" bordercolor="#ffffff" >&nbsp;<% change_c "$xml_wifi_vap5_channel" %></td>
+        <td  align="center" bordercolor="#ffffff" >&nbsp;<%= "$xml_wlan_vap5_mode" %></td>
+        <td  align="center" bordercolor="#ffffff" >&nbsp;<%= "$xml_wlan_vap5_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button4)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+      
+      <tr id="tr6" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap6_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap6</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap6_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap6_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap6_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap6_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap6_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button5)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+     
+     
+      
+      <tr id="tr7" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap7_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap7</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap7_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap7_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap7_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap7_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap7_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button6)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+      
+      <tr id="tr8" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap8_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap8</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap8_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap8_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap8_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap8_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap8_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button7)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+      
+      <tr id="tr9" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap9_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap9</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap9_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap9_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap9_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap9_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap9_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button8)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+      
+      <tr id="tr10" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap10_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap10</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap10_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap10_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap10_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap10_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap10_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button9)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+      
+      <tr id="tr11" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap11_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap11</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap11_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap11_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap11_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap11_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap11_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button10)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+      
+      <tr id="tr12" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap12_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap12</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap12_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap12_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap12_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap12_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap12_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button11)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+      
+      <tr id="tr13" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap13_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap13</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap13_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap13_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap13_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap13_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap13_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button12)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+ 
+       <tr id="tr14" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap14_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap14</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap14_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap14_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap14_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap14_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap14_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button13)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+ 
+       <tr id="tr15" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap15_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap15</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap15_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap15_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap15_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap15_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap15_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button14)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+ 
+       <tr id="tr16" style="display:none">
+      	<td  align="center" height="24" ></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap16_wifi" %></td>
+        <td  align="center" bordercolor="#ffffff">vap16</td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap16_ssid" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap16_up" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<% change_c "$xml_wifi_vap16_channel" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap16_mode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<%= "$xml_wlan_vap16_wlanmode" %></td>
+        <td  align="center" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(winfo_del_button15)</script></td>
+        <td  align="center"  ></td>
+      </tr>
+                            
+       </table>
+       <form id="form1" name="form1"method="post" action="<%= $action_cgi %>" onsubmit="return valvalidate()">
+		  <table id="tab1"  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+      <tr>
+				<td width="100%"  colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(winfo_vap_create)</script></b></td>
+			</tr>
+												
+			<tr>
+				<td colspan="2" height="10">
+				</td>
+			</tr>
+			
+      <tr>
+				<td align="right" height="24" width="280" bordercolor="#ffffff"><script language="javascript">replace(winfo_vap_name)</script>&nbsp;</td>
+				<td width="370" bordercolor="#ffffff">
+				 <select name="vapname" id="vapname">
+						<option value="vap1" >vap1</option>
+						<option value="vap2" >vap2</option>
+						<option value="vap3" >vap3</option>
+						<option value="vap4" >vap4</option>
+						<option value="vap5" >vap5</option>
+						<option value="vap6" >vap6</option>
+						<option value="vap7" >vap7</option>
+						<option value="vap8" >vap8</option>
+						<% vap_status %>
+					</select>		
+				</td>
+			</tr>
+												
+			<tr>
+				<td align="right" height="24" bordercolor="#ffffff"><script language="javascript">replace(winfo_vap_parent)</script>&nbsp;</td>
+				<td  bordercolor="#ffffff">
+					<select name="wifiname">
+				  	<option value="wifi0" >wifi0</option>
+				  	<% wifi_status %>
+				  </select>	
+				</td>
+			</tr>
+			
+			<tr>
+				<td align="right" height="24" bordercolor="#ffffff"><script language="javascript">replace(winfo_wlan_mode)</script>&nbsp;</td>
+				<td  bordercolor="#ffffff">
+				<select name="wlanmode" id="wlanmode">
+					<option value="ap" >ap</option>
+					<option value="sta" >sta</option>
+					<option value="root" >wds root</option>
+					<option value="client" >wds client</option>
+				</select>	
+				</td>
+			</tr>
+			
+			<tr>
+				<td colspan="2" height="10">
+				</td>
+			</tr>
+			
+			<tr>
+        <td align="center" height="40" colspan="2"><label>
+        <script language="javascript">replace(winfo_apply)</script></td>
+        </label></td>
+      </tr>
+      
+      <tr>
+				<td colspan="2" height="10">
+				</td>
+			</tr>
+      </table>
+      </td>
+   </tr>
+</table> 
+		<table align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+     <tr>
+				<td colspan="2" height="10">
+				</td>
+			</tr> 
+      <tr>
+        <td align="right"   colspan="2"><script language="javascript">replace(winfo_help)</script></td>
+      </tr>
+    </table>
+  <input type="hidden" value="Config" name="SERVLET">
+  <input type="hidden" value="" name="dvap">
+  <input type="hidden" value="%" name="vapdel">
+</form>
+  </div>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+
+<%in page_footer.htm %>
+</body>
+</html>
+

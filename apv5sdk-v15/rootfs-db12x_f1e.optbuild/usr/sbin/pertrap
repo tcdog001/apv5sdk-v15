@@ -1,0 +1,60 @@
+#!/bin/sh
+
+IWCONFIG=/usr/sbin/iwconfig
+IWLIST=/usr/sbin/iwlist
+SEND_TRAP=/usr/sbin/send_trap
+
+MAX_VAP_NUM=16
+MAX_WIFI=2
+CONFIG_XML="/etc/config/config.xml"
+. /usr/lib/web/xmlconf.sh
+XPATH_VAP="/config/network/vap"
+
+
+#get_vap_name(wifi_name)
+#wifi_name : wifi[n] n=0,1,2...
+get_vap_name()
+{
+	local wifi_name="notset"
+	local if_name=""
+	local vap_str=""
+	local num=0
+	while [ ! "$wifi_name" = $1 ] && [ $num -lt $MAX_VAP_NUM ] 
+	do
+		num=$(($num+1))
+		vap_str=`config_read ${XPATH_VAP}${num} 2>/dev/null`
+		wifi_name=`config_getoption "$vap_str" wifi 2>/dev/null`
+	done
+	if [ "$wifi_name" = $1 ];then
+		echo `config_getoption "$vap_str" if 2>/dev/null`
+	fi
+}
+
+#channel_detect(dev_name)
+#dev_name : wifi[n] n=0,1,2...
+channel_detect()
+{
+    vap_name_in_wifi=`get_vap_name $1`
+    if [ ! -n "$vap_name_in_wifi" ];then
+	    exit 1
+    fi
+    outside_frequencies=`$IWLIST ${vap_name_in_wifi} scanning 2>/dev/null | awk -F ":|[ ]+" '/Frequency/{print $3}'`
+    if [ ! -n "$outside_frequencies" ];then
+	    exit 1 
+    fi
+    inside_frequency=`$IWCONFIG $vap_name_in_wifi 2>/dev/null | awk '/Frequency/{print $2}'| awk -F ":|=" '{print $2}'`
+    echo $outside_frequencies | grep -q $inside_frequency 2>/dev/null
+    if [ ! $? -eq 0 ];then
+	    return 1 
+    fi
+    return 0
+}
+
+$SEND_TRAP PowerCycleRegisteredAlarm
+for n in `seq $MAX_WIFI`
+do
+	count=$((n-1))
+	if  channel_detect wifi${count}  ;then
+		$SEND_TRAP DeviceInterferenceDetected
+	fi
+done

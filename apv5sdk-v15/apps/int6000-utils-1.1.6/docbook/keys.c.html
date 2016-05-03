@@ -1,0 +1,200 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			keys.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='itln_subagent2.c.html' title=' itln_subagent2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='lookup.c.html' title=' lookup.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   keys.c - Encryption Key Data and Functions;
+ *
+ *   keys.h
+ *
+ *   Tabulate default Intellon pass phrases and their DAK, NMK and 
+ *   NID for search and conversion purposes; 
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef KEYS_SOURCE
+#define KEYS_SOURCE
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../crypt/keys.h&quot;
+
+/*====================================================================*
+ *   variables;                
+ *--------------------------------------------------------------------*/
+
+const struct key keys [KEYS] = 
+
+{
+	{
+		&quot;none/secret&quot;,
+		{
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00 
+		},
+		{
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00 
+		}
+	},
+	{
+		&quot;HomePlugAV&quot;,
+		{
+			0x68,
+			0x9F,
+			0x07,
+			0x4B,
+			0x8B,
+			0x02,
+			0x75,
+			0xA2,
+			0x71,
+			0x0B,
+			0x0B,
+			0x57,
+			0x79,
+			0xAD,
+			0x16,
+			0x30 
+		},
+		{
+			0x50,
+			0xD3,
+			0xE4,
+			0x93,
+			0x3F,
+			0x85,
+			0x5B,
+			0x70,
+			0x40,
+			0x78,
+			0x4D,
+			0xF8,
+			0x15,
+			0xAA,
+			0x8D,
+			0xB7 
+		}
+	},
+	{
+		&quot;HomePlugAV0123&quot;,
+		{
+			0xF0,
+			0x84,
+			0xB4,
+			0xE8,
+			0xF6,
+			0x06,
+			0x9F,
+			0xF1,
+			0x30,
+			0x0C,
+			0x9B,
+			0xDB,
+			0x81,
+			0x23,
+			0x67,
+			0xFF 
+		},
+		{
+			0xB5,
+			0x93,
+			0x19,
+			0xD7,
+			0xE8,
+			0x15,
+			0x7B,
+			0xA0,
+			0x01,
+			0xB0,
+			0x18,
+			0x66,
+			0x9C,
+			0xCE,
+			0xE3,
+			0x0D 
+		}
+	}
+};
+
+/*====================================================================*
+ *   
+ *--------------------------------------------------------------------*/
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='itln_subagent2.c.html' title=' itln_subagent2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='lookup.c.html' title=' lookup.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

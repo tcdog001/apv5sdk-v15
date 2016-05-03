@@ -1,0 +1,45 @@
+#!/bin/sh
+
+echo "start associate"
+
+#if the atf file is exists, then first associate autelan AC
+if [ ! -f /jffs/config.wtp ]; then
+	cp -f /etc/wlan/config.wtp /jffs
+fi
+cp -f /jffs/config.wtp /tmp
+
+if [ ! -f /jffs/atf ]; then
+	echo "run apctl"
+	sysctl -w dev.wifi0.thinap=0
+	apcomm &
+	apctl -i default &
+	nt=0
+	while [ $nt -lt 30 ]; do
+		if [ -f /tmp/zt_state ]; then
+			break
+		fi
+		sleep 10
+		nt=$(($nt + 1))
+		echo "waitting associate zt AC $nt times..."
+	done
+	if [ $nt -lt 30 ]; then
+		zt_monitor &
+	fi
+else
+	nt=30
+fi
+# if ap have didn't associate zt AC, then will to associate autelan AC 
+if [ $nt -eq 30 ]; then
+	killall apcomm
+	killall apctl
+	killall ntpclient
+	killall dhcpsnooping
+	echo "run wtpd"
+	
+	sysctl -w dev.wifi0.thinap=1
+	
+	wtpd > /dev/null 2>&1 &
+	sleep 3
+	/usr/sbin/wtpd_check &
+	/usr/sbin/ap_monitor &
+fi

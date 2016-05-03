@@ -1,0 +1,237 @@
+#!/bin/sh
+
+#command path
+IFCONFIG=/sbin/ifconfig
+WLANCONFIG=/usr/sbin/wlanconfig
+IWCONFIG=/usr/sbin/iwconfig
+#SETANTENNA=/usr/sbin/setantenna
+#SETTXPOWER=/usr/sbin/settxpower
+PACKET=/usr/sbin/packet
+KILLALL=/usr/bin/killall
+#MYDAEMON=/usr/sbin/mydaemon
+IWLIST=/usr/sbin/iwlist
+
+#file path
+AP_MODE_FILE=/proc/sys/dev/wifi0/thinap
+SEND_SWITCH_FILE=/proc/sys/net/ath0/transmit_switch
+SEND_RATE_FILE=/proc/sys/net/ath0/transmit_rate
+TX_OFFSET_FILE=/jffs/tx-offset
+
+#constant num
+TXPOWER_DEF=15
+
+#get parameter
+DEV_NAME=wifi0
+if [ ! -z $1 ];then
+	DEV_NAME="$1"
+fi
+
+#function
+
+#
+#set_power( txpower )
+#
+set_power()
+{
+	local tx_offset=0
+	if [ -f /jffs/tx-offset ];then
+		tx_offset=`cat  /jffs/tx-offset`
+	fi
+	local txpower=$(($1-${tx_offset}))
+	if [ ${txpower} -lt 1 ];then
+		txpower=1
+	fi
+	${IWCONFIG} ath0 txpower ${txpower}
+	return $?
+}
+
+
+#create ap interface and init
+RES=0
+echo "1. create and init virtual interface :"
+echo 0 > "${AP_MODE_FILE}" 
+RES=$(($?+${RES}))
+${WLANCONFIG} ath0 destroy 
+${WLANCONFIG} ath0 create wlandev ${DEV_NAME} wlanmode ap
+RES=$(($?+${RES}))
+#${SETANTENNA} ${DEV_NAME} diversity 0 
+#RES=$(($?+${RES}))
+#${SETANTENNA} ${DEV_NAME} tx 1 
+#RES=$(($?+${RES}))
+echo 1 > ${SEND_SWITCH_FILE} 
+RES=$(($?+${RES}))
+${KILLALL} wtpd_check
+echo -n "create virtual interface:"
+if [ ! ${RES} -eq 0 ];then
+	echo "fault"
+	exit 1
+else
+	echo "ok"
+fi
+echo ""
+
+#config interface
+opt=0
+flag=0
+trans_rate=11000
+vap_channel=1
+packet_size=500
+packet_num=100000
+
+cat /tmp/device_info.xml | awk -F"<|>|[ ]+" '/product_model/{print $4}' | grep -q -e '^A[QG][0-9]\{4\}-[A-Z0-9]\{0,\}H[A-Z0-9]\{0,\}'
+NORMAL=$?   
+if [ ${NORMAL} -eq 0 ];then
+	vap_txpower=27
+else
+	vap_txpower=20
+fi
+
+echo "2. config virtual interface: "
+while test ${flag} -eq 0
+do
+    echo "###############################################"
+    echo "# 1.Set txpower (current value: ${vap_txpower})"
+    echo "# 2.Set transmit rate (current value: ${trans_rate})      "
+    echo "# 3.Set channel (current value: ${vap_channel})" 
+    echo "# 4.Set packet size  (current value: ${packet_size})"
+    echo "# 5.Set packet number (current value: ${packet_num})"
+    echo "# 6.confirm"    
+    echo "################################################"
+    echo -n "please input your choice:"
+    read opt
+    case "${opt}" in
+    1)
+    	echo -n "txpower: "
+    	read vap_txpower
+    ;;
+    2)
+    	echo -n "transmit rate:"
+    	read trans_rate
+    ;;
+    3)
+    	echo -n "channel:"
+    	read vap_channel
+    ;;
+    4)
+    	echo -n "packet size:"
+    	read packet_size
+    ;;
+    5)
+    	echo -n "packet number:"
+    	read packet_num
+    ;;
+    6)
+    	flag=1
+    ;;
+    *)
+    	echo ""
+    ;;
+    esac
+done
+
+RES=0
+
+${IWCONFIG} ath0 channel ${vap_channel}
+if [ ! $? -eq 0 ];then
+	cur_channel=`${IWLIST} ath0 channel | awk -F"[ ]+|\(|\)" 'NR==(lineno-1) {print $7 }' lineno=`iwlist ath0 channel | wc -l``
+	echo "error: set channel fault , current channel: ${cur_channel}"
+	RES=$(($?+${RES}))
+fi
+
+set_power ${vap_txpower} 
+if [ ! $? -eq 0 ];then
+	cur_txpower=`${IWCONFIG} ath0 | awk '/Tx-Power/{print $4 }' | cut -d":" -f2 | cut -d"=" -f2`
+	echo "===Error: set txpower fault , current txpower: ${cur_txpower}"
+	RES=$(($?+${RES}))
+fi
+
+echo ${trans_rate}  > ${SEND_RATE_FILE}
+if [ ! $? -eq 0 ];then
+	echo "===Error: set transmit rate fault"
+	RES=$(($?+${RES}))
+fi
+
+${IFCONFIG} ath0 up
+if [ ! $? -eq 0 ];then
+	echo "===Error: set interface up fault "
+	RES=$(($?+${RES}))
+fi
+
+echo ""
+echo -n "virtual interface config:"
+if [ ${RES} -eq 0 ];then
+	echo "ok"
+else
+	echo "fault"
+	exit 1
+fi
+
+#start transmit
+trans_flag=0
+trans_opt=0
+echo ""
+echo "3. start transmit "
+if [ -f ${TX_OFFSET_FILE} ];then
+	amplifier=`cat ${TX_OFFSET_FILE}`
+else
+	amplifier="no amplifier"
+fi
+while test ${trans_flag} -eq 0
+do
+    echo "#################################"
+    echo "# 1.init gain (only for Amplifier)"
+    echo "# 2.increase gain (only for Amplifier)"
+    echo "# 3.decreate gain (only for Amplifier)" 
+    echo "# 4.start transmit (Amplifier: ${amplifier})"
+    echo "# 5.quit"
+    echo "#################################"
+    echo -n "please input your choice:"
+    read trans_opt
+    case ${trans_opt} in
+    	1)
+    		${KILLALL} packet
+    		if [ -f ${TX_OFFSET_FILE} ];then
+    			echo 15 > ${TX_OFFSET_FILE}
+    			set_power ${vap_txpower}
+    		else
+    			echo "===Error: no amplifier"
+    		fi
+    	;;
+    	2)
+    	    ${KILLALL} packet
+    		if [ -f ${TX_OFFSET_FILE} ];then
+    			cur_tx_offset=`cat ${TX_OFFSET_FILE}`
+    			new_tx_offset=$((${cur_tx_offset}+1))
+    			echo ${new_tx_offset} > ${TX_OFFSET_FILE}
+    			set_power ${vap_txpower}
+    		else
+    			echo "===Error: no amplifier"
+    		fi
+    	;;
+    	3)
+    		${KILLALL} packet
+    		if [ -f ${TX_OFFSET_FILE} ];then
+    			cur_tx_offset=`cat ${TX_OFFSET_FILE}`
+    			new_tx_offset=$((${cur_tx_offset}-1))
+    			if [ ${new_tx_offset} -lt 1 ];then
+    				new_tx_offset=0
+    			fi
+    			echo ${new_tx_offset} > ${TX_OFFSET_FILE}
+    			set_power ${vap_txpower}
+    		else
+    			echo "===Error: no amplifier"
+    		fi
+    	;;
+    	4)
+    		 ${PACKET}  ${packet_num} ${packet_size} ath0  & >/dev/null 
+    	;;
+    	5)
+    		trans_flag=1
+    	;;
+    	*)
+    		echo ""
+    	;;
+    esac
+done
+
+

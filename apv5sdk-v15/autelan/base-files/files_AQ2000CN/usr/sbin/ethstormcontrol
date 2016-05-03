@@ -1,0 +1,86 @@
+#!/bin/sh
+
+VERSION="$(basename $0) ver.1.0"
+USAGE="Usage: $(basename $0) <eth0|eth1> <port1|port2|...> <rate> [-i mask]"
+DESCRIPTION="Description: set the specified port's storm control,-i mask enables some specified frames to be included in
+the calculations for storm control,mask=1:broadcast frames,mask=2:unknown unicast frames,mask=4:unknown multicast frames,they are bit mask,so they can do or operation"
+
+if [ $# -lt 3 ];then
+	echo "${USAGE}" >&2
+	echo "${DESCRIPTION}" >&2
+	exit 1
+fi
+
+case "${1}" in
+	eth0 | eth1)
+		ETH="${1}"
+		;;
+	*)
+		echo "${USAGE}" >&2
+		echo "${DESCRIPTION}" >&2
+		exit 1
+		;;
+esac
+
+case "${2}" in
+	port1 | port2 | port3 | port4)
+		PORT=`echo "${2}" | grep -o '[0-9]'`
+		;;
+	*)
+		echo "${USAGE}" >&2
+		echo "${DESCRIPTION}" >&2
+		exit 1
+		;;
+esac
+
+REG=$((${PORT} * 0x100 + 0x114))
+
+if [ -n "${4}" ]; then
+	if [ -n "${5}" ]; then
+		MASK=${5}
+	else
+		echo "${USAGE}" >&2
+		echo "${DESCRIPTION}" >&2
+		exit 1
+	fi			
+else
+	MASK=7
+fi
+
+RATE=0
+RATEVAL=0
+case ${3} in
+	0)
+		RATEVAL=0
+		;;
+	1)
+		RATEVAL=-1
+		;;
+	2)
+		RATEVAL=0
+		;;
+	*)
+		while [ ${RATEVAL} -le 15 ]; do
+		RATE=$(( 2 ** ${RATEVAL} ))
+		if [ ${3} -le $(( ${RATE} * 2 )) -a ${3} -ge ${RATE} ]; then
+		break
+		fi
+		RATEVAL=$(( ${RATEVAL} + 1 ))
+		done
+		;;
+esac
+
+if [ ${3} -eq 0 ]; then
+ethreg -i ${ETH} -p 15 ${REG}=0
+
+OLDVAL=`ethreg -i ${ETH} -p 15 0x30 | awk '{print $5}'`
+VAL=$(( ${OLDVAL} & 0xfffbffff ))
+ethreg -i ${ETH} -p 15 0x30=${VAL}
+else	
+VAL=$((${RATEVAL} + 2 + ((${MASK} & 0x7) * 0x100)))
+ethreg -i ${ETH} -p 15 ${REG}=${VAL}
+
+OLDVAL=`ethreg -i ${ETH} -p 15 0x30 | awk '{print $5}'`
+VAL=$(( ${OLDVAL} | 0x40000 ))
+ethreg -i ${ETH} -p 15 0x30=${VAL}
+fi

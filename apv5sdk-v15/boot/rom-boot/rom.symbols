@@ -1,0 +1,4 @@
+void serial_puts (const char *s)
+void udelay (unsigned long usec)
+void simple_mips_cache_reset(void)
+void call_fw(u32, u32)

@@ -1,0 +1,27 @@
+#!/usr/bin/haserl
+<html>
+	<head>
+		<title>WMM</title>
+	</head>
+	<body>
+		<br>When need to apply Wi-Fi Multimedia,you can set the option
+1.	Current VAP: Select the vap which want to set from the list.
+2.	WMM Support: Click the ¡°Enable¡±, then show the settings optitions of WMM AP and STA various priority contention parameters; Click the ¡°Disable¡±, then don¡¯t show.
+3.	WMM And TOS Map: Click the ¡°Enable¡±, then show the settings optitions of map between WMM priority and IP TOS field; Click the ¡°Disable¡±, then don¡¯t show.
+4.	WMM And VLAN Map: Click the ¡°Enable¡±, then show the settings optitions of map between WMM priority and VLAN priority; Click the ¡°Disable¡±, then don¡¯t show.
+5.	Background: Set the contention parameters of AP Background priority. CWmin indicates the minimum value of contention window. CWmax indicates the max value of contention window. AIFSN indicates the waiting slot time before enter contention window. TXOP indicates the max time that the flow occupy transmit media, over the time, regardless of whether or not have data to send, will give up the transmit, re-enter contention state. NOACK indicates the data frame whether or not need the ACK response. The specific role of these contention parameters please refer to the manual configuration. Please try to use the default value, the default value is 15, 1023, 7, 0.
+6.	Best Effort: Set the contention parameters of AP Best Effort priority. The  default value is 15, 63, 3, 0.
+7.	Video: Set the contention parameters of AP Video priority. The  default value is 7, 15, 1, 3.008ms.
+8.	Voice: Set the contention parameters of AP Voice priority. The  default value is 3, 7, 1, 1.504ms.
+9.	Background: Set the contention parameters of STA Background priority. The default value is 15, 1023, 7, 0.
+10.	Best Effort: Set the contention parameters of STA Best Effort priority. The  default value is 15, 1023, 3, 0.
+11.	Video: Set the contention parameters of STA Video priority. The  default value is 7, 15, 2, 3.008ms.
+12.	Voice: Set the contention parameters of STA Voice priority. The  default value is 3, 7, 2, 1.504ms.
+13.	wmm and tos engress map config: Set the map of engress priority between wmm and tos. The range of tos priority is from 0 to 7, 0 is the lowest, 7 is the highest. By default, priority 6 and 7 for the network control communications use, is not recommended.
+14.	wmm and vlan ingress map config: Set the map of ingress priority between wmm and vlan. The range of vlan priority is also from 0 to 7, 0 is the lowest, 7 is the highest.
+15.	wmm and vlan engress map config: Set the map of engress priority between wmm and vlan.
+16.	Click the ¡°Apply¡± button to put the configuration into effect when completed.
+
+
+	</body>
+</html>

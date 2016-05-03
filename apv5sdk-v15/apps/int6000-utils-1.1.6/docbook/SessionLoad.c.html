@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			SessionLoad.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='SessionEdit.c.html' title=' SessionEdit.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SessionPeek.c.html' title=' SessionPeek.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void SessionLoad (const char * filename);
+ *
+ *   session.h
+ *
+ *   read session variable from named file; initialize the variable
+ *   and try to save it if the file cannot be read;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SESSIONLOAD_SOURCE
+#define SESSIONLOAD_SOURCE
+
+#include &lt;unistd.h&gt;    
+#include &lt;memory.h&gt;
+#include &lt;fcntl.h&gt;
+
+#include &quot;../cgi/page.h&quot;
+#include &quot;../cgi/session.h&quot;
+#include &quot;../ether/ether.h&quot;
+
+void SessionLoad (const char * filename) 
+
+{
+	extern struct session session;
+	extern const byte localcast [ETHER_ADDR_LEN];
+	int fd = open (filename, O_RDONLY);
+	if (read (fd, &amp;session, sizeof (session)) != sizeof (session)) 
+	{
+		memset (&amp;session, 0, sizeof (session));
+		strcpy (session.option, OPTION_TOPOLOGY);
+		anynic (session.source, sizeof (session.source));
+		memcpy (session.bridge [0].MAC, localcast, ETHER_ADDR_LEN);
+		memcpy (session.device.MAC, localcast, ETHER_ADDR_LEN);
+		session.QoS.TTL [0] = session.QoS.TTL [1] = 20000000;
+		session.QoS.TTL [2] = session.QoS.TTL [3] = 30000000;
+		strcpy (session.DPW, SESSION_DPW);
+		strcpy (session.NPW, SESSION_NPW);
+		SessionSave (filename);
+	}
+	close (fd);
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='SessionEdit.c.html' title=' SessionEdit.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SessionPeek.c.html' title=' SessionPeek.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

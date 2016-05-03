@@ -1,0 +1,27 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:118: warning: function declaration isn't a prototype
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:145: warning: function declaration isn't a prototype
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:162: warning: function declaration isn't a prototype
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:180: warning: function declaration isn't a prototype
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c: In function 'capwap_splide_fast_recv':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:271: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c: In function 'capwap_header_add':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:545: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c: In function 'capwap_udp_ip':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:629: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:645: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:682: warning: suggest explicit braces to avoid ambiguous 'else'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c: At top level:
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:1720: warning: initialization discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:1721: warning: initialization discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:1732: warning: initialization discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:1733: warning: initialization discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:1744: warning: initialization discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:1745: warning: initialization discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:1756: warning: initialization discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:1757: warning: initialization discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c: In function 'capwap_sysctl_attach':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:1821: warning: passing argument 2 of 'register_sysctl_paths' discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c: In function 'capwap_udp_ip':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:754: warning: control reaches end of non-void function
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c: At top level:
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/capwap_split_fast/src/capwap_split_fast.c:939: warning: 'capwap_sysctls' defined but not used

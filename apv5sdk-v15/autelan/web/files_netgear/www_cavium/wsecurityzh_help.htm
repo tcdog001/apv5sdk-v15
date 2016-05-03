@@ -1,0 +1,21 @@
+#!/usr/bin/haserl
+<html> 
+        <head>
+		<title>wireless security</title>
+	</head>
+	<body>
+	<br>Wireless Security Type部分是对无线接口安全方面的设置，用户可以设置该接口工作于None、WEP或者WPA三种安全模式中的一种。
+       <br>
+	<br>WEP的相关设置中，包括WEP的工作mode、密钥长度的设定和密钥值。
+	<br>Mode：可以选择Open system和Share Key
+	<br>Encryption：设定密钥的长度。有三个选项64 bit WEP、128 bit WEP、152 bit WEP，分别对应5个、13个和16个ascii字符，或者10个、26个和32个16进制字符（只能包含0-9、a-f），在填写WEP Key的时候必须按照上面的规格进行设定，否则无法生效。
+        <br>WEP Key：最多可以同时支持4个WEP Key同时工作。可以手动输入，也可以在WEP Passphrase输入任意字符串，由AP自动生成相应长度的WEP Key
+	<br>
+	<br>请在终端进行和该无线接口相对应的安全设置（安全方式，Key等），否则将无法正常关联
+        <br>
+	<br>WPA设置，可以选择WPA是工作在PSK方式还是Radius方式，如果是后者，则还需要在Radius Server子页面设定对应的Radius Server信息。加密方式可以选择TKIP或者AES，同样，终端也必须做相应配置才能关联。
+     <br>如果选择的是PSK方式，那么用户需要在PSK Setting 的Passphrase之后输入使用的密钥。
+        <br>
+	<br>全部设定完成后，点击VAP Apply按钮使设置生效
+  </body>
+</html>

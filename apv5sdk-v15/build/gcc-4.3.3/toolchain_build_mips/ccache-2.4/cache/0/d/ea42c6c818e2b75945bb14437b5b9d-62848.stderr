@@ -1,0 +1,31 @@
+In file included from shell/mxml_attribute.c:12:
+shell/mxml.h:27: warning: function declaration isn't a prototype
+shell/mxml.h:32: warning: function declaration isn't a prototype
+shell/mxml.h:37: warning: function declaration isn't a prototype
+shell/mxml.h:64: warning: function declaration isn't a prototype
+shell/mxml.h:137: warning: function declaration isn't a prototype
+shell/mxml_attribute.c:20: warning: function declaration isn't a prototype
+shell/mxml_attribute.c: In function 'mxml_attribute_new':
+shell/mxml_attribute.c:22: warning: implicit declaration of function 'malloc'
+shell/mxml_attribute.c:22: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_attribute.c: In function 'mxml_attribute_clone':
+shell/mxml_attribute.c:51: warning: implicit declaration of function 'strlen'
+shell/mxml_attribute.c:52: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_attribute.c:53: warning: implicit declaration of function 'memcpy'
+shell/mxml_attribute.c:53: warning: incompatible implicit declaration of built-in function 'memcpy'
+shell/mxml_attribute.c:58: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_attribute.c:59: warning: incompatible implicit declaration of built-in function 'memcpy'
+shell/mxml_attribute.c: In function 'mxml_attribute_destroy':
+shell/mxml_attribute.c:78: warning: implicit declaration of function 'free'
+shell/mxml_attribute.c:78: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_attribute.c:81: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_attribute.c:86: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_attribute.c: In function 'mxml_attribute_read':
+shell/mxml_attribute.c:121: warning: implicit declaration of function 'isalpha'
+shell/mxml_attribute.c:134: warning: implicit declaration of function 'isalnum'
+shell/mxml_attribute.c:220: warning: 'return' with no value, in function returning non-void
+shell/mxml_attribute.c:226: warning: implicit declaration of function 'strncmp'
+shell/mxml_attribute.c:264: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_attribute.c:265: warning: incompatible implicit declaration of built-in function 'memcpy'
+shell/mxml_attribute.c:104: warning: 'iPosAmper' may be used uninitialized in this function
+shell/mxml_attribute.c:99: warning: 'quotechr' may be used uninitialized in this function

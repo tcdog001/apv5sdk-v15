@@ -1,0 +1,18 @@
+#!/usr/bin/haserl
+<html>
+	<head>
+		<title>虚拟局域网</title>
+	</head>
+	<body>
+		<br>虚拟局域网（VLAN, Virtual Local Area Network）技术，可以有效的将广播报文限制在由VLAN技术限定的某个逻辑子网中。我们可以
+通过虚拟局域网功能创建带有指定VID的vlan，并通过无线设置功能将VAP加入所创建的VLAN中。这样，当某个移动设备接入这个VAP时，
+这个移动设备就加入了该VAP对应的VLAN。
+
+1.创建 :  创建/删除当前vlan  （勾选该项为创建，去勾选为删除）
+2.虚拟ID : 当前VLAN对应的VLAN ID，用以区分不同的VLAN。为0~4096的非负整数
+3.虚拟局域网名 : 当前VLAN对应的VLAN名， 以便用户对配置的VLAN进行区分
+4.IP地址 ：当前VLAN的IP地址，可以不设置
+5.子网掩码 :  当前VLAN的子网掩码，可以不设置
+6.eth[n] : 加入当前VLAN的上行接口（n 为由0开始的非负整数，上限为“当前设备上行接口数-1”）
+	</body>
+</html>

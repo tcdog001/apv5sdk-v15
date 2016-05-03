@@ -1,0 +1,20 @@
+In file included from shell/mxml_sgs.c:13:
+shell/mxml.h:27: warning: function declaration isn't a prototype
+shell/mxml.h:32: warning: function declaration isn't a prototype
+shell/mxml.h:37: warning: function declaration isn't a prototype
+shell/mxml.h:64: warning: function declaration isn't a prototype
+shell/mxml.h:137: warning: function declaration isn't a prototype
+shell/mxml_sgs.c:21: warning: function declaration isn't a prototype
+shell/mxml_sgs.c: In function 'mxml_sgs_new':
+shell/mxml_sgs.c:22: warning: implicit declaration of function 'malloc'
+shell/mxml_sgs.c:22: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_sgs.c:29: warning: implicit declaration of function 'free'
+shell/mxml_sgs.c:29: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_sgs.c: In function 'mxml_sgs_destroy':
+shell/mxml_sgs.c:43: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_sgs.c:45: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_sgs.c: In function 'mxml_sgs_append_char':
+shell/mxml_sgs.c:56: warning: implicit declaration of function 'realloc'
+shell/mxml_sgs.c:56: warning: incompatible implicit declaration of built-in function 'realloc'
+shell/mxml_sgs.c: In function 'mxml_sgs_append_string_len':
+shell/mxml_sgs.c:78: warning: incompatible implicit declaration of built-in function 'realloc'

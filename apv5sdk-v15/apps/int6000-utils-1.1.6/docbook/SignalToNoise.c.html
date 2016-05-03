@@ -1,0 +1,266 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			SignalToNoise.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='SetSDRAMConfig.c.html' title=' SetSDRAMConfig.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SlaveMembership.c.html' title=' SlaveMembership.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   signed SignalToNoise (struct int6k * int6k);
+ *
+ *   int6k.h
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *      Lluis Paulet Gimbert &lt;dimat.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SIGNALTONOISE_SOURCE
+#define SIGNALTONOISE_SOURCE
+
+#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/endian.h&quot;
+
+#define SLOTS 6
+#define CARRIERS 1156
+
+/*
+ * modulation per carrier is represented using 4 bits allowing only 8
+ * values to be represented; this table converts the modulation value
+ * to decibels which are then used in SNR calculations;
+ */
+
+static byte mod2bits [8] = 
+
+{
+	0,
+	1,
+	2,
+	3,
+	4,
+	6,
+	8,
+	10
+};
+
+static byte mod2db [8] = 
+
+{
+	0,
+	2,
+	4,
+	7,
+	10,
+	16,
+	22,
+	28 
+};
+
+signed SignalToNoise (struct int6k * int6k) 
+
+{
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+	byte result [SLOTS] [CARRIERS/2];
+	byte GIL [SLOTS];
+	byte AGC [SLOTS];
+	double SNR [SLOTS];
+	double BPC [SLOTS];
+	double AvgSNR = 0;
+	double AvgBPC = 0;
+	unsigned carriers = 0;
+	unsigned carrier = 0;
+	unsigned slots = 0;
+	unsigned slot = 0;
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_tone_slot_char_request 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MACADDRESS [ETHER_ADDR_LEN];
+		uint8_t TMSLOT;
+	}
+	* request = (struct vs_tone_slot_char_request *) (message);
+	struct __packed vs_tone_slot_char_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint8_t TMSLOT;
+		uint8_t NUMTMS;
+		uint16_t TMNUMACTCARRIERS;
+		uint8_t MOD_CARRIER [CARRIERS/2];
+		uint8_t GIL;
+		uint8_t AGC;
+	}
+	* confirm = (struct vs_tone_slot_char_confirm *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	Request (int6k, &quot;Compute signal-to-noise ratio&quot;);
+	memset (message, 0, sizeof (struct message));
+	EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message-&gt;intellon, (VS_RX_TONE_MAP_CHAR | MMTYPE_REQ));
+	int6k-&gt;packetsize = ETHER_MIN_LEN;
+	memcpy (request-&gt;MACADDRESS, int6k-&gt;RDA, sizeof (request-&gt;MACADDRESS));
+	request-&gt;TMSLOT = 0;
+	if (SendMME (int6k) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+		return (-1);
+	}
+	if (ReadMME (int6k, (VS_RX_TONE_MAP_CHAR | MMTYPE_CNF)) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+		return (-1);
+	}
+	carriers = LE16TOH (confirm-&gt;TMNUMACTCARRIERS);
+	slots = confirm-&gt;NUMTMS;
+	if (!slots) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;No Tone Maps Available&quot;);
+		return (-1);
+	}
+	memset (result, 0, sizeof (result));
+	for (slot = 0; slot &lt; slots; slot++) 
+	{
+		EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+		IntellonHeader (&amp;message-&gt;intellon, (VS_RX_TONE_MAP_CHAR | MMTYPE_REQ));
+		memcpy (request-&gt;MACADDRESS, int6k-&gt;RDA, sizeof (request-&gt;MACADDRESS));
+		request-&gt;TMSLOT = slot;
+		int6k-&gt;packetsize = ETHER_MIN_LEN;
+		if (SendMME (int6k) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+			return (-1);
+		}
+		if (ReadMME (int6k, (VS_RX_TONE_MAP_CHAR | MMTYPE_CNF)) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+			return (-1);
+		}
+		if (confirm-&gt;MSTATUS) 
+		{
+			Failure (int6k, INT6K_WONTDOIT);
+			return (-1);
+		}
+		memcpy (&amp;result [slot][0], confirm-&gt;MOD_CARRIER, sizeof (confirm-&gt;MOD_CARRIER));
+		GIL [slot] = confirm-&gt;GIL;
+		AGC [slot] = confirm-&gt;AGC;
+	}
+	memset (SNR, 0, sizeof (SNR));
+	while (carrier &lt; carriers) 
+	{
+		unsigned value = 0;
+		unsigned index = carrier &gt;&gt; 1;
+		for (slot = 0; slot &lt; SLOTS; slot++) 
+		{
+			value = result [slot][index];
+			if ((carrier &amp; 1)) 
+			{
+				value &gt;&gt;= 4;
+			}
+			value &amp;= 0x0F;
+			BPC [slot] += mod2bits [value];
+			SNR [slot] += mod2db [value];
+			AvgBPC += mod2bits [value];
+			AvgSNR += mod2db [value];
+		}
+		carrier++;
+	}
+	AvgBPC /= carriers;
+	AvgBPC /= slots;
+	AvgSNR /= carriers;
+	AvgSNR /= slots;
+	printf (&quot; SNR&quot;);
+	for (slot = 0; slot &lt; slots; slot++) 
+	{
+		printf (&quot; %8.3f&quot;, SNR [slot] / carriers);
+	}
+	printf (&quot; %8.3f&quot;, AvgSNR);
+	printf (&quot; \n&quot;);
+	printf (&quot; ATN&quot;);
+	for (slot = 0; slot &lt; slots; slot++) 
+	{
+		printf (&quot; %8.3f&quot;, SNR [slot] / carriers - 60);
+	}
+	printf (&quot; %8.3f&quot;, AvgSNR - 60);
+	printf (&quot; \n&quot;);
+	printf (&quot; BPC&quot;);
+	for (slot = 0; slot &lt; slots; slot++) 
+	{
+		printf (&quot; %8.3f&quot;, BPC [slot] / carriers);
+	}
+	printf (&quot; %8.3f&quot;, AvgBPC);
+	printf (&quot; \n&quot;);
+	printf (&quot; AGC&quot;);
+	for (slot = 0; slot &lt; slots; slot++) 
+	{
+		printf (&quot; %02d&quot;, AGC [slot]);
+	}
+	printf (&quot; \n&quot;);
+	printf (&quot; GIL&quot;);
+	for (slot = 0; slot &lt; slots; slot++) 
+	{
+		printf (&quot; %02d&quot;, GIL [slot]);
+	}
+	printf (&quot; \n&quot;);
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='SetSDRAMConfig.c.html' title=' SetSDRAMConfig.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SlaveMembership.c.html' title=' SlaveMembership.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

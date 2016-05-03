@@ -1,0 +1,153 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<% 
+xml_eth0=`config_read /config/network/eth0`
+xml_eth0_ip=`config_getoption "$xml_eth0" ip`
+xml_eth0_netmask=`config_getoption "$xml_eth0" netmask`
+xml_eth0_fw2=`config_getoption "$xml_eth0" forward2`
+
+if [ "$DEV_eth1" == "enable" ];then
+		xml_eth1=`config_read /config/network/eth1`
+		xml_eth1_ip=`config_getoption "$xml_eth1" ip`
+		xml_eth1_netmask=`config_getoption "$xml_eth1" netmask`
+		xml_eth1_fw2=`config_getoption "$xml_eth1" forward2`
+fi
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js interface_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	var eth1_status="<%= $DEV_eth1 %>";
+	init_mmenu(flag);
+	init_basemenu(flag);
+	init_lan(flag);
+function Ip() 
+{
+	  overlayer();
+}
+
+function dev_check()
+{
+	   if(eth1_status != "enable")
+	   {
+	   	  document.getElementById("tab1").style.display="none";
+	   }
+}
+ 
+</script>
+</head>
+<body onLoad="dev_check()">
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_interface.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return Ip()">
+<div align="center">
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">  
+	<tr>
+		<td bordercolor="#d9d9d9">						
+      <table  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+		  <tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(bnet_eth0)</script></b></td>
+			</tr>
+		  
+		  <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="28" bordercolor="#ffffff" width="280"><script language="javascript">replace(bnet_eip0)</script>
+			</td><td align="left" bordercolor="#ffffff" width="370"><input type="text" name="wdip1"  value="<%= "$xml_eth0_ip" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="28" bordercolor="#ffffff"><script language="javascript">replace(bnet_emask0)</script>
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="wdmask1"  value="<%= "$xml_eth0_netmask" %>" ></td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_eth0_fw2" "no" %> name="wdfw21" value="no" >&nbsp;</td>
+			<td  bordercolor="#ffffff"><script language="javascript">replace(bnet_efw20)</script></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+		</table>
+		  <table id="tab1"  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+		  <tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(bnet_eth1)</script></b></td>
+			</tr>
+		  
+		  <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="28" bordercolor="#ffffff" width="280"><script language="javascript">replace(bnet_eip1)</script>
+			</td><td align="left" bordercolor="#ffffff" width="370"><input type="text" name="wdip2"  value="<%= "$xml_eth1_ip" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="28" bordercolor="#ffffff"><script language="javascript">replace(bnet_emask1)</script>
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="wdmask2" value="<%= "$xml_eth1_netmask" %>" ></td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_eth1_fw2" "no" %> name="wdfw22" value="no" >&nbsp;</td>
+			<td  bordercolor="#ffffff"><script language="javascript">replace(bnet_efw21)</script></td>
+			</tr>
+		  
+	    <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>	
+		</table>
+		</td>
+   </tr>
+</table>   
+		<table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+			<tr>
+			  <td align="center" height="40" valign="middle" colspan="2" ><script language="javascript" >replace(b_lansu)</script>&nbsp;</td>
+			</tr>
+			<tr>
+        <td align="right"   colspan="2"><script language="javascript">replace(wd_help)</script></td>
+      </tr>
+		</table>
+</div>
+<input type="hidden" value="Wdif Setup" name="SERVLET">
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

@@ -1,0 +1,10 @@
+#!/bin/sh
+IWPRIV=/usr/sbin/iwpriv
+
+if [ "$2" == "enable" ]; then
+    $IWPRIV "$1" ap_auth 1
+elif [ "$2" == "disable" ]; then
+    $IWPRIV "$1" ap_auth 0
+else
+    echo "ap_dispatch_auth <interface> <enable/disable>"
+fi

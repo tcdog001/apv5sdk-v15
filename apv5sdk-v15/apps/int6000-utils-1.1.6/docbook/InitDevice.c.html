@@ -1,0 +1,138 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			InitDevice.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='Identity2.c.html' title=' Identity2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='InitializeDevice.c.html' title=' InitializeDevice.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *  
+ *   int InitDevice (struct int6k * int6k);
+ *
+ *   int6k.h
+ *  
+ *   initialize a device by configuring the SDRAM before firmware is
+ *   downloaded and executed; INT6000 devices require separate SDRAM
+ *   configuration parameters to be downloaded; INT63000/6400 devices
+ *   may be configured by downloading and executing a generic memctl
+ *   firmware applet; this function uses the latter method;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef INITDEVICE_SOURCE
+#define INITDEVICE_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../nvm/nvm.h&quot;
+
+int InitDevice (struct int6k * int6k) 
+
+{
+	struct header_nvm header_nvm;
+	unsigned image = 0;
+	memset (&amp;header_nvm, 0, sizeof (header_nvm));
+	if (lseek (int6k-&gt;NVM.file, 0, SEEK_SET)) 
+	{
+		error (1, errno, &quot;Can't rewind %s&quot;, filepart (int6k-&gt;NVM.name));
+	}
+	do 
+	{
+		if (lseek (int6k-&gt;NVM.file, 0, SEEK_CUR) != LE32TOH (header_nvm.NEXTHEADER)) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), 0, &quot;Bad file position: %s (%d)&quot;, filepart (int6k-&gt;NVM.name), image);
+		}
+		if (read (int6k-&gt;NVM.file, &amp;header_nvm, sizeof (header_nvm)) &lt; sizeof (header_nvm)) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't read header: %s (%d)&quot;, filepart (int6k-&gt;NVM.name), image);
+		}
+		if (LE32TOH (header_nvm.HEADERVERSION) != NVM_HEADER_VERSION) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), 0, &quot;Bad header version: %s (%d)&quot;, filepart (int6k-&gt;NVM.name), image);
+		}
+		if (checksum_32 (&amp;header_nvm, sizeof (struct header_nvm), 0)) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), 0, &quot;Bad header checksum: %s (%d)&quot;, filepart (int6k-&gt;NVM.name), image);
+		}
+		if (_anyset (LE32TOH (header_nvm.IGNOREMASK), (1 &lt;&lt; (int6k-&gt;hardwareID - 1)))) 
+		{
+			if (lseek (int6k-&gt;NVM.file, LE32TOH (header_nvm.NEXTHEADER), SEEK_SET) == -1) 
+			{
+				error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't skip image: %s&quot;, filepart (int6k-&gt;NVM.name));
+			}
+		}
+		if (header_nvm.IMAGETYPE == NVM_IMAGE_MEMCTL) 
+		{
+			if (WriteMEM (int6k, &amp;int6k-&gt;NVM, LE32TOH (header_nvm.IMAGEADDR), LE32TOH (header_nvm.IMAGELENGTH))) 
+			{
+				return (-1);
+			}
+			if (StartFirmware (int6k, &amp;header_nvm)) 
+			{
+				return (-1);
+			}
+		}
+		else if (lseek (int6k-&gt;NVM.file, LE32TOH (header_nvm.NEXTHEADER), SEEK_SET) == -1) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't skip image: %s&quot;, filepart (int6k-&gt;NVM.name));
+		}
+		image++;
+	}
+	while (header_nvm.NEXTHEADER);
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='Identity2.c.html' title=' Identity2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='InitializeDevice.c.html' title=' InitializeDevice.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

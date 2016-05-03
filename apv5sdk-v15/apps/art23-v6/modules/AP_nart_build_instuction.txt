@@ -1,0 +1,9 @@
+export PATH=/opt/eldk/4.1/usr/bin:$PATH
+
+cd art2/src/driver/linux
+make -f makefile.artmod KERNELPATH=/home/mtien/pj/amcc/maui/linux-2.6.32 POWERPC=1
+art.ko will be created in modules folder
+
+cd art2/src/art
+make -f makefile.nart KERNELPATH=/home/mtien/pj/amcc/maui/linux-2.6.32 POWERPC=1
+nart.out will be created in ./obj folder

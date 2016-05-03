@@ -1,0 +1,35 @@
+#!/bin/sh
+########################################
+#system upgrad tool for web GUI,AQ2010
+#parameter numbers check and usage
+if [ $# -ne 1 ] ;then
+	echo "Usage: sysupgrade [SYSTEM-FILENAME]"
+	exit 1
+fi
+
+############################################
+SEND_TRAP=/usr/sbin/send_trap
+FAILFLAG=/tmp/sysupgrade_fail
+SUCCESSFLAG=/tmp/sysupgrade_suc
+
+rm -rf $FAILFLAG
+rm -rf $SUCCESSFLAG
+/usr/sbin/stop_monitor
+
+#if file exist 
+if [ -e $1 ]; then
+	echo "file exist!"
+	/usr/sbin/checkimg $1 1>/dev/null 2>&1
+	if [ ! $? -eq 0 ];then
+		exit 1
+	fi
+	file_size=`du -sh $1 | awk '{print $1}' | grep -o -e '[0-9]*'`
+	file_unit=`du -sh $1 | awk '{print $1}' | grep -o -e '[a-zA-Z]'`
+	( [ $file_unit != "M" ] || [ $file_size -lt 10 ] || [ $file_size -gt 30 ] ) && $SEND_TRAP FlashWriteFail && exit 1
+#	cat /www/reboot.htm >/dev/null
+#	cat /sbin/sysreboot >/dev/null
+    ( (free&&date&&dd if=$1 of=/dev/mtdblock4&&free&&date)>/tmp/sysupgradelog 2>$FAILFLAG ) && touch $SUCCESSFLAG
+	   $SEND_TRAP apUploadSucceed > /dev/null 2>&1	
+   	 mv /tmp/sysupgradelog /jffs/sysupgradelog
+fi
+

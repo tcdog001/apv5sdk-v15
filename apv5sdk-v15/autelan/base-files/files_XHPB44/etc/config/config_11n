@@ -1,0 +1,178 @@
+#!/bin/sh
+#
+# source library
+#
+if [ -f /jffs/AQ21mpci_*.e2p  ];then
+	cp /jffs/AQ21mpci_*.e2p /tmp/update_file.c
+	rm -f /jffs/AQ21mpci_*.e2p 
+	#avrutil -e
+fi 
+
+if [ -f /jffs/.OEM/.company_name ] && [ -f /jffs/.OEM/.logo/.logo.jpg ];then
+	cp /jffs/.OEM/.logo/.logo.jpg /www/image/logo.jpg
+fi
+#prepare for passwd
+cp /etc/wlan/etc/passwd /tmp
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+. /usr/lib/web/sysinit.sh
+. /usr/lib/web/function.sh
+#. /etc/wlan/vendor_setup.sh
+chown -R root:root /www
+chown -R root:root /usr/lib/web
+if [ ! -e /etc/config/config.xml ]; then
+    cp -f /etc/defaults/config.xml /etc/config/config.xml
+fi
+if [ -d /jffs/hostapd ];then
+	echo "hostapd config dir ok"
+else
+	mkdir /jffs/hostapd
+fi
+#
+# load the entire configuration
+#
+local xml_config=`config_read /config`
+#
+# hostname
+#
+echo "hongxin" > /proc/sys/kernel/hostname
+
+
+if [ -f /jffs/.OEM/.company_name ];then
+	echo "`cat /jffs/.OEM/.company_name`" > /proc/sys/kernel/hostname
+fi
+	
+#prepare config.wtp for wtpd
+if [ ! -f /jffs/config.wtp ];then
+	cp /etc/wlan/config.wtp /jffs/config.wtp 
+fi
+
+if [ ! -f /jffs/config.wtp6 ];then
+	cp /etc/wlan/config.wtp6 /jffs/config.wtp6 
+fi
+cp /jffs/config.wtp /tmp/config.wtp
+cp /jffs/config.wtp6 /tmp/config.wtp6
+
+#vendor setup
+#
+if [ -d /jffs/.OEM/.default ];then
+	if [ -f /jffs/.OEM/.default/.def_user  ];then
+		if [ -f /jffs/.OEM/.default/.def_pass  ];then
+			vendor_user=`cat /jffs/.OEM/.default/.def_user`
+			vendor_pass=`cat /jffs/.OEM/.default/.def_pass`
+			vendor_user_setup "${vendor_user}" "${vendor_pass}"
+			sys_user_setup
+		fi
+	fi
+	if [ -f /jffs/.OEM/.default/.def_ssid ];then
+		vendor_ssid=`cat /jffs/.OEM/.default/.def_ssid`
+		vendor_ssid_setup "${vendor_ssid}"
+	fi
+	if [ -f /jffs/.OEM/.default/.def_wmode ];then
+		vendor_wmode=`cat /jffs/.OEM/.default/.def_wmode`
+		vendor_wmode_setup ${vendor_wmode}
+	fi
+	if [ -d /jffs/.OEM/.default_set ];then
+		rm -rf /jffs/.OEM/.default_set
+	fi
+	mv /jffs/.OEM/.default /jffs/.OEM/.default_set
+fi
+
+
+#
+# LAN & WLAN
+#
+#sys_user_setup
+#route_forward_conf
+sys_lan_setup
+sys_dns_setup
+#sys_3g_wan_setup
+xml_config=`config_read /config/system`
+xml_system_mode=`config_getoption "$xml_config" workmode`
+if [ $xml_system_mode == 1 ]; then
+	sysctl -w dev.wifi0.thinap=0
+	sys_ntp_setup
+	sys_vlan_startsetup
+	sys_wlan_setup
+	sys_security_startsetup
+	sys_macfilter_startsetup
+	sys_advanceset_startsetup
+	sys_wds_setup
+	sys_stp_setup
+	wired_if_conf
+	wireless_if_conf
+	SysLogServer_conf
+	snmp_conf
+	#tr069_conf
+	dhcpserver_conf
+	dhcpsnooping_conf
+	adminsec_conf
+	#netfilter_conf
+	intelligence_conf
+	sys_url_filter
+	locate_conf
+	wtpd_enable
+	#led set
+	#avrutil -B
+	sys_lan_setup
+	route_forward_conf
+    /usr/sbin/linkcheck eth0 >/dev/null 2>&1 &
+    /usr/sbin/linkcheck eth1 >/dev/null 2>&1 &
+else
+	sysctl -w dev.wifi0.thinap=1
+	if [ ! -f /jffs/process_text ];then
+		cp -f /etc/wlan/process_text /jffs
+	fi
+	if [ -f /jffs/wtp.log.txt ];then
+	    echo "wtp.log.txt ok"
+	else
+		cp -f /etc/wlan/wtp.log.txt /jffs
+	fi
+	sys_lan_setup
+	route_forward_conf
+	if [ -f /jffs/config.wtp ];then
+		wtpd > /dev/null 2>&1 &
+	else
+		cp -f /etc/wlan/config.wtp /jffs
+		wtpd > /dev/null 2>&1 &
+	fi
+
+     sleep 3
+	if [ -f /jffs/config.wtp6 ];then
+		cp /sbin/wtpd /tmp/wtpd6
+		chmod a+x /tmp/wtpd6
+		/tmp/wtpd6 -f /tmp/config.wtp6 > /dev/null 2>&1 &
+	else
+		cp -f /etc/wlan/config.wtp6 /jffs
+		cp /sbin/wtpd /tmp/wtpd6
+		chmod a+x /tmp/wtpd6
+		/tmp/wtpd6 -f /tmp/config.wtp6 > /dev/null 2>&1 &
+	fi
+
+	/usr/sbin/wtpd_check &
+	/etc/init.d/mini_httpd start
+	/usr/sbin/telnetd
+	#/usr/bin/iperf -s -u -b 100M &
+	#/usr/bin/iperf -s &
+	if [ -x /jffs/shell  ]; then
+                /jffs/shell
+        fi
+fi
+
+/usr/sbin/ap_monitor &
+
+/etc/init.d/dropbear start
+##### wapi start #####
+#mkdir -p /tmp/web
+#cp /web/* /tmp/web 1>/dev/null 2>&1
+#/sbin/mini_httpd -u root -p 8080 -d /web
+#/web/ias /web/cgi-bin/AS.conf 1>/dev/null 2>&1
+#sleep 2
+#cp -f /tmp/web/as.cer /web
+##### wapi end #####
+/etc/wlan/factoryreset > /dev/null 2>&1 &
+/etc/wlan/arpnotice > /dev/null 2>&1 &
+#/usr/sbin/linkcheck eth0 >/dev/null 2>&1 &
+#/usr/sbin/linkcheck eth1 >/dev/null 2>&1 &
+/usr/sbin/mod_check
+

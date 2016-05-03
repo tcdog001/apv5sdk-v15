@@ -1,0 +1,95 @@
+IFCONFIG=/sbin/ifconfig
+SYSCTL=/sbin/sysctl
+CONFIG_XML=/jffs/config.xml
+ETHTOOL=/usr/sbin/ethtool
+
+#option:  link-off|access-off
+OPTION=link-off
+#set_flag: 0|1
+SET_FLAG=0
+#checked_eth: eth[n]
+CHECKED_ETH=eth0
+
+INTERVAL=60
+MAX_VAP_NUM=16
+VAP_NAME=vap
+
+if [ "$2" = "access-off"  ];then
+    OPTION=$2
+fi
+
+#if [ 0$2 -gt 0  ];then
+#    INTERVAL=$2
+#fi
+
+if [ ! -z "$1" ];then
+    CHECKED_ETH=$1
+fi
+
+# eth_link_is_down(ifname)
+# ifname : eth{n}  n=0,1...
+eth_link_is_down()
+{
+    local link_statue=`$ETHTOOL $1 2>/dev/null | awk '/detected:/{print $3}'`
+    if [ "$link_statue" = "no"  ];then
+        return 0
+    else
+        return 1
+    fi         
+}
+
+. /usr/lib/web/xmlconf.sh
+XPATH_VAP=/config/network/vap
+
+
+# disable_ath(action)
+# action : on | off
+set_ath()
+{
+       
+    for num in `seq $MAX_VAP_NUM`
+    do
+        VAP_OPTION=down
+        MAX_ACCESS_NUM=0
+	local vap_str=`config_read ${XPATH_VAP}${num} 2>/dev/null`
+        local if_name=`config_getoption "$vap_str" if 2>/dev/null`
+        if [ -n "$if_name"  ];then
+            if [ $OPTION = "link-off"  ];then
+                if [ "$1" = "on" ];then
+                    local VAP_ENABLE=`config_getoption "$vap_str" enable`
+                    if [ "$VAP_ENABLE" = "yes" ];then
+                        VAP_OPTION=up
+                    fi
+                fi
+	        $IFCONFIG $if_name $VAP_OPTION  1>/dev/null 2>&1
+            else
+                if [ "$1" = on ];then
+                    MAX_ACCESS_NUM=`config_getoption "$vap_str" count`
+                fi
+                $IFCONFIG $if_name down 1>/dev/null 2>&1
+	        $SYSCTL -w net.$if_name.maxaid=$MAX_ACCESS_NUM 1>/dev/null 2>&1 
+	        $IFCONFIG $if_name up 1>/dev/null 2>&1
+            fi
+        fi
+    done    
+}
+
+
+
+#while :
+#do
+   if eth_link_is_down $CHECKED_ETH ; then
+       if [ ! -f /tmp/link-down ];then
+           set_ath off
+	   touch /tmp/link-down
+       fi
+   else
+       if [ -f /tmp/link-down  ];then
+           set_ath on
+	   rm -f /tmp/link-down
+       fi
+   fi
+#    sleep $INTERVAL 
+#done
+
+

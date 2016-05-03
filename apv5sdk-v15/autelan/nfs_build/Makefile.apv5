@@ -1,0 +1,24 @@
+.NOTPARALLEL:
+
+.PHONY: install
+
+install:
+	@echo "--install nfs-utils--"
+	cp -f ${TOPDIR}/build/${TOOLCHAIN}/project_build_mips/uclibc/root/usr/sbin/rpc.mountd ${ROOTFSDIR}/usr/sbin
+	cp -f ${TOPDIR}/build/${TOOLCHAIN}/project_build_mips/uclibc/root/usr/sbin/rpc.nfsd ${ROOTFSDIR}/usr/sbin
+	#cp -f ${TOPDIR}/build/${TOOLCHAIN}/project_build_mips/uclibc/root/usr/sbin/rpc.statd ${ROOTFSDIR}/usr/sbin
+	cp -f ${TOPDIR}/build/${TOOLCHAIN}/project_build_mips/uclibc/root/sbin/portmap ${ROOTFSDIR}/sbin
+	cp -f ${TOPDIR}/build/${TOOLCHAIN}/project_build_mips/uclibc/root/usr/sbin/exportfs ${ROOTFSDIR}/usr/sbin
+	cp -f ${TOPDIR}/build/${TOOLCHAIN}/build_mips/nfs-utils-1.0.10/utils/mountd/mountd ${ROOTFSDIR}/usr/sbin
+	cp -f ${TOPDIR}/build/${TOOLCHAIN}/build_mips/nfs-utils-1.0.10/utils/nfsstat/nfsstat ${ROOTFSDIR}/usr/sbin
+	cp -f S60nfs ${ROOTFSDIR}/etc/init.d
+	cp -f exports ${ROOTFSDIR}/etc	
+
+	@echo "--install nfs ko--"
+	cp -f ${KERNELPATH}/fs/exportfs/exportfs.ko ${USBMODPATH}
+	cp -f ${KERNELPATH}/fs/nfsd/nfsd.ko ${USBMODPATH}
+	cp -f ${KERNELPATH}/fs/lockd/lockd.ko ${USBMODPATH}
+	cp -f ${KERNELPATH}/fs/nfs/nfs.ko ${USBMODPATH}
+	cp -f ${KERNELPATH}/net/sunrpc/sunrpc.ko ${USBMODPATH}
+
+

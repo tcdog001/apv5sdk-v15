@@ -1,0 +1,15 @@
+#!/bin/sh
+#this script is used for the production led test ,which is opposite of up5Gled
+#pro_ctl_util -d 14
+HW_version="`pro_ctl_util -i | awk -F':' '/HD version/{print $2}'`"
+case "$HW_version" in
+5.0)
+	pro_ctl_util -d 15
+	;;
+6.0)
+	pro_ctl_util -d 21
+	;;
+*)
+	pro_ctl_util -d 21
+	;;
+esac

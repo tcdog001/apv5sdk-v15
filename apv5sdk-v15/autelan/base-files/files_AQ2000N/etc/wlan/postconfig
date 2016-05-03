@@ -1,0 +1,16 @@
+#!/bin/sh
+if [ ! -f /jffs/art_flag ];then
+	showsysinfo
+else
+	echo "****into art mode!!!"
+fi
+echo "==========================="
+echo "system check:"
+#/usr/sbin/mount_check
+#/usr/sbin/dev_check
+echo "==========================="
+echo 1 > /tmp/start_flag
+#cp /jffs/* /etc/config -rf
+#cp /etc/config/* /jffs -rf
+#killall wtpd
+#echo 0 >/proc/sys/dev/wifi0/thinap

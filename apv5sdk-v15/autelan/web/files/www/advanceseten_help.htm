@@ -1,0 +1,25 @@
+#!/usr/bin/haserl
+<html>
+        <head>
+                <title>Advanced Setting</title>
+        </head>
+        <body>
+        <br>The advanced setting allows a user to set more parameters of wireless interface. 
+Rate:Transmission rate of the wireless interface. Even signal of the wireless interface is very good, the transmission rate between the interface and stations will not exceed the Rate value. However, the exact rate cannot be verified by the notification in window system. 
+Beacon Interval: This value is used to set the interval between two beacon frames. In a beacon frame, there is some information about SSID, rate, etc. 
+DTIM Interval: This value is used to set the interval between two DTIM frames. The value should be within 1-255. When AP stores the broadcast or multicast packets in buffer, it will send the next DTIM and its interval to arouse stations in saving mode to receive these packets. 
+Fragmentation Threshold: Threshold for fragmentation. If the wireless interface will send a packet larger than the threshold value, the packet will be divided into several fragment no larger than the value. 
+Tx Antenna: Select the antenna for transmit packets if more than one antenna available, a user can select particular antenna for sending packets. 
+Rx Antenna: Select the antenna for receive packets if more than one antenna available, a user can select particular antenna for receiving packets. 
+Preamble: The length of preamble. In the IEEE802.11g standard, a physical frame consists preamble, header and payload. Preamble is used to confirm when a station and an AP send or receive data to avoid confliction between wireless devices. After receive preamble, the receiver device begins to accept data. As for wireless transmission, if a preamble is longer, available data is shorter. Therefore a short preamble can improve the transmission efficiency. Short preamble is optional for 802.11b, but compulsive for 802.11g 
+Tx Power: The transmitting power of wireless interface. All the virtual wireless interfaces share the same Tx power and channel. The value of Tx power will not be larger than 20dbm. 
+RTS Threshold: The threshold of RTS. If the wireless interface will send a packet larger than the threshold value, the RTS/CTS mechanism will start. 
+Wireless Multimedia Support Settings: Allow a user to set WMM parameters 
+WMM Support: Enable or disable the WMM support of the wireless interface. 
+No-Acknowledgement: NO-ACK, that means broadcast and multicast packets will not get according ACK packets. In WMM, a user can set traffic of a particular priority transmitted without ACK mechanism. It will be effective when works with Block ACK mechanism, or it will cause retransmission of TCP packets and influence the performance of network. 
+After complete all configuration, click Advanceset Apply button to validate modification.
+If  work at sta mode ,you only need to search a ap to connect.if work at  wds root mode,same as ap mode,if work at wds client mode ,same as sta mode. 
+
+        </body>
+</html>
+

@@ -1,0 +1,4 @@
+io_on_streams.c: In function 'autelan_fscanf':
+io_on_streams.c:257: warning: implicit declaration of function 'vfscanf'
+io_on_streams.c: In function 'autelan_sscanf':
+io_on_streams.c:269: warning: implicit declaration of function 'vsscanf'

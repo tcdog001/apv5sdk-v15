@@ -1,0 +1,160 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Chapter 8.  Embedded API Reference</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><meta name="keywords" content="
+				int6k 
+				, 
+				powerline 
+				"><link rel="start" href="index.html" title="Intellon INT6000 Linux Toolkit"><link rel="up" href="index.html" title="Intellon INT6000 Linux Toolkit"><link rel="prev" href="ch07s07.html" title="HTTP Interface"><link rel="next" href="ch08s02.html" title="External API Functions"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 8. 
+		Embedded API Reference
+		</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s07.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch08s02.html">Next</a></td></tr></table><hr></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="chapter-ihpapi"></a>Chapter 8. 
+		Embedded API Reference
+		</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ch08.html#interface-intro">
+			Introduction
+			</a></span></dt><dt><span class="section"><a href="ch08s02.html">
+			External API Functions
+			</a></span></dt><dd><dl><dt><span class="section"><a href="ch08s02.html#ihpapi-initializedevice">
+			ihpapi_InitializeDevice
+			</a></span></dt><dt><span class="section"><a href="ch08s02.html#ihpapi-updatedevice">
+			ihpapi_UpdateDevice
+			</a></span></dt><dt><span class="section"><a href="ch08s02.html#ihpapi-resetdevice">
+			ihpapi_ResetDevice
+			</a></span></dt><dt><span class="section"><a href="ch08s02.html#ihpapi-rxframe">
+			ihpapi_RxFrame
+			</a></span></dt><dt><span class="section"><a href="ch08s02.html#ihpapi-txframe">
+			ihpapi_TxFrame
+			</a></span></dt><dt><span class="section"><a href="ch08s02.html#ihpapi-manageenetphy">
+			ihpapi_ManageEnetPHY
+			</a></span></dt><dt><span class="section"><a href="ch08s02.html#ihpapi-setsdramconfig">
+			ihpapi_SetSDRAMConfig
+			</a></span></dt><dt><span class="section"><a href="ch08s02.html#ihpapi-getversioninfo">
+			ihpapi_GetVersionInfo
+			</a></span></dt><dt><span class="section"><a href="ch08s02.html#ihpapi-getmanufacturerinfo">
+			ihpapi_GetManufacturerInfo
+			</a></span></dt><dt><span class="section"><a href="ch08s02.html#ihpapi-setkey">
+			ihpapi_SetKey
+			</a></span></dt><dt><span class="section"><a href="ch08s02.html#ihpapi-getnetworkinfo">
+			ihpapi_GetNetworkInfo
+			</a></span></dt><dt><span class="section"><a href="ch08s02.html#ihpapi-getconnectioninfo">
+			ihpapi_GetConnectionInfo
+			</a></span></dt><dt><span class="section"><a href="ch08s02.html#ihpapi-gettonemapinfo">
+			ihpapi_GetToneMapInfo
+			</a></span></dt></dl></dd><dt><span class="section"><a href="ch08s03.html">
+			Internal API Functions
+			</a></span></dt><dd><dl><dt><span class="section"><a href="ch08s03.html#ihp-EncodeEthernetHeader">
+			EncodeEthernetHeader
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-EncodeIntellonHeader">
+			EncodeIntellonHeader
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeGetVersion">
+			ihp_DecodeGetVersion
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeLinkStats">
+			ihp_DecodeLinkStats
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeNetworkInfo">
+			ihp_DecodeNetworkInfo
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeSetKey">
+			ihp_DecodeSetKey
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeMfgString">
+			ihp_DecodeMfgString
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DeviceHostAction">
+			ihp_DecodeHostAction
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeResetDevice">
+			ihp_DecodeResetDevice
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeResetToFactoryDefaults">
+			ihp_DecodeResetToFactoryDefaults
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeSetSDRAMCfg">
+			ihp_DecodeSetSDRAMCfg
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeGetToneMapInfo">
+			ihp_DecodeGetToneMapInfo
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeEthernetPHYSettings">
+			ihp_DecodeEthernetPHYSettings
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeGetRxToneMap">
+			ihp_DecodeGetRxToneMap
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp_DecodeSetLEDBehavior">
+			ihp_DecodeSetLEDBehavior
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeStartMAC">
+			ihp_DecodeStartMAC
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeReadModule">
+			ihp_DecodeReadModule
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeWriteModule">
+			ihp_DecodeWriteModule
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeWriteMemory">
+			ihp_DecodeWriteMemory
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp_DecodeFlashNVM">
+			ihp_DecodeFlashNVM
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-DecodeGetNVM">
+			ihp_DecodeGetNVM
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-SequenceReadModule">
+			ihp_SequenceReadModule
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-SequenceWriteModule">
+			ihp_SequenceWriteModule
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp_SequenceWriteMemory">
+			ihp_SequenceWriteMemory
+			</a></span></dt><dt><span class="section"><a href="ch08s03.html#ihp-FindFWHeader">
+			ihp_FindFWHeader
+			</a></span></dt></dl></dd></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="interface-intro"></a>
+			Introduction
+			</h2></div></div></div><p>
+			This chapter is a function reference for the Intellon Embedded API. It assumes that the reader has a copy of the  <em class="citetitle">Intellon HomePlug AV Application Programming Interface User's Guide</em> and the <em class="citetitle">Intellon HomePlug AV Firmware Technical Reference Manual</em>. Obtain copies from Intellon Corporation, Ocala FL USA, if you do not have them.
+			</p><p>
+			Intellon supports three levels of Application Programming Interface (API), described below. Intellon device operations are ultimately performed by sending and receiving Intellon vendor-specific management messages using ISO Layer 2 Ethernet frames. The <span class="application">HomePlug AV API</span> assists application developers with common Intellon powerline device operations with the encoding and decoding of Ethernet frames and the automation of transaction sequences. Application developers must still select appropriate raw packet <code class="function">send</code> and <code class="function">receive</code> function and implement process decision logic.  
+			</p><p>
+			 
+			</p><div class="variablelist"><dl><dt><span class="term">
+					Management Messages
+					</span></dt><dd><p>
+						Management messages are the lowest level interface to Intellon powerline devices. They consist of  Ethernet frames exchanged between a host processor and Intellon powerline devices connected to the host via an ethernet connection. Some messages can be forwared from one powerline device to another overpowerline. Others cannot. An application must allocate memory for the Ethernet frame, encode it with the correct information and then transmit it using a raw Ethernet socket. 
+						</p><p>
+						Application developers must understand each and every managment message transmitted or received and write program logic to encode and decode each type of Ethernet frame. They must also understand how to send and receive ISO Layer 2 Ethernet frames from their host processor. Management message function and format are explained in <em class="citetitle">HomePlug AV Firmware Technical Reference Manual</em>. Management messages are often added with new firmware revisions.
+						</p><p>
+						Application developers must take into account the endian-ness of their host processor when encoding and decoding managment messages.
+						</p></dd><dt><span class="term">
+					Internal API Functions
+					</span></dt><dd><p>
+						Ethernet frame encoding is not difficult but it can be tedious and repetitive to implement. The Embedded API includes a number of core functions that can assist programmers in encoding and decoding Ethernet frames containing Intellon vendor-specific management messages. Intellon has defined a series of data structures that correspond to common powerline device operations and function that process them.
+						</p><p>
+					Applications populate structures and pass to frame encoders to create well-formed management messages for transmission. They all oass them to frame decoders to populate them from management messages received from powerline devices. This approach isolates application software from implementation or platform details such as data offsets, data interpretation and processor byte order.
+						</p><p>
+					Many powerline device operations require a sequence of transactions to complete. For example, downloading firmware to a powerline device requires multiple transactions because the firmware exceeds the data capacity of an Ethernet frame. Other operations, like device initiialization, also require multiple management message types. In addition, transmission errors can occur and must ve handled before proceeding.
+					</p></dd><dt><span class="term">
+					External API Functions
+					</span></dt><dd><p>
+						The Intellon Embedded API is designed to listen for Intellon powerline device requests and respond to them. It also supports an number of device and network interrogation operations that return critical or, in some cases, complex information. Applications routinely execute a basic loop to detect powerline device requests and decode them. The application determines what sort of response is required, encodes it and transmits it and awaits acknowledgement from the powerline device. 
+						</p><p>
+						A key feature of the Embedded API is that application programmers need not deal with Intellon vendor-specific management messages directly. Management messages are handled by the Core API Functions mentioned above. Also, processor byte-order issues are handled internally.
+						</p></dd></dl></div><div class="example"><a name="id2581178"></a><p class="title"><b>Example 8.1. 
+				Message Handling Loop
+				</b></p><div class="example-contents"><pre class="programlisting">
+#include &lt;stdint.h&gt;
+#include &lt;errno.h&gt;    
+#include &lt;transport.h&gt;
+#include "ihpapi.h"
+
+int8_t packet [ETHER_MAX_LEN]
+size_t length;
+ihpapi_result_t result;
+ihpapi_status_t status;
+
+read(&amp;amp;length, packet);                                   
+if (isHomePlugEthertype(&amp;frame))
+{                  
+ 	if (ihpapi_RxFrame(sizeof (packet), packet, &amp;result))  
+	{
+       		processErrorStatus(&amp;amp;result.opStatus)
+	}
+    	else
+	{
+       		if(IHPAPI_OPCODE_NOOP == result.opcode) 
+		{
+           			processTheResponse(&amp;result);
+       		}	 
+		length = ihpapi_TxFrame(sa, da,  sizeof (packet), packet, &amp;status)
+		if (length)
+		{
+			send (length, packet);
+		}
+  	}
+} 
+</pre><p>
+				The message handling code shown above briefly demonstrates how the Intellon Embedded API could be used to dynamically handle an incoming vendor-specific message. Notice that only two API functions are used: <a class="ulink" href="RxFrame.c.html" target="_top">RxFrame</a> and <a class="ulink" href="TxFrame.c.html" target="_top">TxFrame</a>. The application developer must select the appropriate <code class="function">read</code> and <code class="function">send</code> function and must design and implement function <code class="function">processTheResponse</code>.
+				</p></div></div><br class="example-break"></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s07.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch08s02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">
+			HTTP Interface
+			 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 
+			External API Functions
+			</td></tr></table></div></body></html>

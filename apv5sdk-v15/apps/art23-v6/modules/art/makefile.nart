@@ -1,0 +1,209 @@
+ART_ROOT=$(PWD)/..
+
+# Default Architecture is MIPS
+TOOLARCH=mips
+TOOL_PREFIX=$(TOOLARCH)-linux-uclibc-
+CFLAGS = -D__LINUX_MIPS32_ARCH__
+
+ifeq ($(POWERPC),1)
+TOOLARCH=powerpc-apm-linux-gnu
+TOOL_PREFIX=$(TOOLARCH)-
+PATH := $(PATH):/opt/eldk/4.1/usr/bin
+CFLAGS = -D__LINUX_POWERPC_ARCH__ -DENDIAN_SWAP
+endif
+
+OUTPUT_DIR=obj
+CC = $(TOOL_PREFIX)gcc
+LD = $(TOOL_PREFIX)gcc
+STRIP = $(TOOL_PREFIX)strip
+
+CFLAGS += -DLinux -DLINUX -DSOC_LINUX -DARCH_BIG_ENDIAN -DMDK_AP -DSOC_AP -DART_BUILD -DREMOVE_PKT_LOG -DAH_SUPPORT_WRITE_EEPROM -DATH_SUPPORT_TxBF -DATH_SUPPORT_PAPRD
+CFLAGS += -I$(ART_ROOT)/art \
+		-I$(ART_ROOT)/driver/linux/modules/include \
+		-I$(ART_ROOT)/common \
+		-I$(ART_ROOT)/client \
+		-I$(ART_ROOT)/shared \
+		-I$(ART_ROOT)/wlan/hal \
+		-I$(ART_ROOT)/wlan/include \
+		-I$(ART_ROOT)/wlan/hal/nartlinux \
+		-I$(ART_ROOT)/wlan/hal/ar9300 \
+		-I$(ART_ROOT)/devlib \
+		-I$(ART_ROOT)/devlib/ar9300 \
+		-I$(ART_ROOT)/devlib/ar5416 \
+		-I$(ART_ROOT)/shared \
+		-I$(ART_ROOT)/devlib/LZMA 
+
+CFLAGS += -Os
+LDFLAGS += -lm
+
+VPATH = $(ART_ROOT)/art \
+		$(ART_ROOT)/common \
+		$(ART_ROOT)/client \
+		$(ART_ROOT)/wlan/hal \
+		$(ART_ROOT)/wlan/hal/nartlinux \
+		$(ART_ROOT)/devlib \
+		$(ART_ROOT)/devlib/ar9300 \
+		$(ART_ROOT)/devlib/ar5416 \
+		$(ART_ROOT)/shared \
+		$(ART_ROOT)/devlib/LZMA \
+		$(ART_ROOT)/wlan/hal/ar5416 \
+		$(ART_ROOT)/wlan/hal/ar9300
+
+SRCS = 	TimeMillisecond.c \
+		CardError.c \
+		LinkError.c \
+		NartError.c \
+		EepromError.c \
+		ConnectError.c \
+		ErrorPrint.c \
+		ErrorCommand.c \
+		Template.c \
+		HelpCommand.c \
+		Help.c \
+		Sticky.c \
+		socket_linux.c \
+		smatch.c \
+		RxDescriptor.c \
+		rate_constants.c \
+		ParameterSelect.c \
+		ParameterParse.c \
+		ParameterParseNart.c \
+		configCmd.c \
+		TargetPowerGet.c \
+		NewArt.c \
+		NartVersion.c \
+		NartRegister.c \
+		nart.c \
+		MyDelay.c \
+		mlibif.c \
+		mEepStruct9300.c \
+		mData5416.c \
+		mCal9300.c \
+		mCal5416.c \
+		LZMAuncompress.c \
+		LZMAcompress.c \
+		LinkTxStat.c \
+		LinkTxPacket.c \
+		LinkTx.c \
+		LinkRxStat.c \
+		LinkRx.c \
+		Link.c \
+		Interpolate.c \
+		hw_routines.c \
+		GainTable.c \
+		Field.c \
+		dk_mem.c \
+		Device.c \
+		ConfigurationSet.c \
+		ConfigurationGet.c \
+		ConfigurationCommand.c \
+		CommandParse.c \
+		Carrier.c \
+		Card.c \
+		Calibrate.c \
+		Ar9300TxDescriptor.c \
+		Ar9300RxDescriptor.c \
+		Ar9300PcieConfig.c \
+		Ar9300Field.c \
+		Ar9330_Field.c \
+		Ar9300EepromStructSet.c \
+		Ar9300EepromSave.c \
+		Ar9300Device.c \
+		Ar9300CalibrationApply.c \
+		ar9300_xmit_ds.c \
+		ar9300_xmit.c \
+		ar9300_txbf_cal.c \
+		ar9300_txbf.c \
+		ar9300_timer.c \
+		ar9300_target_pwr.c \
+		ar9300_spectral.c \
+		ar9300_reset.c \
+		ar9300_recv_ds.c \
+		ar9300_recv.c \
+		ar9300_radio.c \
+		ar9300_radar.c \
+		ar9300_power.c \
+		ar9300_phy.c \
+		ar9300_misc.c \
+		ar9300_keycache.c \
+		ar9300_interrupts.c \
+		ar9300_gpio.c \
+		ar9300_EEPROM_print.c \
+		ar9300_eeprom.c \
+		ar9300_beacon.c \
+		ar9300_attach.c \
+		ar9300_ani.c \
+		Ar5416TxDescriptor.c \
+		Ar5416RxDescriptor.c \
+		Ar5416Field.c \
+		ar5416_xmit_ds.c \
+		ar5416_xmit.c \
+		ar5416_timer.c \
+		ar5416_spectral.c \
+		ar5416_reset.c \
+		ar5416_recv_ds.c \
+		ar5416_recv.c \
+		ar5416_radar.c \
+		ar5416_power.c \
+		ar5416_phy.c \
+		ar5416_misc.c \
+		ar5416_keycache.c \
+		ar5416_interrupts.c \
+		ar5416_gpio.c \
+		ar5416_eeprom_def.c \
+		ar5416_eeprom_ar9287.c \
+		ar5416_eeprom_4k.c \
+		ar5416_eeprom.c \
+		ar5416_beacon.c \
+		ar5416_attach.c \
+		ar5416_ani.c \
+		ar2133.c \
+		ah_eeprom.c \
+		ah.c \
+		ah_regdomain.c \
+		linux_hw.c \
+		ah_osdep_art.c \
+		TxDescriptor.c \
+		AnwiDriverInterface.c \
+		Ar9300Temperature.c \
+		UserPrint.c \
+		PacketLog.c \
+		PApreCal.c \
+		NoiseFloor.c \
+		Ar9300_2_0_Field.c \
+		Ar9340Field.c \
+		ar9300EepromPrint.c \
+		ar9300_paprd.c \
+		papredistortion.c 
+
+ifeq ($(USB),1)
+	CFLAGS += -DUSE_HIF
+endif 
+
+OBJS    :=  $(patsubst %.c,$(OUTPUT_DIR)/%.o,$(SRCS))
+
+
+BIN := $(OUTPUT_DIR)/nart.out
+
+all: $(OUTPUT_DIR) $(OBJS) obj_list $(BIN)
+
+$(BIN):
+	@echo $(CFLAGS)
+	$(CC) -static -o $@  `cat $(OUTPUT_DIR)/.obj_list` $(LDFLAGS)
+	$(STRIP) -s $@ -o $@	
+
+obj_list:
+	rm -f $(BIN) 
+	rm -f $(OUTPUT_DIR)/.obj_list
+	echo $(OUTPUT_DIR)/*.o > $(OUTPUT_DIR)/.obj_list
+
+$(OUTPUT_DIR): 
+	echo $(OUTPUT_DIR)
+	mkdir -p ./$(OUTPUT_DIR)
+	
+$(OUTPUT_DIR)/%.o : %.c
+	$(CC) -c $(CFLAGS) $< -o $@
+
+clean:
+	rm -fr $(OUTPUT_DIR)
+

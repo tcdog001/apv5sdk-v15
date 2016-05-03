@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			nvramtest.7a
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='memctl.7a.html' title=' memctl.7a '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='sdramtest.7a.html' title=' sdramtest.7a '>NEXT</a>]
+			</div>
+<pre>
+nvramtest(7a)                         Intellon Linux Toolkit                        nvramtest(7a)
+
+NAME
+       nvramtest.nvm - NVRAM Diagnostic Applet
+
+SYNOPSIS
+       int6ktest nvramtest.nvm [...]
+
+PURPOSE
+       This  diagnostic  applet  has  been  replaced by applet flashtest. It is only provided for
+       legacy support and will probably be removed from future toolkit releases so stop using it.
+
+       This  diagnostic  applet  performs  a  connectivity  and data integrity test of an onboard
+       NVRAM. The test consists of the five sub-tests described below. Each sub-test  depends  on
+       the  successful  completion  of  the previous sub-test. Onboard NVRAM is left in an erased
+       state on successful completion.
+
+PREREQUISITES
+       Bootloader software must be running.
+
+SUBTESTS
+       Onboard LEDs blink three times at the start of each test  to  show  progress.  Control  is
+       returned  to  the  bootloader  after successful completion of all sub-tests. New users are
+       encouraged to use the flashtest applet instead of this one because that  one  communicates
+       by printing messages on the console instead of flashing device LEDs.
+
+       If  any sub-test fails then the onboard LEDs will flash to indicate which test that failed
+       and control will not return to the bootloader. On failure, the  LEDs  will  flash  quickly
+       three  times then slowly several times then extringuish for several seconds. The number of
+       slow flashes indicate the test number. This pattern  repeats  indefinitely.  Test  numbers
+       start with 1.
+
+       1 - JDEC ID Test
+              Read JEDEC ID and compare it to known compatible 2mb and 4mb NVRAMs. If there is an
+              open or a short on any on the four SPI lines then  this  sub-test  will  fail  with
+              blinking  LEDs. Test failure could indicate a bad SPI line or poor component place‐
+              ment or wrong component or bad component. This test completes quickly.
+
+       2 - Bulk Erase
+              Performs a bulk erase and verifies that all locations contain 0xFF. LED will  flash
+              to indicate failure. Failure probably indicates a bad component. This test may take
+              about 20 seconds to complete.
+
+       3 - Write/Read Data Test
+              Write the first 8 bytes of flash sector 0 with a floating 0 pattern and writes  the
+              next  8 bytes with a 1’s fill pattern. then read the patterns back. LEDs will flash
+              to indicates failure. Failure indicates bad NVRAM. This test completes quickly.
+
+       4 - Address Test
+              Write the first location of the next 8 sectors with a progressive data  patternsuch
+              that  the  first  location of sector 1 is written with 1 then the first location of
+              sector 2 is weritten with 2 and so on. Data is read and verified. Failure indicates
+              bad NVRAM. This test completes quickly.
+
+       5 - Sector Erase Test
+              Sequentially erase all sectors. After each sector is erased, confirm that remaining
+              sectiors retain data. Failure indicates a bad NVRAM. This test takes about 10  sec‐
+              onds to complete.
+
+DISCLAIMER
+       Intellon image file structure and content is proprietary to Intellon Corporation, Ocala FL
+       USA. Consequently, public information is not available. Intellon Corporation reserves  the
+       right  to change file structure or content in future firmware releases without any obliga‐
+       tion to notify or compensate users of this program. This program is reserved  for  use  by
+       Intellon  Field Application Engineers. Use of this program may void some contractual obli‐
+       gations made by Intellon.
+
+EXAMPLES
+       The following example uses program int6ktest to download and execute applet nvramtest.nvm.
+
+          # int6ktest nvramtest.nvm
+          eth2 00:B0:52:00:00:01 Start Applet nvramtest.nvm (0)
+          eth2 00:B0:52:00:00:01 Write Memory (00001000:2668)
+          eth2 00:B0:52:00:00:01 Wrote nvramtest.nvm
+
+SEE ALSO
+       applets(7), flashtest(7), int6ktest(7), marchloop(7), memctl(7), sdramtest(7)
+
+CREDITS
+        John Byron &lt;john.byron@intellon.com&gt;
+
+int6000-utils-linux                    Intellon Corporation                         nvramtest(7a)
+</pre>
+		<div class='footerlink'>
+			[<a href='memctl.7a.html' title=' memctl.7a '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='sdramtest.7a.html' title=' sdramtest.7a '>NEXT</a>]
+			</div>
+		</body>
+	</html>

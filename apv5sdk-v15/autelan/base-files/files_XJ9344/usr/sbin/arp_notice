@@ -1,0 +1,6 @@
+#!/bin/sh
+while :
+do
+/sbin/arp req & 
+sleep 180
+done

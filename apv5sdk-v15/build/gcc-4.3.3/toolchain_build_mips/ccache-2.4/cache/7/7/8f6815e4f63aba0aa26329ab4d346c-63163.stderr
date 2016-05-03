@@ -1,0 +1,6 @@
+../common/ar7240_pci.c: In function 'plat_dev_init':
+../common/ar7240_pci.c:100: warning: passing argument 2 of 'ar7240_pci_write_config' makes integer from pointer without a cast
+../common/ar7240_pci.c:102: warning: passing argument 2 of 'ar7240_pci_write_config' makes integer from pointer without a cast
+../common/ar7240_pci.c:104: warning: passing argument 2 of 'ar7240_pci_write_config' makes integer from pointer without a cast
+../common/ar7240_pci.c: At top level:
+../common/ar7240_pci.c:35: warning: 'ar7240_local_read_config' defined but not used

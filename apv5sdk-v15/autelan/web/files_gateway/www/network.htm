@@ -1,0 +1,82 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+xml_lan=`config_read /config/network/lan`
+xml_gateway=`config_getoption "$xml_lan" gateway`
+xml_dhcp=`config_read /config/network/dhcp/dhcpserver`
+xml_dhcp_enable=`config_getoption "$xml_dhcp" enable`
+IFCONFIG="/sbin/ifconfig"
+Interface1="eth0"
+Interface2="eth1"
+Bridge="default"
+ETH0_MAC=`$IFCONFIG $Interface1 2> /dev/null|grep -i -o -e 'HWaddr [0-9a-fA-F:-]\{1,17\}'|awk -F' ' '{print $2}'`
+ETH1_MAC=`$IFCONFIG $Interface2 2> /dev/null|grep -i -o -e 'HWaddr [0-9a-fA-F:-]\{1,17\}'|awk -F' ' '{print $2}'`
+BR_IP=`$IFCONFIG $Bridge 2> /dev/null|grep -i -o -e 'inet addr:[0-9\.]\{1,15\}'|awk -F':' '{print $2}'`
+BR_SUBNET=`$IFCONFIG $Bridge 2> /dev/null|grep -i -o -e 'Mask:[0-9\.]\{1,15\}'|awk -F':' '{print $2}'`
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Network</title>
+<% include_js lan_set.js %>
+<script language="javascript" src="js/display.js"></script>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+</head>
+
+<body bgcolor="#efefef">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1"><script language="javascript">replace(lan_status_to_status)</script></td>
+          <td class="top1"><a href="lan_settings.htm" target="MainFrame"><script language="javascript">replace(lan_status_to_set)</script></a></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2"><script language="javascript">replace(lan_status_submenu)</script></td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" ><script language="javascript">replace(lan_status_head)</script></font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150"><script language="javascript">replace(lan_status_mac1)</script></td>
+          <td class="td_style" width="350"><%= $ETH0_MAC %></td>
+        </tr>
+		<tr>
+          <td class="td_style"><script language="javascript">replace(lan_status_mac2)</script></td>
+          <td class="td_style"><%= $ETH1_MAC %></td>
+        </tr>
+		<tr>
+          <td class="td_style"><script language="javascript">replace(lan_status_ip)</script></td>
+          <td class="td_style"><%= $BR_IP %></td>
+        </tr>
+		<tr>
+          <td class="td_style"><script language="javascript">replace(lan_status_mask)</script></td>
+          <td class="td_style"><%= $BR_SUBNET %></td>
+        </tr>
+		<tr>
+          <td class="td_style"><script language="javascript">replace(lan_status_dhcp)</script></td>
+          <td class="td_style"><%= $xml_dhcp_enable %></td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><a class="imgLink" href="#" onclick="window.parent.frames.MainFrame.location.reload();"><script language="javascript">replace(lan_status_refresh)</script></a></td>
+  </tr>
+</table>
+</div>
+</body>
+</html>

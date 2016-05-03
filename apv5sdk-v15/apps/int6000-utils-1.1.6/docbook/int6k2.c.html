@@ -1,0 +1,741 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			int6k2.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='int6k.c.html' title=' int6k.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kboot.c.html' title=' int6kboot.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   int6k2.c - Intellon Device Manager;
+ *
+ *   This program is essentialy the same as int6k but there are some
+ *   functional differences because the API is operation oriented as
+ *   opposed to message oriented;
+ *
+ *   Software developers are encouraged to study counterpart modules
+ *   in both programs and select those that suite their needs; 
+ *
+ *   this program sends and receives raw ethernet frames and so needs
+ *   root priviledges; if you install it using &quot;chmod 555&quot; and &quot;chown 
+ *   root:root&quot; then you must login as root to run it; otherwise, you 
+ *   can install it using &quot;chmod 4555&quot; and &quot;chown root:root&quot; so that 
+ *   anyone can run it; the program will refuse to run until you get
+ *   thing right;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *      Alex Vasquez &lt;alex.vasquez@intellon.com&gt;
+ *      Abdel Younes &lt;younes@leacom.fr&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*&quot;
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;limits.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/putoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../crypt/HPAVKey.h&quot;
+#include &quot;../nodes/nodes.h&quot;
+#include &quot;../ihpapi/ihp.h&quot;
+#include &quot;../ihpapi/ihpapi.h&quot;
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../crypt/keys.h&quot;
+#include &quot;../nvm/nvm.h&quot;
+#include &quot;../pib/pib.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../int6k2/FactoryDefaults2.c&quot;
+#include &quot;../int6k2/HostActionWait2.c&quot;
+#include &quot;../int6k2/Identity2.c&quot;
+#include &quot;../int6k2/MfgString2.c&quot;
+#include &quot;../int6k2/NetworkInfo2.c&quot;
+#include &quot;../int6k2/ReadMAC2.c&quot;
+#include &quot;../int6k2/ReadMME2.c&quot;
+#include &quot;../int6k2/ReadPIB2.c&quot;
+#include &quot;../int6k2/ResetDevice2.c&quot;
+#include &quot;../int6k2/RdModWrPib2.c&quot;
+#include &quot;../int6k2/SetKey2.c&quot;
+#include &quot;../int6k2/SetSDRAM2.c&quot;
+#include &quot;../int6k2/Upgrade2.c&quot;
+#include &quot;../int6k2/VersionInfo2.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../int6k/chipset.c&quot;
+#include &quot;../int6k/Confirm.c&quot;
+#include &quot;../int6k/SendMME.c&quot;
+#include &quot;../int6k/Request.c&quot;
+#include &quot;../int6k/Failure.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ihpapi/GetManufacturerInfo.c&quot;
+#include &quot;../ihpapi/GetNetworkInfo.c&quot;
+#include &quot;../ihpapi/GetVersionInfo.c&quot;
+#include &quot;../ihpapi/InitializeDevice.c&quot;
+#include &quot;../ihpapi/ResetDevice.c&quot;
+#include &quot;../ihpapi/ResetToFactoryDefaults.c&quot;
+#include &quot;../ihpapi/RxFrame.c&quot;
+#include &quot;../ihpapi/SequenceTerminate.c&quot;
+#include &quot;../ihpapi/SetKey.c&quot;
+#include &quot;../ihpapi/SetSDRAMConfig.c&quot;
+#include &quot;../ihpapi/TxFrame.c&quot;
+#include &quot;../ihpapi/UpdateDevice.c&quot;
+#include &quot;../ihpapi/EncodeEthernetHeader.c&quot;
+#include &quot;../ihpapi/EncodeIntellonHeader.c&quot;
+#include &quot;../ihpapi/DecodeEthernetPHYSettings.c&quot;
+#include &quot;../ihpapi/DecodeFlashNVM.c&quot;
+#include &quot;../ihpapi/DecodeGetToneMap.c&quot;
+#include &quot;../ihpapi/DecodeGetRxToneMap.c&quot;
+#include &quot;../ihpapi/DecodeGetVersion.c&quot;
+#include &quot;../ihpapi/DecodeHostAction.c&quot;
+#include &quot;../ihpapi/DecodeLinkStats.c&quot;
+#include &quot;../ihpapi/DecodeMfgString.c&quot;
+#include &quot;../ihpapi/DecodeNetworkInfo.c&quot;
+#include &quot;../ihpapi/DecodeResetDevice.c&quot;
+#include &quot;../ihpapi/DecodeResetToFactoryDefaults.c&quot;
+#include &quot;../ihpapi/DecodeSetKey.c&quot;
+#include &quot;../ihpapi/DecodeSetSDRAMCfg.c&quot;
+#include &quot;../ihpapi/DecodeStartMAC.c&quot;
+#include &quot;../ihpapi/DecodeReadModule.c&quot;
+#include &quot;../ihpapi/DecodeWriteMemory.c&quot;
+#include &quot;../ihpapi/DecodeWriteModule.c&quot;
+#include &quot;../ihpapi/FindFWHeader.c&quot;
+#include &quot;../ihpapi/SequenceReadModule.c&quot;
+#include &quot;../ihpapi/SequenceWriteMemory.c&quot;
+#include &quot;../ihpapi/SequenceWriteModule.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/uintspec.c&quot;
+#include &quot;../tools/alert.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/emalloc.c&quot;
+#include &quot;../tools/fdchecksum32.c&quot;
+#include &quot;../tools/fdchecksum_32.c&quot;
+#include &quot;../tools/checksum32.c&quot;
+#include &quot;../tools/checksum_32.c&quot;
+#include &quot;../tools/hexencode.c&quot;
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/hexstring.c&quot;
+#include &quot;../tools/hexdump.c&quot;
+#include &quot;../tools/binout.c&quot;
+#include &quot;../tools/decout.c&quot;
+#include &quot;../tools/typename.c&quot;
+#include &quot;../tools/checkfilename.c&quot;
+#include &quot;../tools/strfbits.c&quot;
+#include &quot;../tools/bclose.c&quot;
+#include &quot;../tools/beof.c&quot;
+#include &quot;../tools/bgetnexts.c&quot;
+#include &quot;../tools/bgeto.c&quot;
+#include &quot;../tools/bgets.c&quot;
+#include &quot;../tools/binout.c&quot;
+#include &quot;../tools/bopen.c&quot;
+#include &quot;../tools/buffer.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#endif
+
+#ifndef MAKEFILE
+
+// #include &quot;../tools/bopen.c&quot;
+// #include &quot;../tools/bclose.c&quot;
+// #include &quot;../tools/bgets.c&quot;
+// #include &quot;../tools/bgetnexts.c&quot;
+// #include &quot;../tools/bgeto.c&quot;
+// #include &quot;../tools/beof.c&quot;
+
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../crypt/SHA256Reset.c&quot;
+#include &quot;../crypt/SHA256Block.c&quot;
+#include &quot;../crypt/SHA256Write.c&quot;
+#include &quot;../crypt/SHA256Fetch.c&quot;
+#include &quot;../crypt/HPAVKeyNID.c&quot;
+#include &quot;../crypt/keys.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ether/openchannel.c&quot;
+#include &quot;../ether/closechannel.c&quot;
+#include &quot;../ether/sendpacket.c&quot;
+#include &quot;../ether/readpacket.c&quot;
+#include &quot;../ether/channel.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../pib/pibfile.c&quot;
+#include &quot;../pib/pibpeek.c&quot;
+#include &quot;../pib/pibcodes.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../nvm/nvmfile.c&quot;
+#include &quot;../nvm/nvmpeek.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../mme/MMECode.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../nodes/reorder.c&quot;
+#include &quot;../nodes/xmlattribute.c&quot;
+#include &quot;../nodes/xmlvalue.c&quot;
+#include &quot;../nodes/xmlcontent.c&quot;
+#include &quot;../nodes/xmlnode.c&quot;
+#include &quot;../nodes/xmlopen.c&quot;
+#include &quot;../nodes/xmlscan.c&quot;
+#include &quot;../nodes/xmledit.c&quot;
+#include &quot;../nodes/xmlfree.c&quot;
+#endif
+
+/*====================================================================*
+ *   program constants;
+ *--------------------------------------------------------------------*/
+
+#define BROADCAST &quot;FF:FF:FF:FF:FF:FF&quot;
+#define LOCALCAST &quot;00:B0:52:00:00:01&quot;
+
+/*====================================================================*
+ *   
+ *   void DeviceManager (struct int6k *int6k, signed loop, signed wait);
+ *   
+ *   perform operations in logical order despite any order specfied 
+ *   on the command line; for example, read PIB before writing PIB; 
+ *
+ *   operation order is controlled by the order of &quot;if&quot; statements 
+ *   shown here; the entire operation sequence can be repeated with
+ *   an optional pause between each iteration;
+ * 
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static void manager (struct int6k *int6k, signed loop, signed wait) 
+
+{
+	signed pass = loop;
+	while (pass-- &gt; 0) 
+	{
+		if (_anyset (int6k-&gt;flags, INT6K_VERSION)) 
+		{
+			VersionInfo2 (int6k);
+		}
+		if (_anyset (int6k-&gt;flags, INT6K_MANUFACTURER)) 
+		{
+			MfgString2 (int6k);
+		}
+		if (_anyset (int6k-&gt;flags, INT6K_READ_PIB_INFO)) 
+		{
+			Identity2 (int6k);
+		}
+		if (_anyset (int6k-&gt;flags, INT6K_NETWORK)) 
+		{
+			NetworkInfo2 (int6k);
+		}
+		if (_anyset (int6k-&gt;flags, INT6K_READ_PIB)) 
+		{
+			ReadPIB2 (int6k);
+		}
+		if (_anyset (int6k-&gt;flags, (INT6K_SETLOCALKEY | INT6K_SETREMOTEKEY))) 
+		{
+			SetKey2 (int6k);
+		}
+		if (_anyset (int6k-&gt;flags, INT6K_SDRAM_CONFIG)) 
+		{
+			SetSDRAM2 (int6k);
+		}
+		if (_allset (int6k-&gt;flags, (INT6K_WRITE_MAC | INT6K_WRITE_PIB))) 
+		{
+			Upgrade2 (int6k);
+			sleep (20);
+		}
+		if (_allset (int6k-&gt;flags, INT6K_RD_MOD_WR_PIB)) 
+		{
+			RdModWrPIB2 (int6k);
+		}
+		if (_anyset (int6k-&gt;flags, INT6K_FACTORY_DEFAULTS)) 
+		{
+			FactoryDefaults2 (int6k);
+		}
+		if (_anyset (int6k-&gt;flags, INT6K_RESET_DEVICE)) 
+		{
+			ResetDevice2 (int6k);
+		}
+		if (int6k-&gt;index == 0) 
+		{
+			continue;
+		}
+		if (!wait) 
+		{
+			continue;
+		}
+		if (_allclr (int6k-&gt;flags, INT6K_SILENCE)) 
+		{
+			alert (&quot;pause %d seconds %d more times&quot;, wait, pass);
+		}
+		sleep (wait);
+	}
+	return;
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char * argv []);
+ *   
+ *   parse command line, populate int6k structure and perform selected 
+ *   operations; show help summary if asked; see getoptv and putoptv
+ *   to understand command line parsing and help summary display; see
+ *   int6k2.h for the definition of struct int6k; 
+ *
+ *   the command line accepts multiple MAC addresses and the program 
+ *   performs the specified operations on each address, in turn; the
+ *   address order is significant but the option order is not; the
+ *   default address is a local broadcast that causes all devices on
+ *   the local H1 interface to respond but not those at the remote
+ *   end of the powerline;
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	extern struct channel channel;
+	extern const struct key keys [];
+	static const char *optv [] = 
+	{
+		&quot;D:F:hi:IJ:K:l:mMN:qp:P:rRsS:Tvw:X:x&quot;,
+		&quot;device [device] [...] [&gt; stdout]&quot;,
+		&quot;Intellon INT6x00 Device Manager using Intellon HomePlug AV API&quot;,
+		&quot;D x\tset DAK in hex format&quot;,
+		&quot;F s\tfirmware and PIB to NVRAM option [NOINT6K_NOFW]&quot;,
+		&quot;h\twait and process requests from the device&quot;,
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		&quot;i n\tuse host interface n [2]&quot;,
+
+#else
+
+		&quot;i s\tuse host interface s [&quot; CHANNEL_ETHDEVICE &quot;]&quot;,
+
+#endif
+
+		&quot;I\tread device identity with ihpapi_UpdateDevice()&quot;,
+		&quot;J x\tset NMK on remote device x via local device with ihpapi_SetKey()&quot;,
+		&quot;K x\tNetwork Membership Key in hex format&quot;,
+		&quot;l n\tloop n time [1]&quot;,
+		&quot;m\tnetwork information&quot;,
+		&quot;M\tset NMK on local device with ihpapi_SetKey()&quot;,
+		&quot;N f\twrite MAC from file to RAM with ihpapi_InitializeDevice()&quot;,
+		&quot;p f\tread PIB from RAM to file with ihpapi_UpdateDevice()&quot;,
+		&quot;P f\twrite PIB from file to RAM with ihpapi_InitializeDevice()&quot;,
+		&quot;q\tquiet&quot;,
+		&quot;r\tread hardware and firmware revision with ihpapi_GetVersionInfo()&quot;,
+		&quot;R\treset device with ihpapi_ResetDevice()&quot;,
+		&quot;s\tread manufacturer string with ihpapi_GetManufacturerInfo()&quot;,
+		&quot;S f\tset SDRAM configuration with ihpapi_SetSDRAMConfig()&quot;,
+		&quot;T\treset to factory defaults with ihpapi_ResetToFactoryDefaults()&quot;,
+		&quot;v\tverbose messages&quot;,
+		&quot;w n\tpause n seconds [0]&quot;,
+		&quot;X f\tread-modify-write PIB&quot;,
+		&quot;x\texit on error&quot;,
+		(const char *) (0) 
+	};
+
+#include &quot;../int6k/int6k-struct.c&quot;
+
+	signed loop = 1;
+	signed wait = 0;
+	signed c;
+	optind = 1;
+	opterr = 1;
+	if (getenv (PLCDEVICE)) 
+	{
+#if defined (WINPCAP) || defined (LIBPCAP)
+		channel.id = atoi (getenv (PLCDEVICE));
+#else
+		channel.name = strdup (getenv (PLCDEVICE));
+#endif
+	}
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'D':
+			if (!strcmp (optarg, &quot;key1&quot;)) 
+			{
+				memcpy (int6k.DAK, keys [0].DAK, sizeof (int6k.DAK));
+				break;
+			}
+			if (!strcmp (optarg, &quot;key2&quot;)) 
+			{
+				memcpy (int6k.DAK, keys [1].DAK, sizeof (int6k.DAK));
+				break;
+			}
+			if (!hexencode (int6k.DAK, sizeof (int6k.DAK), (const char *)(optarg))) 
+			{
+				error (1, errno, &quot;DAK=[%s]&quot;, optarg);
+			}
+			break;
+		case 'F':
+			if (!strcmp (optarg, &quot;INT6K_NOFLASH&quot;)) 
+			{
+				int6k.options = INT6K_NOFLASH;
+				break;
+			}
+			if (!strcmp (optarg, &quot;NOINT6K_FW_FLASH&quot;)) 
+			{
+				int6k.options = NOINT6K_FW_FLASH;
+				break;
+			}
+			if (!strcmp (optarg, &quot;INT6K_FLASH&quot;)) 
+			{
+				int6k.options = INT6K_FLASH;
+				break;
+			}
+			error (1, EINVAL, &quot;argument %s is not one of INT6K_FLASH, INT6K_FW_FLASH or INT6K_NO_FLASH&quot;, optarg);
+			break;
+		case 'h':
+			_setbits (int6k.flags, INT6K_HOST_ACTION);
+			break;
+		case 'i':
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+			channel.id = atoi (optarg);
+
+#else
+
+			channel.name = optarg;
+
+#endif
+
+			break;
+		case 'I':
+			_setbits (int6k.flags, INT6K_READ_PIB_INFO);
+			break;
+		case 'J':
+			if (!hexencode (int6k.RDA, sizeof (int6k.RDA), (const char *)(optarg))) 
+			{
+				error (1, errno, &quot;MAC=[%s]&quot;, optarg);
+			}
+			_setbits (int6k.flags, INT6K_SETREMOTEKEY);
+			break;
+		case 'K':
+			if (!strcmp (optarg, &quot;key1&quot;)) 
+			{
+				memcpy (int6k.NMK, keys [0].NMK, sizeof (int6k.NMK));
+				break;
+			}
+			if (!strcmp (optarg, &quot;key2&quot;)) 
+			{
+				memcpy (int6k.NMK, keys [1].NMK, sizeof (int6k.NMK));
+				break;
+			}
+			if (!hexencode (int6k.NMK, sizeof (int6k.NMK), (const char *)(optarg))) 
+			{
+				error (1, errno, &quot;NMK=[%s]&quot;, optarg);
+			}
+			break;
+		case 'l':
+			loop = (unsigned)(uintspec (optarg, 0, UINT_MAX));
+			break;
+		case 'm':
+			_setbits (int6k.flags, INT6K_NETWORK);
+			break;
+		case 'M':
+			_setbits (int6k.flags, INT6K_SETLOCALKEY);
+			break;
+		case 'n':
+			if (!checkfilename (optarg)) 
+			{
+				error (1, EINVAL, &quot;%s&quot;, optarg);
+			}
+			if ((int6k.NVM.file = open (optarg, O_BINARY|O_CREAT|O_RDWR|O_TRUNC, FILE_FILEMODE)) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, optarg);
+			}
+			_setbits (int6k.flags, INT6K_READ_MAC);
+			int6k.NVM.name = optarg;
+			break;
+		case 'N':
+			if (!checkfilename (optarg)) 
+			{
+				error (1, EINVAL, &quot;%s&quot;, optarg);
+			}
+			if ((int6k.NVM.file = open (optarg, O_BINARY|O_RDONLY)) == -1) 
+			{
+				error (1, errno, &quot;Can't open %s&quot;, optarg);
+			}
+			int6k.NVM.name = optarg;
+			if (nvmfile (&amp;int6k.NVM)) 
+			{
+				error (1, errno, &quot;Bad NVM file: %s&quot;, int6k.NVM.name);
+			}
+			_setbits (int6k.flags, INT6K_WRITE_MAC);
+			break;
+		case 'p':
+			if (!checkfilename (optarg)) 
+			{
+				error (1, EINVAL, &quot;%s&quot;, optarg);
+			}
+			if ((int6k.PIB.file = open (optarg, O_BINARY|O_CREAT|O_RDWR|O_TRUNC, FILE_FILEMODE)) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, optarg);
+			}
+			_setbits (int6k.flags, INT6K_READ_PIB);
+			int6k.PIB.name = optarg;
+			break;
+		case 'P':
+			if (!checkfilename (optarg)) 
+			{
+				error (1, EINVAL, &quot;%s&quot;, optarg);
+			}
+			if ((int6k.PIB.file = open (optarg, O_BINARY|O_RDONLY)) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, optarg);
+			}
+			int6k.PIB.name = optarg;
+			if (pibfile (&amp;int6k.PIB)) 
+			{
+				error (1, errno, &quot;Bad PIB file: %s&quot;, int6k.PIB.name);
+			}
+			_setbits (int6k.flags, INT6K_WRITE_PIB);
+			break;
+		case 'q':
+			_setbits (channel.flags, CHANNEL_SILENCE);
+			_setbits (int6k.flags, INT6K_SILENCE);
+			break;
+		case 'r':
+			_setbits (int6k.flags, INT6K_VERSION);
+			break;
+		case 'R':
+			_setbits (int6k.flags, INT6K_RESET_DEVICE);
+			break;
+		case 's':
+			_setbits (int6k.flags, INT6K_MANUFACTURER);
+			break;
+		case 'S':
+			if (!checkfilename (optarg)) 
+			{
+				error (1, EINVAL, &quot;%s&quot;, optarg);
+			}
+			if ((int6k.CFG.file = open (optarg, O_BINARY|O_RDONLY)) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, optarg);
+			}
+			int6k.CFG.name = optarg;
+			_setbits (int6k.flags, INT6K_SDRAM_CONFIG);
+			break;
+		case 'T':
+			_setbits (int6k.flags, INT6K_FACTORY_DEFAULTS);
+			break;
+		case 'v':
+			_setbits (channel.flags, CHANNEL_VERBOSE);
+			_setbits (int6k.flags, INT6K_VERBOSE);
+			break;
+		case 'w':
+			wait = (unsigned)(uintspec (optarg, 0, 3600));
+			break;
+		case 'X':
+			if (!checkfilename (optarg)) 
+			{
+				error (1, EINVAL, &quot;%s&quot;, optarg);
+			}
+			int6k.XML.name = optarg;
+			_setbits (int6k.flags, INT6K_RD_MOD_WR_PIB);
+			break;
+		case 'x':
+			_setbits (int6k.flags, INT6K_BAILOUT);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+
+/*
+ *      raw packets require root priviledges unless one takes special steps;
+ */
+
+#ifndef WIN32
+
+	if (geteuid ()) 
+	{
+		error (1, EPERM, &quot;Program needs root priviledges.&quot;);
+	}
+
+#endif
+
+/*
+ *   if no hardware addresses or multiple hardware addresses are 
+ *   specified on the command line and the user elected to read 
+ *   either the MAC or PIB from RAM then terminate to prevent 
+ *   accidental overwriting of either file; no hardware addresses
+ *   means local broadcast and many device could respond;
+ */
+
+	if (argc != 1) 
+	{
+		if (int6k.nvm.file != -1) 
+		{
+			error (1, 0, INT6K_NODEVICE);
+		}
+		if (int6k.pib.file != -1) 
+		{
+			error (1, 0, INT6K_NODEVICE);
+		}
+	}
+
+/*
+ *   open a layer 2 socket and bind it to the Ethernet interface named
+ *   in channel.name on unix-like systems or numbered by channel.id if
+ *   using LibPcap or WinPcap;
+ */
+
+	openchannel (int6k.channel);
+
+/*
+ *   allocate an Ethernet frame buffer and point channel.message to it; 
+ *   the API uses this buffer to store all outgoing and incoming Ethernet
+ *   frames; frame fields are accessed using message structure members;
+ */
+
+	if (!(int6k.message = malloc (sizeof (struct message)))) 
+	{
+		error (1, errno, INT6K_ERR_MEMORY);
+	}
+
+/*
+ *   allocate an API workspace and point int6k.result to it; workspace
+ *   structure is explained in the API Programmer's Guide; a workspace
+ *   is not needed unless you are calling API functions; 
+ */
+
+	if (!(int6k.result = malloc (sizeof (ihpapi_result_t)))) 
+	{
+		error (1, errno, INT6K_ERR_MEMORY);
+	}
+
+/*
+ *   operate on the default device named in channel.peer when no 
+ *   device addresses appear on the command line;
+ */
+
+	if (!argc) 
+	{
+		manager (&amp;int6k, loop, wait);
+	}
+
+/*
+ *   for each hardware address, replace the channel.peer address and
+ *   perform all indicated operations on each device; replace symbolic
+ *   addresses (&quot;all&quot;, &quot;broadcast&quot; and &quot;local&quot;) with literal addresses 
+ *   for convenience; operations are indicated by bits in int6k.flags;
+ */
+
+	while ((argc--) &amp;&amp; (*argv)) 
+	{
+		if (!strcmp (*argv, &quot;all&quot;)) 
+		{
+			*argv = BROADCAST;
+		}
+		else if (!strcmp (*argv, &quot;broadcast&quot;)) 
+		{
+			*argv = BROADCAST;
+		}
+		else if (!strcmp (*argv, &quot;local&quot;)) 
+		{
+			*argv = LOCALCAST;
+		}
+		if (!hexencode (channel.peer, sizeof (channel.peer), *argv)) 
+		{
+			error (1, errno, &quot;MAC=[%s]&quot;, *argv);
+		}
+		manager (&amp;int6k, loop, wait);
+		argv++;
+	}
+
+/*
+ *   release Ethernet frame buffer and API workspace; close socket;
+ */
+
+	free (int6k.message);
+	free (int6k.result);
+	closechannel (int6k.channel);
+	exit (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='int6k.c.html' title=' int6k.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kboot.c.html' title=' int6kboot.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

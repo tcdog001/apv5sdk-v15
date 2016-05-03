@@ -1,0 +1,13 @@
+#!/bin/sh
+iperf -s > /tmp/spd_in_log 2>/dev/null &
+sleep 10 
+killall iperf
+spd_in=`cat /tmp/spd_in_log | awk '{if(NR==7){print $8substr($9,1,1)}}'`
+
+if [ ! -z "${spd_in}" ];then
+	echo "& ingress: ${spd_in} &"
+else
+	echo "& ingress: 0.00 &"
+fi
+
+

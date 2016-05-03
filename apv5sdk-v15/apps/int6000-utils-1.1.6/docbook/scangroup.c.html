@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			scangroup.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='scanflush.c.html' title=' scanflush.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='scanident.c.html' title=' scanident.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void scangroup (SCAN * content, const char *charset);
+ *
+ *   scan.h
+ *
+ *.  released 2005 by charles maier associates ltd. for public use;
+ *:  compiled on debian gnu/linux with gcc 2.95 compiler;
+ *;  licensed under the gnu public license version two;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SCANGROUP_SOURCE
+#define SCANGROUP_SOURCE
+
+#include &quot;../scan/scan.h&quot;
+
+void scangroup (SCAN * content, const char *charset) 
+
+{
+	while ((content-&gt;final &lt; content-&gt;limit) &amp;&amp; !isbreak (content, charset)) 
+	{
+		switch (*content-&gt;final++) 
+		{
+		case '{':
+			scangroup (content, &quot;}&quot;);
+			nextbreak (content);
+			break;
+		case '(':
+			scangroup (content, &quot;)&quot;);
+			nextbreak (content);
+			break;
+		case '[':
+			scangroup (content, &quot;]&quot;);
+			nextbreak (content);
+			break;
+		case '\&quot;':
+			scanquote (content, &quot;\&quot;&quot;);
+			nextbreak (content);
+			break;
+		case '\'':
+			scanquote (content, &quot;\'&quot;);
+			nextbreak (content);
+			break;
+		case '\\':
+			nextbreak (content);
+			break;
+		default:
+			break;
+		}
+	}
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='scanflush.c.html' title=' scanflush.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='scanident.c.html' title=' scanident.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

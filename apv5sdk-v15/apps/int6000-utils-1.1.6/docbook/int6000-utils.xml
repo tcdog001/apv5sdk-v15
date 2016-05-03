@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- ?xml-stylesheet href="intellon.css" type="text/css"? -->
+<!-- ?xml-stylesheet href="intellon.xsl" type="text/xsl"? -->
+<!--
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+	<!ENTITY overview SYSTEM "overview.xml">
+	<!ENTITY hardware SYSTEM "hardware.xml">
+	<!ENTITY software SYSTEM "software.xml">
+	<!ENTITY firmware SYSTEM "firmware.xml">
+	<!ENTITY procedures SYSTEM "procedures.xml">
+	<!ENTITY interface SYSTEM "interface.xml">
+	<!ENTITY support SYSTEM "support.xml">
+	<!ENTITY library SYSTEM "library.xml">
+	<!ENTITY security SYSTEM "security.xml">
+	<!ENTITY scripting SYSTEM "scripting.xml">
+	<!ENTITY embedding SYSTEM "embedding.xml">
+	<!ENTITY management SYSTEM "management.xml">
+]>
+<book lang='en'>
+	<bookinfo>
+		<title>
+			Intellon INT6000 Linux Toolkit 
+			</title>
+		<authorgroup>
+			<corpauthor>
+				Intellon Corporation, Ocala FL USA
+				</corpauthor>
+			<editor>
+				<firstname>
+					Charles 
+					</firstname>
+				<surname>
+					Maier 
+					</surname>
+				</editor>
+			</authorgroup>
+		<date>
+			DEC 2009
+			</date>
+		<releaseinfo>
+			int6000-utils-1.1.6
+			</releaseinfo>
+		<abstract>
+			<para>
+				Intellon Corporation, Orlando FL USA, offers the Intellon Linux Toolkit free of charge to their customers. The toolkit contains C Language source code and GNU Makefiles needed to compile dozens of useful programs for engineers and software developers. It also includes a variety of Bash shell scripts that use these programs, in various ways, to interrogate, control and manage Intellon <productname>INT6000</productname>, <productname>INT6300</productname> and <productname>INT6400</productname> devices. These programs are simple and compact,  making them suitable for embedded applications where resources are at a premium. Most all have command line interfaces,  making them generally unsuitable for end users or computer novices. 
+				</para>
+			<para>
+				Although this Toolkit is intended for Linux environments, it includes a Visual Studio 2003 solution file and pre-compiled versions of most programs that are ready to install and run on most Microsoft Windows platforms. The Linux and Windows applications have the same code base but Intellon does not offer technical support for this toolkit on Microsoft Windows. <productname>WinPcap</productname> must be installed in order to use Toolkit programs on Microsoft Windows platforms.
+				</para>
+			<para>
+				New users should read the entire first chapter of this document before starting to use the toolkit. This will probably answer most questions concerning installation, structure, content and application.
+				</para>
+			<para>
+				<trademark class='registered'>HomePlug</trademark> AV is a registered trademark of the HomePlug Powerline Aliance. <trademark>Linux</trademark> is a trademark of Linus Tovalds. <trademark class='registered'>Windows</trademark> is a registered trademark of Microsoft Corporation. 
+				</para>
+			<para>
+				<productname>INT6000</productname>, <productname>INT6300</productname> and <productname>INT6400</productname> are products of Intellon Corporation. 
+				</para>
+			</abstract>
+		<keywordset>
+			<keyword>
+				int6k 
+				</keyword>
+			<keyword>
+				powerline 
+				</keyword>
+			</keywordset>
+		</bookinfo>
+	&overview; 
+	&hardware; 
+	&software; 
+	&firmware; 
+	&procedures; 
+	&scripting; 
+	&embedding;
+<!--
+	&management;
+ -->
+	&interface; 
+	&support;
+	</book>

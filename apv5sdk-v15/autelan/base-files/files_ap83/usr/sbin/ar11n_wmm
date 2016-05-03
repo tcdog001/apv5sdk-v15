@@ -1,0 +1,30 @@
+#!/bin/sh
+
+IWPRIV="iwpriv"
+
+usage()
+{
+    echo "usege: ar11n_qos (wlanname,mode)"
+    exit 1
+}
+
+if [ ! $# -eq 2 ];then
+    usage
+fi
+
+wlanname="$1"
+mode=$2
+
+if [ -f /jffs/.wmm ];then
+#if [ 1 ];then
+    if [ $mode = "n" ];then
+        $IWPRIV $wlanname wmm 1
+#        echo 1
+    else
+        exit 1
+#        echo 0
+    fi
+else
+    exit 1
+fi
+

@@ -1,0 +1,18 @@
+#!/bin/sh
+tx_s=`pro_ctl_util -i | awk -F ":" '/product type is/{print $2}'`
+if [ $? == "0" ];then
+	echo $tx_s | grep -q 'H'
+	if [ $? == "0" ];then
+		if [ -f /etc/config/tx-offset ];then
+			txoff=`cat /etc/config/tx-offset`
+			echo "&"$txoff"&"
+		else
+			echo "&1&"
+		fi
+	else
+		echo "&0&"
+	fi
+else
+	echo "&wrong&"
+fi
+

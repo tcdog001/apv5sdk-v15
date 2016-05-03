@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			psin.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='psgraph.7.html' title=' psgraph.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='pskey.7.html' title=' pskey.7 '>NEXT</a>]
+			</div>
+<pre>
+psin(7)                               Intellon Linux Toolkit                              psin(7)
+
+NAME
+       psin - Import PIB Prescalers
+
+SYNOPSIS
+       psin [options] [&lt;stdin] file
+
+SYNOPSIS
+       Import  an  amplitude  map,  read  from  stdin,  and insert it into and existing PIB file,
+       replacing previous amplitude map values. Intellon can provide standard amplitude maps  (or
+       prescalers)  that  conform  to  most  national or international EMI regulations. Generally
+       speaking, these maps should not be modified but there are execeptions. This  program  per‐
+       mits  custom  amplitude  maps to be loaded into an PIB file. It can also be used to copy a
+       map directly from one PIB file to another when used with program psout.
+
+       This program is part of the Intellon Linux Toolkit. See the ilt man page for  an  overview
+       and installation instructions.
+
+CAVEATS
+       The Intellon Windows Device Manager determines the type of prescalars stored in the PIB by
+       inspecting the ToneMaskType code which is also stored in the PIB but is not  part  of  the
+       prescalar set. If this program is used to store a new prescalar set in a PIB and the Tone‐
+       MaskType code is not updated to reflect the change then the Windows  Device  Manager  will
+       continue  to display the previous prescalar type. This will confuse Windows Device Manager
+       users. Use program setpib to set the ToneMaskType code and program  pskey  to  verify  the
+       true prescalar type.
+
+       Tampering  with  prescalar  settings may violate national or international electo-magnetic
+       emission standards and lead to fines or penalties. Intellon Corporation shall not be  held
+       responsible for any consequences of modifications made to prescalar sets provided to their
+       customers.
+
+OPTIONS
+       None.
+
+ARGUMENTS
+       file   The name of an Intellon  Parameter  Information  Block  (PIB)  file.  The  original
+              prescalers  are  replaced and the checksum is re-computed. By convention, PIB files
+              have a .pib extension but this program does not enforce that  convention  and  does
+              not  make any assumption based on filename or extension but the program will reject
+              invalid PIB files. Only one file may be specified on the command line.
+
+FILES
+       An amplitude map consists of 1155 frequency-amplitude pairs. Each pair consists of a deci‐
+       mal  index  and  a  hexadecimal scaler value. The index represents a frequecy from 1.8 mhz
+       through 30 mhz. The scaler represents the amplitude attenuation applied at that frequency.
+       The frequency and attenuation are computed as follows.
+
+          frequency = 40.96 * (index + 74)
+          decibels = 20 * log10 (scaler / 256)
+
+EXAMPLE
+       The following example loads prescaler file abc.psc into PIB file abc.pib. The ToneMaskType
+       code is not updated by this operation and should be updated separately to avoid  confusing
+       Windows Device Manager users. Program setpib is one means of updating this code.
+
+          # psin &lt; abc.psc abc.pib
+
+DISCLAIMER
+       PIB  file structure and content is proprietary to Intellon Corporation, Ocala FL USA. Con‐
+       sequently, public information is not available. Intellon Corporation reserves the right to
+       modify PIB file structure or content in future firmware releases without any obligation to
+       notify or compensate users of this program.
+
+SEE ALSO
+       psgraph(7), pskey(7), psout(7), setpib(7)
+
+CREDITS
+        Charles Maier &lt;charles.maier@intellon.com&gt;
+
+int6000-utils-linux                    Intellon Corporation                               psin(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='psgraph.7.html' title=' psgraph.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='pskey.7.html' title=' pskey.7 '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,6 @@
+meminit.c: In function 'wasp_ddr_initial_config':
+meminit.c:206: warning: 'type' may be used uninitialized in this function
+meminit.c:206: warning: 'tap_val' may be used uninitialized in this function
+meminit.c:206: warning: 'cycle_val' may be used uninitialized in this function
+meminit.c:205: warning: 'ddr_config2' may be used uninitialized in this function
+meminit.c:205: warning: 'ddr_config' may be used uninitialized in this function

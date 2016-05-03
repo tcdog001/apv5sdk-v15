@@ -1,0 +1,733 @@
+#!/bin/sh
+#
+# source library
+#
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+
+cp /etc/defaults/config.xml /tmp/upgrade.xml
+chown root:root /tmp/upgrade.xml  > /dev/null
+chown root:root /etc/config/config.xml >/dev/null
+chmod 755 /tmp/upgrade.xml /etc/config/config.xml
+
+local xml_system=`config_read /config/system`
+local xml_system_version=`config_getoption "$xml_system" version`
+local xml_system_subversion1=`echo $xml_system_version|awk -F'.' '{print $1}' 2>/dev/null`
+local xml_system_subversion2=`echo $xml_system_version|awk -F'.' '{print $2}' 2>/dev/null`
+local xml_system_subversion3=`echo $xml_system_version|awk -F'.' '{print $3}' 2>/dev/null`
+
+local xml_upsystem=`upconfig_read /config/system`
+local xml_upsystem_version=`upconfig_getoption "$xml_upsystem" version`
+local xml_upsystem_subversion1=`echo $xml_upsystem_version|awk -F'.' '{print $1}' 2>/dev/null`
+local xml_upsystem_subversion2=`echo $xml_upsystem_version|awk -F'.' '{print $2}' 2>/dev/null`
+local xml_upsystem_subversion3=`echo $xml_upsystem_version|awk -F'.' '{print $3}' 2>/dev/null`
+
+if [ "$xml_system_version" == "$xml_upsystem_version" ]&&[ $xml_system_version != "" ]; then	 
+	echo "Device version is the same."
+else 
+	echo "please wait to update the config file..."
+	local xml_session=`config_read /config/session`
+	local xml_session_session_id=`config_getoption "$xml_session" session_id`
+	local xml_session_timestamp=`config_getoption "$xml_session" timestamp`
+	local xml_session_client_ip=`config_getoption "$xml_session" client_ip`
+	local xml_session_timeout=`config_getoption "$xml_session" timeout`
+	#add 200907092019
+	local xml_session_lang=`config_getoption "$xml_session" language`
+	#end
+	  
+	local xml_system=`config_read /config/system`
+	local xml_system_version=`config_getoption "$xml_system" version`
+	local xml_system_type=`config_getoption "$xml_system" type`
+	local xml_system_username=`config_getoption "$xml_system" username`
+	local xml_system_password=`config_getoption "$xml_system" password`
+	local xml_system_workmode=`config_getoption "$xml_system" workmode`
+	local xml_system_timezone=`config_getoption "$xml_system" timezone`
+	local xml_system_timeserver_usedefault=`config_getoption "$xml_system" timeserver_usedefault`
+	local xml_system_timeserverdefault=`config_getoption "$xml_system" timeserverdefault`
+	local xml_system_timeserver1=`config_getoption "$xml_system" timeserver1`
+	local xml_system_timeserver2=`config_getoption "$xml_system" timeserver2`
+	
+	
+	local xml_system_log=`config_read /config/system/log`
+	local xml_system_log_enable=`config_getoption "$xml_system_log" enable`
+	local xml_system_log_sip=`config_getoption "$xml_system_log" sip`
+	local xml_system_log_sport=`config_getoption "$xml_system_log" sport`
+	
+	#add 200907092019
+	local xml_wifi0=`config_read /config/network/wifi0`
+	local xml_wifi0_enable=`config_getoption "$xml_wifi0" enable`
+	local xml_wifi0_txpower=`config_getoption "$xml_wifi0" txpower`
+	local xml_wifi0_channel=`config_getoption "$xml_wifi0" channel`
+	local xml_wifi0_channel1=`config_getoption "$xml_wifi0" channel1`
+	local xml_wifi0_channela=`config_getoption "$xml_wifi0" channela`
+	local xml_wifi0_autochannel=`config_getoption "$xml_wifi0" autochannel`
+	local xml_wifi0_mode=`config_getoption "$xml_wifi0" mode`
+	local xml_wifi0_modea=`config_getoption "$xml_wifi0" modea`
+	local xml_wifi0_moden=`config_getoption "$xml_wifi0" moden`
+	#add by zhaoyu 09.12.03
+	if [ "$xml_wifi0_moden" == "11nght20" ]; then
+	  eval xml_wifi0_moden="11ng"
+	elif [ "$xml_wifi0_moden" == "11naht20" ]; then
+	  eval xml_wifi0_moden="11na"
+	fi
+	local xml_wifi0_diversity=`config_getoption "$xml_wifi0" diversity`
+	local xml_wifi0_txantenna=`config_getoption "$xml_wifi0" txantenna`
+	local xml_wifi0_rxantenna=`config_getoption "$xml_wifi0" rxantenna`
+	local xml_wifi0_region=`config_getoption "$xml_wifi0" region`
+	
+	local xml_wifi1=`config_read /config/network/wifi1`
+	local xml_wifi1_enable=`config_getoption "$xml_wifi1" enable`
+	local xml_wifi1_txpower=`config_getoption "$xml_wifi1" txpower`
+	local xml_wifi1_channel=`config_getoption "$xml_wifi1" channel`
+	local xml_wifi1_channel1=`config_getoption "$xml_wifi1" channel1`
+	local xml_wifi1_channela=`config_getoption "$xml_wifi1" channela`
+	local xml_wifi1_autochannel=`config_getoption "$xml_wifi1" autochannel`
+	local xml_wifi1_mode=`config_getoption "$xml_wifi1" mode`
+	local xml_wifi1_modea=`config_getoption "$xml_wifi1" modea`
+	local xml_wifi1_moden=`config_getoption "$xml_wifi1" moden`
+	#add by zhaoyu 09.12.03
+	if [ "$xml_wifi1_moden" == "11nght20" ]; then
+	  eval xml_wifi1_moden="11ng"
+	elif [ "$xml_wifi1_moden" == "11naht20" ]; then
+	  eval xml_wifi1_moden="11na"
+	fi
+	local xml_wifi1_diversity=`config_getoption "$xml_wifi1" diversity`
+	local xml_wifi1_txantenna=`config_getoption "$xml_wifi1" txantenna`
+	local xml_wifi1_rxantenna=`config_getoption "$xml_wifi1" rxantenna`
+	local xml_wifi1_region=`config_getoption "$xml_wifi1" region`
+#del by cdh	
+#	local xml_country_code=`config_read /config/network/country`
+#	local xml_wlan_region=`config_getoption "$xml_country_code" region`
+	
+	local xml_network_sroute=`config_read /config/network/sroute`
+	local xml_network_route1=`config_getoption "$xml_network_sroute" route1`
+	local xml_network_route2=`config_getoption "$xml_network_sroute" route2`
+	local xml_network_rtip2=`config_getoption "$xml_network_sroute" rtip2`
+	local xml_network_rtmask2=`config_getoption "$xml_network_sroute" rtmask2`
+	#end
+	
+	local xml_network_vlan1=`config_read /config/network/vlan1`
+	local xml_network_vlan1_create=`config_getoption "$xml_network_vlan1" create`
+	local xml_network_vlan1_vid=`config_getoption "$xml_network_vlan1" vid`
+	local xml_network_vlan1_vlanname=`config_getoption "$xml_network_vlan1" vlanname`
+	local xml_network_vlan1_ifeth=`config_getoption "$xml_network_vlan1" ifeth`
+	local xml_network_vlan1_ifeth1=`config_getoption "$xml_network_vlan1" ifeth1`
+	
+	local xml_network_vlan2=`config_read /config/network/vlan2`
+	local xml_network_vlan2_create=`config_getoption "$xml_network_vlan2" create`
+	local xml_network_vlan2_vid=`config_getoption "$xml_network_vlan2" vid`
+	local xml_network_vlan2_vlanname=`config_getoption "$xml_network_vlan2" vlanname`
+	local xml_network_vlan2_ifeth=`config_getoption "$xml_network_vlan2" ifeth`
+	local xml_network_vlan2_ifeth1=`config_getoption "$xml_network_vlan2" ifeth1`
+	
+	local xml_network_vlan3=`config_read /config/network/vlan3`
+	local xml_network_vlan3_create=`config_getoption "$xml_network_vlan3" create`
+	local xml_network_vlan3_vid=`config_getoption "$xml_network_vlan3" vid`
+	local xml_network_vlan3_vlanname=`config_getoption "$xml_network_vlan3" vlanname`
+	local xml_network_vlan3_ifeth=`config_getoption "$xml_network_vlan3" ifeth`
+	local xml_network_vlan3_ifeth1=`config_getoption "$xml_network_vlan3" ifeth1`
+	
+	local xml_network_vlan4=`config_read /config/network/vlan4`
+	local xml_network_vlan4_create=`config_getoption "$xml_network_vlan4" create`
+	local xml_network_vlan4_vid=`config_getoption "$xml_network_vlan4" vid`
+	local xml_network_vlan4_vlanname=`config_getoption "$xml_network_vlan4" vlanname`
+	local xml_network_vlan4_ifeth=`config_getoption "$xml_network_vlan4" ifeth`
+	local xml_network_vlan4_ifeth1=`config_getoption "$xml_network_vlan4" ifeth1`
+	
+	local xml_network_vlan5=`config_read /config/network/vlan5`
+	local xml_network_vlan5_create=`config_getoption "$xml_network_vlan5" create`
+	local xml_network_vlan5_vid=`config_getoption "$xml_network_vlan5" vid`
+	local xml_network_vlan5_vlanname=`config_getoption "$xml_network_vlan5" vlanname`
+	local xml_network_vlan5_ifeth=`config_getoption "$xml_network_vlan5" ifeth`
+	local xml_network_vlan5_ifeth1=`config_getoption "$xml_network_vlan5" ifeth1`
+	
+	local xml_network_vlan6=`config_read /config/network/vlan6`
+	local xml_network_vlan6_create=`config_getoption "$xml_network_vlan6" create`
+	local xml_network_vlan6_vid=`config_getoption "$xml_network_vlan6" vid`
+	local xml_network_vlan6_vlanname=`config_getoption "$xml_network_vlan6" vlanname`
+	local xml_network_vlan6_ifeth=`config_getoption "$xml_network_vlan6" ifeth`
+	local xml_network_vlan6_ifeth1=`config_getoption "$xml_network_vlan6" ifeth1`
+	
+	local xml_network_vlan7=`config_read /config/network/vlan7`
+	local xml_network_vlan7_create=`config_getoption "$xml_network_vlan7" create`
+	local xml_network_vlan7_vid=`config_getoption "$xml_network_vlan7" vid`
+	local xml_network_vlan7_vlanname=`config_getoption "$xml_network_vlan7" vlanname`
+	local xml_network_vlan7_ifeth=`config_getoption "$xml_network_vlan7" ifeth`
+	local xml_network_vlan7_ifeth1=`config_getoption "$xml_network_vlan7" ifeth1`
+	
+	local xml_network_vlan8=`config_read /config/network/vlan8`
+	local xml_network_vlan8_create=`config_getoption "$xml_network_vlan8" create`
+	local xml_network_vlan8_vid=`config_getoption "$xml_network_vlan8" vid`
+	local xml_network_vlan8_vlanname=`config_getoption "$xml_network_vlan8" vlanname`
+	local xml_network_vlan8_ifeth=`config_getoption "$xml_network_vlan8" ifeth`
+	local xml_network_vlan8_ifeth1=`config_getoption "$xml_network_vlan8" ifeth1`
+	
+	local xml_network=`config_read /config/network`
+	local xml_network_hostname=`config_getoption "$xml_network" hostname`
+	local xml_network_vapnum=`config_getoption "$xml_network" vapnum`
+	local xml_network_domain=`config_getoption "$xml_network" domain`
+	
+	local xml_network_rogueapdetection=`config_read /config/network/rogueapdetection`
+	local xml_network_rogueapdetection_enable=`config_getoption "$xml_network_rogueapdetection" enable`
+	
+	local xml_network_lan=`config_read /config/network/lan`
+	local xml_network_lan_type=`config_getoption "$xml_network_lan" type`
+	local xml_network_lan_proto=`config_getoption "$xml_network_lan" proto`
+	local xml_network_lan_ipaddr=`config_getoption "$xml_network_lan" ipaddr`
+	local xml_network_lan_netmask=`config_getoption "$xml_network_lan" netmask`
+	local xml_network_lan_gateway=`config_getoption "$xml_network_lan" gateway`
+	local xml_network_lan_nameserver_config=`config_getoption "$xml_network_lan" nameserver_config`
+	local xml_network_lan_nameserver1=`config_getoption "$xml_network_lan" nameserver1`
+	local xml_network_lan_nameserver2=`config_getoption "$xml_network_lan" nameserver2`
+	local xml_network_lan_vendorclassid=`config_getoption "$xml_network_lan" vendorclassid`
+	
+	local xml_network_wds=`config_read /config/network/wds`
+	local xml_network_wds_wdsenable=`config_getoption "$xml_network_wds" wdsenable`
+	local xml_network_wds_wdsrole=`config_getoption "$xml_network_wds" wdsrole`
+	local xml_network_wds_wdsssid=`config_getoption "$xml_network_wds" wdsssid`
+	local xml_network_wds_wdschannel=`config_getoption "$xml_network_wds" wdschannel`
+	
+	local xml_network_advanset=`config_read /config/network/advanset`
+	local xml_network_advanset_portprio=`config_getoption "$xml_network_advanset" portprio`
+	local xml_network_advanset_setfd=`config_getoption "$xml_network_advanset" setfd`
+	local xml_network_advanset_sethello=`config_getoption "$xml_network_advanset" sethello`
+	local xml_network_advanset_maxage=`config_getoption "$xml_network_advanset" maxage`
+	local xml_network_advanset_stpenable=`config_getoption "$xml_network_advanset" stpenable`
+	
+	local xml_network_vap1=`config_read /config/network/vap1`
+	local xml_network_vap1_if=`config_getoption "$xml_network_vap1" if`
+	local xml_network_vap1_enable=`config_getoption "$xml_network_vap1" enable`
+	local xml_network_vap1_broadcast=`config_getoption "$xml_network_vap1" broadcast`
+	local xml_network_vap1_ssid=`config_getoption "$xml_network_vap1" ssid`
+	local xml_network_vap1_region=`config_getoption "$xml_network_vap1" region`
+	local xml_network_vap1_channel=`config_getoption "$xml_network_vap1" channel`
+	local xml_network_vap1_mode=`config_getoption "$xml_network_vap1" mode`
+	local xml_network_vap1_security=`config_getoption "$xml_network_vap1" security`
+	local xml_network_vap1_wepbit=`config_getoption "$xml_network_vap1" wepbit`
+	local xml_network_vap1_wepkey=`config_getoption "$xml_network_vap1" wepkey`
+	local xml_network_vap1_passkey1=`config_getoption "$xml_network_vap1" passkey1`
+	local xml_network_vap1_passkey2=`config_getoption "$xml_network_vap1" passkey2`
+	local xml_network_vap1_passkey3=`config_getoption "$xml_network_vap1" passkey3`
+	local xml_network_vap1_passkey4=`config_getoption "$xml_network_vap1" passkey4`
+	local xml_network_vap1_authmode=`config_getoption "$xml_network_vap1" authmode`
+	local xml_network_vap1_wpamode=`config_getoption "$xml_network_vap1" wpamode`
+	local xml_network_vap1_passphrase=`config_getoption "$xml_network_vap1" passphrase`
+	local xml_network_vap1_encryption=`config_getoption "$xml_network_vap1" encryption`
+	local xml_network_vap1_macfilter=`config_getoption "$xml_network_vap1" macfilter`
+	local xml_network_vap1_filtermode=`config_getoption "$xml_network_vap1" filtermode`
+	local xml_network_vap1_mac1=`config_getoption "$xml_network_vap1" mac1`
+	local xml_network_vap1_mac2=`config_getoption "$xml_network_vap1" mac2`
+	local xml_network_vap1_mac3=`config_getoption "$xml_network_vap1" mac3`
+	local xml_network_vap1_mac4=`config_getoption "$xml_network_vap1" mac4`
+	local xml_network_vap1_mac5=`config_getoption "$xml_network_vap1" mac5`
+	local xml_network_vap1_mac6=`config_getoption "$xml_network_vap1" mac6`
+	local xml_network_vap1_mac7=`config_getoption "$xml_network_vap1" mac7`
+	local xml_network_vap1_mac8=`config_getoption "$xml_network_vap1" mac8`
+	local xml_network_vap1_mac9=`config_getoption "$xml_network_vap1" mac9`
+	local xml_network_vap1_mac10=`config_getoption "$xml_network_vap1" mac10`
+	local xml_network_vap1_mac11=`config_getoption "$xml_network_vap1" mac11`
+	local xml_network_vap1_mac12=`config_getoption "$xml_network_vap1" mac12`
+	local xml_network_vap1_mac13=`config_getoption "$xml_network_vap1" mac13`
+	local xml_network_vap1_mac14=`config_getoption "$xml_network_vap1" mac14`
+	local xml_network_vap1_mac15=`config_getoption "$xml_network_vap1" mac15`
+	local xml_network_vap1_mac16=`config_getoption "$xml_network_vap1" mac16`
+	local xml_network_vap1_mac17=`config_getoption "$xml_network_vap1" mac17`
+	local xml_network_vap1_mac18=`config_getoption "$xml_network_vap1" mac18`
+	local xml_network_vap1_mac19=`config_getoption "$xml_network_vap1" mac19`
+	local xml_network_vap1_mac20=`config_getoption "$xml_network_vap1" mac20`
+	local xml_network_vap1_rate=`config_getoption "$xml_network_vap1" rate`
+	local xml_network_vap1_beacon=`config_getoption "$xml_network_vap1" beacon`
+	local xml_network_vap1_dtim=`config_getoption "$xml_network_vap1" dtim`
+	local xml_network_vap1_frag=`config_getoption "$xml_network_vap1" frag`
+	local xml_network_vap1_txantenna=`config_getoption "$xml_network_vap1" txantenna`
+	local xml_network_vap1_rxantenna=`config_getoption "$xml_network_vap1" rxantenna`
+	local xml_network_vap1_preamble=`config_getoption "$xml_network_vap1" preamble`
+	local xml_network_vap1_radiotype=`config_getoption "$xml_network_vap1" radiotype`
+	local xml_network_vap1_rts=`config_getoption "$xml_network_vap1" rts`
+	#add 200907092019
+	local xml_network_vap1_create=`config_getoption "$xml_network_vap1" create`
+	local xml_network_vap1_wlanmode=`config_getoption "$xml_network_vap1" wlanmode`
+	local xml_network_vap1_ip=`config_getoption "$xml_network_vap1" ip`
+	local xml_network_vap1_netmask=`config_getoption "$xml_network_vap1" netmask`
+	local xml_network_vap1_forward2=`config_getoption "$xml_network_vap1" forward2`
+	local xml_network_vap1_assocchan=`config_getoption "$xml_network_vap1" assocchan`
+	local xml_network_vap1_assocweight=`config_getoption "$xml_network_vap1" assocweight`
+	local xml_network_vap1_assocrssi=`config_getoption "$xml_network_vap1" assocrssi`
+	local xml_network_vap1_wifi=`config_getoption "$xml_network_vap1" wifi`
+	local xml_network_vap1_isolation=`config_getoption "$xml_network_vap1" isolation`
+	local xml_network_vap1_bcisolation=`config_getoption "$xml_network_vap1" bcisolation`
+	#end
+	
+	local xml_network_vap1_wmm=`config_read /config/network/vap1/wmm`
+	local xml_network_vap1_wmm_enable=`config_getoption "$xml_network_vap1_wmm" enable`
+	local xml_network_vap1_wmm_noack=`config_getoption "$xml_network_vap1_wmm" noack`
+	
+	local xml_network_vap1_vlan=`config_read /config/network/vap1/vlan`
+	local xml_network_vap1_vlan_enable=`config_getoption "$xml_network_vap1_vlan" enable`
+	local xml_network_vap1_vlan_vid=`config_getoption "$xml_network_vap1_vlan" vid`
+	
+	local xml_network_vap2=`config_read /config/network/vap2`
+	local xml_network_vap2_if=`config_getoption "$xml_network_vap2" if`
+	local xml_network_vap2_enable=`config_getoption "$xml_network_vap2" enable`
+	local xml_network_vap2_broadcast=`config_getoption "$xml_network_vap2" broadcast`
+	local xml_network_vap2_ssid=`config_getoption "$xml_network_vap2" ssid`
+	local xml_network_vap2_region=`config_getoption "$xml_network_vap2" region`
+	local xml_network_vap2_channel=`config_getoption "$xml_network_vap2" channel`
+	local xml_network_vap2_mode=`config_getoption "$xml_network_vap2" mode`
+	local xml_network_vap2_security=`config_getoption "$xml_network_vap2" security`
+	local xml_network_vap2_wepbit=`config_getoption "$xml_network_vap2" wepbit`
+	local xml_network_vap2_wepkey=`config_getoption "$xml_network_vap2" wepkey`
+	local xml_network_vap2_passkey1=`config_getoption "$xml_network_vap2" passkey1`
+	local xml_network_vap2_passkey2=`config_getoption "$xml_network_vap2" passkey2`
+	local xml_network_vap2_passkey3=`config_getoption "$xml_network_vap2" passkey3`
+	local xml_network_vap2_passkey4=`config_getoption "$xml_network_vap2" passkey4`
+	local xml_network_vap2_authmode=`config_getoption "$xml_network_vap2" authmode`
+	local xml_network_vap2_wpamode=`config_getoption "$xml_network_vap2" wpamode`
+	local xml_network_vap2_passphrase=`config_getoption "$xml_network_vap2" passphrase`
+	local xml_network_vap2_encryption=`config_getoption "$xml_network_vap2" encryption`
+	local xml_network_vap2_macfilter=`config_getoption "$xml_network_vap2" macfilter`
+	local xml_network_vap2_filtermode=`config_getoption "$xml_network_vap2" filtermode`
+	local xml_network_vap2_mac1=`config_getoption "$xml_network_vap2" mac1`
+	local xml_network_vap2_mac2=`config_getoption "$xml_network_vap2" mac2`
+	local xml_network_vap2_mac3=`config_getoption "$xml_network_vap2" mac3`
+	local xml_network_vap2_mac4=`config_getoption "$xml_network_vap2" mac4`
+	local xml_network_vap2_mac5=`config_getoption "$xml_network_vap2" mac5`
+	local xml_network_vap2_mac6=`config_getoption "$xml_network_vap2" mac6`
+	local xml_network_vap2_mac7=`config_getoption "$xml_network_vap2" mac7`
+	local xml_network_vap2_mac8=`config_getoption "$xml_network_vap2" mac8`
+	local xml_network_vap2_mac9=`config_getoption "$xml_network_vap2" mac9`
+	local xml_network_vap2_mac10=`config_getoption "$xml_network_vap2" mac10`
+	local xml_network_vap2_mac11=`config_getoption "$xml_network_vap2" mac11`
+	local xml_network_vap2_mac12=`config_getoption "$xml_network_vap2" mac12`
+	local xml_network_vap2_mac13=`config_getoption "$xml_network_vap2" mac13`
+	local xml_network_vap2_mac14=`config_getoption "$xml_network_vap2" mac14`
+	local xml_network_vap2_mac15=`config_getoption "$xml_network_vap2" mac15`
+	local xml_network_vap2_mac16=`config_getoption "$xml_network_vap2" mac16`
+	local xml_network_vap2_mac17=`config_getoption "$xml_network_vap2" mac17`
+	local xml_network_vap2_mac18=`config_getoption "$xml_network_vap2" mac18`
+	local xml_network_vap2_mac19=`config_getoption "$xml_network_vap2" mac19`
+	local xml_network_vap2_mac20=`config_getoption "$xml_network_vap2" mac20`
+	local xml_network_vap2_rate=`config_getoption "$xml_network_vap2" rate`
+	local xml_network_vap2_beacon=`config_getoption "$xml_network_vap2" beacon`
+	local xml_network_vap2_dtim=`config_getoption "$xml_network_vap2" dtim`
+	local xml_network_vap2_frag=`config_getoption "$xml_network_vap2" frag`
+	local xml_network_vap2_txantenna=`config_getoption "$xml_network_vap2" txantenna`
+	local xml_network_vap2_rxantenna=`config_getoption "$xml_network_vap2" rxantenna`
+	local xml_network_vap2_preamble=`config_getoption "$xml_network_vap2" preamble`
+	local xml_network_vap2_radiotype=`config_getoption "$xml_network_vap2" radiotype`
+	local xml_network_vap2_rts=`config_getoption "$xml_network_vap2" rts`
+	#add 200907092019
+	local xml_network_vap2_create=`config_getoption "$xml_network_vap2" create`
+	local xml_network_vap2_wlanmode=`config_getoption "$xml_network_vap2" wlanmode`
+	local xml_network_vap2_ip=`config_getoption "$xml_network_vap2" ip`
+	local xml_network_vap2_netmask=`config_getoption "$xml_network_vap2" netmask`
+	local xml_network_vap2_forward2=`config_getoption "$xml_network_vap2" forward2`
+	local xml_network_vap2_assocchan=`config_getoption "$xml_network_vap2" assocchan`
+	local xml_network_vap2_assocweight=`config_getoption "$xml_network_vap2" assocweight`
+	local xml_network_vap2_assocrssi=`config_getoption "$xml_network_vap2" assocrssi`
+	local xml_network_vap2_wifi=`config_getoption "$xml_network_vap2" wifi`
+	local xml_network_vap2_isolation=`config_getoption "$xml_network_vap2" isolation`
+	local xml_network_vap2_bcisolation=`config_getoption "$xml_network_vap2" bcisolation`
+	#end
+	
+	local xml_network_vap2_wmm=`config_read /config/network/vap2/wmm`
+	local xml_network_vap2_wmm_enable=`config_getoption "$xml_network_vap2_wmm" enable`
+	local xml_network_vap2_wmm_noack=`config_getoption "$xml_network_vap2_wmm" noack`
+	
+	local xml_network_vap2_vlan=`config_read /config/network/vap2/vlan`
+	local xml_network_vap2_vlan_enable=`config_getoption "$xml_network_vap2_vlan" enable`
+	local xml_network_vap2_vlan_vid=`config_getoption "$xml_network_vap2_vlan" vid`
+	
+	local xml_network_radius=`config_read /config/network/radius`
+	local xml_network_radius_radiusip=`config_getoption "$xml_network_radius" radiusip`
+	local xml_network_radius_authport=`config_getoption "$xml_network_radius" authport`
+	local xml_network_radius_acceptport=`config_getoption "$xml_network_radius" acceptport`
+	local xml_network_radius_sharekey=`config_getoption "$xml_network_radius" sharekey`
+	
+	local xml_network_acconfig=`config_read /config/network/acconfig`
+	local xml_network_acconfig_AC_ADDRESSES=`config_getoption "$xml_network_acconfig" AC_ADDRESSES`
+	local xml_network_acconfig_WTP_LOCATION=`config_getoption "$xml_network_acconfig" WTP_LOCATION`
+	local xml_network_acconfig_WTP_LEV3_PROTOCOL=`config_getoption "$xml_network_acconfig" WTP_LEV3_PROTOCOL`
+	local xml_network_acconfig_WTP_FORCE_MTU=`config_getoption "$xml_network_acconfig" WTP_FORCE_MTU`
+	local xml_network_acconfig_AC_LOG_FILE_ENABLE=`config_getoption "$xml_network_acconfig" AC_LOG_FILE_ENABLE`
+	local xml_network_acconfig_AC_LOG_FILE_SIZE=`config_getoption "$xml_network_acconfig" AC_LOG_FILE_SIZE`
+	local xml_network_acconfig_WTP_AC_DOMAIN_NAME=`config_getoption "$xml_network_acconfig" WTP_AC_DOMAIN_NAME`
+	
+	local xml_administrator_snmp=`config_read /config/administrator/snmp`
+	local xml_administrator_snmp_enable=`config_getoption "$xml_administrator_snmp" enable`
+	local xml_administrator_snmp_syslocation=`config_getoption "$xml_administrator_snmp" syslocation`
+	local xml_administrator_snmp_syscontact=`config_getoption "$xml_administrator_snmp" syscontact`
+	local xml_administrator_snmp_publicCN=`config_getoption "$xml_administrator_snmp" publicCN`
+	local xml_administrator_snmp_privateCN=`config_getoption "$xml_administrator_snmp" privateCN`
+	local xml_administrator_snmp_TCN=`config_getoption "$xml_administrator_snmp" TCN`
+	local xml_administrator_snmp_subIP1=`config_getoption "$xml_administrator_snmp" subIP1`
+	local xml_administrator_snmp_subIP2=`config_getoption "$xml_administrator_snmp" subIP2`
+	local xml_administrator_snmp_subIP3=`config_getoption "$xml_administrator_snmp" subIP3`
+	local xml_administrator_snmp_subIP4=`config_getoption "$xml_administrator_snmp" subIP4`
+	
+	#add 200907092019
+	[ -n "$xml_session_lang" ]&&{
+			local uxml_session=`upconfig_read /config/session`
+			uxml_session=`upconfig_setoption "$uxml_session" language "$xml_session_lang"`
+			upconfig_write  /config/session "$uxml_session"
+	}
+	#end
+	
+	local uxml_system=`upconfig_read /config/system`
+	
+	
+  if [ "$xml_system_subversion1" -gt "1" ]||[ "$xml_system_subversion1" -eq "1" -a "$xml_system_subversion2" -gt "1" ]||[ "$xml_system_subversion1" -eq "1" -a "$xml_system_subversion2" -eq "1" -a "$xml_system_subversion3" -ge "10" ]; then	 
+  uxml_system=`upconfig_setoption "$uxml_system" password "$xml_system_password"`
+  uxml_system=`upconfig_setoption "$uxml_system" username "$xml_system_username"`
+  fi
+  
+	uxml_system=`upconfig_setoption "$uxml_system" workmode "$xml_system_workmode"`
+	uxml_system=`upconfig_setoption "$uxml_system" timezone "$xml_system_timezone"`
+	uxml_system=`upconfig_setoption "$uxml_system" timeserver_usedefault "$xml_system_timeserver_usedefault"`
+	uxml_system=`upconfig_setoption "$uxml_system" timeserverdefault "$xml_system_timeserverdefault"`
+	uxml_system=`upconfig_setoption "$uxml_system" timeserver1 "$xml_system_timeserver1"`
+	uxml_system=`upconfig_setoption "$uxml_system" timeserver2 "$xml_system_timeserver2"`
+	upconfig_write  /config/system "$uxml_system"
+	
+	local uxml_system_log=`upconfig_read /config/system/log`
+	uxml_system_log=`upconfig_setoption "$uxml_system_log" enable "$xml_system_log_enable"`
+	uxml_system_log=`upconfig_setoption "$uxml_system_log" sip "$xml_system_log_sip"`
+	uxml_system_log=`upconfig_setoption "$uxml_system_log" sport "$xml_system_log_sport"`
+	upconfig_write  /config/system/log "$uxml_system_log"
+	
+	#add 200907092019
+	[ -n "$xml_wifi0_enable" ]&&{
+		local uxml_wifi0=`upconfig_read /config/network/wifi0`
+		[ -n "$xml_wifi0_enable" ]&&uxml_wifi0=`upconfig_setoption "$uxml_wifi0" enable "$xml_wifi0_enable"`
+		[ -n "$xml_wifi0_txpower" ]&&uxml_wifi0=`upconfig_setoption "$uxml_wifi0" txpower "$xml_wifi0_txpower"`
+		[ -n "$xml_wifi0_channel" ]&&uxml_wifi0=`upconfig_setoption "$uxml_wifi0" channel "$xml_wifi0_channel"`
+		[ -n "$xml_wifi0_channel1" ]&&uxml_wifi0=`upconfig_setoption "$uxml_wifi0" channel1 "$xml_wifi0_channel1"`
+		[ -n "$xml_wifi0_channela" ]&&uxml_wifi0=`upconfig_setoption "$uxml_wifi0" channela "$xml_wifi0_channela"`
+		[ -n "$xml_wifi0_autochannel" ]&&uxml_wifi0=`upconfig_setoption "$uxml_wifi0" autochannel "$xml_wifi0_autochannel"`
+		[ -n "$xml_wifi0_mode" ]&&uxml_wifi0=`upconfig_setoption "$uxml_wifi0" mode "$xml_wifi0_mode"`
+		[ -n "$xml_wifi0_modea" ]&&uxml_wifi0=`upconfig_setoption "$uxml_wifi0" modea "$xml_wifi0_modea"`
+		[ -n "$xml_wifi0_moden" ]&&uxml_wifi0=`upconfig_setoption "$uxml_wifi0" moden "$xml_wifi0_moden"`
+		[ -n "$xml_wifi0_diversity" ]&&uxml_wifi0=`upconfig_setoption "$uxml_wifi0" diversity "$xml_wifi0_diversity"`
+		[ -n "$xml_wifi0_txantenna" ]&&uxml_wifi0=`upconfig_setoption "$uxml_wifi0" txantenna "$xml_wifi0_txantenna"`
+		[ -n "$xml_wifi0_rxantenna" ]&&uxml_wifi0=`upconfig_setoption "$uxml_wifi0" rxantenna "$xml_wifi0_rxantenna"`
+		[ -n "$xml_wifi0_region" ]&&uxml_wifi0=`upconfig_setoption "$uxml_wifi0" region "$xml_wifi0_region"`
+		upconfig_write  /config/network/wifi0 "$uxml_wifi0"
+	}
+	
+	[ -n "$xml_wifi1_enable" ]&&{
+		local uxml_wifi1=`upconfig_read /config/network/wifi1`
+		[ -n "$xml_wifi1_enable" ]&&uxml_wifi1=`upconfig_setoption "$uxml_wifi1" enable "$xml_wifi1_enable"`
+		[ -n "$xml_wifi1_txpower" ]&&uxml_wifi1=`upconfig_setoption "$uxml_wifi1" txpower "$xml_wifi1_txpower"`
+		[ -n "$xml_wifi1_channel" ]&&uxml_wifi1=`upconfig_setoption "$uxml_wifi1" channel "$xml_wifi1_channel"`
+		[ -n "$xml_wifi1_channel1" ]&&uxml_wifi1=`upconfig_setoption "$uxml_wifi1" channel1 "$xml_wifi1_channel1"`
+		[ -n "$xml_wifi1_channela" ]&&uxml_wifi1=`upconfig_setoption "$uxml_wifi1" channela "$xml_wifi1_channela"`
+		[ -n "$xml_wifi1_autochannel" ]&&uxml_wifi1=`upconfig_setoption "$uxml_wifi1" autochannel "$xml_wifi1_autochannel"`
+		[ -n "$xml_wifi1_mode" ]&&uxml_wifi1=`upconfig_setoption "$uxml_wifi1" mode "$xml_wifi1_mode"`
+		[ -n "$xml_wifi1_modea" ]&&uxml_wifi1=`upconfig_setoption "$uxml_wifi1" modea "$xml_wifi1_modea"`
+		[ -n "$xml_wifi1_moden" ]&&uxml_wifi1=`upconfig_setoption "$uxml_wifi1" moden "$xml_wifi1_moden"`
+		[ -n "$xml_wifi1_diversity" ]&&uxml_wifi1=`upconfig_setoption "$uxml_wifi1" diversity "$xml_wifi1_diversity"`
+		[ -n "$xml_wifi1_txantenna" ]&&uxml_wifi1=`upconfig_setoption "$uxml_wifi1" txantenna "$xml_wifi1_txantenna"`
+		[ -n "$xml_wifi1_rxantenna" ]&&uxml_wifi1=`upconfig_setoption "$uxml_wifi1" rxantenna "$xml_wifi1_rxantenna"`
+		[ -n "$xml_wifi1_region" ]&&uxml_wifi1=`upconfig_setoption "$uxml_wifi1" region "$xml_wifi1_region"`
+		upconfig_write  /config/network/wifi1 "$uxml_wifi1"
+	}
+#del by cdh	
+#	[ -n "$xml_wlan_region" ]&&{
+#		local uxml_country_code=`config_read /config/network/country`
+#		uxml_country_code=`upconfig_setoption "$uxml_country_code" region "$xml_wlan_region"`
+#		upconfig_write  /config/network/country "$uxml_country_code"
+#	}
+	
+	[ -n "$xml_network_route1" ]&&{
+		local uxml_network_sroute=`upconfig_read /config/network/sroute`
+		uxml_network_sroute=`upconfig_setoption "$uxml_network_sroute" route1 "$xml_network_route1"`
+		[ -n "$xml_network_route2" ]&&uxml_network_sroute=`upconfig_setoption "$uxml_network_sroute" route2 "$xml_network_route2"`
+		[ -n "$xml_network_rtip2" ]&&uxml_network_sroute=`upconfig_setoption "$uxml_network_sroute" rtip2 "$xml_network_rtip2"`
+		[ -n "$xml_network_rtmask2" ]&&uxml_network_sroute=`upconfig_setoption "$uxml_network_sroute" rtmask2 "$xml_network_rtmask2"`
+		upconfig_write  /config/network/sroute "$uxml_network_sroute"
+	}
+	#end
+	
+	local uxml_network_vlan1=`upconfig_read /config/network/vlan1`
+	uxml_network_vlan1=`upconfig_setoption "$uxml_network_vlan1" create "$xml_network_vlan1_create"`
+	uxml_network_vlan1=`upconfig_setoption "$uxml_network_vlan1" vid "$xml_network_vlan1_vid"`
+	uxml_network_vlan1=`upconfig_setoption "$uxml_network_vlan1" vlanname "$xml_network_vlan1_vlanname"`
+	uxml_network_vlan1=`upconfig_setoption "$uxml_network_vlan1" ifeth "$xml_network_vlan1_ifeth"`
+	upconfig_write  /config/network/vlan1 "$uxml_network_vlan1"
+	
+	local uxml_network_vlan2=`upconfig_read /config/network/vlan2`
+	uxml_network_vlan2=`upconfig_setoption "$uxml_network_vlan2" create "$xml_network_vlan2_create"`
+	uxml_network_vlan2=`upconfig_setoption "$uxml_network_vlan2" vid "$xml_network_vlan2_vid"`
+	uxml_network_vlan2=`upconfig_setoption "$uxml_network_vlan2" vlanname "$xml_network_vlan2_vlanname"`
+	uxml_network_vlan2=`upconfig_setoption "$uxml_network_vlan2" ifeth "$xml_network_vlan2_ifeth"`
+	upconfig_write  /config/network/vlan2 "$uxml_network_vlan2"
+	
+	local uxml_network_vlan3=`upconfig_read /config/network/vlan3`
+	uxml_network_vlan3=`upconfig_setoption "$uxml_network_vlan3" create "$xml_network_vlan3_create"`
+	uxml_network_vlan3=`upconfig_setoption "$uxml_network_vlan3" vid "$xml_network_vlan3_vid"`
+	uxml_network_vlan3=`upconfig_setoption "$uxml_network_vlan3" vlanname "$xml_network_vlan3_vlanname"`
+	uxml_network_vlan3=`upconfig_setoption "$uxml_network_vlan3" ifeth "$xml_network_vlan3_ifeth"`
+	upconfig_write  /config/network/vlan3 "$uxml_network_vlan3"
+	
+	local uxml_network_vlan4=`upconfig_read /config/network/vlan4`
+	uxml_network_vlan4=`upconfig_setoption "$uxml_network_vlan4" create "$xml_network_vlan4_create"`
+	uxml_network_vlan4=`upconfig_setoption "$uxml_network_vlan4" vid "$xml_network_vlan4_vid"`
+	uxml_network_vlan4=`upconfig_setoption "$uxml_network_vlan4" vlanname "$xml_network_vlan4_vlanname"`
+	uxml_network_vlan4=`upconfig_setoption "$uxml_network_vlan4" ifeth "$xml_network_vlan4_ifeth"`
+	upconfig_write  /config/network/vlan4 "$uxml_network_vlan4"
+	
+	local uxml_network_vlan5=`upconfig_read /config/network/vlan5`
+	uxml_network_vlan5=`upconfig_setoption "$uxml_network_vlan5" create "$xml_network_vlan5_create"`
+	uxml_network_vlan5=`upconfig_setoption "$uxml_network_vlan5" vid "$xml_network_vlan5_vid"`
+	uxml_network_vlan5=`upconfig_setoption "$uxml_network_vlan5" vlanname "$xml_network_vlan5_vlanname"`
+	uxml_network_vlan5=`upconfig_setoption "$uxml_network_vlan5" ifeth "$xml_network_vlan5_ifeth"`
+	upconfig_write  /config/network/vlan5 "$uxml_network_vlan5"
+	
+	local uxml_network_vlan6=`upconfig_read /config/network/vlan6`
+	uxml_network_vlan6=`upconfig_setoption "$uxml_network_vlan6" create "$xml_network_vlan6_create"`
+	uxml_network_vlan6=`upconfig_setoption "$uxml_network_vlan6" vid "$xml_network_vlan6_vid"`
+	uxml_network_vlan6=`upconfig_setoption "$uxml_network_vlan6" vlanname "$xml_network_vlan6_vlanname"`
+	uxml_network_vlan6=`upconfig_setoption "$uxml_network_vlan6" ifeth "$xml_network_vlan6_ifeth"`
+	upconfig_write  /config/network/vlan6 "$uxml_network_vlan6"
+	
+	local uxml_network_vlan7=`upconfig_read /config/network/vlan7`
+	uxml_network_vlan7=`upconfig_setoption "$uxml_network_vlan7" create "$xml_network_vlan7_create"`
+	uxml_network_vlan7=`upconfig_setoption "$uxml_network_vlan7" vid "$xml_network_vlan7_vid"`
+	uxml_network_vlan7=`upconfig_setoption "$uxml_network_vlan7" vlanname "$xml_network_vlan7_vlanname"`
+	uxml_network_vlan7=`upconfig_setoption "$uxml_network_vlan7" ifeth "$xml_network_vlan7_ifeth"`
+	upconfig_write  /config/network/vlan7 "$uxml_network_vlan7"
+	
+	local uxml_network_vlan8=`upconfig_read /config/network/vlan8`
+	uxml_network_vlan8=`upconfig_setoption "$uxml_network_vlan8" create "$xml_network_vlan8_create"`
+	uxml_network_vlan8=`upconfig_setoption "$uxml_network_vlan8" vid "$xml_network_vlan8_vid"`
+	uxml_network_vlan8=`upconfig_setoption "$uxml_network_vlan8" vlanname "$xml_network_vlan8_vlanname"`
+	uxml_network_vlan8=`upconfig_setoption "$uxml_network_vlan8" ifeth "$xml_network_vlan8_ifeth"`
+	upconfig_write  /config/network/vlan8 "$uxml_network_vlan8"
+	
+	local uxml_network=`upconfig_read /config/network`
+	uxml_network=`upconfig_setoption "$uxml_network" hostname "$xml_network_hostname"`
+	#uxml_network=`upconfig_setoption "$uxml_network" vapnum "$xml_network_vapnum"`
+	uxml_network=`upconfig_setoption "$uxml_network" domain "$xml_network_domain"`
+	upconfig_write  /config/network "$uxml_network"
+	
+	local uxml_network_rogueapdetection=`upconfig_read /config/network/rogueapdetection`
+	uxml_network_rogueapdetection=`upconfig_setoption "$uxml_network_rogueapdetection" enable "$xml_network_rogueapdetection_enable"`
+	upconfig_write  /config/network/rogueapdetection "$uxml_network_rogueapdetection"
+	
+	local uxml_network_lan=`upconfig_read /config/network/lan`
+	uxml_network_lan=`upconfig_setoption "$uxml_network_lan" type "$xml_network_lan_type"`
+	uxml_network_lan=`upconfig_setoption "$uxml_network_lan" proto "$xml_network_lan_proto"`
+	uxml_network_lan=`upconfig_setoption "$uxml_network_lan" ipaddr "$xml_network_lan_ipaddr"`
+	uxml_network_lan=`upconfig_setoption "$uxml_network_lan" netmask "$xml_network_lan_netmask"`
+	uxml_network_lan=`upconfig_setoption "$uxml_network_lan" gateway "$xml_network_lan_gateway"`
+	uxml_network_lan=`upconfig_setoption "$uxml_network_lan" nameserver_config "$xml_network_lan_nameserver_config"`
+	uxml_network_lan=`upconfig_setoption "$uxml_network_lan" nameserver1 "$xml_network_lan_nameserver1"`
+	uxml_network_lan=`upconfig_setoption "$uxml_network_lan" nameserver2 "$xml_network_lan_nameserver2"`
+	uxml_network_lan=`upconfig_setoption "$uxml_network_lan" vendorclassid "$xml_network_lan_vendorclassid"`
+	upconfig_write  /config/network/lan "$uxml_network_lan"
+	
+	local uxml_network_wds=`upconfig_read /config/network/wds`
+	uxml_network_wds=`upconfig_setoption "$uxml_network_wds" wdsenable "$xml_network_wds_wdsenable"`
+	uxml_network_wds=`upconfig_setoption "$uxml_network_wds" wdsrole "$xml_network_wds_wdsrole"`
+	uxml_network_wds=`upconfig_setoption "$uxml_network_wds" wdsssid "$xml_network_wds_wdsssid"`
+	uxml_network_wds=`upconfig_setoption "$uxml_network_wds" wdschannel "$xml_network_wds_wdschannel"`
+	upconfig_write  /config/network/wds "$uxml_network_wds"
+	
+	local uxml_network_advanset=`upconfig_read /config/network/advanset`
+	uxml_network_advanset=`upconfig_setoption "$uxml_network_advanset" portprio "$xml_network_advanset_portprio"`
+	uxml_network_advanset=`upconfig_setoption "$uxml_network_advanset" setfd "$xml_network_advanset_setfd"`
+	uxml_network_advanset=`upconfig_setoption "$uxml_network_advanset" sethello "$xml_network_advanset_sethello"`
+	uxml_network_advanset=`upconfig_setoption "$uxml_network_advanset" maxage "$xml_network_advanset_maxage"`
+	uxml_network_advanset=`upconfig_setoption "$uxml_network_advanset" stpenable "$xml_network_advanset_stpenable"`
+	upconfig_write  /config/network/advanset "$uxml_network_advanset"
+	
+	local uxml_network_vap1=`upconfig_read /config/network/vap1`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" if "$xml_network_vap1_if"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" enable "$xml_network_vap1_enable"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" broadcast "$xml_network_vap1_broadcast"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" ssid "$xml_network_vap1_ssid"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" region "$xml_network_vap1_region"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" channel "$xml_network_vap1_channel"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mode "$xml_network_vap1_mode"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" security "$xml_network_vap1_security"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" wepbit "$xml_network_vap1_wepbit"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" wepkey "$xml_network_vap1_wepkey"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" passkey1 "$xml_network_vap1_passkey1"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" passkey2 "$xml_network_vap1_passkey2"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" passkey3 "$xml_network_vap1_passkey3"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" passkey4 "$xml_network_vap1_passkey4"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" authmode "$xml_network_vap1_authmode"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" wpamode "$xml_network_vap1_wpamode"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" passphrase "$xml_network_vap1_passphrase"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" encryption "$xml_network_vap1_encryption"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" macfilter "$xml_network_vap1_macfilter"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" filtermode "$xml_network_vap1_filtermode"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac1 "$xml_network_vap1_mac1"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac2 "$xml_network_vap1_mac2"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac3 "$xml_network_vap1_mac3"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac4 "$xml_network_vap1_mac4"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac5 "$xml_network_vap1_mac5"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac6 "$xml_network_vap1_mac6"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac7 "$xml_network_vap1_mac7"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac8 "$xml_network_vap1_mac8"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac9 "$xml_network_vap1_mac9"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac10 "$xml_network_vap1_mac10"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac11 "$xml_network_vap1_mac11"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac12 "$xml_network_vap1_mac12"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac13 "$xml_network_vap1_mac13"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac14 "$xml_network_vap1_mac14"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac15 "$xml_network_vap1_mac15"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac16 "$xml_network_vap1_mac16"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac17 "$xml_network_vap1_mac17"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac18 "$xml_network_vap1_mac18"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac19 "$xml_network_vap1_mac19"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" mac20 "$xml_network_vap1_mac20"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" rate "$xml_network_vap1_rate"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" beacon "$xml_network_vap1_beacon"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" dtim "$xml_network_vap1_dtim"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" frag "$xml_network_vap1_frag"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" txantenna "$xml_network_vap1_txantenna"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" rxantenna "$xml_network_vap1_rxantenna"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" preamble "$xml_network_vap1_preamble"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" radiotype "$xml_network_vap1_radiotype"`
+	uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" rts "$xml_network_vap1_rts"`
+	#add 200907092019
+	[ -n "$xml_network_vap1_create" ]&&uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" create "$xml_network_vap1_create"`
+	[ -n "$xml_network_vap1_wlanmode" ]&&uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" wlanmode "$xml_network_vap1_wlanmode"`
+	[ -n "$xml_network_vap1_ip" ]&&uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" ip "$xml_network_vap1_ip"`
+	[ -n "$xml_network_vap1_netmask" ]&&uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" netmask "$xml_network_vap1_netmask"`
+	[ -n "$xml_network_vap1_forward2" ]&&uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" forward2 "$xml_network_vap1_forward2"`
+	[ -n "$xml_network_vap1_assocchan" ]&&uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" assocchan "$xml_network_vap1_assocchan"`
+	[ -n "$xml_network_vap1_assocweight" ]&&uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" assocweight "$xml_network_vap1_assocweight"`
+	[ -n "$xml_network_vap1_assocrssi" ]&&uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" assocrssi "$xml_network_vap1_assocrssi"`
+	[ -n "$xml_network_vap1_wifi" ]&&uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" wifi "$xml_network_vap1_wifi"`
+	[ -n "$xml_network_vap1_isolation" ]&&uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" isolation "$xml_network_vap1_isolation"`
+	[ -n "$xml_network_vap1_bcisolation" ]&&uxml_network_vap1=`upconfig_setoption "$uxml_network_vap1" bcisolation "$xml_network_vap1_bcisolation"`
+	#end
+	upconfig_write  /config/network/vap1 "$uxml_network_vap1"
+	
+	local uxml_network_vap1_wmm=`upconfig_read /config/network/vap1/wmm`
+	uxml_network_vap1_wmm=`upconfig_setoption "$uxml_network_vap1_wmm" enable "$xml_network_vap1_wmm_enable"`
+	uxml_network_vap1_wmm=`upconfig_setoption "$uxml_network_vap1_wmm" noack "$xml_network_vap1_wmm_noack"`
+	upconfig_write  /config/network/vap1/wmm "$uxml_network_vap1_wmm"
+	
+	local uxml_network_vap1_vlan=`upconfig_read /config/network/vap1/vlan`
+	uxml_network_vap1_vlan=`upconfig_setoption "$uxml_network_vap1_vlan" enable "$xml_network_vap1_vlan_enable"`
+	uxml_network_vap1_vlan=`upconfig_setoption "$uxml_network_vap1_vlan" vid "$xml_network_vap1_vlan_vid"`
+	upconfig_write  /config/network/vap1/vlan "$uxml_network_vap1_vlan"
+	
+	local uxml_network_vap2=`upconfig_read /config/network/vap2`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" if "$xml_network_vap2_if"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" enable "$xml_network_vap2_enable"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" broadcast "$xml_network_vap2_broadcast"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" ssid "$xml_network_vap2_ssid"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" region "$xml_network_vap2_region"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" channel "$xml_network_vap2_channel"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mode "$xml_network_vap2_mode"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" security "$xml_network_vap2_security"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" wepbit "$xml_network_vap2_wepbit"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" wepkey "$xml_network_vap2_wepkey"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" passkey1 "$xml_network_vap2_passkey1"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" passkey2 "$xml_network_vap2_passkey2"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" passkey3 "$xml_network_vap2_passkey3"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" passkey4 "$xml_network_vap2_passkey4"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" authmode "$xml_network_vap2_authmode"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" wpamode "$xml_network_vap2_wpamode"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" passphrase "$xml_network_vap2_passphrase"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" encryption "$xml_network_vap2_encryption"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" macfilter "$xml_network_vap2_macfilter"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" filtermode "$xml_network_vap2_filtermode"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac1 "$xml_network_vap2_mac1"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac2 "$xml_network_vap2_mac2"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac3 "$xml_network_vap2_mac3"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac4 "$xml_network_vap2_mac4"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac5 "$xml_network_vap2_mac5"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac6 "$xml_network_vap2_mac6"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac7 "$xml_network_vap2_mac7"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac8 "$xml_network_vap2_mac8"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac9 "$xml_network_vap2_mac9"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac10 "$xml_network_vap2_mac10"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac11 "$xml_network_vap2_mac11"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac12 "$xml_network_vap2_mac12"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac13 "$xml_network_vap2_mac13"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac14 "$xml_network_vap2_mac14"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac15 "$xml_network_vap2_mac15"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac16 "$xml_network_vap2_mac16"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac17 "$xml_network_vap2_mac17"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac18 "$xml_network_vap2_mac18"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac19 "$xml_network_vap2_mac19"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" mac20 "$xml_network_vap2_mac20"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" rate "$xml_network_vap2_rate"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" beacon "$xml_network_vap2_beacon"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" dtim "$xml_network_vap2_dtim"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" frag "$xml_network_vap2_frag"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" txantenna "$xml_network_vap2_txantenna"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" rxantenna "$xml_network_vap2_rxantenna"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" preamble "$xml_network_vap2_preamble"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" radiotype "$xml_network_vap2_radiotype"`
+	uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" rts "$xml_network_vap2_rts"`
+	#add 200907092019
+	[ -n "$xml_network_vap2_create" ]&&uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" create "$xml_network_vap2_create"`
+	[ -n "$xml_network_vap2_wlanmode" ]&&uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" wlanmode "$xml_network_vap2_wlanmode"`
+	[ -n "$xml_network_vap2_ip" ]&&uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" ip "$xml_network_vap2_ip"`
+	[ -n "$xml_network_vap2_netmask" ]&&uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" netmask "$xml_network_vap2_netmask"`
+	[ -n "$xml_network_vap2_forward2" ]&&uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" forward2 "$xml_network_vap2_forward2"`
+	[ -n "$xml_network_vap2_assocchan" ]&&uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" assocchan "$xml_network_vap2_assocchan"`
+	[ -n "$xml_network_vap2_assocweight" ]&&uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" assocweight "$xml_network_vap2_assocweight"`
+	[ -n "$xml_network_vap2_assocrssi" ]&&uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" assocrssi "$xml_network_vap2_assocrssi"`
+	[ -n "$xml_network_vap2_wifi" ]&&uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" wifi "$xml_network_vap2_wifi"`
+	[ -n "$xml_network_vap2_isolation" ]&&uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" isolation "$xml_network_vap2_isolation"`
+	[ -n "$xml_network_vap2_bcisolation" ]&&uxml_network_vap2=`upconfig_setoption "$uxml_network_vap2" bcisolation "$xml_network_vap2_bcisolation"`
+	#end
+	upconfig_write  /config/network/vap2 "$uxml_network_vap2"
+	
+	local uxml_network_vap2_wmm=`upconfig_read /config/network/vap2/wmm`
+	uxml_network_vap2_wmm=`upconfig_setoption "$uxml_network_vap2_wmm" enable "$xml_network_vap2_wmm_enable"`
+	uxml_network_vap2_wmm=`upconfig_setoption "$uxml_network_vap2_wmm" noack "$xml_network_vap2_wmm_noack"`
+	upconfig_write  /config/network/vap2/wmm "$uxml_network_vap2_wmm"
+	
+	local uxml_network_vap2_vlan=`upconfig_read /config/network/vap2/vlan`
+	uxml_network_vap2_vlan=`upconfig_setoption "$uxml_network_vap2_vlan" enable "$xml_network_vap2_vlan_enable"`
+	uxml_network_vap2_vlan=`upconfig_setoption "$uxml_network_vap2_vlan" vid "$xml_network_vap2_vlan_vid"`
+	upconfig_write  /config/network/vap2/vlan "$uxml_network_vap2_vlan"
+	
+	local uxml_network_radius=`upconfig_read /config/network/radius`
+	uxml_network_radius=`upconfig_setoption "$uxml_network_radius" radiusip "$xml_network_radius_radiusip"`
+	uxml_network_radius=`upconfig_setoption "$uxml_network_radius" authport "$xml_network_radius_authport"`
+	uxml_network_radius=`upconfig_setoption "$uxml_network_radius" acceptport "$xml_network_radius_acceptport"`
+	uxml_network_radius=`upconfig_setoption "$uxml_network_radius" sharekey "$xml_network_radius_sharekey"`
+	upconfig_write  /config/network/radius "$uxml_network_radius"
+	
+	local uxml_network_acconfig=`upconfig_read /config/network/acconfig`
+	uxml_network_acconfig=`upconfig_setoption "$uxml_network_acconfig" AC_ADDRESSES "$xml_network_acconfig_AC_ADDRESSES"`
+	uxml_network_acconfig=`upconfig_setoption "$uxml_network_acconfig" WTP_LOCATION "$xml_network_acconfig_WTP_LOCATION"`
+	uxml_network_acconfig=`upconfig_setoption "$uxml_network_acconfig" WTP_LEV3_PROTOCOL "$xml_network_acconfig_WTP_LEV3_PROTOCOL"`
+	uxml_network_acconfig=`upconfig_setoption "$uxml_network_acconfig" WTP_FORCE_MTU "$xml_network_acconfig_WTP_FORCE_MTU"`
+	uxml_network_acconfig=`upconfig_setoption "$uxml_network_acconfig" AC_LOG_FILE_ENABLE "$xml_network_acconfig_AC_LOG_FILE_ENABLE"`
+	uxml_network_acconfig=`upconfig_setoption "$uxml_network_acconfig" AC_LOG_FILE_SIZE "$xml_network_acconfig_AC_LOG_FILE_SIZE"`
+	uxml_network_acconfig=`upconfig_setoption "$uxml_network_acconfig" WTP_AC_DOMAIN_NAME "$xml_network_acconfig_WTP_AC_DOMAIN_NAME"`
+	upconfig_write  /config/network/acconfig "$uxml_network_acconfig"
+	
+	local uxml_administrator_snmp=`upconfig_read /config/administrator/snmp`
+	uxml_administrator_snmp=`upconfig_setoption "$uxml_administrator_snmp" enable "$xml_administrator_snmp_enable"`
+	uxml_administrator_snmp=`upconfig_setoption "$uxml_administrator_snmp" syslocation "$xml_administrator_snmp_syslocation"`
+	uxml_administrator_snmp=`upconfig_setoption "$uxml_administrator_snmp" syscontact "$xml_administrator_snmp_syscontact"`
+	uxml_administrator_snmp=`upconfig_setoption "$uxml_administrator_snmp" publicCN "$xml_administrator_snmp_publicCN"`
+	uxml_administrator_snmp=`upconfig_setoption "$uxml_administrator_snmp" privateCN "$xml_administrator_snmp_privateCN"`
+	uxml_administrator_snmp=`upconfig_setoption "$uxml_administrator_snmp" TCN "$xml_administrator_snmp_TCN"`
+	uxml_administrator_snmp=`upconfig_setoption "$uxml_administrator_snmp" subIP1 "$xml_administrator_snmp_subIP1"`
+	uxml_administrator_snmp=`upconfig_setoption "$uxml_administrator_snmp" subIP2 "$xml_administrator_snmp_subIP2"`
+	uxml_administrator_snmp=`upconfig_setoption "$uxml_administrator_snmp" subIP3 "$xml_administrator_snmp_subIP3"`
+	uxml_administrator_snmp=`upconfig_setoption "$uxml_administrator_snmp" subIP4 "$xml_administrator_snmp_subIP4"`
+	upconfig_write  /config/administrator/snmp "$uxml_administrator_snmp"	
+	
+	cp -f /tmp/upgrade.xml /etc/config/config.xml
+	rm /tmp/upgrade.xml -rf
+	rm /jffs/preconfig -rf
+	rm /jffs/config -rf
+	rm /jffs/config.ap83 -rf
+	rm /jffs/postconfig -rf
+	echo $xml_upsystem_version > /etc/config/version
+	rm -rf /jffs/checksum
+fi
+

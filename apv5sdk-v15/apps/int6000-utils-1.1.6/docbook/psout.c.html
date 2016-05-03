@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			psout.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='psnotch.c.html' title=' psnotch.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='putoptv.c.html' title=' putoptv.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   psout.c - extract prescalers from int6000 parameter file;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;sys/stat.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/chars.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../pib/pib.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/fdchecksum_32.c&quot;
+#include &quot;../tools/filepart.c&quot;
+#include &quot;../tools/error.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../pib/pibfile.c&quot;
+#endif
+
+/*====================================================================*
+ *   program constants;
+ *--------------------------------------------------------------------*/
+
+#define PSOUT_VERBOSE (1 &lt;&lt; 0)
+#define PSOUT_SILENCE (1 &lt;&lt; 1)
+#define PSOUT_ALLTONE (1 &lt;&lt; 2)
+
+/*====================================================================*
+ *
+ *   static signed psout (struct _file_ * pib);
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed psout (struct _file_ * pib, flag_t flags) 
+
+{
+	uint32_t offset = 0;
+	uint32_t scalar;
+	if (lseek (pib-&gt;file, PRESCALAR_OFFSET, SEEK_SET) != PRESCALAR_OFFSET) 
+	{
+		error (0, errno, &quot;Can't seek %s&quot;, filepart (pib-&gt;name));
+		return (-1);
+	}
+	while (offset &lt; PRESCALAR_MEMBER) 
+	{
+		if (read (pib-&gt;file, &amp;scalar, sizeof (scalar)) &lt; sizeof (scalar)) 
+		{
+			error (0, errno, &quot;Can't read %s&quot;, filepart (pib-&gt;name));
+			return (-1);
+		}
+		printf (&quot;%08d %08X\n&quot;, offset, scalar);
+		offset++;
+	}
+	return (0);
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char *argv []) 
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char *argv []) 
+
+{
+	static const char *optv [] = 
+	{
+		&quot;&quot;,
+		&quot;pibfile [&gt; scalars]&quot;,
+		&quot;extract prescalers from int6000 parameter file&quot;,
+		(const char *) (0) 
+	};
+	struct _file_ pib;
+	signed state = 0;
+	flag_t flags = (flag_t)(0);
+	signed c;
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	if (argc &gt; 1) 
+	{
+		error (1, ECANCELED, &quot;Only one source file allowed&quot;);
+	}
+	if ((argc) &amp;&amp; (*argv)) 
+	{
+		pib.name = *argv;
+		if ((pib.file = open (pib.name, O_BINARY|O_RDONLY)) == -1) 
+		{
+			error (0, errno, &quot;Can't open %s&quot;, pib.name);
+			state = 1;
+			errno = 0;
+		}
+		else if (pibfile (&amp;pib)) 
+		{
+			error (0, errno, &quot;Bad PIB file: %s&quot;, pib.name);
+			state = 1;
+		}
+		else if (psout (&amp;pib, flags)) 
+		{
+			state = 1;
+		}
+		close (pib.file);
+		argc--;
+		argv++;
+	}
+	return (state);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='psnotch.c.html' title=' psnotch.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='putoptv.c.html' title=' putoptv.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

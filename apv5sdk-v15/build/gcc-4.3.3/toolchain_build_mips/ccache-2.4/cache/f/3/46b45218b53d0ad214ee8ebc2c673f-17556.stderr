@@ -1,0 +1,9 @@
+../src/mxml_sgs.c: In function 'mxml_sgs_new':
+../src/mxml_sgs.c:22: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_sgs.c:29: warning: incompatible implicit declaration of built-in function 'free'
+../src/mxml_sgs.c: In function 'mxml_sgs_destroy':
+../src/mxml_sgs.c:43: warning: incompatible implicit declaration of built-in function 'free'
+../src/mxml_sgs.c: In function 'mxml_sgs_append_char':
+../src/mxml_sgs.c:56: warning: incompatible implicit declaration of built-in function 'realloc'
+../src/mxml_sgs.c: In function 'mxml_sgs_append_string_len':
+../src/mxml_sgs.c:78: warning: incompatible implicit declaration of built-in function 'realloc'

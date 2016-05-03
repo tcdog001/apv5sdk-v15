@@ -1,0 +1,31 @@
+#!/usr/bin/haserl
+<html>
+	<head>
+		<title> Intelligence Setting</title>
+	</head>
+	<body>
+		<br>monitoring AP performance to find out circumstances like uplink exception, signal exception and so on ,and adjust the AP 
+automaticly to  optimize the performance of AP
+
+uplink detect: checking the uplink network, and let's all VAP down if AP can not keep in touch with the uplink network. this detect
+include two forms: uplink-interface-detect and uplink-network-detect
+uplink-interface-detect : monitor eth interface linked to uplink network. And judge can not keep in touch with uplink if link status down
+(PS: there should be only one eth interface can use policy link-off or access-off ,all others should use ignore policy )
+1. When eth[n] disable£ºpolicy used when interface eth[n] down. when use "ignore" policy, AP will do nothing ,and down all VAP if use "link-off"
+policy; while use "access-off" policy, AP refuse any wireless terminal 's link request but do not down VAP
+2. Auto Detect Interval: interval of detecting . And AP will stop detecting when set value to zero
+uplink-netwrok-detect: if AP can not keep in touch with the IP address you appointed, we judge the AP aslo can not keep in touch with uplink
+network 
+1.Up Link IP Address£ºIP address used to check uplink network access capability
+2. Auto Detect Interval: interval of detecting . And AP will stop detecting when set value to zero
+
+Channel Auto Adjust£ºif there are APs using the same channel , the AP should try to find out a clean channel(least AP use this channel)  
+1.Auto Adjust Channel On wifi[n]£ºchange the current wifi£¨n is indentity of wifi , which start from zero£©.
+2. Auto Detect Interval: interval of detecting . And AP will stop detecting when set value to zero
+
+txpower Auto Adjust£ºif there are APs using the same channel , the AP should change txpower according to the policy you appointed
+1.Auto Adjust Power On wifi[n]£ºchange current wifi 's txpower , and appoint the policy using for change£¨n is indentity of wifi , which start from zero£©.   
+2. Auto Detect Interval: interval of detecting . And AP will stop detecting when set value to zero
+
+	</body>
+</html>

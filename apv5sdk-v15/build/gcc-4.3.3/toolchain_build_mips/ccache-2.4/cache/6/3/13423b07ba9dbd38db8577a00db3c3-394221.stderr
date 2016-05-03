@@ -1,0 +1,17 @@
+WTP.c: In function 'printmsg':
+WTP.c:273: warning: pointer targets in passing argument 1 of 'autelan_sprintf' differ in signedness
+WTP.c:275: warning: pointer targets in passing argument 1 of 'autelan_sprintf' differ in signedness
+WTP.c:280: warning: pointer targets in passing argument 1 of 'autelan_sprintf' differ in signedness
+WTP.c:283: warning: pointer targets in passing argument 1 of 'autelan_sprintf' differ in signedness
+WTP.c:286: warning: pointer targets in passing argument 1 of 'autelan_sprintf' differ in signedness
+WTP.c:297: warning: pointer targets in passing argument 1 of 'autelan_sprintf' differ in signedness
+WTP.c:299: warning: pointer targets in passing argument 1 of 'autelan_sprintf' differ in signedness
+WTP.c:303: warning: pointer targets in passing argument 1 of 'autelan_sprintf' differ in signedness
+WTP.c:306: warning: pointer targets in passing argument 1 of 'autelan_sprintf' differ in signedness
+WTP.c:312: warning: pointer targets in passing argument 1 of 'autelan_sprintf' differ in signedness
+WTP.c:315: warning: pointer targets in passing argument 1 of 'autelan_sprintf' differ in signedness
+WTP.c:319: warning: pointer targets in passing argument 1 of 'autelan_sprintf' differ in signedness
+WTP.c: In function 'signal_func':
+WTP.c:890: warning: implicit declaration of function 'CWWTPSendLTEDeviceData'
+WTP.c: In function 'main':
+WTP.c:1070: warning: passing argument 1 of 'CWCreateThreadMutex' from incompatible pointer type

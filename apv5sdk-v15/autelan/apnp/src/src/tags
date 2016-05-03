@@ -1,0 +1,272 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+AC_MANAGE_CONFIG_EXEC_FAIL	apnp_type.h	/^	AC_MANAGE_CONFIG_EXEC_FAIL,$/;"	e	enum:__anon1
+AC_MANAGE_CONFIG_FLUSH_FAIL	apnp_type.h	/^	AC_MANAGE_CONFIG_FLUSH_FAIL,$/;"	e	enum:__anon1
+AC_MANAGE_CONFIG_RELEVANCE	apnp_type.h	/^	AC_MANAGE_CONFIG_RELEVANCE,$/;"	e	enum:__anon1
+AC_MANAGE_CONFIG_SAVE_FAIL	apnp_type.h	/^	AC_MANAGE_CONFIG_SAVE_FAIL,$/;"	e	enum:__anon1
+AC_MANAGE_SERVICE_STOP_FAIL	apnp_type.h	/^	AC_MANAGE_SERVICE_STOP_FAIL,$/;"	e	enum:__anon1
+APNP_CONFIG_EXIST	apnp_type.h	/^	APNP_CONFIG_EXIST,$/;"	e	enum:__anon1
+APNP_CONFIG_FAIL	apnp_type.h	/^	APNP_CONFIG_FAIL,$/;"	e	enum:__anon1
+APNP_CONFIG_NONEXIST	apnp_type.h	/^	APNP_CONFIG_NONEXIST,$/;"	e	enum:__anon1
+APNP_CONFIG_REACH_MAX_NUM	apnp_type.h	/^	APNP_CONFIG_REACH_MAX_NUM,$/;"	e	enum:__anon1
+APNP_ERR_ADDR_MATCH	apnp_type.h	32;"	d
+APNP_ERR_BAD_ADDRESS	apnp_type.h	31;"	d
+APNP_ERR_BAD_INPUT	apnp_type.h	36;"	d
+APNP_ERR_BAD_PARSE	apnp_type.h	33;"	d
+APNP_ERR_BAD_PRE	apnp_type.h	35;"	d
+APNP_ERR_BAD_TYPE	apnp_type.h	38;"	d
+APNP_ERR_MALLOC_FAIL	apnp_type.h	34;"	d
+APNP_ERR_OPEN_FAIL	apnp_type.h	30;"	d
+APNP_ERR_PACKET_PROXY	apnp_type.h	37;"	d
+APNP_ERR_SUCCESS	apnp_type.h	29;"	d
+APNP_FILE_OPEN_FAIL	apnp_type.h	/^	APNP_FILE_OPEN_FAIL,$/;"	e	enum:__anon1
+APNP_FLAGS_NETLINK_SOCKET	apnp_type.h	9;"	d
+APNP_FLAGS_STREAM_SOCKET	apnp_type.h	8;"	d
+APNP_FREE	apnp_type.h	5;"	d
+APNP_INPUT_TYPE_ERROR	apnp_type.h	/^	APNP_INPUT_TYPE_ERROR,$/;"	e	enum:__anon1
+APNP_MALLOC_ERROR	apnp_type.h	/^	APNP_MALLOC_ERROR,$/;"	e	enum:__anon1
+APNP_NETLINK_DOMAIN	apnp_transport.h	4;"	d
+APNP_SUCCESS	apnp_type.h	/^	APNP_SUCCESS,$/;"	e	enum:__anon1
+AR	Makefile	/^AR = ${PREFIX}-ar$/;"	m
+CC	Makefile	/^CC = ${PREFIX}-gcc$/;"	m
+DEFAULT_WEB_DIR	apnp_device.c	3;"	d	file:
+DESC_URL_SIZE	apnp_device.c	4;"	d	file:
+EXECNAME	Makefile	/^EXECNAME = apnpd$/;"	m
+INCLUDE	Makefile	/^INCLUDE = \/projects\/hnd\/tools\/linux\/hndtools-arm-linux-2.6.36-uclibc-4.5.3\/include\/apnp$/;"	m
+INIT_LIST_HEAD	apnp_list.h	/^static inline void INIT_LIST_HEAD(struct list_head *list)$/;"	f
+LD	Makefile	/^LD = ${PREFIX}-ld$/;"	m
+LDPATH	Makefile	/^LDPATH = \/projects\/hnd\/tools\/linux\/hndtools-arm-linux-2.6.36-uclibc-4.5.3\/lib\/apnp$/;"	m
+LIST_HEAD_INIT	apnp_list.h	1447;"	d
+MAX_PAYLOAD	apnp_type.h	53;"	d
+MONITORSERVTYPE	apnp_device.c	5;"	d	file:
+MoniterMutex	apnp_device.c	/^ithread_mutex_t MoniterMutex;$/;"	v
+MonitorCallbackEvent	apnp_device.c	/^int MonitorCallbackEvent(Upnp_EventType EventType, void *Event,$/;"	f
+MonitorHandleActionRequest	apnp_device.c	/^int MonitorHandleActionRequest(struct Upnp_Action_Request *ca_event)$/;"	f
+MonitorPowerOff	apnp_device.c	/^int MonitorPowerOff(void) $/;"	f
+MonitorPowerOn	apnp_device.c	/^int MonitorPowerOn(void) $/;"	f
+Monitor_get_ap_apname	apnp_device.c	/^static void Monitor_get_ap_apname(char* value,char* str)$/;"	f	file:
+Monitor_get_ap_ip	apnp_device.c	/^static void Monitor_get_ap_ip(char* value,char* str)$/;"	f	file:
+Monitor_get_ap_mac	apnp_device.c	/^static void Monitor_get_ap_mac(char* value,char* str)$/;"	f	file:
+Monitor_get_ap_name	apnp_device.c	/^static void Monitor_get_ap_name(char* value,char* str)$/;"	f	file:
+Monitor_get_ap_radio_count	apnp_device.c	/^static void Monitor_get_ap_radio_count(char* value,char* str)$/;"	f	file:
+Monitor_get_ap_radioif	apnp_device.c	/^static void Monitor_get_ap_radioif(char* value,char* str)$/;"	f	file:
+Monitor_get_ap_soft_version	apnp_device.c	/^static void Monitor_get_ap_soft_version(char* value,char* str)$/;"	f	file:
+Monitor_get_ap_stacount	apnp_device.c	/^static void Monitor_get_ap_stacount(char* value,char* str)$/;"	f	file:
+Monitor_get_radio_channel	apnp_device.c	/^static void Monitor_get_radio_channel(IXML_Document * in,char* value,char* str)$/;"	f	file:
+Monitor_get_radio_id	apnp_device.c	/^static void Monitor_get_radio_id(IXML_Document * in,char* value,char* str)$/;"	f	file:
+Monitor_get_radio_maxassoc	apnp_device.c	/^static void Monitor_get_radio_maxassoc(IXML_Document * in,char* value,char* str)$/;"	f	file:
+Monitor_get_radio_mode	apnp_device.c	/^static void Monitor_get_radio_mode(IXML_Document * in,char* value,char* str)$/;"	f	file:
+Monitor_get_radio_power	apnp_device.c	/^static void Monitor_get_radio_power(IXML_Document * in,char* value,char* str)$/;"	f	file:
+Monitor_get_radio_rate	apnp_device.c	/^static void Monitor_get_radio_rate(IXML_Document * in,char* value,char* str)$/;"	f	file:
+Monitor_get_radio_wlancount	apnp_device.c	/^static void Monitor_get_radio_wlancount(IXML_Document * in,char* value,char* str)$/;"	f	file:
+Monitor_get_radio_wlanif	apnp_device.c	/^static void Monitor_get_radio_wlanif(IXML_Document * in,char* value,char* str)$/;"	f	file:
+Monitor_get_wlan_essid	apnp_device.c	/^static void Monitor_get_wlan_essid(IXML_Document * in,char* value,char* str)$/;"	f	file:
+Monitor_get_wlan_name	apnp_device.c	/^static void Monitor_get_wlan_name(IXML_Document * in,char* value,char* str)$/;"	f	file:
+Monitor_get_wlan_securitykey	apnp_device.c	/^static void Monitor_get_wlan_securitykey(IXML_Document * in,char* value,char* str)$/;"	f	file:
+Monitor_get_wlan_securitytype	apnp_device.c	/^static void Monitor_get_wlan_securitytype(IXML_Document * in,char* value,char* str)$/;"	f	file:
+OBJS	Makefile	/^OBJS = $(SRCS:.c=.o)$/;"	m
+PREFIX	Makefile	/^PREFIX = arm-brcm-linux-uclibcgnueabi$/;"	m
+SRCDIRS	Makefile	/^SRCDIRS = .$/;"	m
+SRCS	Makefile	/^SRCS = $(wildcard *.c)$/;"	m
+Sessions	apnp_api.c	/^static struct session_list *Sessions = NULL;$/;"	v	typeref:struct:session_list	file:
+Util_GetFirstDocumentItem	apnp_device.c	/^char *Util_GetFirstDocumentItem(IXML_Document *doc, const char *item)$/;"	f
+_APNP_API_H	apnp_api.h	2;"	d
+_APNP_CONFIG_H	apnp_config.h	2;"	d
+_APNP_FUNCTION_H	apnp_function.h	2;"	d
+_APNP_IPADDRESS_H	apnp_ipaddress.h	2;"	d
+_APNP_LIST_H	apnp_list.h	2;"	d
+_APNP_NETLINK_DOMAIN_H_	apnp_netlink.h	2;"	d
+_APNP_SESSION_H	apnp_session.h	2;"	d
+_APNP_TASK_HANDLER_H	apnp_task_handler.h	2;"	d
+_APNP_TRANSPORT_H	apnp_transport.h	2;"	d
+_APNP_TYPE_H	apnp_type.h	2;"	d
+_APNP_UTIL_H	apnp_util.h	2;"	d
+__list_add	apnp_list.h	/^static inline void __list_add(struct list_head *new, struct list_head *prev,struct list_head *next)$/;"	f
+__list_del	apnp_list.h	/^static inline void __list_del(struct list_head * prev, struct list_head * next)$/;"	f
+_apnp_tdomain_init	apnp_api.c	/^_apnp_tdomain_init(){$/;"	f
+_find_tdomain	apnp_transport.c	/^_find_tdomain(const char *name) {$/;"	f	file:
+_sess_add	apnp_api.c	/^_sess_add(apnp_session *in_session, $/;"	f	file:
+_sess_copy	apnp_api.c	/^_sess_copy(apnp_session * in_session) {$/;"	f	file:
+_sess_process_packet	apnp_api.c	/^_sess_process_packet(void *sessp,$/;"	f	file:
+_task_add	apnp_api.c	/^_task_add(apnp_task *task) {$/;"	f	file:
+_task_create	apnp_api.c	/^_task_create(void *sessp, void *opaque, u_long olength) {$/;"	f	file:
+_task_free	apnp_api.c	/^_task_free(apnp_task **task) {$/;"	f	file:
+_task_get	apnp_api.c	/^_task_get(void){$/;"	f	file:
+_task_netlink_parse	apnp_api.c	/^_task_netlink_parse(apnp_task *task, u_char *data, size_t length) {$/;"	f	file:
+_task_process	apnp_api.c	/^_task_process(apnp_task *task) {$/;"	f	file:
+_task_thread	apnp_api.c	/^_task_thread(void) {$/;"	f
+addr	apnp_transport.h	/^	void			*addr;$/;"	m	struct:apnp_transport_s
+ap_conf	apnp_config.c	/^apnp_ap ap_conf;$/;"	v
+apname	apnp_config.h	/^	char*			apname;$/;"	m	struct:apnp_ap_s
+apnp_ap	apnp_config.h	/^typedef struct apnp_ap_s* 	 apnp_ap;$/;"	t	typeref:struct:apnp_ap_s
+apnp_ap_s	apnp_config.h	/^struct apnp_ap_s{$/;"	s
+apnp_callback	apnp_type.h	/^typedef int (*apnp_callback) (int, apnp_session *, $/;"	t
+apnp_config_init	apnpd.c	/^apnp_config_init(void)$/;"	f	file:
+apnp_init	apnpd.c	/^apnp_init()$/;"	f	file:
+apnp_netlink_close	apnp_netlink.c	/^apnp_netlink_close(apnp_transport *t, void *buf, size_t size,$/;"	f	file:
+apnp_netlink_create_chunk	apnp_netlink.c	/^apnp_netlink_create_chunk( u_long flags) {$/;"	f	file:
+apnp_netlink_ctor	apnp_netlink.c	/^apnp_netlink_ctor(void)$/;"	f
+apnp_netlink_recv	apnp_netlink.c	/^apnp_netlink_recv(apnp_transport *t, void *buf, size_t size,$/;"	f	file:
+apnp_netlink_send	apnp_netlink.c	/^apnp_netlink_send(apnp_transport *t, void *buf, size_t size,$/;"	f	file:
+apnp_netlink_transport	apnp_netlink.c	/^apnp_netlink_transport(struct sockaddr_nl *addr, int flags)$/;"	f
+apnp_open	apnp_api.c	/^apnp_open(apnp_session * session) {$/;"	f
+apnp_radio	apnp_config.h	/^typedef struct apnp_radio_s* apnp_radio;$/;"	t	typeref:struct:apnp_radio_s
+apnp_radio_s	apnp_config.h	/^struct apnp_radio_s{$/;"	s
+apnp_read	apnp_api.c	/^apnp_read(fd_set *fdset) {$/;"	f
+apnp_receive	apnpd.c	/^apnp_receive(void) {$/;"	f	file:
+apnp_running	apnpd.c	/^static int apnp_running = 1;$/;"	v	file:
+apnp_select_info	apnp_api.c	/^apnp_select_info(int *numfds, fd_set *fdset,$/;"	f
+apnp_service_init	apnpd.c	/^apnp_service_init(){$/;"	f	file:
+apnp_service_restart	apnp_api.c	/^apnp_service_restart(uint32_t ip_addr)$/;"	f
+apnp_sess_close	apnp_api.c	/^apnp_sess_close(void *sessp) {$/;"	f	file:
+apnp_sess_free	apnp_api.c	/^apnp_sess_free(apnp_session *s) {$/;"	f	file:
+apnp_sess_open	apnp_api.c	/^apnp_sess_open(apnp_session *in_session) {$/;"	f	file:
+apnp_sess_read	apnp_api.c	/^apnp_sess_read(void *sessp, fd_set *fdset) {$/;"	f	file:
+apnp_session	apnp_type.h	/^typedef struct apnp_session_s			apnp_session;$/;"	t	typeref:struct:apnp_session_s
+apnp_session_init	apnp_session.c	/^apnp_session_init()$/;"	f
+apnp_session_s	apnp_type.h	/^struct apnp_session_s {$/;"	s
+apnp_singal_init	apnpd.c	/^apnp_singal_init(void) {	$/;"	f	file:
+apnp_sockaddr_in2	apnp_netlink.c	/^apnp_sockaddr_in2(struct sockaddr_nl *addr,unsigned subscriptions)$/;"	f
+apnp_strdeal	apnp_util.c	/^char *apnp_strdeal(char *dest,char *src)$/;"	f
+apnp_strncpy	apnp_util.c	/^char *apnp_strncpy(char *dest, char *src, size_t num)$/;"	f
+apnp_task	apnp_api.c	/^typedef struct apnp_task_s	apnp_task;$/;"	t	typeref:struct:apnp_task_s	file:
+apnp_task_ip_change	apnp_task_handler.c	/^apnp_task_ip_change(void *data, size_t data_len,void **data_addr, size_t *data_addr_len)$/;"	f
+apnp_task_process	apnpd.c	/^apnp_task_process(void) {$/;"	f	file:
+apnp_task_s	apnp_api.c	/^struct apnp_task_s {$/;"	s	file:
+apnp_tdomain	apnp_transport.h	/^typedef struct apnp_tdomain_s   apnp_tdomain;$/;"	t	typeref:struct:apnp_tdomain_s
+apnp_tdomain_init	apnp_transport.c	/^apnp_tdomain_init(void){$/;"	f
+apnp_tdomain_register	apnp_transport.c	/^apnp_tdomain_register(apnp_tdomain *n) {$/;"	f
+apnp_tdomain_s	apnp_transport.h	/^struct apnp_tdomain_s {$/;"	s
+apnp_transport	apnp_transport.h	/^typedef struct apnp_transport_s apnp_transport;$/;"	t	typeref:struct:apnp_transport_s
+apnp_transport_free	apnp_transport.c	/^apnp_transport_free(apnp_transport *t) {$/;"	f
+apnp_transport_open	apnp_transport.c	/^apnp_transport_open(const char *name, u_long flags) {$/;"	f
+apnp_transport_s	apnp_transport.h	/^struct apnp_transport_s {$/;"	s
+apnp_wlan	apnp_config.h	/^typedef struct apnp_wlan_s*  apnp_wlan;$/;"	t	typeref:struct:apnp_wlan_s
+apnp_wlan_s	apnp_config.h	/^struct apnp_wlan_s{$/;"	s
+callback	apnp_type.h	/^	apnp_callback callback;$/;"	m	struct:apnp_session_s
+channel	apnp_config.h	/^    char*			channel;$/;"	m	struct:apnp_radio_s
+conf_ap_free	apnp_config.c	/^void conf_ap_free()$/;"	f
+conf_ap_init	apnp_config.c	/^static void conf_ap_init()$/;"	f	file:
+conf_radio_free	apnp_config.c	/^static void conf_radio_free()$/;"	f	file:
+conf_radio_init	apnp_config.c	/^static void conf_radio_init()$/;"	f	file:
+conf_wlan_free	apnp_config.c	/^static void conf_wlan_free()$/;"	f	file:
+conf_wlan_init	apnp_config.c	/^static void conf_wlan_init()$/;"	f	file:
+conf_xml_do	apnp_config.c	/^static int conf_xml_do(const char* filePath)$/;"	f	file:
+conf_xml_init	apnp_config.c	/^static void conf_xml_init()$/;"	f	file:
+config_init	apnp_config.c	/^void config_init()$/;"	f
+container_of	apnp_list.h	1451;"	d
+device_handle	apnpd.c	/^UpnpDevice_Handle device_handle = -1;$/;"	v
+device_start	apnp_device.c	/^int device_start(char *hostip, uint16_t port)$/;"	f
+device_stop	apnp_device.c	/^int device_stop()$/;"	f
+do_ioctl_get_ipaddress	apnp_ipaddress.c	/^unsigned long do_ioctl_get_ipaddress(char *dev)$/;"	f
+domain_list	apnp_transport.c	/^static apnp_tdomain *domain_list = NULL;$/;"	v	file:
+essid	apnp_config.h	/^	char*		essid;$/;"	m	struct:apnp_wlan_s
+expire	apnp_api.c	/^	struct timeval  expire; 			\/* time this task is due to expire *\/$/;"	m	struct:apnp_task_s	typeref:struct:apnp_task_s::timeval	file:
+f_accept	apnp_transport.h	/^	int (*f_accept)	(struct apnp_transport_s *);$/;"	m	struct:apnp_transport_s
+f_close	apnp_transport.h	/^	int (*f_close)		(struct apnp_transport_s *);$/;"	m	struct:apnp_transport_s
+f_create_from_chunk	apnp_transport.h	/^	apnp_transport *(*f_create_from_chunk) (u_long);$/;"	m	struct:apnp_tdomain_s
+f_recv	apnp_transport.h	/^	int (*f_recv)		(struct apnp_transport_s *, void *,$/;"	m	struct:apnp_transport_s
+f_send	apnp_transport.h	/^	int (*f_send)		(struct apnp_transport_s *, void *,$/;"	m	struct:apnp_transport_s
+flags	apnp_transport.h	/^	u_long		flags;$/;"	m	struct:apnp_transport_s
+flags	apnp_type.h	/^	u_long	flags;$/;"	m	struct:apnp_session_s
+get_ap_apname	apnp_function.c	/^void get_ap_apname(char APName[])$/;"	f
+get_ap_ip	apnp_function.c	/^void get_ap_ip(char Ip[])$/;"	f
+get_ap_mac	apnp_function.c	/^void get_ap_mac(char Mac[])$/;"	f
+get_ap_name	apnp_function.c	/^void get_ap_name(char Name[])$/;"	f
+get_ap_radio_count	apnp_function.c	/^void get_ap_radio_count(char RadioC[])$/;"	f
+get_ap_radioif	apnp_function.c	/^void get_ap_radioif(char RadioIf[])$/;"	f
+get_ap_soft_version	apnp_function.c	/^void get_ap_soft_version(char Version[])$/;"	f
+get_ap_stacount	apnp_function.c	/^void get_ap_stacount(char StaC[])$/;"	f
+get_radio_channel	apnp_function.c	/^void get_radio_channel(const char* Radio,char RadioCh[])$/;"	f
+get_radio_id	apnp_function.c	/^void get_radio_id(const char* Radio,char RadioId[])$/;"	f
+get_radio_maxassoc	apnp_function.c	/^void get_radio_maxassoc(const char* Radio,char RadioMaxAC[])$/;"	f
+get_radio_mode	apnp_function.c	/^void get_radio_mode(const char* Radio,char RadioMode[])$/;"	f
+get_radio_power	apnp_function.c	/^void get_radio_power(const char* Radio,char RadioPower[])$/;"	f
+get_radio_rate	apnp_function.c	/^void get_radio_rate(const char* Radio,char RadioRate[])$/;"	f
+get_radio_wlancount	apnp_function.c	/^void get_radio_wlancount(const char* Radio,char RadioWlanC[])$/;"	f
+get_radio_wlanif	apnp_function.c	/^void get_radio_wlanif(const char* Radio,char RadioWlanIf[])$/;"	f
+get_wlan_essid	apnp_function.c	/^void get_wlan_essid(const char* Wlan,char WlanEssid[])$/;"	f
+get_wlan_name	apnp_function.c	/^void get_wlan_name(const char* Wlan,char WlanName[])$/;"	f
+get_wlan_securitykey	apnp_function.c	/^void get_wlan_securitykey(const char* Wlan,char WlanSeKey[])$/;"	f
+get_wlan_securitytype	apnp_function.c	/^void get_wlan_securitytype(const char* Wlan,char WlanSeType[])$/;"	f
+global_sessid	apnp_api.c	/^static u_long global_sessid 	= 0;$/;"	v	file:
+global_taskid	apnp_api.c	/^static u_long global_taskid		= 0;$/;"	v	file:
+head	apnp_config.h	/^	struct list_head head;$/;"	m	struct:apnp_ap_s	typeref:struct:apnp_ap_s::list_head
+id	apnp_config.h	/^    char*			id;$/;"	m	struct:apnp_radio_s
+ifname	apnpd.c	/^char *ifname;$/;"	v
+init_tdomain_init_done	apnp_api.c	/^static int init_tdomain_init_done = 0;$/;"	v	file:
+ip	apnp_config.h	/^    char*			ip;$/;"	m	struct:apnp_ap_s
+ip	apnp_task_handler.c	/^uint32_t ip;$/;"	v
+ip2str	apnp_ipaddress.c	/^ip2str(uint32_t ip, char *str, size_t size)$/;"	f
+keep_going	apnpd.c	/^static int keep_going = 1;$/;"	v	file:
+list_add	apnp_list.h	/^static inline void list_add(struct list_head *new, struct list_head *head)$/;"	f
+list_del	apnp_list.h	/^static inline void list_del(struct list_head *entry)$/;"	f
+list_entry	apnp_list.h	1496;"	d
+list_for_each	apnp_list.h	1492;"	d
+list_head	apnp_list.h	/^struct list_head {$/;"	s
+local	apnp_type.h	/^	u_char 	*local;$/;"	m	struct:apnp_session_s
+local_len	apnp_type.h	/^	size_t	  local_len;$/;"	m	struct:apnp_session_s
+mac	apnp_config.h	/^    char*			mac;$/;"	m	struct:apnp_ap_s
+main	apnpd.c	/^int main(int argc, char *argv[])$/;"	f
+maxassoc	apnp_config.h	/^	char*		 	maxassoc;$/;"	m	struct:apnp_radio_s
+method	apnp_api.c	/^	task_method		method;				\/* user method process task *\/$/;"	m	struct:apnp_task_s	file:
+method_data	apnp_api.c	/^	void			*method_data;		\/* user method data process task *\/$/;"	m	struct:apnp_task_s	file:
+method_data_length	apnp_api.c	/^	size_t		method_data_length;$/;"	m	struct:apnp_task_s	file:
+mode	apnp_config.h	/^	char* 			mode;$/;"	m	struct:apnp_radio_s
+msgMaxSize	apnp_transport.h	/^	unsigned long 	msgMaxSize;$/;"	m	struct:apnp_transport_s
+name	apnp_config.h	/^	char*			name;$/;"	m	struct:apnp_ap_s
+name	apnp_config.h	/^	char*		name;$/;"	m	struct:apnp_wlan_s
+name	apnp_transport.h	/^    char *name;$/;"	m	struct:apnp_tdomain_s
+netlinkDomain	apnp_netlink.c	/^static apnp_tdomain netlinkDomain;$/;"	v	file:
+next	apnp_api.c	/^	struct apnp_task_s	*next;$/;"	m	struct:apnp_task_s	typeref:struct:apnp_task_s::apnp_task_s	file:
+next	apnp_api.c	/^	struct session_list *next;$/;"	m	struct:session_list	typeref:struct:session_list::session_list	file:
+next	apnp_list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::list_head
+next	apnp_transport.h	/^	struct apnp_tdomain_s *next;$/;"	m	struct:apnp_tdomain_s	typeref:struct:apnp_tdomain_s::apnp_tdomain_s
+offsetof	apnp_list.h	1449;"	d
+para_data	apnp_api.c	/^	void		*para_data;				\/* user para data for process task *\/$/;"	m	struct:apnp_task_s	file:
+para_data_length	apnp_api.c	/^	size_t	para_data_length;$/;"	m	struct:apnp_task_s	file:
+power	apnp_config.h	/^	char*			power;$/;"	m	struct:apnp_radio_s
+prefetch	apnp_list.h	1488;"	d
+prev	apnp_list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::
+radioNum	apnp_config.c	/^static int radioNum = 2 ;$/;"	v	file:
+radio_count	apnp_config.h	/^	char*			radio_count;$/;"	m	struct:apnp_ap_s
+radio_list	apnp_config.h	/^	struct list_head radio_list;$/;"	m	struct:apnp_radio_s	typeref:struct:apnp_radio_s::list_head
+radioif	apnp_config.h	/^	char*			radioif;$/;"	m	struct:apnp_ap_s
+rate	apnp_config.h	/^	char*		 	rate;$/;"	m	struct:apnp_radio_s
+remote	apnp_type.h	/^	u_char 	*remote;$/;"	m	struct:apnp_session_s
+remote_len	apnp_type.h	/^	size_t	  remote_len;$/;"	m	struct:apnp_session_s
+s_errno	apnp_type.h	/^	int             s_errno;$/;"	m	struct:apnp_session_s
+s_manage_errno	apnp_type.h	/^	int             s_manage_errno;   $/;"	m	struct:apnp_session_s
+securitykey	apnp_config.h	/^	char*		securitykey;$/;"	m	struct:apnp_wlan_s
+securitytype	apnp_config.h	/^	char*		securitytype;$/;"	m	struct:apnp_wlan_s
+sess_netlink_init	apnp_session.c	/^sess_netlink_init()$/;"	f
+sessid	apnp_type.h	/^	u_long	sessid; $/;"	m	struct:apnp_session_s
+session	apnp_api.c	/^	apnp_session *session;$/;"	m	struct:session_list	file:
+session_list	apnp_api.c	/^struct session_list {$/;"	s	file:
+session_mutex	apnp_api.c	/^static pthread_mutex_t session_mutex;$/;"	v	file:
+sessp	apnp_api.c	/^	struct session_list 	*sessp;$/;"	m	struct:apnp_task_s	typeref:struct:apnp_task_s::session_list	file:
+signal_handler	apnpd.c	/^static void signal_handler(int sig) $/;"	f	file:
+sock	apnp_transport.h	/^	int 			sock;$/;"	m	struct:apnp_transport_s
+soft_version	apnp_config.h	/^	char*			soft_version;$/;"	m	struct:apnp_ap_s
+stacount	apnp_config.h	/^	char*		 	stacount;$/;"	m	struct:apnp_ap_s
+str_is_legal	apnp_util.c	/^static BOOL str_is_legal(char c) $/;"	f	file:
+task_cond	apnp_api.c	/^static pthread_cond_t	task_cond;$/;"	v	file:
+task_id	apnp_api.c	/^	u_long  task_id;     			\/* task id *\/$/;"	m	struct:apnp_task_s	file:
+task_method	apnp_type.h	/^typedef int (*task_method) (void *, size_t, $/;"	t
+task_mutex	apnp_api.c	/^static pthread_mutex_t task_mutex;$/;"	v	file:
+task_queue	apnp_api.c	/^static apnp_task 			*task_queue = NULL, *task_tail = NULL;$/;"	v	file:
+task_tail	apnp_api.c	/^static apnp_task 			*task_queue = NULL, *task_tail = NULL;$/;"	v	file:
+time	apnp_api.c	/^	struct timeval  time;   				\/* Time this task was made *\/$/;"	m	struct:apnp_task_s	typeref:struct:apnp_task_s::timeval	file:
+timeout	apnp_api.c	/^	u_long          timeout;        		\/* length to wait for timeout *\/$/;"	m	struct:apnp_task_s	file:
+transport	apnp_api.c	/^	apnp_transport *transport;$/;"	m	struct:session_list	file:
+transport_data	apnp_api.c	/^	void		*transport_data;$/;"	m	struct:apnp_task_s	file:
+transport_data_length	apnp_api.c	/^	size_t     transport_data_length;$/;"	m	struct:apnp_task_s	file:
+wlanNum	apnp_config.c	/^static int wlanNum = 8 ;$/;"	v	file:
+wlan_list	apnp_config.h	/^	struct list_head wlan_list;$/;"	m	struct:apnp_radio_s	typeref:struct:apnp_radio_s::list_head
+wlan_list	apnp_config.h	/^	struct list_head wlan_list;$/;"	m	struct:apnp_wlan_s	typeref:struct:apnp_wlan_s::list_head
+wlancount	apnp_config.h	/^	char*		 	wlancount;$/;"	m	struct:apnp_radio_s
+wlanif	apnp_config.h	/^	char*			wlanif;$/;"	m	struct:apnp_radio_s

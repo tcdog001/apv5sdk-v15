@@ -1,0 +1,3 @@
+cpu.c: In function 'flush_cache':
+cpu.c:94: warning: implicit declaration of function 'dcache_flush_range'
+cpu.c:88: warning: unused variable 'i'

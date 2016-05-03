@@ -1,0 +1,74 @@
+.NOTPARALLEL:
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR = src
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE), amcc)
+CROSS=powerpc-apm-linux-gnu
+else ifeq ($(BOARD_TYPE), armada370)
+CROSS=arm-marvell-linux-gnueabi
+else
+CROSS=mips64-octeon-linux-gnu
+endif
+#wangyu add end
+
+CC=${CROSS}-gcc
+
+ifndef SSL_TREE
+SSL_TREE:= ../openssl/src
+endif
+
+#TOOLCHAIN_ABI_64=y
+
+ifdef TOOLCHAIN_ABI_N32
+  export TOOLCHAIN_ABI=-mabi=n32
+  export LDFLAGS=-melf32btsmipn32
+  export LIBDIR=/usr/lib32
+endif
+
+ifdef TOOLCHAIN_ABI_64
+  export TOOLCHAIN_ABI=-mabi=64
+  export LDFLAGS=-melf64btsmip
+  export LIBDIR=/usr/lib64
+endif
+
+ifdef TOOLCHAIN_UCLIBC
+  export TOOLCHAIN_ABI=-muclibc
+  export LDFLAGS=-melf32btsmipn32
+  export LIBDIR=/uclibc/usr/lib
+endif
+
+
+unexport LDFLAGS
+
+.PHONY: all
+all: build install
+
+.PHONY: build
+build:
+ifeq ($(SUB_TYPE),LTEFI)
+	${MAKE} -C ${PKG_BUILD_DIR} PREFIX=${ROOTFSDIR}/usr CC="${CC}" STRIPFLAGS="${TOOLCHAIN_ABI} -Wl,-s" LTEFI=1 SSL_TREE=${SSL_TREE} 
+else
+ifeq ($(SUB_TYPE),LTEFI_V2)
+	${MAKE} -C ${PKG_BUILD_DIR} PREFIX=${ROOTFSDIR}/usr CC="${CC}" STRIPFLAGS="${TOOLCHAIN_ABI} -Wl,-s" LTEFI_V2=1 SSL_TREE=${SSL_TREE}
+else	
+	${MAKE} -C ${PKG_BUILD_DIR} PREFIX=${ROOTFSDIR}/usr CC="${CC}" STRIPFLAGS="${TOOLCHAIN_ABI} -Wl,-s" SSL_TREE=${SSL_TREE}
+endif
+endif
+
+.PHONY: clean
+
+clean:
+	${MAKE} -C ${PKG_BUILD_DIR} clean
+
+#install dir: /sbin
+.PHONY: install
+install: 
+			cp -f ${PKG_BUILD_DIR}/mini_httpd ${ROOTFSDIR}/sbin
+			cp -f ${PKG_BUILD_DIR}/mini_httpd.pem ${ROOTFSDIR}/sbin		

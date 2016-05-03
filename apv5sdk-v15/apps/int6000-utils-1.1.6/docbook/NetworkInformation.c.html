@@ -1,0 +1,160 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			NetworkInformation.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='NetworkInfo2.c.html' title=' NetworkInfo2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='NetworkTopology.c.html' title=' NetworkTopology.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed NetworkInformation (struct channel * channel);
+ *
+ *   int6k.h
+ *
+ *   Request network membership information for the peer device using 
+ *   one VS_NW_INFO message; 
+ *
+ *   This function is similar to function NetworkInfo() but the output 
+ *   format is different;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef NETWORKINFORMATION_SOURCE
+#define NETWORKINFORMATION_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;memory.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/error.h&quot;
+
+signed NetworkInformation (struct channel * channel) 
+
+{
+	struct message message;
+	char string [24];
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed station 
+	{
+		uint8_t DA [ETHER_ADDR_LEN];
+		uint8_t TEI;
+		uint8_t BDA [ETHER_ADDR_LEN];
+		uint8_t AVGTX;
+		uint8_t AVGRX;
+	}
+	* station;
+	struct __packed network 
+	{
+		uint8_t NID [7];
+		uint8_t SNID;
+		uint8_t TEI;
+		uint8_t ROLE;
+		uint8_t CCO_MACADDR [ETHER_ADDR_LEN];
+		uint8_t CCO_TEI;
+		uint8_t NUMSTAS;
+		struct station station [1];
+	}
+	* network;
+	struct __packed networks 
+	{
+		uint8_t NUMAVLNS;
+		struct network network [1];
+	}
+	* networks = (struct networks *) (&amp;message.content);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	memset (&amp;message, 0, sizeof (message));
+	EthernetHeader (&amp;message.ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message.intellon, (VS_NW_INFO | MMTYPE_REQ));
+	if (sendpacket (channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+	{
+		error (1, errno, INT6K_CANTSEND);
+	}
+	if (readpacket (channel, &amp;message, sizeof (message)) &lt;= 0) 
+	{
+		error (1, errno, INT6K_CANTREAD);
+	}
+	network = (struct network *)(&amp;networks-&gt;network);
+	while (networks-&gt;NUMAVLNS-- &gt; 0) 
+	{
+		printf (&quot; NET&quot;);
+		printf (&quot; NID %20s&quot;, hexstring (string, sizeof (string), network-&gt;NID, sizeof (network-&gt;NID)));
+		printf (&quot; SNID %03d&quot;, network-&gt;SNID);
+		printf (&quot;\n&quot;);
+		printf (&quot; %s&quot;, (network-&gt;TEI == network-&gt;CCO_TEI)? &quot;CCO&quot;: &quot;STA&quot;);
+		printf (&quot; TEI %03d&quot;, network-&gt;TEI);
+		printf (&quot; MAC %17s&quot;, hexstring (string, sizeof (string), message.ethernet.OSA, sizeof (message.ethernet.ODA)));
+		printf (&quot; BDA %17s&quot;, hexstring (string, sizeof (string), message.ethernet.ODA, sizeof (message.ethernet.ODA)));
+		printf (&quot;\n&quot;);
+		station = (struct station *)(&amp;network-&gt;station);
+		while (network-&gt;NUMSTAS-- &gt; 0) 
+		{
+			printf (&quot; %s&quot;, (station-&gt;TEI == network-&gt;CCO_TEI)? &quot;CCO&quot;: &quot;STA&quot;);
+			printf (&quot; TEI %03d&quot;, station-&gt;TEI);
+			printf (&quot; MAC %17s&quot;, hexstring (string, sizeof (string), station-&gt;DA, sizeof (station-&gt;DA)));
+			printf (&quot; BDA %17s&quot;, hexstring (string, sizeof (string), station-&gt;BDA, sizeof (station-&gt;BDA)));
+			printf (&quot; TX %03d&quot;, station-&gt;AVGTX);
+			printf (&quot; RX %03d&quot;, station-&gt;AVGRX);
+			printf (&quot;\n&quot;);
+			station++;
+		}
+		network = (struct network *)(station);
+	}
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='NetworkInfo2.c.html' title=' NetworkInfo2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='NetworkTopology.c.html' title=' NetworkTopology.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,368 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			SessionEdit.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='SequenceWriteModule.c.html' title=' SequenceWriteModule.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SessionLoad.c.html' title=' SessionLoad.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void SessionEdit ();
+ *
+ *   session.h
+ *   
+ *   read a multipart/form-data message from stdin and update the 
+ *   cgi session variable; 
+ *
+ *   the entire message is read into the control scanner and parsed
+ *   into lines; lines are then copied into the content scanner and
+ *   parsed into keyword and value tokens; content lines are parsed
+ *   and processed by function MultipartContent;
+ *
+ *   See RFC-2338 &quot;Returning Values from Forms: multipart/form-data&quot;
+ *   for an explanation of the multipart form-data message format;
+ *   
+ *   environment variable CONTENT_LENGTH contains the length of the
+ *   HTTP_POST frame; read the entire frame into the control buffer
+ *   for scanning;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SESSIONEDIT_SOURCE
+#define SESSIONEDIT_SOURCE
+
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;ctype.h&gt;
+
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/format.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../ether/ether.h&quot;
+#include &quot;../scan/scan.h&quot;
+#include &quot;../cgi/session.h&quot;
+#include &quot;../cgi/page.h&quot;
+#include &quot;../pib/pib.h&quot;
+#include &quot;../nvm/nvm.h&quot;
+
+void SessionEdit () 
+
+{
+	extern struct session session;
+	extern struct fileinfo pib;
+	extern struct fileinfo nvm;
+	char address [ETHER_ADDR_LEN * 3];
+	struct _scan_ control;
+	struct _scan_ content;
+	char dataname [CGI_DATANAME_LENGTH];
+	char filename [CGI_FILENAME_LENGTH];
+	char * string = getenv (&quot;CONTENT_LENGTH&quot;);
+	signed length = 0;
+	if (!string) 
+	{
+		string = &quot;&quot;;
+	}
+	while (isdigit (*string)) 
+	{
+		length *= 10;
+		length += *string - '0';
+		string ++;
+	}
+	string = malloc (length);
+	if (!string) 
+	{
+		string = &quot;&quot;;
+	}
+	scaninput (&amp;control, string, length);
+	while (control.index &lt; control.limit) 
+	{
+		control.index += read (STDIN_FILENO, (char *)(control.index), CGI_DATA_LENGTH);
+	}
+
+#if 1
+
+	signed fd = open (SESSION_LOG, O_CREAT|O_APPEND|O_WRONLY);
+	write (fd, control.start, control.index - control.start);
+	write (fd, &quot;\n&quot;, 1);
+	close (fd);
+
+#endif
+
+	while (isready (&amp;control)) 
+	{
+		scanflush (&amp;control);
+		scanchunk (&amp;control);
+		if (istoken (&amp;control, &quot;\r\n&quot;)) 
+		{
+			scanflush (&amp;control);
+			scanchunk (&amp;control);
+			if (istoken (&amp;control, &quot;\r\n&quot;)) 
+			{
+				continue;
+			}
+			control.final--;
+			control.final--;
+			if (!strcmp (dataname, SUBMIT_RETURN)) 
+			{
+			}
+			else if (!strcmp (dataname, SUBMIT_OPTION)) 
+			{
+				copytoken (&amp;control, session.option, sizeof (session.option));
+			}
+			else if (!strcmp (dataname, SUBMIT_ACTION)) 
+			{
+				copytoken (&amp;control, session.action, sizeof (session.action));
+			}
+			else if (!strcmp (dataname, SUBMIT_SOURCE)) 
+			{
+				copytoken (&amp;control, session.source, sizeof (session.source));
+			}
+			else if (!strcmp (dataname, SUBMIT_DEVICE)) 
+			{
+				copytoken (&amp;control, address, sizeof (address));
+				hexencode (session.device.MAC, sizeof (session.device.MAC), address);
+			}
+			else if (!strcmp (dataname, FIELD_DPW)) 
+			{
+				copytoken (&amp;control, session.DPW, sizeof (session.DPW));
+				HPAVKeyDAK (session.device.DAK, session.DPW);
+			}
+			else if (!strcmp (dataname, FIELD_NPW)) 
+			{
+				copytoken (&amp;control, session.NPW, sizeof (session.NPW));
+				HPAVKeyNMK (session.device.NMK, session.NPW);
+				HPAVKeyNID (session.device.NID, session.device.NMK, 0);
+			}
+			else if (!strcmp (dataname, FIELD_VLAN &quot;0&quot;)) 
+			{
+				session.QoS.VLAN [0] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_VLAN &quot;1&quot;)) 
+			{
+				session.QoS.VLAN [1] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_VLAN &quot;2&quot;)) 
+			{
+				session.QoS.VLAN [2] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_VLAN &quot;3&quot;)) 
+			{
+				session.QoS.VLAN [3] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_VLAN &quot;4&quot;)) 
+			{
+				session.QoS.VLAN [4] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_VLAN &quot;5&quot;)) 
+			{
+				session.QoS.VLAN [5] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_VLAN &quot;6&quot;)) 
+			{
+				session.QoS.VLAN [6] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_VLAN &quot;7&quot;)) 
+			{
+				session.QoS.VLAN [7] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_TOS &quot;0&quot;)) 
+			{
+				session.QoS.ToS [0] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_TOS &quot;1&quot;)) 
+			{
+				session.QoS.ToS [1] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_TOS &quot;2&quot;)) 
+			{
+				session.QoS.ToS [2] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_TOS &quot;3&quot;)) 
+			{
+				session.QoS.ToS [3] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_TOS &quot;4&quot;)) 
+			{
+				session.QoS.ToS [4] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_TOS &quot;5&quot;)) 
+			{
+				session.QoS.ToS [5] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_TOS &quot;6&quot;)) 
+			{
+				session.QoS.ToS [6] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_TOS &quot;7&quot;)) 
+			{
+				session.QoS.ToS [7] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_TTL &quot;0&quot;)) 
+			{
+				session.QoS.TTL [0] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_TTL &quot;1&quot;)) 
+			{
+				session.QoS.TTL [1] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_TTL &quot;2&quot;)) 
+			{
+				session.QoS.TTL [2] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_TTL &quot;3&quot;)) 
+			{
+				session.QoS.TTL [3] = tovalue (&amp;control);
+			}
+			else if (!strcmp (dataname, FIELD_PRI &quot;0&quot;)) 
+			{
+				if (istoken (&amp;control, &quot;on&quot;)) 
+				{
+					session.QoS.method [0] |= 2;
+				}
+			}
+			else if (!strcmp (dataname, FIELD_PRI &quot;1&quot;)) 
+			{
+				if (istoken (&amp;control, &quot;on&quot;)) 
+				{
+					session.QoS.method [1] |= 2;
+				}
+			}
+			else if (!strcmp (dataname, FIELD_PIB)) 
+			{
+				struct header_pib * header_pib = (struct header_pib *)(control.first);
+				strcpy (pib.name, filepart (filename));
+				pib.size = LE16TOH (header_pib-&gt;PIBLENGTH);
+				pib.data = control.first;
+				if (pib.size != tokensize (&amp;control)) 
+				{
+					status (0, EPERM, &quot;PIB file %s has wrong size&quot;, pib.name);
+				}
+				if (checksum_32 (header_pib, pib.size, 0)) 
+				{
+					status (0, EPERM, &quot;PIB file %s has bad checksum&quot;, pib.name);
+				}
+				control.final = control.first + pib.size;
+			}
+			else if (!strcmp (dataname, FIELD_NVM)) 
+			{
+				struct header_nvm * header_nvm = (struct header_nvm *)(control.first);
+				strcpy (nvm.name, filepart (filename));
+				nvm.size = nvmspan (header_nvm);
+				nvm.data = control.first;
+				if (!nvm.size) 
+				{
+					status (0, EPERM, &quot;NVM file %s has wrong structure&quot;, nvm.name);
+				}
+				control.final = control.first + nvm.size;
+			}
+			control.final++;
+			control.final++;
+			continue;
+		}
+		scaninput (&amp;content, control.first, control.final - control.first);
+		scantoken (&amp;content);
+		if (istoken (&amp;content, &quot;--&quot;)) 
+		{
+			scanflush (&amp;content);
+			scanident (&amp;content);
+			continue;
+		}
+		if (havetoken (&amp;content, &quot;Content-Disposition&quot;)) 
+		{
+			memset (dataname, 0, sizeof (dataname));
+			memset (filename, 0, sizeof (filename));
+			if (!havetoken (&amp;content, &quot;:&quot;)) 
+			{
+				continue;
+			}
+			if (!havetoken (&amp;content, &quot;form-data&quot;)) 
+			{
+				error (0, EINVAL, &quot;expected form-data content type&quot;);
+				continue;
+			}
+			if (!havetoken (&amp;content, &quot;;&quot;)) 
+			{
+				continue;
+			}
+			if (!havetoken (&amp;content, &quot;name&quot;)) 
+			{
+				error (0, EINVAL, &quot;expected control name&quot;);
+				continue;
+			}
+			if (!havetoken (&amp;content, &quot;=&quot;)) 
+			{
+				continue;
+			}
+			copyquote (&amp;content, dataname, sizeof (dataname));
+			nexttoken (&amp;content);
+			if (!havetoken (&amp;content, &quot;;&quot;)) 
+			{
+				continue;
+			}
+			if (!havetoken (&amp;content, &quot;filename&quot;)) 
+			{
+				error (0, EINVAL, &quot;expected file name&quot;);
+				continue;
+			}
+			if (!havetoken (&amp;content, &quot;=&quot;)) 
+			{
+				continue;
+			}
+			copyquote (&amp;content, filename, sizeof (filename));
+			continue;
+		}
+		if (havetoken (&amp;content, &quot;Content-Type&quot;)) 
+		{
+			if (!havetoken (&amp;content, &quot;:&quot;)) 
+			{
+				continue;
+			}
+			if (!havetoken (&amp;content, &quot;application&quot;)) 
+			{
+				continue;
+			}
+			if (!havetoken (&amp;content, &quot;/&quot;)) 
+			{
+				continue;
+			}
+			if (!havetoken (&amp;content, &quot;octet-stream&quot;)) 
+			{
+				continue;
+			}
+			continue;
+		}
+	}
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='SequenceWriteModule.c.html' title=' SequenceWriteModule.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SessionLoad.c.html' title=' SessionLoad.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

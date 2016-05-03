@@ -1,0 +1,95 @@
+.TH int6klog 7 "Intellon Corporation" "int6000-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+int6klog - Intellon Log File Manager
+.SH SYNOPSIS
+.BR int6klog
+.RI [ options ] 
+.RI [ device ] 
+.RI [ device ] 
+[...]
+.SH DESCRIPTION
+Read and print various device logs to file for analysis by Intellon Technical Support.
+.PP
+This program is part of the Intellon Linux Toolkit. See the \fBilt\fR man page for an overview and installation instructions.
+.SH OPTIONS
+.TP
+.RB - e
+Redirects stderr messages to stdout. By convention status and error messages are printed on stderr while primary program output is printed on stdout. This option prints all output on stdout in cases where this is desired.
+.TP
+-\fBi\fR \fIinterface\fR
+Select the host Ethernet interface. All requests are sent via this interface and only reponses received via this interface are recognized. The default interface is \fBeth1\fR because most people use \fBeth0\fR as their principle network connection; however, if environment string "PLC" is defined then it takes precedence over the default interface. This option then takes precedence over either default.
+.TP
+.RB - q
+Suppresses status messages on stderr. 
+.TP
+.RB - v
+Print additional information on stdout. In particular, this option dumps incoming and outgoing packets which can be saved as text files for reference.
+.TP
+-\fBw \fIfilename\fR
+Read Watchdog Report from the device and write it to the named file using VS_WD_RPT. The report is dumped in binary format by default but is dumped in XML format when option \fB-x\fR is present. The report file can be sent to Intellon Corporation for technical analysis. No assumptions are made based on filename and no filename convetions are enforced; however, you should use a \fB.log\fR file extension to indicate binary format.
+.TP
+-\fBW \fIfilename\fR
+Same as option \fB-w\fR but clears the Watchdog Report after reading it.
+.TP
+.RB - x
+Formats the Watchdog Report file in XML format when used with options \fB-w\fR or \fB-W\fR.
+.TP
+.RB - ? ,-- help
+Print program help summary on stdout. This option takes precedence over other options on the command line. 
+.TP
+.RB - ? ,-- version
+Print program version information on stdout. This option takes precedence over other options on the command line. Use this option when sending screen dumps to Intellon Technical Support so that they know exactly which version of the Linux Toolkit you are using.
+.SH ARGUMENTS
+.TP
+.IR device
+The MAC address of some powerline device. More than one address may be specified. If more than one address is specified then operations are performed on each device in turn. The default address is \fBlocal\fR. See \fBDEVICES\fR for information about symbolic device addresses.
+.SH LOGFILES
+Log files are save in binary format by default but they can also be saved in XML format by adding option \fB-x\fR to the command line. By convention, binary log files have a \fB.log\fR extension and XML log files have a \fB.xlog\fR extension. The extension is not critical but it helps us determine the format before we open the file.
+.SH DEVICES
+Powerline devices use Ethernet Media Access Control (MAC) addresses. MAC addresses are 12 hexadecimal digits (\fB0123456789ABCDEFabcdef\fR) in upper, lower or mixed case. Individual octets may be separated by colons, for clarity, but not all octets need to be seperated. For example, "00b052000001", "00:b0:52:00:00:01" and "00b052:000001" are valid and equivalent.
+.PP
+The following MAC addresses are special and may be expressed by name instead of number.
+.TP
+.BR all
+Equivalent to "broadcast", described next.
+.TP
+.BR broadcast
+A synonym for the standard Ethernet broadcast address, \fBFF:FF:FF:FF:FF:FF\fR. All devices, whether local, remote or foreign will respond to this address.
+.TP
+.BR local
+A synonym for the Intellon vendor specific Local Management Address (LMA), \fB00:B0:52:00:00:01\fR. All local Intellon devices will recognize this address but remote and foreign devices will not. A remote device is any device at the far end of a powerline connection. A foreign device is any device not manufactured by Intellon.
+.SH REFERENCES
+See the Intellon HomePlug AV Firmware Technical Reference Manual for more information.
+.SH DISCLAIMER
+Intellon HomePlug AV Vendor Specific Management Message structure and content is proprietary to Intellon Corporation, Ocala FL USA. Consequently, public information is not available. Intellon Corporation reserves the right to modify message structure or content in future firmware releases without any obligation to notify or compensate users of this program.
+.SH EXAMPLES
+The following example reads the Watchdog Report and writes it to file \fBabc.log\fR in binary format. Information will continue to accumulate on the device because option \fB-w\fR does not clear the report. We must explicitly name a device on the command when creating files.
+.PP
+   # int6klog -w abc.log 00:B0:52:BA:BE:02
+   eth1 00:B0:52:00:00:01 Read Watchdog Report
+   eth1 00:B0:52:BE:EF:03 Read abc.log
+.PP
+The next example does the same thing as the last example but clears the report after reading. We forgot the MAC address of the local device and so we used the symbolic device address \fBlocal\fR. Notice that option \fB-W\fR is the upper case version of option \fB-w\fR because it affects device behavior. There is no indication that the report has cleared but trust us. It cleared.
+.PP
+   # int6klog -W abc.log local
+   eth1 00:B0:52:00:00:01 Read Watchdog Report
+   eth1 00:B0:52:BE:EF:03 Read abc.log
+.PP
+The next example does the same as the first example but saves the report in XML format. We used file extension \fB.xlog\fR to distinguish XML from binary format. 
+.PP
+   # int6klog -W abc.xlog local
+   eth1 00:B0:52:00:00:01 Read Watchdog Report
+   eth1 00:B0:52:BE:EF:03 Read abc.log
+.PP
+.SH SEE ALSO
+.BR ilt ( 7 ),
+.BR int6k ( 7 ),
+.BR int6kf ( 7 ),
+.BR int6khost ( 7 ),
+.BR int6kid ( 7 ),
+.BR int6krate ( 7 ),
+.BR int6krule ( 7 ),
+.BR int6kstat ( 7 ),
+.BR int6kwait ( 7 )
+.SH CREDITS
+ Charles Maier <charles.maier@intellon.com>

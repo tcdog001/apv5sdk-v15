@@ -1,0 +1,1 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/gdb-6.8/sim/mips/tconfig.in

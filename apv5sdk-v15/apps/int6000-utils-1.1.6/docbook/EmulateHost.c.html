@@ -1,0 +1,322 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			EmulateHost.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='DivisionOption.c.html' title=' DivisionOption.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='EmulateHost64.c.html' title=' EmulateHost64.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *  
+ *   int EmulateHost (struct int6k * int6k);
+ *  
+ *   int6k.h
+ *
+ *   wait indefinitely for VS_HST_ACTION messages; service requests
+ *   as they arrive; this function is for demonstration and testing
+ *   only; it stops dead - like a bug! - on error;
+ *   
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef EMULATEHOST_SOURCE
+#define EMULATEHOST_SOURCE
+
+#include &lt;unistd.h&gt;
+#include &lt;memory.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+
+#include &quot;../nvm/nvm.h&quot;
+#include &quot;../pib/pib.h&quot;
+
+int EmulateHost (struct int6k * int6k) 
+
+{
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+	static const char * hostaction [] = 
+	{
+		&quot;initialize device&quot;,
+		&quot;store firmware&quot;,
+		&quot;store parameters&quot;,
+		&quot;update host&quot;,
+		&quot;configure memory&quot;,
+		&quot;restore defaults&quot;,
+		&quot;unknown&quot; 
+	};
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_host_action_ind 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MACTION;
+	}
+	* indicate = (struct vs_host_action_ind *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	struct header_nvm header_nvm;
+	struct header_pib header_pib;
+	uint32_t offset = INT6K_PIBOFFSET;
+	const char * PIB = int6k-&gt;PIB.name;
+	const char * NVM = int6k-&gt;NVM.name;
+	unsigned timeout = channel-&gt;timeout;
+	channel-&gt;timeout = -1;
+	Request (int6k, &quot;Waiting for Host Action&quot;);
+	while (ReadMME (int6k, (VS_HST_ACTION | MMTYPE_IND)) &gt; 0) 
+	{
+		Confirm (int6k, &quot;Host Action Request is (%d) %s.&quot;, indicate-&gt;MACTION, hostaction [indicate-&gt;MACTION]);
+		memcpy (&amp;channel-&gt;peer, indicate-&gt;ethernet.OSA, sizeof (channel-&gt;peer));
+		channel-&gt;timeout = timeout;
+		if (indicate-&gt;MACTION == 0x00) 
+		{
+			if (HostActionResponse (int6k)) 
+			{
+				return (-1);
+			}
+			if (lseek (int6k-&gt;NVM.file, 0, SEEK_SET)) 
+			{
+				error (1, errno, &quot;Can't homed %s&quot;, filepart (int6k-&gt;NVM.name));
+			}
+			if (read (int6k-&gt;NVM.file, &amp;header_nvm, sizeof (header_nvm)) &lt; sizeof (header_nvm)) 
+			{
+				error (1, errno, &quot;Can't read %s&quot;, filepart (int6k-&gt;NVM.name));
+			}
+			while (header_nvm.NEXTHEADER) 
+			{
+				lseek (int6k-&gt;NVM.file, LE32TOH (header_nvm.NEXTHEADER), SEEK_SET);
+				if (read (int6k-&gt;NVM.file, &amp;header_nvm, sizeof (header_nvm)) &lt; sizeof (header_nvm)) 
+				{
+					error (1, errno, &quot;Can't read %s&quot;, filepart (int6k-&gt;NVM.name));
+				}
+			}
+			if (WriteMEM (int6k, &amp;int6k-&gt;NVM, LE32TOH (header_nvm.IMAGEADDR), LE32TOH (header_nvm.IMAGELENGTH))) 
+			{
+				return (-1);
+			}
+			if (lseek (int6k-&gt;PIB.file, 0, SEEK_SET)) 
+			{
+				error (1, errno, &quot;Can't home %s&quot;, filepart (int6k-&gt;PIB.name));
+			}
+			if (read (int6k-&gt;PIB.file, &amp;header_pib, sizeof (header_pib)) &lt; sizeof (header_pib)) 
+			{
+				error (1, errno, &quot;Can't read %s&quot;, filepart (int6k-&gt;PIB.name));
+			}
+			if (lseek (int6k-&gt;PIB.file, 0, SEEK_SET)) 
+			{
+				error (1, errno, &quot;Can't home %s&quot;, filepart (int6k-&gt;PIB.name));
+			}
+			if (ntohs (*(uint16_t *)(&amp;header_pib)) &lt; 0x0305) 
+			{
+				offset = LEGACY_PIBOFFSET;
+			}
+			if (WriteMEM (int6k, &amp;int6k-&gt;PIB, offset, LE16TOH (header_pib.PIBLENGTH))) 
+			{
+				return (-1);
+			}
+			if (StartFirmware (int6k, &amp;header_nvm)) 
+			{
+				return (-1);
+			}
+			if (_anyset (int6k-&gt;flags, INT6K_FLASH_DEVICE)) 
+			{
+				if (WriteNVM (int6k)) 
+				{
+					return (-1);
+				}
+				if (WritePIB (int6k)) 
+				{
+					return (-1);
+				}
+				if (Flash (int6k)) 
+				{
+					return (-1);
+				}
+			}
+		}
+		else if (indicate-&gt;MACTION == 0x01) 
+		{
+			if (HostActionResponse (int6k)) 
+			{
+				return (-1);
+			}
+			close (int6k-&gt;NVM.file);
+			if (ReadNVM (int6k)) 
+			{
+				return (-1);
+			}
+			int6k-&gt;NVM.name = int6k-&gt;nvm.name;
+			if ((int6k-&gt;NVM.file = open (int6k-&gt;NVM.name, O_BINARY|O_RDONLY)) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, filepart (int6k-&gt;NVM.name));
+			}
+			if (ResetDevice (int6k)) 
+			{
+				return (-1);
+			}
+		}
+		else if (indicate-&gt;MACTION == 0x02) 
+		{
+			if (HostActionResponse (int6k)) 
+			{
+				return (-1);
+			}
+			close (int6k-&gt;PIB.file);
+			if (ReadPIB (int6k)) 
+			{
+				return (-1);
+			}
+			int6k-&gt;PIB.name = int6k-&gt;pib.name;
+			if ((int6k-&gt;PIB.file = open (int6k-&gt;PIB.name, O_BINARY|O_RDONLY)) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, filepart (int6k-&gt;PIB.name));
+			}
+			if (ResetDevice (int6k)) 
+			{
+				return (-1);
+			}
+		}
+		else if (indicate-&gt;MACTION == 0x03) 
+		{
+			if (HostActionResponse (int6k)) 
+			{
+				return (-1);
+			}
+			close (int6k-&gt;NVM.file);
+			if (ReadNVM (int6k)) 
+			{
+				return (-1);
+			}
+			int6k-&gt;NVM.name = int6k-&gt;nvm.name;
+			if ((int6k-&gt;NVM.file = open (int6k-&gt;NVM.name, O_BINARY|O_RDONLY)) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, filepart (int6k-&gt;NVM.name));
+			}
+			close (int6k-&gt;PIB.file);
+			if (ReadPIB (int6k)) 
+			{
+				return (-1);
+			}
+			int6k-&gt;PIB.name = int6k-&gt;pib.name;
+			if ((int6k-&gt;PIB.file = open (int6k-&gt;PIB.name, O_BINARY|O_RDONLY)) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, filepart (int6k-&gt;PIB.name));
+			}
+			if (ResetDevice (int6k)) 
+			{
+				return (-1);
+			}
+		}
+		else if (indicate-&gt;MACTION == 0x04) 
+		{
+
+#if 0
+
+/*
+ *	Due to an omission in the INT6300 BootLoader, responding to this VS_HST_ACTION 
+ *      indication will suppress subsequent VS_HST_ACTION messages and the device will 
+ *     	not request firmware and parameters; this may be corrected on the INT6400; 
+ */
+
+			if (HostActionResponse (int6k)) 
+			{
+				return (-1);
+			}
+
+#endif
+
+			if (WriteCFG (int6k)) 
+			{
+				return (-1);
+			}
+
+/*
+ *	At this point, one could download firmware and parameters without waiting for 
+ *	further  requests from the device; however, we elect to wait for them since it 
+ *	is 'good form'; a device should send code 0x00 within 10 seconds of this one; 
+ */
+
+		}
+		else if (indicate-&gt;MACTION == 0x05) 
+		{
+			if (HostActionResponse (int6k)) 
+			{
+				return (-1);
+			}
+			close (int6k-&gt;NVM.file);
+			int6k-&gt;NVM.name = NVM;
+			if ((int6k-&gt;NVM.file = open (int6k-&gt;NVM.name, O_BINARY|O_RDONLY)) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, filepart (int6k-&gt;NVM.name));
+			}
+			close (int6k-&gt;PIB.file);
+			int6k-&gt;PIB.name = PIB;
+			if ((int6k-&gt;PIB.file = open (int6k-&gt;PIB.name, O_BINARY|O_RDONLY)) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, filepart (int6k-&gt;PIB.name));
+			}
+			if (ResetDevice (int6k)) 
+			{
+				return (-1);
+			}
+		}
+		channel-&gt;timeout = -1;
+		printf (&quot;\n&quot;);
+	}
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='DivisionOption.c.html' title=' DivisionOption.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='EmulateHost64.c.html' title=' EmulateHost64.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

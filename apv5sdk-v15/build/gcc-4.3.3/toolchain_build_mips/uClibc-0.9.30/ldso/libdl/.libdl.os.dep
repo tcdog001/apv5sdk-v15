@@ -1,0 +1,186 @@
+ldso/libdl/libdl.os: ldso/libdl/libdl.c include/libc-symbols.h \
+  include/bits/uClibc_arch_features.h ldso/include/ldso.h \
+  include/features.h include/bits/uClibc_config.h include/sys/cdefs.h \
+  include/libc-internal.h include/bits/stackinfo.h include/stdlib.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include/stddef.h \
+  include/bits/waitflags.h include/bits/waitstatus.h include/endian.h \
+  include/bits/endian.h include/sys/types.h include/bits/types.h \
+  include/bits/wordsize.h include/bits/kernel_types.h \
+  include/bits/typesizes.h include/bits/pthreadtypes.h \
+  include/bits/sched.h include/time.h include/sys/select.h \
+  include/bits/select.h include/bits/sigset.h include/bits/time.h \
+  include/sys/sysmacros.h include/alloca.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include/stdarg.h \
+  include/bits/uClibc_page.h ldso/include/dl-syscall.h \
+  ldso/ldso/mips/dl-syscalls.h include/sys/syscall.h \
+  include/bits/sysnum.h include/bits/syscalls.h include/sgidefs.h \
+  include/errno.h include/bits/errno.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/linux/errno.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/asm/errno.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/asm-generic/errno-base.h \
+  include/bits/uClibc_errno.h \
+  libpthread/linuxthreads.old/sysdeps/pthread/tls.h include/bits/mman.h \
+  include/bits/kernel_stat.h ldso/include/dl-string.h \
+  ldso/ldso/mips/dl-sysdep.h include/elf.h include/stdint.h \
+  include/link.h include/dlfcn.h include/bits/dlfcn.h \
+  include/bits/elfclass.h ldso/include/dl-elf.h ldso/include/dl-defs.h \
+  ldso/include/dl-hash.h include/assert.h include/stdio.h \
+  include/bits/uClibc_stdio.h include/bits/uClibc_mutex.h \
+  include/pthread.h include/sched.h include/bits/uClibc_clk_tck.h \
+  include/signal.h include/bits/initspin.h include/bits/sigthread.h \
+  include/bits/uClibc_pthread.h include/bits/stdio_lim.h include/string.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include/stdbool.h \
+  ldso/libdl/../ldso/dl-array.c ldso/libdl/../ldso/dl-debug.c \
+  ldso/ldso/mips/elfinterp.c ldso/libdl/../ldso/dl-hash.c \
+  ldso/libdl/../ldso/dl-elf.c
+
+include/libc-symbols.h:
+
+include/bits/uClibc_arch_features.h:
+
+ldso/include/ldso.h:
+
+include/features.h:
+
+include/bits/uClibc_config.h:
+
+include/sys/cdefs.h:
+
+include/libc-internal.h:
+
+include/bits/stackinfo.h:
+
+include/stdlib.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include/stddef.h:
+
+include/bits/waitflags.h:
+
+include/bits/waitstatus.h:
+
+include/endian.h:
+
+include/bits/endian.h:
+
+include/sys/types.h:
+
+include/bits/types.h:
+
+include/bits/wordsize.h:
+
+include/bits/kernel_types.h:
+
+include/bits/typesizes.h:
+
+include/bits/pthreadtypes.h:
+
+include/bits/sched.h:
+
+include/time.h:
+
+include/sys/select.h:
+
+include/bits/select.h:
+
+include/bits/sigset.h:
+
+include/bits/time.h:
+
+include/sys/sysmacros.h:
+
+include/alloca.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include/stdarg.h:
+
+include/bits/uClibc_page.h:
+
+ldso/include/dl-syscall.h:
+
+ldso/ldso/mips/dl-syscalls.h:
+
+include/sys/syscall.h:
+
+include/bits/sysnum.h:
+
+include/bits/syscalls.h:
+
+include/sgidefs.h:
+
+include/errno.h:
+
+include/bits/errno.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/linux/errno.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/asm/errno.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/asm-generic/errno-base.h:
+
+include/bits/uClibc_errno.h:
+
+libpthread/linuxthreads.old/sysdeps/pthread/tls.h:
+
+include/bits/mman.h:
+
+include/bits/kernel_stat.h:
+
+ldso/include/dl-string.h:
+
+ldso/ldso/mips/dl-sysdep.h:
+
+include/elf.h:
+
+include/stdint.h:
+
+include/link.h:
+
+include/dlfcn.h:
+
+include/bits/dlfcn.h:
+
+include/bits/elfclass.h:
+
+ldso/include/dl-elf.h:
+
+ldso/include/dl-defs.h:
+
+ldso/include/dl-hash.h:
+
+include/assert.h:
+
+include/stdio.h:
+
+include/bits/uClibc_stdio.h:
+
+include/bits/uClibc_mutex.h:
+
+include/pthread.h:
+
+include/sched.h:
+
+include/bits/uClibc_clk_tck.h:
+
+include/signal.h:
+
+include/bits/initspin.h:
+
+include/bits/sigthread.h:
+
+include/bits/uClibc_pthread.h:
+
+include/bits/stdio_lim.h:
+
+include/string.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include/stdbool.h:
+
+ldso/libdl/../ldso/dl-array.c:
+
+ldso/libdl/../ldso/dl-debug.c:
+
+ldso/ldso/mips/elfinterp.c:
+
+ldso/libdl/../ldso/dl-hash.c:
+
+ldso/libdl/../ldso/dl-elf.c:
+cmd_ldso_libdl_libdl.os := /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/bin/mips-linux-uclibc-gcc -c ldso/libdl/libdl.c -o ldso/libdl/libdl.os -include include/libc-symbols.h -Wall -Wstrict-prototypes -fno-strict-aliasing -march=mips32r2 -mtune=mips32r2 -mabi=32 -fno-stack-protector -fno-builtin -nostdinc -Iinclude -I. -Ilibc/sysdeps/linux/mips -fno-asm -msoft-float -DUCLIBC_INTERNAL -std=gnu99 -Os -funit-at-a-time -fno-tree-loop-optimize -fno-tree-dominator-opts -fno-strength-reduce -mno-split-addresses -Ilibpthread/linuxthreads.old/sysdeps/unix/sysv/linux/mips -Ilibpthread/linuxthreads.old/sysdeps/mips -Ilibpthread/linuxthreads.old/sysdeps/unix/sysv/linux -Ilibpthread/linuxthreads.old/sysdeps/pthread -Ilibpthread/linuxthreads.old -Ilibpthread -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/ -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3//include-fixed -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include -DNDEBUG "-mno-split-addresses" -fPIC -DNOT_IN_libc -DIS_IN_libdl -Ildso/ldso/mips -Ildso/include -Ildso/ldso -DUCLIBC_RUNTIME_PREFIX=\"/\" -DLDSO_ELFINTERP=\"mips/elfinterp.c\" -MT ldso/libdl/libdl.os -MD -MP -MF ldso/libdl/.libdl.os.dep

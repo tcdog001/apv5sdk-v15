@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			stylesheet.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='styles.c.html' title=' styles.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='synonym.c.html' title=' synonym.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed stylesheet (signed margin) ;
+ *
+ *   print CSS2 style block on stdout; this ensures that class names
+ *   match those used in the output;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef STYLESHEET_SOURCE
+#define STYLESHEET_SOURCE
+
+#include &lt;stdio.h&gt;
+
+#include &quot;../tools/format.h&quot;
+#include &quot;../tools/markup.h&quot;
+#include &quot;../cgi/page.h&quot;
+
+signed stylesheet (signed margin) 
+
+{
+	output (margin, &quot;body { background: white; font: normal 10pt monospace; }&quot;);
+	output (margin, &quot;form { border: solid 1px black; margin: 2px; }&quot;);
+	output (margin, &quot;button { border: none; margin: 0px; background: silver; width: 100px; }&quot;);
+	output (margin, &quot;fieldset { border: solid 1px silver; }&quot;);
+	output (margin, &quot;div { border: solid 1px silver; margin: 2px; }&quot;);
+	output (margin, &quot;legend { font: bold 10pt sanserif; }&quot;);
+	output (margin, &quot;table { font: normal 10pt monospace; }&quot;);
+	output (margin, &quot;tr { vertical-align: top; }&quot;);
+	output (margin, &quot;th, td { padding: 2px 5px; }&quot;);
+	output (margin, &quot;td.lite { background: aqua; }&quot;);
+	output (margin, &quot;td.dark { background: silver; }&quot;);
+	output (margin, &quot;div.%s { text-align: center; }&quot;, STYLE_HEADER);
+	output (margin, &quot;div.%s { min-height: 325px; }&quot;, STYLE_ACTION);
+	output (margin, &quot;div.%s { min-height: 325px; }&quot;, STYLE_STATUS);
+	output (margin, &quot;div.%s { text-align: center; }&quot;, STYLE_FOOTER);
+	output (margin, &quot;h2.%s { margin: 20px 20px; }&quot;, STYLE_STATUS);
+	output (margin, &quot;img.%s { border: none; align: center; margin: 5px; }&quot;, STYLE_HEADER);
+	output (margin, &quot;img.%s { border: none; align: center; width: 100%%; }&quot;, STYLE_FOOTER);
+	output (margin, &quot;input { border:none; background: beige; }&quot;);
+	output (margin, &quot;input.%s { width: 150px; }&quot;, FIELD_QOS);
+	output (margin, &quot;input.%s { width: 75px; }&quot;, FIELD_VLAN);
+	output (margin, &quot;input.%s { width: 75px; }&quot;, FIELD_TOS);
+	output (margin, &quot;input.%s { width: 75px; }&quot;, FIELD_TTL);
+	output (margin, &quot;input.%s { width: 300px; padding: 2px 5px; font: normal 10pt monospace; }&quot;, STYLE_PWD);
+
+#ifdef STYLE_KEY
+
+	output (margin, &quot;input.%s { width: 400px; font: normal 10pt monospace; }&quot;, STYLE_KEY);
+
+#endif
+
+	output (margin, &quot;input.%s { min-width: 600px; }&quot;, STYLE_FILE);
+	output (margin, &quot;input.%s { background: silver; width: 100px; }&quot;, STYLE_OPTION);
+	output (margin, &quot;input.%s { background: silver; width: 100px; }&quot;, STYLE_ACTION);
+	output (margin, &quot;input.%s { background: silver; width: 100px; }&quot;, STYLE_DEVICE);
+	output (margin, &quot;input.%s { background: silver; width: 100px; }&quot;, STYLE_SOURCE);
+	output (margin, &quot;select.%s { font: normal 10pt monospace; }&quot;, STYLE_SOURCE);
+	output (margin, &quot;select.%s { font: normal 10pt monospace; }&quot;, STYLE_DEVICE);
+	output (margin, &quot;input.%s { background: none; }&quot;, STYLE_PEEK);
+	return (margin);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='styles.c.html' title=' styles.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='synonym.c.html' title=' synonym.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

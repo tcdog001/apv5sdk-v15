@@ -1,0 +1,265 @@
+#!/bin/sh
+if [ $# -ne 2 ] ;then
+	echo "Usage: woc_sysupgrade version current/next"
+	exit 1
+fi
+usage()
+{
+        echo "Usage: woc_sysupgrade version current/next"
+        exit 1
+}
+
+#kernel 1
+write_flash_kernel1()
+{
+	sync
+	sleep 1
+	echo "write kernel lenth"
+	/usr/bin/pro_ctl_util -V $KERNEL_LENTH -S 40160
+	echo "write rootfs lenth"
+	/usr/bin/pro_ctl_util -V $ROOTFS_LENTH -S 40164
+	sync
+	sleep 1 
+	echo "write kernel crc value"
+	/usr/bin/pro_ctl_util -V $CRC_KERNEL -S 40144
+	echo "write rootfs crc value"
+	/usr/bin/pro_ctl_util -V $CRC_ROOTFS -S 40148
+	sync 
+	sleep 1 
+}
+#kernel2
+write_flash_kernel2()
+{	
+	sync
+	sleep 1
+	echo "write kernel lenth"
+	/usr/bin/pro_ctl_util -V $KERNEL_LENTH -S 40168
+	echo "write rootfs lenth"
+	/usr/bin/pro_ctl_util -V $ROOTFS_LENTH -S 40172
+	sync
+	sleep 1 
+	echo "write kernel crc value"
+	/usr/bin/pro_ctl_util -V $CRC_KERNEL -S 40152
+	echo "write rootfs crc value"
+	/usr/bin/pro_ctl_util -V $CRC_ROOTFS -S 40156
+	sync 
+	sleep 1 
+}
+begin_upgrade()
+{
+	WRCPUUTIL=/usr/bin/pro_ctl_util
+	sync
+	sleep 1
+#	OPT="`df | awk '{ if($6 == "/")print $1 }' | grep -o [0-9]`"
+#	OPT="`$WRCPUUTIL -C|awk -F':' '/opt/{print $2}'`"
+	if [ $OPT -eq 3 ];then
+		dd if=vmlinux_s27.lzma.uImage of=/dev/mtdblock4 
+		if [ $? -ne 0 ];then
+			logger -s "ERROR: failed to copy kernel image"
+			touch 10
+			exit 3
+		fi
+		sync
+		sleep 1
+		rm vmlinux_s27.lzma.uImage
+		dd if=rootfs.squashfs of=/dev/mtdblock5 
+		if [ $? -ne 0 ];then
+			logger -s "ERROR: failed to copy rootfs image"
+			touch 11
+			exit 4
+		fi
+		sync 
+		sleep 1
+		rm rootfs.squashfs
+		write_flash_kernel2
+	else
+		dd if=vmlinux_s27.lzma.uImage of=/dev/mtdblock2 
+		if [ $? -ne 0 ];then
+			logger -s "ERROR: failed to copy kernel image"
+			touch 21
+			exit 3
+		fi
+		sync
+		sleep 1
+		rm vmlinux_s27.lzma.uImage
+		dd if=rootfs.squashfs of=/dev/mtdblock3 
+		if [ $? -ne 0 ];then
+			logger -s "ERROR: failed to copy rootfs image"
+			touch 22
+			exit 4
+		fi
+                sync
+                sleep 1
+		rm rootfs.squashfs
+		write_flash_kernel1
+	fi
+	
+}
+
+tar_version()
+{
+	[ ! -e vmlinux_s27.lzma.uImage ] || [ ! -e rootfs.squashfs ] || [ ! -e kernel.md5 ] || [ ! -e root_fs.md5 ] || [ ! -e crc.info ] || [ ! -e version ]
+	if [ $? -ne 1 ]; then
+		rm -f $1
+		exit 2
+	fi
+#wangyu add for the test of file length
+	size=$(ls -l vmlinux_s27.lzma.uImage | awk -F " " '{print $5}')
+        echo $size
+        if [ $size -lt 716800 ];then
+        	logger -s "wrong size of uImage"
+        	exit 1
+        fi
+        echo "the size of uImage is ok!"
+        size=$(ls -l rootfs.squashfs | awk -F " " '{print $5}')
+    	echo $size
+    	if [ $size -gt 7012352 ];then
+      	 	logger -s "wrong size of rootfs"
+     		exit 1
+  	fi
+  	echo "the size of rootfs is ok!"
+#wangyu add end
+	md5sum -c kernel.md5 < vmlinux_s27.lzma.uImage
+	if [ $? -ne 0 ]; then
+		logger -s "ERROR: invalid md5sum of vmlinux_s27.lzma.uImage"
+		cat kernel.md5 | logger -s
+		rm -f $1
+		exit 1
+	fi
+	md5sum -c root_fs.md5  < rootfs.squashfs
+	if [ $? -ne 0 ]; then
+		logger -s "ERROR: invalid md5sum of rootfs.squashfs"
+		cat root_fs.md5 | logger -s
+		rm -f $1
+		exit 1
+	fi
+	rm -f kernel.md5 root_fs.md5
+#	begin_upgrade
+
+}
+
+crc_begin()
+{
+	tar -zxvf version.tar
+	if [ $? -ne 0 ]; then
+		logger -s "tar version faild"
+		exit 1
+	fi
+#wangyu add for the pc018 flag file
+echo "test."
+[ -e pc018thinapos ]
+if [ $? -eq 1 ]; then
+	#rm -f /jffs/config.xml
+	#rm -f /jffs/config.wtp
+	#rm -f /jffs/preconfig
+	#rm -f /jffs/config.ap83
+	#rm -f /jffs/config
+	echo "the wrong flag file"
+	exit 1
+else
+	rm -f pc018thinapos
+fi	
+#wangyu add end
+	rm version.tar
+#	CRC="`cat crc.info | awk -F ':' '/kernel/{print $2}'`"
+	CRC_VALUE="`crc vmlinux_s27.lzma.uImage | awk -F '=' '/crc/{print $2}'`"
+#	CRC2="`cat crc.info | awk -F ':' '/rootfs/{printf $2}'`"
+	CRC2_VALUE="`crc rootfs.squashfs | awk -F '=' '/crc/{print $2}'`"
+#	if [ $CRC == $CRC_VALUE ] && [ $CRC2 == $CRC2_VALUE ];then
+	CRC_KERNEL="`sed -n '1p' crc.info`"
+	KERNEL_LENTH="`sed -n '2p' crc.info`"
+	CRC_ROOTFS="`sed -n '3p' crc.info`"
+	ROOTFS_LENTH="`sed -n '4p' crc.info`"
+	if [ "$CRC_KERNEL" == "$CRC_VALUE" -a "$CRC_ROOTFS" == "$CRC2_VALUE" ];then
+		tar_version
+		sleep 1
+		begin_upgrade
+	else
+		logger -s "ERROR: crc value not right"
+		exit 3
+	fi	
+	return 0;	
+}
+
+write_version()
+{
+	if [ $OPT -eq 3 ];then
+		echo "write version"
+		sync 
+		sleep 1
+		$WRCPUUTIL -P $VERSION -O 40188
+	else if [ $OPT -eq 5 ];then
+		echo "write version"
+		sync 
+		sleep 1
+		$WRCPUUTIL -P $VERSION -O 40180
+	else 
+		echo "no flag value"
+	fi
+	fi
+}
+
+if [ -e $1 ]; then
+	echo "file exist!"
+	WRCPUUTIL=/usr/bin/pro_ctl_util
+#	$WRCPUUTIL -b 16 > /dev/null 2>&1
+	cd /tmp 
+	echo $2
+	if [ $2 != "next" -a $2 != "current" ];then
+		echo "the second parameter is wrong"
+		echo "woc_sysupgrade version next/current"
+		exit 1
+	fi
+#	cp /usr/bin/ap83-firmware-upgrade-web /tmp/
+	/usr/sbin/stop_monitor & >/dev/null 2>&1
+#	killall wtpd & > /dev/null 2>&1
+#	echo 0 > /proc/sys/dev/wifi0/monitor_process
+	OPT="`df | awk '{ if($6 == "/")print $1 }' | grep -e "[0-9]" -o`"
+	mv $1 version.tar
+	sleep 2
+	crc_begin
+	VERSION="`cat version`"
+	VALUE="`$WRCPUUTIL -C|awk -F':' '/opt/{print $2}'`"
+	write_version
+	sleep 2
+	sleep 1
+
+case $2 in
+  next)
+	if [ $VALUE -eq 1 ];then
+		echo "write 2 into flag"
+		sync
+		sleep 1
+		$WRCPUUTIL -V 2 -S 40176
+		sleep 1
+		$WRCPUUTIL -d 16 > /dev/null 2>&1
+		rm crc.info version
+		echo B > /proc/kes_debug_flag
+		/sbin/sysreboot
+	fi
+	if [ $VALUE -eq 2 ];then
+		echo "write 1 into flag"
+		sync 
+		sleep 1
+		$WRCPUUTIL -V 1 -S 40176
+		sleep 1
+		$WRCPUUTIL -d 16 > /dev/null 2>&1
+		rm crc.info version
+		echo B > /proc/kes_debug_flag
+		/sbin/sysreboot
+	fi
+	;;
+  current)
+	sync
+	sleep 1
+#	$WRCPUUTIL -d 16 > /dev/null 2>&1
+	rm crc.info version
+#	/sbin/sysreboot
+	;;
+  *)
+	usage
+	exit 1
+	;;
+esac	
+fi
+

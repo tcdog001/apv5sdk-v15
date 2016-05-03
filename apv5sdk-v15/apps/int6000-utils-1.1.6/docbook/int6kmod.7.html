@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			int6kmod.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='int6km.7.html' title=' int6km.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kprobe.7.html' title=' int6kprobe.7 '>NEXT</a>]
+			</div>
+<pre>
+int6kmod(7)                           Intellon Linux Toolkit                          int6kmod(7)
+
+NAME
+       int6kmod - Intellon Module Management Utility
+
+SYNOPSIS
+       int6kmod [options] [device] [device] [...]
+
+DESCRIPTION
+       Read  or  write an Intellon module file to or from a device using VS_MODULE_OPERATION mes‐
+       sages.
+
+       This program is part of the Intellon Linux Toolkit. See the ilt man page for  an  overview
+       and installation instructions.
+
+OPTIONS
+       -e     Redirects  stderr  messages  to stdout. By convention status and error messages are
+              printed on stderr while primary program output is printed on  stdout.  This  option
+              prints all output on stdout in cases where this is desired.
+
+       -i interface
+              Select  the  host  Ethernet interface. All requests are sent via this interface and
+              only reponses received via this interface are recognized. The default interface  is
+              eth1  because  most people use eth0 as their principle network connection; however,
+              if environment string &quot;PLC&quot; is defined then it takes precedence  over  the  default
+              interface. This option then takes precedence over either default.
+
+       -m filename
+              Read  the specified module from NVRAM and write it to a file. The module is identi‐
+              fied by module and sub-module using options -t and -s. Runtime firmware will report
+              an error if the module is not available.
+
+       -M filename
+              Read  the  named  module  file  and  download it to the device NVRAM. The module is
+              assigned to a module and sub-module identifier using options  -t  and  -s.  Runtime
+              firmware  will  reject modules having invalid module and sub-mocule idetnifiers. As
+              implemented, int6kmod will reject files exceeding 1400 bytes but  this  restriction
+              will be removed in later versions.
+
+       -q     Suppresses status messages on stderr.
+
+       -s sub-module-id
+              The  sub-module  identifier  expressed  as  a 16-bit deciaml, hexadecimal or binary
+              value. This identifier indicates a specific module with the module class  specified
+              using  option  -t.  Any  16-bit  value is permitted but only certain values will be
+              accepted by device firmware. The default value is 0x0000.
+
+       -S session-id
+              The session identifier expressed as a 32-bit hexadecimal value. Any 32-bit value is
+              permitted  except  for  0x00000000  and  0xFFFFFFFF. The program will use a default
+              value when this option is omitted.
+
+       -t module-id
+              The module identifier expressed as a 16-bit decimal, hexadecimal or  binary  value.
+              This  identifier  indicates  the module type or class. Option -s indicates the spe‐
+              cific member of a module class. Any 16-bit value is permitted but only certain val‐
+              ues will be accepted by device firmware. The default value is 0x0000.
+
+       -v     Print  additional  information on stdout. In particular, this option dumps incoming
+              and outgoing packets which can be saved as text files for reference.
+
+       -w     Write settings to the device instead of reading settings from the device. If  omit‐
+              ted  then  settings  are  read  from the device and displayed. If present, the user
+              should specify all settings to avoid writing default values to the device.
+
+       -?,--help
+              Print program help summary on stdout.  This  option  takes  precedence  over  other
+              options on the command line.
+
+       -?,--version
+              Print  program  version  information  on  stdout. This option takes precedence over
+              other options on the command line. Use this option when  sending  screen  dumps  to
+              Intellon  Technical  Support  so  that they know exactly which version of the Linux
+              Toolkit you are using.
+
+ARGUMENTS
+       device The MAC address of some powerline device. More than one address may be specified on
+              the  command  line.  If more than one address is specified then operations are per‐
+              formed on each device in turn. The default address is local. See DEVICES for infor‐
+              mation.
+
+DEVICES
+       Powerline  devices  use  Ethernet Media Access Control (MAC) addresses. A MAC address is a
+       48-bit value entered as 12 hexadecimal digits in upper, lower  or  mixed  character  case.
+       Octets   may   be   separated  with  colons  for  clarity.  For  example,  &quot;00b052000001&quot;,
+       &quot;00:b0:52:00:00:01&quot; and &quot;00b052:000001&quot; are valid and equivalent.
+
+       The following MAC addresses are special and may be entered by name instead of number.
+
+       all    Same as &quot;broadcast&quot;.
+
+       broadcast
+              A synonym for the  Ethernet  broadcast  address,  FF:FF:FF:FF:FF:FF.  All  devices,
+              whether local, remote or foreign recognize messages sent to this address.  A remote
+              device is any device at the far end of a powerline connection. A foreign device  is
+              any device not manufactured by Intellon.
+
+       local  A  synonym  for  the  Intellon  vendor  specific  Local  Management  Address (LMA),
+              00:B0:52:00:00:01. All local Intellon devices recognize this address but remote and
+              foreign devices do not. A remote device is any device at the far end of a powerline
+              connection. A foreign device is any device not manufactured by Intellon.
+
+REFERENCES
+       See the Intellon HomePlug AV Firmware Technical Reference Manual for more information.
+
+DISCLAIMER
+       Intellon HomePlug AV Vendor Specific Management Message structure and content  is  propri‐
+       etary  to  Intellon  Corporation,  Ocala  FL  USA. Consequently, public information is not
+       available. Intellon Corporation reserves the right to modify message structure or  content
+       in  future  firmware releases without any obligation to notify or compensate users of this
+       program.
+
+EXAMPLES
+       The following command reads module file abc.bin and writes it to  the  local  device.  The
+       module  identifier 0x1000 to indicate that it is an MDIO Init module. The sub-module iden‐
+       tifer will default to 0x0000. The session identifier will default  to  some  static  value
+       determined  by  the  program.  The operation takes place in three steps. The last step may
+       take 2 or 3 seconds to complete.
+
+          # int6kmod -M abc.bin -t 0x1000
+          eth1 00:B0:52:00:00:01 Request Session
+          eth1 00:B0:52:BE:EF:03 Granted
+          eth1 00:B0:52:00:00:01 Write abc.bin
+          eth1 00:B0:52:BE:EF:03 Written
+          eth1 00:B0:52:00:00:01 Commit Modules
+          eth1 00:B0:52:BE:EF:03 Committed None.
+
+SEE ALSO
+       ilt(7)
+
+CREDITS
+        Charles Maier &lt;charles.maier@intellon.com&gt;
+
+int6000-utils-linux                    Intellon Corporation                           int6kmod(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='int6km.7.html' title=' int6km.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kprobe.7.html' title=' int6kprobe.7 '>NEXT</a>]
+			</div>
+		</body>
+	</html>

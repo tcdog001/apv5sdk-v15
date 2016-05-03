@@ -1,0 +1,90 @@
+#!/bin/sh
+
+#################################################
+#define these first!!!!
+
+#about ftpget paraments
+FTPUSR="admin"
+FTPPSWD="123456"
+FTPIP="192.168.67.34"
+FTPFILE="ftp_download_packet.tar.gz"
+#FTPTIME is in second
+FTPTIME="600"
+FTPPATH="/tmp/udisk"
+UNTAR="tar -zxvf"
+
+#################################################
+usage()
+{
+        echo "Usage:"
+        echo "   ftpupdate {ftp_server_IP} {user} {passwd} {ftp_file} {interval}"
+        echo "             ftp_server_IP: $1 ?"
+       	echo "             user: $2 ?"
+        echo "             passwd: $3 ?"
+        echo "             ftp_file: $4 ? default is ftp_download_packet.tar.gz"
+        echo "             interval: $5 ? default is 600 (s)"
+}
+
+if [ $# -lt 3 ];then
+        usage $1 $2 $3
+        exit 1
+fi
+
+[ -n "$5" ] && FTPTIME=$5
+[ -n "$4" ] && FTPFILE=$4
+[ -n "$3" ] && FTPPSWD=$3
+[ -n "$2" ] && FTPUSR=$2
+[ -n "$1" ] && FTPIP=$1
+
+usage1()
+{
+        echo ""
+       	echo "ftp_server_IP: $FTPIP"
+       	echo "user: $FTPUSR"
+        echo "passwd: $FTPPSWD"
+        echo "ftp_file: $FTPFILE"
+        echo "interval: $FTPTIME"
+        echo ""
+}
+
+if [ -d "${FTPPATH}" ] ; then
+	usage1
+else	
+	echo "${FTPPATH} not exist! Stop ftpupgdate!"
+	exit 1
+fi
+
+begin_download()
+{
+	cd /tmp
+	echo "ftpget -u ${FTPUSR} -p ${FTPPSWD} ${FTPIP} ${FTPFILE} ${FTPFILE}"
+	ftpget -u ${FTPUSR} -p ${FTPPSWD} ${FTPIP} ${FTPFILE} ${FTPFILE}
+	if [ $? -eq 0 ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+while :
+do	
+	DATE=`date`
+	begin_download
+	if [ $? -ne 0 ] ; then
+		echo "ftpget failed, --$DATE"
+	else
+		cd ${FTPPATH}
+		mv /tmp/${FTPFILE} packet.tar
+		size=$(ls -l packet.tar | awk -F " " '{print $5}')
+		echo "filesize = $size, begin untar the file ..."
+		${UNTAR} packet.tar
+		if [ $? -ne 0 ] ; then
+			logger -s "tar version faild"
+			exit 1
+		fi
+		rm packet.tar
+		echo "${FTPFILE} download to ${FTPPATH}, --$DATE"
+		echo "wait in ${FTPTIME} sec for the next download ..."
+	fi
+		sleep ${FTPTIME}
+done		

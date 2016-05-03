@@ -1,0 +1,5 @@
+@set version-GCC 4.3.3
+@clear DEVELOPMENT
+@set srcdir /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/gcc-4.3.3/gcc
+@set VERSION_PACKAGE (GCC) 
+@set BUGURL @uref{http://gcc.gnu.org/bugs.html}

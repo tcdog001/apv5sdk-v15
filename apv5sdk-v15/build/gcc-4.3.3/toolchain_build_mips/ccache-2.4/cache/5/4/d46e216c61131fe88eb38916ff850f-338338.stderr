@@ -1,0 +1,2 @@
+drivers/mtd/devices/ath_flash.c: In function 'ath_flash_init':
+drivers/mtd/devices/ath_flash.c:355: warning: passing argument 2 of 'add_mtd_partitions' from incompatible pointer type

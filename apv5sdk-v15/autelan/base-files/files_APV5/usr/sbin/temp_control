@@ -1,0 +1,23 @@
+#!/bin/sh
+
+while :
+do
+Temperature="`pro_ctl_util -M | awk -F "=" '{print $2}'`"
+#echo $Temperature
+if [ -f /jffs/.temp_value ];then
+	base_temp="`cat /jffs/.temp_value`"
+	#echo $base_temp
+	if [ $Temperature -gt $base_temp ]; then
+		/usr/bin/pro_ctl_util -y 
+	else
+		/usr/bin/pro_ctl_util -x
+	fi
+else
+	if [ $Temperature -gt 10 ]; then
+		/usr/bin/pro_ctl_util -y 
+	else
+		/usr/bin/pro_ctl_util -x
+	fi
+fi
+sleep 5
+done

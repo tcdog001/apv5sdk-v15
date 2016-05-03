@@ -1,0 +1,8 @@
+#!/bin/sh
+while :
+do
+sleep 60
+own_ip="`ifconfig default | awk -F ":" '/inet addr/ {print $2}' | awk -F " " '{print $1}'`"
+echo $own_ip
+arping -A $own_ip -c 1
+done

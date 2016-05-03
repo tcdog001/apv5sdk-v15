@@ -1,0 +1,236 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_snmp=`config_read /config/administrator/snmp`
+
+xml_snmp_enable=`config_getoption "$xml_snmp" enable`
+xml_snmp_syslocation=`config_getoption "$xml_snmp" syslocation`
+xml_snmp_syscontact=`config_getoption "$xml_snmp" syscontact`
+xml_snmp_publicCN=`config_getoption "$xml_snmp" publicCN`
+xml_snmp_privateCN=`config_getoption "$xml_snmp" privateCN`
+xml_snmp_TCN=`config_getoption "$xml_snmp" TCN`
+xml_snmp_subIP1=`config_getoption "$xml_snmp" subIP1`
+xml_snmp_subIP2=`config_getoption "$xml_snmp" subIP2`
+xml_snmp_subIP3=`config_getoption "$xml_snmp" subIP3`
+xml_snmp_subIP4=`config_getoption "$xml_snmp" subIP4`
+xml_snmp_snmpip=`config_getoption "$xml_snmp" snmpip`
+
+xml_accessever=`config_read /config/administrator/accessever`
+xml_accessever_enable=`config_getoption "$xml_accessever" enable`
+xml_accessever_porthttp=`config_getoption "$xml_accessever" porthttp`
+xml_accessever_porthttps=`config_getoption "$xml_accessever" porthttps`
+
+xml_ssh=`config_read /config/administrator/ssh`
+xml_ssh_enable=`config_getoption "$xml_ssh" enable`
+  
+xml_telnet=`config_read /config/administrator/telnet`
+xml_telnet_enable=`config_getoption "$xml_telnet" enable`
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js admin_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script type="text/javascript">
+	var flag="<%= $xml_session_lang %>";
+ init_mmenu(flag);
+	init_adminmenu(flag);
+	init_remote(flag);
+	      
+function Ip() {
+   var reg = /^(\d{1,2}|1\d\d|2[0-1]\d|2[0-2][0-3])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+   var x = document.all.snmpip;
+   if (!reg.test(x.value)) {
+				     alert("Please input IP  correctly.");
+				     x.focus();
+				     return false;
+			  }
+    
+   var a="<%= $HTTP_HOST %>";
+   var a1=a.split(":"); 
+   var b=document.all.porthttp.value;
+   var c=document.all.porthttps.value;
+   
+   
+   overlayer();        
+} 
+
+function shielding(){
+}        
+</script>
+</head>
+<body onLoad="shielding()">
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_administration5.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return Ip()">
+<div align="center">
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0">
+					      <tr style="display:none">
+					        <td align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(remote_web)</script></b></td>
+					      </tr>
+					      
+					      <tr style="display:none">
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+					      
+					      <tr style="display:none">
+					      <td align="left" height="24" width="280" bordercolor="#ffffff"><script language="javascript">replace(remote_proto)</script>&nbsp;</td>
+				        <td align="left" width="370" bordercolor="#ffffff">
+				          <input type="radio" <% webui_radiobutton_check "$xml_accessever_enable" "http" %> name="htt" value="http" onClick="shielding()" />
+				        <script language="javascript">replace(remote_http)</script>&nbsp;&nbsp; <input type="radio" <% webui_radiobutton_check "$xml_accessever_enable" "https" %> name="htt" value="https" onClick="shielding()" />
+				        <script language="javascript">replace(remote_https)</script></td> 
+				        </tr>
+				       
+				        
+				        <tr id="a1" align="left" style="display:none">
+				        	<td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(remote_port)</script>&nbsp;</td>
+									<td bordercolor="#ffffff"><input type="text" name="porthttp" maxlength="5" size="5" value="<%= "$xml_accessever_porthttp" %>"></td>
+								</tr>
+								
+								<tr id="a2" align="left" style="display:none">
+									<td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(remote_port)</script>&nbsp;</td>
+									<td bordercolor="#ffffff"><input type="text" name="porthttps" maxlength="5" size="5" value="<%= "$xml_accessever_porthttps" %>"></td>
+								</tr>
+							
+									      
+					      <tr style="display:none">
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+					      
+					       <tr >
+					        <td align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(remote_sshtelnet)</script></b></td>
+					      </tr>
+					      
+					      <tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+								
+								<tr style="display:none">
+									<td align="left" bordercolor="#ffffff"><script language="javascript">replace(remote_ssh)</script>&nbsp;</td>
+				          <td align="left"  height="24"  bordercolor="#ffffff">
+				          &nbsp;<input type="checkbox" <% webui_checkbox_check "$xml_ssh_enable" "yes" %> name="sshenable" value="yes" >
+				          </td>
+				        </tr>
+				        
+				        <tr>
+									<td align="left" height="24" width="280" bordercolor="#ffffff"><script language="javascript">replace(remote_telnet)</script>&nbsp;</td>
+				          <td align="left" width="370" bordercolor="#ffffff">
+				          &nbsp;<input type="checkbox" <% webui_checkbox_check "$xml_telnet_enable" "yes" %> name="telnetenable" value="yes" >
+				          </td>
+				        </tr>
+								
+					      <tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+								
+					      <tr>
+					        <td align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(remote_snmp)</script></b></td>
+					      </tr>
+					      
+					      <tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+										      
+					      <tr>
+					      	<td  align="left" height="24"  bordercolor="#ffffff"><script language="javascript">replace(remote_snmpenable)</script></td>
+					        <td  align="left"  bordercolor="#ffffff"><label>
+					          <input type="radio" <% webui_radiobutton_check "$xml_snmp_enable" "1" %> name="snmpenable" value="1" />
+					        <script language="javascript">replace(remote_enable)</script> 
+					        <input type="radio" <% webui_radiobutton_check "$xml_snmp_enable" "0" %> name="snmpenable" value="0" />
+					        <script language="javascript">replace(remote_disable)</script></label></td>
+					      </tr>
+					      
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(remote_sl)</script> </td>
+					        <td align="left" bordercolor="#ffffff"><label>
+					          <input type="text" name="syslocation" value="<%= "$xml_snmp_syslocation" %>" />
+					        </label></td>
+					      </tr>
+					      
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(remote_sc)</script> </td>
+					        <td align="left" bordercolor="#ffffff"><label>
+					          <input type="text" name="syscontact" value="<%= "$xml_snmp_syscontact" %>" />
+					        </label></td>
+					      </tr>
+					      
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(remote_rocn)</script> </td>
+					        <td align="left" bordercolor="#ffffff"><label>
+					          <input type="text" name="publicCN" value="<%= "$xml_snmp_publicCN" %>" />
+					        </label></td>
+					      </tr>
+					      
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(remote_rwcn)</script> </td>
+					        <td align="left" bordercolor="#ffffff"><label>
+					          <input type="text" name="privateCN" value="<%= "$xml_snmp_privateCN" %>" />
+					        </label>
+					        <label></label></td>
+					      </tr>
+					      
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(remote_cnt)</script> </td>
+					        <td align="left" bordercolor="#ffffff"><input type="text" name="TCN" value="<%= "$xml_snmp_TCN" %>" /></td>
+					      </tr>
+					      
+					      <tr>
+					        <td align="left" height="24" bordercolor="#ffffff"><script language="javascript">replace(remote_iprt)</script> </td>
+					        <td align="left" bordercolor="#ffffff">
+					          <input name="snmpip" type="text"  value="<%= "$xml_snmp_snmpip" %>" /></td>
+					      </tr>
+					      
+					      <tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+					      </table>
+		            <table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+					      <tr>
+					        <td align="center" height="40" valign="middle" colspan="2"><label>
+					          <script language="javascript">replace(remote_apply)</script>
+					        </label></td>
+					      </tr>
+					      <tr>
+					        <td align="right"   colspan="2"><script language="javascript">replace(remote_help)</script></td>
+					      </tr>
+  </table>
+</div>
+<input type="hidden" value="RA Apply" name="SERVLET">
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

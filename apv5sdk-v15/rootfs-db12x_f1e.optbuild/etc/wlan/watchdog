@@ -1,0 +1,21 @@
+#!/bin/sh
+local thinap
+local wtpd_ok
+while :
+do
+wrcpuutil -g >/dev/null
+thinap=`cat /proc/sys/dev/wifi0/thinap`
+if [ $thinap != '0' ]; then
+	if [ -z "`ps | awk /wtpd/`" ]; then
+	wtpd_ok='0'
+	else
+	wtpd_ok='1'
+	fi
+	if [ $wtpd_ok != '1' ]; then
+		echo "wtpd out unexpectly reboot the system"
+		echo g > /proc/kes_debug_flag
+		reboot
+	fi
+fi
+sleep 20
+done

@@ -1,0 +1,835 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% response_headers %>
+
+<%
+   DEV_wifi_num=`cat $DEVICE_INFO_XML 2>/dev/null | awk -f $XML_GET_DATA_BY_OPTION_AWK  option1=wifi_total option2=count`
+   cur_txpower=`${IWCONFIG} ath0 | awk '/Tx-Power/{print $4 }' | cut -d":" -f2 | cut -d"=" -f2`
+   tx_offset=`cat /jffs/tx-offset 2>/dev/null`
+   if [ $? != 0 ]; then
+      tx_offset="15"
+   else
+   	  tx_en="yes"
+   fi	
+   
+   essid_wifi=`cat /tmp/essid_wifi 2>/dev/null`
+   if [ $? != 0 ]; then
+      essid_wifi="wireless"
+   fi	
+   
+   wifi_name=`cat /tmp/wifi_name 2>/dev/null`
+   if [ $? != 0 ]; then
+      wifi_name="wifi0"
+   fi	
+   
+   eval devmode="$"DEVMODE_${wifi_name}
+   
+   mode_wifi=`cat /tmp/${wifi_name}/mode_${wifi_name} 2>/dev/null`
+   if [ $? != 0 ]; then
+      if [ ${devmode} == "bg" ];then 
+      	mode_wifi="11g"
+      elif [ ${devmode} == "abg" ];then
+      	mode_wifi="11a"
+      elif [ ${devmode} == "n" ];then
+      	mode_wifi="11ng"
+      elif [ ${devmode} == "an" ];then
+      	mode_wifi="11na"
+      fi
+   fi	
+   
+   
+   txpower_wifi=`cat /tmp/${wifi_name}/txpower_${wifi_name} 2>/dev/null`
+   if [ $? != 0 ]; then  
+      eval txpower_wifi="$"DEVPOWER_${wifi_name}
+   fi	
+   
+   rate_wifi=`cat /tmp/${wifi_name}/rate_${wifi_name} 2>/dev/null`
+   if [ $? != 0 ]; then
+      rate_wifi="54"
+   fi
+   ratea_wifi=`cat /tmp/${wifi_name}/ratea_${wifi_name} 2>/dev/null`
+   if [ $? != 0 ]; then
+      ratea_wifi="54"
+   fi
+   rate_n_ht20ds_wifi=`cat /tmp/${wifi_name}/rate_n_ht20ds_${wifi_name} 2>/dev/null`
+   if [ $? != 0 ]; then
+      rate_n_ht20ds_wifi="65"
+   fi
+   rate_n_ht40ds_s_wifi=`cat /tmp/${wifi_name}/rate_n_ht40ds_s_${wifi_name} 2>/dev/null`
+   if [ $? != 0 ]; then
+      rate_n_ht40ds_s_wifi="150"
+   fi
+   rate_n_ht40ds_wifi=`cat /tmp/${wifi_name}/rate_n_ht40ds_${wifi_name} 2>/dev/null`
+   if [ $? != 0 ]; then
+      rate_n_ht40ds_wifi="150"
+   fi
+
+   
+   channel_wifi=`cat /tmp/${wifi_name}/channel_${wifi_name} 2>/dev/null`
+   if [ $? != 0 ]; then
+    	channel_wifi="1"
+   fi	
+   channela_wifi=`cat /tmp/${wifi_name}/channela_${wifi_name} 2>/dev/null`
+   if [ $? != 0 ]; then
+    	channela_wifi="149"
+   fi	
+   
+   txantenna_wifi=`cat /tmp/${wifi_name}/txantenna_${wifi_name} 2>/dev/null`
+   if [ $? != 0 ]; then
+    	txantenna_wifi="1"
+   fi
+   
+   cwmmode_wifi=`cat /tmp/${wifi_name}/cwmmode_${wifi_name} 2>/dev/null`
+   if [ $? != 0 ]; then
+    	if [ ${devmode} == "bg" ];then 
+      	cwmmode_wifi="0"
+      elif [ ${devmode} == "abg" ];then
+      	cwmmode_wifi="0"
+      elif [ ${devmode} == "n" ];then
+      	cwmmode_wifi="1"
+      elif [ ${devmode} == "an" ];then
+      	cwmmode_wifi="0"
+      fi
+   fi
+   
+   extoffset_wifi=`cat /tmp/${wifi_name}/extoffset_${wifi_name} 2>/dev/null`
+   if [ $? != 0 ]; then
+    	extoffset_wifi="1"
+   fi
+   
+   shortgi_wifi=`cat /tmp/${wifi_name}/shortgi_${wifi_name} 2>/dev/null`
+   if [ $? != 0 ]; then
+    	shortgi_wifi="1"
+   fi
+   
+   psize=`cat /tmp/psize 2>/dev/null`
+   if [ $? != 0 ]; then
+      psize="1500"
+   fi	
+   
+   pnumber=`cat /tmp/pnumber 2>/dev/null`
+   if [ $? != 0 ]; then
+      pnumber="1999999"
+   fi	
+   
+   p_test=`cat /tmp/p_test 2>/dev/null`
+   if [ $? != 0 ]; then
+      p_test="no"
+   fi
+   
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script type="text/javascript">
+	var wifi_num = "<%= $DEV_wifi_num %>";
+//	var cur_txpower = "<%= $cur_txpower %>";
+function wifiname_display(){
+	for(var i = 0;i < parseInt(wifi_num);i++)
+	{		
+				var tmp_wifiname="wifi"+i;
+				if(tmp_wifiname == "<%= $wifi_name %>")
+				{
+				 		document.write("<option value='"+tmp_wifiname+"' selected='selected' >"+tmp_wifiname+"</option>");
+				}
+				else
+				{
+					  document.write("<option value='"+tmp_wifiname+"' >"+tmp_wifiname+"</option>");
+				}
+	}
+	
+}
+
+function dtxpower(){
+	var txp = document.getElementById("txoffset");
+	    txp.value = parseInt(txp.value) - 1;
+}
+function atxpower(){
+	var txp = document.getElementById("txoffset");	
+	   txp.value = parseInt(txp.value) + 1; 
+}
+
+function overlayer()
+{
+   document.getElementById("divWaiting").style.display="";
+   document.getElementById("divDisable").style.display="";
+
+}
+
+function mode_display(){
+	var wifi_mode;
+	if (document.getElementById("wifiname").value == "wifi0"){
+   // document.getElementById("txpower").value = "<%= $DEVPOWER_wifi0 %>";
+		wifi_mode = "<%= $DEVMODE_wifi0 %>";
+		if (wifi_mode == "bg"){
+			document.getElementById("mode").style.display = "";
+			document.getElementById("modea").style.display = "none";
+			document.getElementById("moden").style.display = "none";
+			document.getElementById("modeng").style.display = "none";
+			
+
+      document.getElementById("rate").style.display = "";
+      document.getElementById("ratea").style.display = "none";
+      document.getElementById("rate_n_ht20ds").style.display = "none";
+      document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      document.getElementById("rate_n_ht40ds").style.display = "none";
+      document.getElementById("channel").style.display = "";
+      document.getElementById("channela").style.display = "none";
+  
+		}
+		else if (wifi_mode == "abg"){
+			document.getElementById("mode").style.display = "none";
+			document.getElementById("modea").style.display = "";
+			document.getElementById("moden").style.display = "none";
+			document.getElementById("modeng").style.display = "none";
+			
+			if (document.getElementById("modea").value == "11g"){
+      document.getElementById("rate").style.display = "";
+      document.getElementById("ratea").style.display = "none";
+      document.getElementById("rate_n_ht20ds").style.display = "none";
+      document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      document.getElementById("rate_n_ht40ds").style.display = "none";
+      document.getElementById("channel").style.display = "";
+      document.getElementById("channela").style.display = "none";
+      }
+      else if (document.getElementById("modea").value == "11a"){
+      document.getElementById("rate").style.display = "none";
+      document.getElementById("ratea").style.display = "";
+      document.getElementById("rate_n_ht20ds").style.display = "none";
+      document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      document.getElementById("rate_n_ht40ds").style.display = "none";
+      document.getElementById("channel").style.display = "none";
+      document.getElementById("channela").style.display = "";
+      }
+		}
+		else if (wifi_mode == "n"){
+			document.getElementById("mode").style.display = "none";
+			document.getElementById("modea").style.display = "none";
+			document.getElementById("moden").style.display = "none";
+			document.getElementById("modeng").style.display = "";
+			
+			document.getElementById("rate").style.display = "none";
+      document.getElementById("ratea").style.display = "none";
+      
+      if(document.getElementById("modeng").value == "11ng" && document.getElementById("cwmmode").value == "0"){
+      	document.getElementById("rate_n_ht20ds").style.display = "none";
+      	document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      	document.getElementById("rate_n_ht40ds").style.display = "none";
+      }
+      else if(document.getElementById("modeng").value == "11ng" && (document.getElementById("cwmmode").value == "1" || document.getElementById("cwmmode").value == "2")){
+      	if(document.getElementById("shortgi").value == "1"){
+      		document.getElementById("rate_n_ht20ds").style.display = "none";
+      		document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      		document.getElementById("rate_n_ht40ds").style.display = "none";
+      	}
+      	else if(document.getElementById("shortgi").value == "0"){
+      		document.getElementById("rate_n_ht20ds").style.display = "none";
+      		document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      		document.getElementById("rate_n_ht40ds").style.display = "none";
+      	}
+      }
+      
+      document.getElementById("channel").style.display = "";
+      document.getElementById("channela").style.display = "none";
+		}
+		else if (wifi_mode == "an"){
+			document.getElementById("mode").style.display = "none";
+			document.getElementById("modea").style.display = "none";
+			document.getElementById("moden").style.display = "";
+			document.getElementById("modeng").style.display = "none";
+			
+			if (document.getElementById("moden").value == "11ng"){
+      	document.getElementById("rate").style.display = "none";
+      	document.getElementById("ratea").style.display = "none";
+      	if(document.getElementById("cwmmode").value == "0"){
+     		 	document.getElementById("rate_n_ht20ds").style.display = "none";
+      		document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      		document.getElementById("rate_n_ht40ds").style.display = "none";
+      	}
+      	else if(document.getElementById("cwmmode").value == "1" || document.getElementById("cwmmode").value == "2"){
+      		if(document.getElementById("shortgi").value == "1"){
+      			document.getElementById("rate_n_ht20ds").style.display = "none";
+      			document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      			document.getElementById("rate_n_ht40ds").style.display = "none";
+      		}
+      		else if(document.getElementById("shortgi").value == "0"){
+      			document.getElementById("rate_n_ht20ds").style.display = "none";
+      			document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      			document.getElementById("rate_n_ht40ds").style.display = "none";
+      		}
+     		}
+      	document.getElementById("channel").style.display = "";
+      	document.getElementById("channela").style.display = "none";
+      }
+      else if (document.getElementById("moden").value == "11na"){
+      	document.getElementById("rate").style.display = "none";
+      	document.getElementById("ratea").style.display = "none";
+      	if(document.getElementById("cwmmode").value == "0"){
+     		 	document.getElementById("rate_n_ht20ds").style.display = "none";
+      		document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      		document.getElementById("rate_n_ht40ds").style.display = "none";
+      	}
+      	else if(document.getElementById("cwmmode").value == "1" || document.getElementById("cwmmode").value == "2"){
+      		if(document.getElementById("shortgi").value == "1"){
+      			document.getElementById("rate_n_ht20ds").style.display = "none";
+      			document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      			document.getElementById("rate_n_ht40ds").style.display = "none";
+      		}
+      		else if(document.getElementById("shortgi").value == "0"){
+      			document.getElementById("rate_n_ht20ds").style.display = "none";
+      			document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      			document.getElementById("rate_n_ht40ds").style.display = "none";
+      		}
+     		}
+      	document.getElementById("channel").style.display = "none";
+      	document.getElementById("channela").style.display = "";
+      }
+		}
+	}
+	if (document.getElementById("wifiname").value == "wifi1"){
+	//	document.getElementById("txpower").value = "<%= $DEVPOWER_wifi1 %>";
+		wifi_mode = "<%= $DEVMODE_wifi1 %>";
+		if (wifi_mode == "bg"){
+			document.getElementById("mode").style.display = "";
+			document.getElementById("modea").style.display = "none";
+			document.getElementById("moden").style.display = "none";
+			document.getElementById("modeng").style.display = "none";
+			
+			document.getElementById("rate").style.display = "";
+      document.getElementById("ratea").style.display = "none";
+      document.getElementById("rate_n_ht20ds").style.display = "none";
+      document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      document.getElementById("rate_n_ht40ds").style.display = "none";
+      document.getElementById("channel").style.display = "";
+      document.getElementById("channela").style.display = "none";
+		}
+		else if (wifi_mode == "abg"){
+			document.getElementById("mode").style.display = "none";
+			document.getElementById("modea").style.display = "";
+			document.getElementById("moden").style.display = "none";
+			document.getElementById("modeng").style.display = "none";
+			
+			if (document.getElementById("modea").value == "11g"){
+      document.getElementById("rate").style.display = "";
+      document.getElementById("ratea").style.display = "none";
+      document.getElementById("rate_n_ht20ds").style.display = "none";
+      document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      document.getElementById("rate_n_ht40ds").style.display = "none";
+      document.getElementById("channel").style.display = "";
+      document.getElementById("channela").style.display = "none";
+      }
+      else if (document.getElementById("modea").value == "11a"){
+      document.getElementById("rate").style.display = "none";
+      document.getElementById("ratea").style.display = "";
+      document.getElementById("rate_n_ht20ds").style.display = "none";
+      document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      document.getElementById("rate_n_ht40ds").style.display = "none";
+      document.getElementById("channel").style.display = "none";
+      document.getElementById("channela").style.display = "";
+      }
+		}
+		else if (wifi_mode == "n"){
+			document.getElementById("mode").style.display = "none";
+			document.getElementById("modea").style.display = "none";
+			document.getElementById("moden").style.display = "none";
+			document.getElementById("modeng").style.display = "";
+			
+			document.getElementById("rate").style.display = "none";
+      document.getElementById("ratea").style.display = "none";
+      
+      if(document.getElementById("modeng").value == "11ng" && document.getElementById("cwmmode").value == "0"){
+      	document.getElementById("rate_n_ht20ds").style.display = "none";
+      	document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      	document.getElementById("rate_n_ht40ds").style.display = "none";
+      }
+      else if(document.getElementById("modeng").value == "11ng" && (document.getElementById("cwmmode").value == "1" || document.getElementById("cwmmode").value == "2")){
+      	if(document.getElementById("shortgi").value == "1"){
+      		document.getElementById("rate_n_ht20ds").style.display = "none";
+      		document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      		document.getElementById("rate_n_ht40ds").style.display = "none";
+      	}
+      	else if(document.getElementById("shortgi").value == "0"){
+      		document.getElementById("rate_n_ht20ds").style.display = "none";
+      		document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      		document.getElementById("rate_n_ht40ds").style.display = "none";
+      	}
+      }
+      
+      document.getElementById("channel").style.display = "";
+      document.getElementById("channela").style.display = "none";
+		}
+		else if (wifi_mode == "an"){
+			document.getElementById("mode").style.display = "none";
+			document.getElementById("modea").style.display = "none";
+			document.getElementById("moden").style.display = "";
+			document.getElementById("modeng").style.display = "none";
+			
+			if (document.getElementById("moden").value == "11ng"){
+      	document.getElementById("rate").style.display = "none";
+      	document.getElementById("ratea").style.display = "none";
+      	if(document.getElementById("cwmmode").value == "0"){
+     		 	document.getElementById("rate_n_ht20ds").style.display = "none";
+      		document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      		document.getElementById("rate_n_ht40ds").style.display = "none";
+      	}
+      	else if(document.getElementById("cwmmode").value == "1" || document.getElementById("cwmmode").value == "2"){
+      		if(document.getElementById("shortgi").value == "1"){
+      			document.getElementById("rate_n_ht20ds").style.display = "none";
+      			document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      			document.getElementById("rate_n_ht40ds").style.display = "none";
+      		}
+      		else if(document.getElementById("shortgi").value == "0"){
+      			document.getElementById("rate_n_ht20ds").style.display = "none";
+      			document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      			document.getElementById("rate_n_ht40ds").style.display = "none";
+      		}
+     		}
+      	document.getElementById("channel").style.display = "";
+      	document.getElementById("channela").style.display = "none";
+      }
+      else if (document.getElementById("moden").value == "11na"){
+      	document.getElementById("rate").style.display = "none";
+      	document.getElementById("ratea").style.display = "none";
+      	if(document.getElementById("cwmmode").value == "0"){
+     		 	document.getElementById("rate_n_ht20ds").style.display = "none";
+      		document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      		document.getElementById("rate_n_ht40ds").style.display = "none";
+      	}
+      	else if(document.getElementById("cwmmode").value == "1" || document.getElementById("cwmmode").value == "2"){
+      		if(document.getElementById("shortgi").value == "1"){
+      			document.getElementById("rate_n_ht20ds").style.display = "none";
+      			document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      			document.getElementById("rate_n_ht40ds").style.display = "none";
+      		}
+      		else if(document.getElementById("shortgi").value == "0"){
+      			document.getElementById("rate_n_ht20ds").style.display = "none";
+      			document.getElementById("rate_n_ht40ds_s").style.display = "none";
+      			document.getElementById("rate_n_ht40ds").style.display = "none";
+      		}
+     		}
+      	document.getElementById("channel").style.display = "none";
+      	document.getElementById("channela").style.display = "";
+      }
+		}
+	}
+}
+
+function changeWifi(){
+   document.getElementById("wifiname_x").value = document.getElementById("wifiname").value;
+   document.form0.action="packet.cgi";
+	 document.form0.submit(); 
+}
+function shielding(){
+	if (document.getElementById("henable").checked == true){
+		document.getElementById("txoffset").disabled = false;
+		document.getElementById("txpowerdec").disabled = false;
+		document.getElementById("txpoweradd").disabled = false;
+	}
+	if (document.getElementById("henable").checked == false){
+		document.getElementById("txoffset").disabled = true;
+		document.getElementById("txpowerdec").disabled = true;
+		document.getElementById("txpoweradd").disabled = true;
+	}
+}
+function check(){
+	if(document.all.uploadfile.value == ""){      
+	  	  alert("请输入升级文件路径");
+	  	   return false;
+   	   }
+   	overlayer();
+}
+function offset_shielding(){
+	<% if echo "$DEVICE_MODEL" | grep -q 'N' ;then  %>
+	if(document.getElementById("cwmmode").value =="1" || document.getElementById("cwmmode").value =="2"){
+		document.getElementById("e1").style.display="";
+	}
+	if(document.getElementById("cwmmode").value == "0"){
+		document.getElementById("e1").style.display="none";
+	}
+	<% fi %>
+}
+//function cur_txp_grey(){
+//    document.getElementById("cur_txp").disabled = true;
+//}
+</script>
+</head>
+<body onLoad="shielding();mode_display();offset_shielding();">
+	
+<div id="divWaiting" style="display: none; z-index: 1100; left:25%; right: 25%; position: absolute; text-align: center; width: 50%; height: 50px; border-right: #009900 1px solid; border-top: #009900 1px solid; border-left: #009900 1px solid; border-bottom: #009900 1px solid; background-color: #f9fff6; left:expression((this.offsetParent.clientWidth/2)-(this.clientWidth/2)+this.offsetParent.scrollLeft); top: expression((this.offsetParent.clientHeight/2)-(this.clientHeight/2)+this.offsetParent.scrollTop);">
+<br>
+正在处理，请稍候...
+</div>
+<div id="divDisable" style="display: none; width:expression(this.offsetParent.clientWidth); height:expression(this.offsetParent.clientWidth); z-index: 1000; position: absolute; left: 0px; top: 0px; filter: alpha(opacity=50); background-color: black">
+</div>
+
+<%in page_header.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+    <tr>
+			<td colspan="2" height="20">
+			</td>
+		</tr>
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+
+<div align="center">
+		<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+			<tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b>发包测试</b></td>
+			</tr>
+		  
+		  <tr>
+			<td colspan="2" height="20">
+			</td>
+			</tr>
+	   <form method="post" name="form0" action="packet.cgi" >
+			<tr>
+	    	<td align="right" height="24" bordercolor="#ffffff" width="280">射频卡:</td>
+	    	<td  bordercolor="#ffffff" width="370">
+				<select name="wifiname" id="wifiname" onChange="changeWifi()">
+						<script language="JavaScript" type="text/javascript">wifiname_display()</script>
+				</select>	
+	    	</td>
+	   </tr>
+	   <input type="hidden" value="WIFISpec" name="SERVLET">
+	 </form>
+		<form method="post" name="form1" action="packet.cgi" >
+			<tr>
+				<td align="right" height="24" bordercolor="#ffffff" width="280">essid:</td>
+				<td align="left" bordercolor="#ffffff" ><input type="text" name="essid" id="essid" value="<%= "$essid_wifi" %>"></td>
+			</tr>
+			<tr>
+	    	<td align="right" height="24" bordercolor="#ffffff" width="280">模式:</td>
+	    	<td  bordercolor="#ffffff" width="370">
+				<select name="mode" id="mode" onChange="mode_display()">
+						<option <% webui_listbox_select "$mode_wifi" "11g" %> value="11g">11g</option>
+				</select>
+				<select name="modea" id="modea" onChange="mode_display()">
+						<option <% webui_listbox_select "$mode_wifi" "11a" %> value="11a" >11a</option>
+						<option <% webui_listbox_select "$mode_wifi" "11g" %> value="11g">11g</option>
+				</select>
+				<select name="moden" id="moden" onChange="mode_display()">
+						<option <% webui_listbox_select "$mode_wifi" "11ng" %> value="11ng" >11ng</option>
+						<option <% webui_listbox_select "$mode_wifi" "11na" %> value="11na" >11na</option>
+					<!--	<option <% webui_listbox_select "$mode_wifi" "11a" %> value="11a" >11a</option>
+						<option <% webui_listbox_select "$mode_wifi" "11b" %> value="11b">11b</option>
+						<option <% webui_listbox_select "$mode_wifi" "11g" %> value="11g">11g</option>
+						<option <% webui_listbox_select "$mode_wifi" "bg" %> value="bg" >11b and 11g</option>  -->
+				</select>
+				<select name="modeng" id="modeng" onChange="mode_display()">
+						<option <% webui_listbox_select "$mode_wifi" "11ng" %> value="11ng" >11ng</option>
+				<!--		<option <% webui_listbox_select "$mode_wifi" "11b" %> value="11b">11b</option>
+						<option <% webui_listbox_select "$mode_wifi" "11g" %> value="11g">11g</option>
+						<option <% webui_listbox_select "$mode_wifi" "bg" %> value="bg" >11b and 11g</option>   -->
+				</select>
+	    	</td>
+	   </tr>
+			
+			<tr>
+			<td align="right" height="28" bordercolor="#ffffff">功率:
+			</td>
+			<td align="left" bordercolor="#ffffff" ><input type="text" name="txpower" id="txpower" value="<%= $txpower_wifi %>">
+		<!--		&nbsp;实际功率:<input type="text" name="cur_txp" id="cur_txp" value="<%= $cur_txpower %>" size="7" maxlength="4">        -->
+			</td>
+			</td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="28" bordercolor="#ffffff">速率:</td>
+			                       <td align="left" bordercolor="#ffffff"><select name="rate" size="1" id="rate">
+										          <option value="auto" <% webui_listbox_select "$rate_wifi" "auto" %>>Auto</option>
+														  <option value="1" <% webui_listbox_select "$rate_wifi" "1" %>>1Mbps</option>
+														  <option value="2" <% webui_listbox_select "$rate_wifi" "2" %>>2Mbps</option>
+														  <option value="5.5" <% webui_listbox_select "$rate_wifi" "5.5" %>>5.5Mbps</option>
+														  <option value="6" <% webui_listbox_select "$rate_wifi" "6" %>>6Mbps</option>
+														  <option value="9" <% webui_listbox_select "$rate_wifi" "9" %>>9Mbps</option>
+														  <option value="11" <% webui_listbox_select "$rate_wifi" "11" %>>11Mbps</option>
+														  <option value="12" <% webui_listbox_select "$rate_wifi" "12" %>>12Mbps</option>
+														  <option value="18" <% webui_listbox_select "$rate_wifi" "18" %>>18Mbps</option>
+														  <option value="24" <% webui_listbox_select "$rate_wifi" "24" %>>24Mbps</option>
+														  <option value="36" <% webui_listbox_select "$rate_wifi" "36" %>>36Mbps</option>
+														  <option value="48" <% webui_listbox_select "$rate_wifi" "48" %>>48Mbps</option>
+														  <option value="54" <% webui_listbox_select "$rate_wifi" "54" %>>54Mbps</option>
+										         </select>
+														  <select name="ratea" size="1" id="ratea">
+										          <option value="auto" <% webui_listbox_select "$ratea_wifi" "auto" %>>Auto</option>
+														  <option value="6" <% webui_listbox_select "$ratea_wifi" "6" %>>6Mbps</option>
+														  <option value="9" <% webui_listbox_select "$ratea_wifi" "9" %>>9Mbps</option>
+														  <option value="12" <% webui_listbox_select "$ratea_wifi" "12" %>>12Mbps</option>
+														  <option value="18" <% webui_listbox_select "$ratea_wifi" "18" %>>18Mbps</option>
+														  <option value="24" <% webui_listbox_select "$ratea_wifi" "24" %>>24Mbps</option>
+														  <option value="36" <% webui_listbox_select "$ratea_wifi" "36" %>>36Mbps</option>
+														  <option value="48" <% webui_listbox_select "$ratea_wifi" "48" %>>48Mbps</option>
+														  <option value="54" <% webui_listbox_select "$ratea_wifi" "54" %>>54Mbps</option>
+														  </select>
+														  <select name="rate_n_ht20ds" size="1" id="rate_n_ht20ds">
+										          <option value="auto" <% webui_listbox_select "$rate_n_ht20ds_wifi" "auto" %>>Auto</option>
+														  <option value="1" <% webui_listbox_select "$rate_n_ht20ds_wifi" "1" %>>1Mbps</option>
+														  <option value="2" <% webui_listbox_select "$rate_n_ht20ds_wifi" "2" %>>2Mbps</option>
+														  <option value="5.5" <% webui_listbox_select "$rate_n_ht20ds_wifi" "5.5" %>>.5Mbps</option>
+														  <option value="11" <% webui_listbox_select "$rate_n_ht20ds_wifi" "11" %>>11Mbps</option>
+														  <option value="6" <% webui_listbox_select "$rate_n_ht20ds_wifi" "6" %>>6Mbps</option>
+														  <option value="9" <% webui_listbox_select "$rate_n_ht20ds_wifi" "9" %>>9Mbps</option>
+														  <option value="12" <% webui_listbox_select "$rate_n_ht20ds_wifi" "12" %>>12Mbps</option>
+														  <option value="18" <% webui_listbox_select "$rate_n_ht20ds_wifi" "18" %>>18Mbps</option>
+														  <option value="24" <% webui_listbox_select "$rate_n_ht20ds_wifi" "24" %>>24Mbps</option>
+														  <option value="36" <% webui_listbox_select "$rate_n_ht20ds_wifi" "36" %>>36Mbps</option>
+														  <option value="48" <% webui_listbox_select "$rate_n_ht20ds_wifi" "48" %>>48Mbps</option>
+														  <option value="54" <% webui_listbox_select "$rate_n_ht20ds_wifi" "54" %>>54Mbps</option>
+														  <option value="6.5" <% webui_listbox_select "$rate_n_ht20ds_wifi" "6.5" %>>6.5Mbps</option>
+														  <option value="13" <% webui_listbox_select "$rate_n_ht20ds_wifi" "13" %>>13Mbps</option>
+														  <option value="19.5" <% webui_listbox_select "$rate_n_ht20ds_wifi" "19.5" %>>19.5Mbps</option>
+														  <option value="26" <% webui_listbox_select "$rate_n_ht20ds_wifi" "26" %>>26Mbps</option>
+														  <option value="39" <% webui_listbox_select "$rate_n_ht20ds_wifi" "39" %>>39Mbps</option>
+														  <option value="52" <% webui_listbox_select "$rate_n_ht20ds_wifi" "52" %>>52Mbps</option>
+														  <option value="58" <% webui_listbox_select "$rate_n_ht20ds_wifi" "58" %>>58Mbps</option>
+														  <option value="65" <% webui_listbox_select "$rate_n_ht20ds_wifi" "65" %>>65Mbps</option>
+														  <option value="13" <% webui_listbox_select "$rate_n_ht20ds_wifi" "13" %>>13Mbps</option>
+														  <option value="26" <% webui_listbox_select "$rate_n_ht20ds_wifi" "26" %>>26Mbps</option>
+														  <option value="39" <% webui_listbox_select "$rate_n_ht20ds_wifi" "39" %>>39Mbps</option>
+														  <option value="52" <% webui_listbox_select "$rate_n_ht20ds_wifi" "52" %>>52Mbps</option>
+														  <option value="78" <% webui_listbox_select "$rate_n_ht20ds_wifi" "78" %>>78Mbps</option>
+														  <option value="104" <% webui_listbox_select "$rate_n_ht20ds_wifi" "104" %>>104Mbps</option>
+														  <option value="117" <% webui_listbox_select "$rate_n_ht20ds_wifi" "117" %>>117Mbps</option>
+														  <option value="130" <% webui_listbox_select "$rate_n_ht20ds_wifi" "130" %>>130Mbps</option>
+														  </select>
+														  <select name="rate_n_ht40ds_s" size="1" id="rate_n_ht40ds_s">
+										          <option value="auto" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "auto" %>>Auto</option>
+										          <option value="1" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "1" %>>1Mbps</option>
+										          <option value="2" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "2" %>>2Mbps</option>
+										          <option value="5.5" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "5.5" %>>5.5Mbps</option>
+										          <option value="11" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "11" %>>11Mbps</option>
+										          <option value="6" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "6" %>>6Mbps</option>
+														  <option value="9" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "9" %>>9Mbps</option>
+														  <option value="12" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "12" %>>12Mbps</option>
+														  <option value="18" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "18" %>>18Mbps</option>
+														  <option value="24" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "24" %>>24Mbps</option>
+														  <option value="36" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "36" %>>36Mbps</option>
+														  <option value="48" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "48" %>>48Mbps</option>
+														  <option value="54" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "54" %>>54Mbps</option>
+														  <option value="13.5" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "13.5" %>>13.5Mbps</option>
+														  <option value="27" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "27" %>>27Mbps</option>
+														  <option value="40.5" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "40.5" %>>40.5Mbps</option>
+														  <option value="54" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "54" %>>54Mbps</option>
+														  <option value="81" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "81" %>>81Mbps</option>
+														  <option value="108" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "108" %>>108Mbps</option>
+														  <option value="121.5" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "121.5" %>>121.5Mbps</option>
+														  <option value="135" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "135" %>>135Mbps</option>
+														  <option value="150" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "150" %>>150Mbps</option>
+										          <option value="27" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "27" %>>27Mbps</option>
+										          <option value="54" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "54" %>>54Mbps</option>
+										          <option value="81" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "81" %>>81Mbps</option>
+										          <option value="108" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "108" %>>108Mbps</option>
+										          <option value="162" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "162" %>>162Mbps</option>
+														  <option value="216" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "216" %>>216Mbps</option>
+														  <option value="243" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "243" %>>243Mbps</option>
+														  <option value="270" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "270" %>>270Mbps</option>
+														  <option value="300" <% webui_listbox_select "$rate_n_ht40ds_s_wifi" "300" %>>300Mbps</option>
+														  </select>
+														  <select name="rate_n_ht40ds" size="1" id="rate_n_ht40ds">
+										          <option value="auto" <% webui_listbox_select "$rate_n_ht40ds_wifi" "auto" %>>Auto</option>
+										          <option value="1" <% webui_listbox_select "$rate_n_ht40ds_wifi" "1" %>>1Mbps</option>
+										          <option value="2" <% webui_listbox_select "$rate_n_ht40ds_wifi" "2" %>>2Mbps</option>
+										          <option value="5.5" <% webui_listbox_select "$rate_n_ht40ds_wifi" "5.5" %>>5.5Mbps</option>
+										          <option value="11" <% webui_listbox_select "$rate_n_ht40ds_wifi" "11" %>>11Mbps</option>
+										          <option value="6" <% webui_listbox_select "$rate_n_ht40ds_wifi" "6" %>>6Mbps</option>
+														  <option value="9" <% webui_listbox_select "$rate_n_ht40ds_wifi" "9" %>>9Mbps</option>
+														  <option value="12" <% webui_listbox_select "$rate_n_ht40ds_wifi" "12" %>>12Mbps</option>
+														  <option value="18" <% webui_listbox_select "$rate_n_ht40ds_wifi" "18" %>>18Mbps</option>
+														  <option value="24" <% webui_listbox_select "$rate_n_ht40ds_wifi" "24" %>>24Mbps</option>
+														  <option value="36" <% webui_listbox_select "$rate_n_ht40ds_wifi" "36" %>>36Mbps</option>
+														  <option value="48" <% webui_listbox_select "$rate_n_ht40ds_wifi" "48" %>>48Mbps</option>
+														  <option value="54" <% webui_listbox_select "$rate_n_ht40ds_wifi" "54" %>>54Mbps</option>
+														  <option value="13.5" <% webui_listbox_select "$rate_n_ht40ds_wifi" "13.5" %>>13.5Mbps</option>
+														  <option value="27" <% webui_listbox_select "$rate_n_ht40ds_wifi" "27" %>>27Mbps</option>
+														  <option value="40.5" <% webui_listbox_select "$rate_n_ht40ds_wifi" "40.5" %>>40.5Mbps</option>
+														  <option value="54" <% webui_listbox_select "$rate_n_ht40ds_wifi" "54" %>>54Mbps</option>
+														  <option value="81" <% webui_listbox_select "$rate_n_ht40ds_wifi" "81" %>>81Mbps</option>
+														  <option value="108" <% webui_listbox_select "$rate_n_ht40ds_wifi" "108" %>>108Mbps</option>
+														  <option value="121.5" <% webui_listbox_select "$rate_n_ht40ds_wifi" "121.5" %>>121Mbps</option>
+														  <option value="135" <% webui_listbox_select "$rate_n_ht40ds_wifi" "135" %>>135Mbps</option>
+														  <option value="27" <% webui_listbox_select "$rate_n_ht40ds_wifi" "27" %>>27Mbps</option>
+														  <option value="54" <% webui_listbox_select "$rate_n_ht40ds_wifi" "54" %>>54Mbps</option>
+														  <option value="81" <% webui_listbox_select "$rate_n_ht40ds_wifi" "81" %>>81Mbps</option>
+														  <option value="108" <% webui_listbox_select "$rate_n_ht40ds_wifi" "108" %>>108Mbps</option>
+														  <option value="162" <% webui_listbox_select "$rate_n_ht40ds_wifi" "162" %>>162Mbps</option>
+														  <option value="216" <% webui_listbox_select "$rate_n_ht40ds_wifi" "216" %>>216Mbps</option>
+														  <option value="243" <% webui_listbox_select "$rate_n_ht40ds_wifi" "243" %>>243Mbps</option>
+														  <option value="270" <% webui_listbox_select "$rate_n_ht40ds_wifi" "270" %>>270Mbps</option>
+														  </select>
+														  </td>
+			</td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="28" bordercolor="#ffffff">信道:
+			</td><td align="left" bordercolor="#ffffff">
+				<select name="channel" id="channel">
+												<option value="0" <% webui_listbox_select "$channel_wifi" "0" %>>Auto</option>
+												<option value="1" <% webui_listbox_select "$channel_wifi" "1" %>>1 - 2.412GHz</option>
+												<option value="2" <% webui_listbox_select "$channel_wifi" "2" %>>2 - 2.417GHz</option>
+												<option value="3" <% webui_listbox_select "$channel_wifi" "3" %>>3 - 2.422GHz</option>
+												<option value="4" <% webui_listbox_select "$channel_wifi" "4" %>>4 - 2.427GHz</option>
+												<option value="5" <% webui_listbox_select "$channel_wifi" "5" %>>5 - 2.432GHz</option>
+												<option value="6" <% webui_listbox_select "$channel_wifi" "6" %>>6 - 2.437GHz</option>
+												<option value="7" <% webui_listbox_select "$channel_wifi" "7" %>>7 - 2.442GHz</option>
+												<option value="8" <% webui_listbox_select "$channel_wifi" "8" %>>8 - 2.447GHz</option>
+												<option value="9" <% webui_listbox_select "$channel_wifi" "9" %>>9 - 2.452GHz</option>
+												<option value="10" <% webui_listbox_select "$channel_wifi" "10" %>>10 - 2.457GHz</option>
+												<option value="11" <% webui_listbox_select "$channel_wifi" "11" %>>11 - 2.462GHz</option>
+												<option value="12" <% webui_listbox_select "$channel_wifi" "12" %>>12 - 2.467GHz</option>
+												<option value="13" <% webui_listbox_select "$channel_wifi" "13" %>>13 - 2.472GHz</option>
+												</select>
+												<select name="channela" id="channela">
+												<option value="0" <% webui_listbox_select "$channela_wifi" "0" %>>Auto</option>
+										<!--	  <option value="34" <% webui_listbox_select "$channela_wifi" "34" %>>34 - 5.170GHz</option>
+												<option value="36" <% webui_listbox_select "$channela_wifi" "36" %>>36 - 5.180GHz</option>
+												<option value="38" <% webui_listbox_select "$channela_wifi" "38" %>>38 - 5.190GHz</option>
+												<option value="40" <% webui_listbox_select "$channela_wifi" "40" %>>40 - 5.200GHz</option>
+												<option value="42" <% webui_listbox_select "$channela_wifi" "42" %>>42 - 5.210GHz</option>
+												<option value="44" <% webui_listbox_select "$channela_wifi" "44" %>>44 - 5.220GHz</option>
+												<option value="46" <% webui_listbox_select "$channela_wifi" "46" %>>46 - 5.230GHz</option>
+												<option value="48" <% webui_listbox_select "$channela_wifi" "48" %>>48 - 5.240GHz</option>
+												<option value="52" <% webui_listbox_select "$channela_wifi" "52" %>>52 - 5.260GHz</option>
+												<option value="56" <% webui_listbox_select "$channela_wifi" "56" %>>56 - 5.280GHz</option>
+												<option value="60" <% webui_listbox_select "$channela_wifi" "60" %>>60 - 5.300GHz</option>
+												<option value="64" <% webui_listbox_select "$channela_wifi" "64" %>>64 - 5.320GHz</option>
+												<option value="100" <% webui_listbox_select "$channela_wifi" "100" %>>100 - 5.500GHz</option>
+												<option value="104" <% webui_listbox_select "$channela_wifi" "104" %>>104 - 5.520GHz</option>
+												<option value="108" <% webui_listbox_select "$channela_wifi" "108" %>>108 - 5.540GHz</option>
+												<option value="112" <% webui_listbox_select "$channela_wifi" "112" %>>112 - 5.560GHz</option>
+												<option value="116" <% webui_listbox_select "$channela_wifi" "116" %>>116 - 5.580GHz</option>
+												<option value="120" <% webui_listbox_select "$channela_wifi" "120" %>>120 - 5.600GHz</option>
+												<option value="124" <% webui_listbox_select "$channela_wifi" "124" %>>124 - 5.620GHz</option>
+												<option value="128" <% webui_listbox_select "$channela_wifi" "128" %>>128 - 5.640GHz</option>
+												<option value="132" <% webui_listbox_select "$channela_wifi" "132" %>>132 - 5.660GHz</option>
+												<option value="136" <% webui_listbox_select "$channela_wifi" "136" %>>136 - 5.680GHz</option>
+												<option value="140" <% webui_listbox_select "$channela_wifi" "140" %>>140 - 5.700GHz</option> -->
+												<option value="149" <% webui_listbox_select "$channela_wifi" "149" %>>149 - 5.745GHz</option>
+												<option value="153" <% webui_listbox_select "$channela_wifi" "153" %>>153 - 5.765GHz</option>
+												<option value="157" <% webui_listbox_select "$channela_wifi" "157" %>>157 - 5.785GHz</option>
+												<option value="161" <% webui_listbox_select "$channela_wifi" "161" %>>161 - 5.805GHz</option>
+												<option value="165" <% webui_listbox_select "$channela_wifi" "165" %>>165 - 5.825GHz</option>
+												</select>
+	<!--			<select name="channel">
+						<script language="JavaScript" type="text/javascript">channel_display()</script>
+				</select>	     -->
+			</td>
+			</tr>
+			
+			<% if echo "$DEVICE_MODEL" | grep -q 'N' ;then  %>
+					<tr>
+						<td align="right" bordercolor="#ffffff">信道扩展:</td>
+						<td align="left" height="24" bordercolor="#ffffff">
+						<select name="cwmmode" id="cwmmode" size="1" onChange="offset_shielding()">
+						 <option value="0" <% webui_listbox_select "$cwmmode_wifi" "0" %>>20</option>
+						 <option value="1" <% webui_listbox_select "$cwmmode_wifi" "1" %>>20-40</option>    
+						 <option value="2" <% webui_listbox_select "$cwmmode_wifi" "2" %>>40</option>
+						</select>
+						<td align="left" bordercolor="#ffffff"></td>
+					</tr>
+					<tr id="e1">
+						<td align="right" bordercolor="#ffffff">扩展方向:</td>
+						<td align="left" height="24" bordercolor="#ffffff">
+								<select name="extoffset" id="extoffset" size="1">
+								 <option value="0" <% webui_listbox_select "$extoffset_wifi" "0" %>>不扩展</option>
+								 <option value="1" <% webui_listbox_select "$extoffset_wifi" "1" %>>向下</option>    
+								 <option value="-1" <% webui_listbox_select "$extoffset_wifi" "-1" %>>向上</option>
+								</select>
+						<td align="left" bordercolor="#ffffff"></td>
+					</tr>
+					<tr>
+						<td height="24" align="right" bordercolor="#ffffff">短警戒间隔:</td>
+						<td    bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$shortgi_wifi" "1" %> name="shortgi" id="shortgi" value="1" >&nbsp;</td>
+					</tr>
+			<% fi %>
+	<% if echo "$DEVICE_MODEL" | grep -q 'N' ;then  %>
+										     <tr>
+													 <td></td>
+												</tr>
+	<% else %>		
+			<tr>
+			<td align="right" height="28" bordercolor="#ffffff">发射天线:
+			</td>
+			<td align="left" bordercolor="#ffffff">
+				<select name="tx" id="tx" size="1">
+					<option value="0" <% webui_listbox_select "$txantenna_wifi" "0" %>>Auto</option>
+				  <option value="1" <% webui_listbox_select "$txantenna_wifi" "1" %> >Master</option>
+		      <option value="2" <% webui_listbox_select "$txantenna_wifi" "2" %>>Second</option>
+				</select>
+				</td>
+			</tr>
+	<% fi %>
+			<tr>
+			<td align="right" height="28" bordercolor="#ffffff">发包大小:
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="psize" id="psize" value="<%= $psize %>"></td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="28" bordercolor="#ffffff">发包数量:
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="pnumber" id="pnumber" value="<%= $pnumber %>"></td>
+			</td>
+			</tr>
+
+			<tr>
+			<td align="right" height="28" bordercolor="#ffffff">流量测试:
+			</td><td align="left" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$p_test" "yes" %> name="test" id="test" value="yes" ></td>
+			</td>
+			</tr>
+
+			<tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="28" bordercolor="#ffffff">该设备存在功放模块:
+			</td>
+			<td align="left" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$tx_en" "yes" %> name="henable" id="henable" value="yes" onClick="shielding()" >
+	        <input name="txpowerdec" id="txpowerdec" value="功率偏低" type="button" onclick="dtxpower();"><input type="text" name="txoffset" id="txoffset" type="text" value="<%= $tx_offset %>" size="7" maxlength="4" ><input name="txpoweradd" id="txpoweradd" value="功率偏高" type="button" onclick="atxpower();">
+			</td>
+			</tr>
+	<table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+			<tr>
+			  <td align="center" height="40" valign="middle" colspan="2" ><input type="submit" value="发包" name="SERVLET">&nbsp;<input type="submit" value="停止" name="SERVLET"></td>
+			</tr>
+			
+		</table> 
+</div>
+         <input type="hidden" value="<%= $wifi_name %>" name="wifiname_x" id="wifiname_x">
+</form>
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+     <tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b>升级</b></td>
+			</tr>
+		  
+
+<form method="post" name="form2"  action="upgrade_test.cgi" enctype="multipart/form-data"  onSubmit="return check()">
+<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td align="center" height="40" valign="middle" colspan="2" bordercolor="#ffffff"><input type="file" name="uploadfile">&nbsp;<input type="submit" value="升级" name="SERVLET"></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+			</tr>
+</form>
+</table>
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

@@ -1,0 +1,9 @@
+# Config File for AC. Lines beginning with # and blank lines will be ignored
+
+# SW version name of the AP
+</AP_SW_VERSION_NAME>1.0.2
+
+# SW version image path of the AP
+</AP_SW_VERSION_IMAGE_PATH>AW1.0.2.1.Q1.img
+
+#end

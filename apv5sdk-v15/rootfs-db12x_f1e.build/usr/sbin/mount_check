@@ -1,0 +1,10 @@
+#!/bin/sh
+
+mount | grep -o -q '/dev/mtdblock'
+
+if [ $? -eq 0 ];then
+	echo "mount check ok !"
+	exit 0
+fi
+echo "Error:mount fault !"
+exit 1

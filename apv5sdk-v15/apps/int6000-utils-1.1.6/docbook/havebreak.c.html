@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			havebreak.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='grab.c.html' title=' grab.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='haveclass.c.html' title=' haveclass.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   bool havebreak(SCAN * content, const char *charset);
+ *
+ *   scan.h
+ *
+ *   advance to the next input buffer character only if the current
+ *   current input buffer character is in charset; this function is
+ *   useful for detecting optional delimiters;
+ *
+ *   For example:
+ *
+ *   scanalpha (&amp;content);
+ *   if (havebreak (&amp;content, &quot;=&quot;))
+ *   {
+ *      scandigit (&amp;content);
+ *   }
+ *
+ *.  released 2005 by charles maier associates ltd. for public use;
+ *:  compiled on debian gnu/linux with gcc 2.95 compiler;
+ *;  licensed under the gnu public license version two;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef HAVEBREAK_SOURCE
+#define HAVEBREAK_SOURCE
+
+#include &quot;../scan/scan.h&quot;
+
+bool havebreak (SCAN * content, const char *charset) 
+
+{
+	if (isbreak (content, charset)) 
+	{
+		nextbreak (content);
+		return (true);
+	}
+	return (false);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='grab.c.html' title=' grab.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='haveclass.c.html' title=' haveclass.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

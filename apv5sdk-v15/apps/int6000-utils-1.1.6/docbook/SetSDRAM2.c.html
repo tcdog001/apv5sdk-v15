@@ -1,0 +1,180 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			SetSDRAM2.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='SetNMK.c.html' title=' SetNMK.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SetSDRAMConfig.c.html' title=' SetSDRAMConfig.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed SetSDRAM2 (struct int6k * int6k);
+ *   
+ *   int6k2.h
+ *
+ *   Use ihpapi_SetSDRAMConfig api function call and print all responses;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *  Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *      Alex Vasquez &lt;alex.vasquez@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SETSDRAM2_SOURCE
+#define SETSDRAM2_SOURCE
+
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;memory.h&gt;
+
+#include &quot;../ihpapi/ihp.h&quot;
+#include &quot;../ihpapi/ihpapi.h&quot;
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/error.h&quot;
+
+signed SetSDRAM2 (struct int6k * int6k) 
+
+{
+	uint32_t sdlen;
+	uint8_t * sdbuffer;
+	if (_anyset (int6k-&gt;flags, INT6K_HOST_ACTION)) 
+	{
+		int6k-&gt;hostaction = IHPAPI_HAR_INITIALIZE_DEVICE_SDRAMCFG;
+		HostActionWait2 (int6k);
+		int6k-&gt;hostaction = (uint8_t)(-1);
+	}
+	Request (int6k, &quot;Set SDRAM Configuration&quot;);
+	sdlen = lseek (int6k-&gt;CFG.file, 0, SEEK_END);
+	if (sdlen == 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;%s failed to calculate SDRAM file length&quot;, int6k-&gt;CFG.name);
+		return (-1);
+	}
+	sdbuffer = (uint8_t *)malloc (sdlen + sdlen/2);
+	if (sdbuffer == 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;failed get SDRAM memory buffers&quot;);
+		return (-1);
+	}
+	lseek (int6k-&gt;CFG.file, 0, SEEK_SET);
+	if (read (int6k-&gt;CFG.file, sdbuffer, sdlen) != sdlen) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;%s failed to read SDRAM file&quot;, int6k-&gt;CFG.name);
+		free (sdbuffer);
+		return (-1);
+	}
+	memset (int6k-&gt;message, 0, sizeof (struct message));
+	if (sdlen &lt;= 64) 
+	{
+		if (!hexencode (&amp;sdbuffer [sdlen], sdlen/2, (char *)sdbuffer)) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;%s failed to hexencode SDRAM file&quot;, int6k-&gt;CFG.name);
+			free (sdbuffer);
+			return (-1);
+		}
+		int6k-&gt;packetsize = (int)(ihpapi_SetSDRAMConfig (int6k-&gt;channel-&gt;host, int6k-&gt;channel-&gt;peer, sizeof (struct message), (uint8_t *)(int6k-&gt;message), sdlen/2, &amp;sdbuffer [sdlen]));
+		if (int6k-&gt;packetsize == 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;wrong packet size&quot;);
+			free (sdbuffer);
+			return (-1);
+		}
+		if (SendMME (int6k) &lt;= 0) 
+		{
+			free (sdbuffer);
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, INT6K_CANTSEND);
+			return (-1);
+		}
+		if (ReadMME2 (int6k) &lt;= 0) 
+		{
+			free (sdbuffer);
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, INT6K_CANTREAD);
+			return (-1);
+		}
+		if (int6k-&gt;result-&gt;opStatus.status) 
+		{
+			free (sdbuffer);
+			Failure (int6k, INT6K_WONTDOIT);
+			return (-1);
+		}
+	}
+	else 
+	{
+		int6k-&gt;packetsize = (int)(ihpapi_SetSDRAMConfig (int6k-&gt;channel-&gt;host, int6k-&gt;channel-&gt;peer, sizeof (struct message), (uint8_t *)(int6k-&gt;message), sdlen, sdbuffer));
+		do 
+		{
+
+/*
+ *      format request message;
+ */
+
+			if (int6k-&gt;packetsize != 0) 
+			{
+				if (SendMME (int6k) &lt;= 0) 
+				{
+					error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+					free (sdbuffer);
+					return (-1);
+				}
+			}
+			if (ReadMME2 (int6k) == -1) 
+			{
+				error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+				free (sdbuffer);
+				return (-1);
+			}
+			if (int6k-&gt;result-&gt;opStatus.status) 
+			{
+				Failure (int6k, INT6K_WONTDOIT);
+				free (sdbuffer);
+				return (-1);
+			}
+			int6k-&gt;packetsize = (int)(ihpapi_TxFrame (sizeof (struct message), (uint8_t *)(int6k-&gt;message)));
+		}
+		while (int6k-&gt;result-&gt;opCompltCode != IHPAPI_OPCMPLTCODE_COMPLETE);
+	}
+	Confirm (int6k, &quot;Written.&quot;);
+	free (sdbuffer);
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='SetNMK.c.html' title=' SetNMK.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SetSDRAMConfig.c.html' title=' SetSDRAMConfig.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

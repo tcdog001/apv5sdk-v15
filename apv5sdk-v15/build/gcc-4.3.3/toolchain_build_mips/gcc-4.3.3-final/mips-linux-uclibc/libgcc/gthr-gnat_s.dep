@@ -1,0 +1,5 @@
+gthr-gnat_s.o:  \
+ /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/gcc-4.3.3/libgcc/../gcc/gthr-gnat.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/gcc-4.3.3/libgcc/../gcc/gthr-gnat.h
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/gcc-4.3.3/libgcc/../gcc/gthr-gnat.h:

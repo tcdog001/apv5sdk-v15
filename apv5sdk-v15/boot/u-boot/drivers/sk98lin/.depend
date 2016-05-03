@@ -1,0 +1,107 @@
+skge.o: skge.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+skaddr.o: skaddr.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+skgehwt.o: skgehwt.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+skgeinit.o: skgeinit.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+skgepnmi.o: skgepnmi.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+skgesirq.o: skgesirq.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+ski2c.o: ski2c.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+sklm80.o: sklm80.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+skqueue.o: skqueue.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+skrlmt.o: skrlmt.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+sktimer.o: sktimer.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+skvpd.o: skvpd.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+skxmac2.o: skxmac2.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+skcsum.o: skcsum.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+uboot_skb.o: uboot_skb.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h
+uboot_drv.o: uboot_drv.c \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/common.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/db12x.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/configs/ar7240.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/cmd_confdefs.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/linux/bitops.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/asm/bitops.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/linux/types.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/linux/config.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/linux/posix_types.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/linux/stddef.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/asm/posix_types.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/asm/types.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/asm/byteorder.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/linux/byteorder/big_endian.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/linux/byteorder/swab.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/linux/byteorder/generic.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/asm/sgidefs.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/asm/system.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/asm/ptrace.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/asm/isadep.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/linux/string.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/asm/string.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/bin-ccache/../lib/gcc/mips-linux-uclibc/4.3.3/include/stdarg.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/part.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/ide.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/flash.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/image.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/asm/u-boot.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/asm/global_data.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/boot/u-boot/include/asm/regdef.h

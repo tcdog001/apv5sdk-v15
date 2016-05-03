@@ -1,0 +1,29 @@
+#!/bin/sh
+
+UNITE_FILE=/etc/cert/user.cer
+TMP_FILE=/etc/cert/user.cer.tmp
+#UNITE_FILE=user.cer
+#TMP_FILE=user.cer.tmp
+
+usage()
+{
+	echo "Usage: cert_unite srcascert srcapcert [dstcert]"
+	exit 0
+}
+
+( [ ! $# -eq 3 ] && [ ! $# -eq 2 ] ) && usage 
+
+if [ $# -eq 3 ];then
+	UNITE_FILE="$3"
+fi
+
+sed 's/BEGIN CERTIFICATE/BEGIN USER CERTIFICATE/g' $2 > $TMP_FILE
+sed 's/END CERTIFICATE/END USER CERTIFICATE/g' $TMP_FILE > $UNITE_FILE 
+echo "" >> $UNITE_FILE
+sed 's/BEGIN CERTIFICATE/BEGIN ASU CERTIFICATE/g' $1 >> $UNITE_FILE
+sed 's/END CERTIFICATE/END ASU CERTIFICATE/g' $UNITE_FILE > $TMP_FILE
+mv $TMP_FILE $UNITE_FILE
+
+
+
+

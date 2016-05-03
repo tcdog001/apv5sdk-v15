@@ -1,0 +1,83 @@
+#!/bin/sh
+#!/bin/sh
+
+IWCONFIG=/usr/sbin/iwconfig
+IWLIST=/usr/sbin/iwlist
+
+. /usr/lib/web/xmlconf.sh
+
+#usage()
+usage()
+{
+	echo " usage: gettxpower {ifname}"
+	exit 1
+}
+
+#
+#get_wifiname( vapname )
+#
+get_wifiname()
+{
+	vapname="$1"
+#get wifi count
+	CONFIG_XML=/tmp/device_info.xml
+	local wifi_info=`config_read /device/wifi_total 2>/dev/null`
+	local wifi_count=`config_getoption "${wifi_info}" count 2>/dev/null`
+	if [ ${wifi_count} -eq 1 ];then
+		wifiname="wifi0"
+		return 0
+	fi
+#get wifi name
+	CONFIG_XML=/jffs/config.xml
+	local thinap=`cat /proc/sys/dev/wifi0/thinap`
+        if [  0${thinap} -eq 0 ];then
+        	local wifinum=`echo ${vapname} | grep -o '[0-9]\{1,\}'`
+        	wifinum=$((wifinum+1))
+        	local vap_path="/config/network/vap${wifinum}"
+        	local vap_str=`config_read ${vap_path}`
+        	wifiname=`config_getoption "$vap_str" wifi`
+        else
+                local wifinum=`echo ${vapname} | cut -d. -f2 | cut -d- -f1`
+                wifiname="wifi${wifinum}"
+        fi
+	return 0
+}
+
+if [ ! $# -eq 1 ];then
+	usage
+fi
+
+if [ ! -z $1 ];then
+	ifname="$1"
+fi
+
+wifiname=""
+get_wifiname "${ifname}"
+
+txoffset=0
+if [ -f /jffs/tx-offset -a "${wifiname}" = "wifi0" ];then
+	txoffset=`cat /jffs/tx-offset`
+fi
+
+realpow=`iwconfig "${ifname}" | awk  '/Tx-Power/{print $4}' | awk -F":|=" '{print $2}'`
+showpow=$((realpow+txoffset))
+
+echo "${showpow}"
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ifname=$1
+
+real_txpower=`iwconfig "${ifname}" | awk  '/Tx-Power/{print $4}' | awk -F":|=" '{print $2}'`

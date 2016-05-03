@@ -1,0 +1,35 @@
+#!/bin/sh
+
+#parameter numbers check and usage
+if [ $# -ne 1 ] ;then
+    echo "Usage: boot_upgrade default           --- upgrade default bootloader"
+    echo "       boot_upgrade apv6_boot.bin     --- upgrade bootloader which you assign"
+    exit 1
+fi
+
+boot=`basename $1`
+
+#if image exist
+if [ $1 == "default" ] ;then
+	echo "file exist!"
+	cat /www/reboot.htm >/dev/null
+	cat /sbin/sysreboot >/dev/null
+	cp /usr/bin/apv6_boot.bin /tmp/
+	cp /usr/sbin/boot-firmware-upgrade-file /tmp/
+	
+	/usr/sbin/stop_monitor & >/dev/null 2>&1
+	echo 0 > /proc/sys/dev/wifi0/monitor_process    
+	/tmp/boot-firmware-upgrade-file apv6_boot.bin
+elif [ $boot == "apv6_boot.bin" ] ;then
+	echo "file exist!"
+	cat /www/reboot.htm >/dev/null
+	cat /sbin/sysreboot >/dev/null
+	cp /usr/sbin/boot-firmware-upgrade-file /tmp/
+	
+	/usr/sbin/stop_monitor & >/dev/null 2>&1
+	echo 0 > /proc/sys/dev/wifi0/monitor_process    
+	/tmp/boot-firmware-upgrade-file $1
+else
+    echo "wrong format, make sure the filename you assign is apv6_boot.bin"
+fi
+

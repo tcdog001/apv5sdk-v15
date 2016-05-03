@@ -1,0 +1,4 @@
+In file included from /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/dfs/dfs.h:22,
+                 from /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/dfs/dfs_misc.c:19:
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/dfs/../../include/ath_dev.h:550: warning: 'struct ieee80211vap' declared inside parameter list
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/dfs/../../include/ath_dev.h:550: warning: its scope is only this definition or declaration, which is probably not what you want

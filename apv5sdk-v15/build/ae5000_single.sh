@@ -1,0 +1,5 @@
+LD_LIBRARY_PATH=/home/wangyu_ap/apv6/apv6_pc018work/apv6sdk/build/util
+#LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/lib
+export LD_LIBRARY_PATH
+
+make BOARD_TYPE=ap121-2.6.31 BUILD_TYPE=jffs2 ETH_CONFIG=_f1e AQ_TYPE=AE5000ENT OS_TYPE=SINGLE_OS $1 $2 $3

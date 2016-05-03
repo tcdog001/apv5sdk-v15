@@ -1,0 +1,91 @@
+#!/bin/sh
+
+usage()
+{
+	echo "rf_check {wifi[n]} {workmode} {channel} {flag}"
+	echo "n: 0/1"
+	echo "workmode: 11g/11a"
+	echo "flag: 0/1 {0:normal,1:high}"
+	exit 1
+}
+
+if [ ! $# -eq 0  ] && [ ! $# -eq 4 ] ;then
+	usage
+fi
+
+if [  -z $1 ];then
+	WIFI=wifi0
+else
+	WIFI=$1
+fi
+
+if [  -z $2 ];then
+	MODE=11g
+else
+	MODE=$2
+fi
+
+if [  -z $3 ];then
+	CHANNEL=1
+else
+	CHANNEL=$3
+fi
+
+if [  -z $4 ];then
+	FLAG=0
+else
+	FLAG=$4
+fi
+
+#get txpower
+cat /tmp/device_info.xml | awk -F"<|>|[ ]+" '/product_model/{print $4}' | grep -q -e '^A[QG][0-9]\{4\}-[A-Z0-9]\{0,\}H[A-Z0-9]\{0,\}'
+NORMAL=$?   
+if [ ${NORMAL} -eq 0 ] && [ "${WIFI}" = "wifi0" ];then
+	TXPOWER=27
+	if [ -f /jffs/tx-offset ];then
+		OFFSET=`cat /jffs/tx-offset`
+		TXPOWER=$((${TXPOWER}-${OFFSET}))
+	fi
+else
+	TXPOWER=20
+fi
+
+/usr/sbin/stop_monitor
+killall wtpd
+wlanconfig ath0 destroy 
+wlanconfig ath0 create wlandev ${WIFI} wlanmode monitor
+
+ifconfig ath0 up
+ifconfig ath0 down
+sleep 1
+
+iwconfig ath0 essid "rf_check"
+setantenna ${WIFI} diversity 0
+setantenna ${WIFI} tx 1
+
+if [ "${MODE}" == 11a ];then
+	iwconfig ath0 channel 0
+	iwpriv ath0 pureg 0
+	iwpriv ath0 mode 11a
+fi
+iwconfig ath0 channel ${CHANNEL}
+iwconfig ath0 txpower ${TXPOWER}
+
+if [ ${FLAG} -eq 1 ];then
+	iwconfig ath0 rate 6M
+else
+	iwconfig ath0 rate 54M
+fi
+ifconfig ath0 up
+
+ifconfig ath0 down
+sleep 3
+ifconfig ath0 up
+
+if [ ${FLAG} -eq 1 ];then
+	ifconfig ath0 mtu 2000
+	packet 99999999999999 2000 ath0 
+else
+	ifconfig ath0 mtu 1500
+	packet 99999999999999 1500 ath0
+fi

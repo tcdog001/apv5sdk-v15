@@ -1,0 +1,117 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% response_headers %>
+<html>
+<head>
+<title>Netgear</title>
+<script type="text/javascript" src="include/scripts/prototype.js?code=6475626"></script>
+<script type="text/javascript" src="include/scripts/control-modal.js?code=6475626"></script>
+<link rel="stylesheet" href="include/css/layout.css?code=6475626" type="text/css">
+<link rel="stylesheet" href="include/css/style.css?code=6475626" type="text/css">
+<link rel="stylesheet" href="include/css/default.css?code=6475626" type="text/css">
+<link rel="stylesheet" href="include/css/fonts.css?code=6475626" type="text/css">
+<script type="text/javascript">
+
+function validate()
+{
+	var flag="<%= $login_in_status %>";
+	if(flag=="Login Failed")
+	{
+	  alert("Please input user or password correctly");
+		document.all.user.focus();
+	}
+	else if(flag=="Login Success")
+	{
+		window.top.location.href = "frame.html";
+	}
+}
+  
+function form0_submit()
+{ 
+  document.dataForm.action="<%= $login_cgi %>";
+	document.dataForm.submit(); 
+}
+</script>
+</head>
+
+<body style="background-color: #FFFFFF; margin: 0px; padding: 0px;" onload="validate()">
+	<form name="dataForm" id="dataForm" enctype="multipart/form-data" action="<%= $login_cgi %>" method="post">
+	<input type="hidden" id="loading" value="true">
+	<input type="hidden" name="menu1" id="menu1" value="Login">
+	<input type="hidden" name="menu2" id="menu2" value="">
+	<input type="hidden" name="menu3" id="menu3" value="">
+	<input type="hidden" name="menu4" id="menu4" value="">
+	<input type="hidden" name="mode7" id="mode7" value="">
+	<input type="hidden" name="mode8" id="mode8" value="">
+
+	<input type="hidden" name="mode9" id="mode9" value="">
+	<input type="hidden" name="Action" id="Action" value="">
+	<input type="hidden" id="logout">
+	<div id="bodyblock" align="center" style="background-color: #FFFFFF;">
+		<table align="center">
+			<tr>
+				<td class="font15Bold">&nbsp;</td>
+			</tr>
+			<tr>
+
+				<td class="spacerHeight9" style="text-align: center;" align="center">
+					<table id="errorMessageBlock" align="center" style="margin: 4px auto 10px auto; display: none;">
+						<tr>
+							<td style="padding: 5px; vertical-align: top;"><img src="images/alert.gif" style="border: 0px; padding: 0px; margin: 0px;"></td>
+							<td style="padding: 5px 5px 5px 0px; vertical-align: middle;"><b id="br_head">Please address the fields highlighted!</b></td>
+						</tr>
+						<tr>
+							<td style="padding: 0px; vertical-align: top;"></td>
+
+							<td style="padding: 0px 5px 5px 0px; text-align: left;"></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+						<script language="javascript">
+
+</script>
+	<tr>
+		<td>
+
+			<table class="tableStyle" height="100%">
+				<tr>
+					<td class="" style="width: 8px;"><img src="images/clear.gif" width="8"/></td>
+					<td class="spacer100Percent topAlign" style="text-align: center;"><table class="loginBox">
+				<tr>
+					<td colspan="3"><table class='tableStyle'><tr><td colspan='2' class='subSectionTabTopLeft spacer80Percent font12BoldBlue' align="left">Login</td><td class='subSectionTabTopRight spacer20Percent' ><img src='images/help_icon.gif' width='12' height='12' /></td></tr><tr><td colspan='3' class='subSectionTabTopShadow'></td></tr></table></td>
+				</tr>
+				<tr>
+
+					<td class="subSectionBodyDot">&nbsp;</td>
+					<td class="spacer100Percent paddingsubSectionBodyLogin">
+						<table class="padding5Top tableStyle">
+							<tr>
+								<td class="font10Bold spacer25Percent" align="left">Username</td>
+								<td class="spacer55Percent" align="left"><input type='text' class="input"  name="user" id="username" maxlength="48" label="User Name" validate="Presence, { onlyOnSubmit: true }"></td>
+							</tr>
+							<tr>
+
+								<td class="font10Bold padding4Top" align="left">Password</td>
+								<td class="padding4Top" align="left"><input type='password' class="input"  name="pass" id="password" maxlength="64" label="Password" validate="Presence, { onlyOnSubmit: true }"></td>
+							</tr>
+							<tr>
+								<td colspan="2" class="padding5TopBottom10Right"><input type="image" onclick="form0_submit()" src="images/login_on.gif" title="Login" border="0px;"><input type="hidden" name="login" id="login" value=""></td>
+							</tr>
+						</table>
+					</td>
+
+					<td class="subSectionBodyDotRight">&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan="3" class="subSectionBottom"></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+	</div>
+	<input type="hidden" id="helpURL" value="Login">
+</form></body>
+</html>
+

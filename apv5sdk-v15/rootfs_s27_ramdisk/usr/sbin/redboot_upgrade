@@ -1,0 +1,49 @@
+#!/bin/sh
+
+if [ -z $1 ] || [ ! -f $1 ]; then
+	logger -s "$0 <firmware-file>"
+	exit 1
+fi
+
+cd /tmp
+
+if  ! tar tf $1 ap51_V2.rom > /dev/null 2>&1 || 	 \
+    ! tar tf $1 ap51_V2.md5 > /dev/null 2>&1 ; then
+	logger -s "Invalid boot_upgrade file"
+	rm -f $1
+	exit 2
+fi
+
+#
+# Check md5 sum of redboot
+# ALPHA3 & below firmware did not had md5sum support
+#
+
+tar xf $1 ap51_V2.md5 ap51_V2.rom
+md5sum -c ap51_V2.md5
+#tar xOf $1 ap51_V2.rom | md5sum -c ap51_V2.md5
+if [ $? -ne 0 ]; then
+	echo Ap51_V2.rom md5 ERROR
+	rm -f $1 ap51_V2.md5 ap51_V2.rom
+	exit 1
+fi
+
+echo ap51_V2.rom md5 check ok!!!
+#
+#write mtdblock0 to upgrade boot
+#
+#tar xOf $1 ap51_V2.rom | dd of=/dev/mtdblock0
+dd if=ap51_V2.rom of=/dev/mtdblock0
+if [ $? -ne 0 ]; then
+	echo write mtdblock0 to upgrade boot ERROR
+	rm -f $1 ap51_V2.md5 ap51_V2.rom
+	exit 1
+fi
+#
+#upgrade end
+#
+echo RedBoot upgrade ok!!!
+rm -f ap51_V2.rom ap51_V2.md5 
+
+echo n > /proc/kes_debug_flag
+sysreboot

@@ -1,0 +1,46 @@
+.TH memctl 7a "Intellon Corporation" "int6000-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+memctl - Memory Configuration Applet
+.SH SYNOPSIS
+.RB int6ktest
+.BR memctl.nvm
+.RI [ applet ]
+.RI [ ... ]
+.SH PURPOSE
+This configuration applet initializes the SDRAM controller on INT6300 and INT6400 devices. It returns to the bootloader on completion. This applet should be downloaded and executed once before downloading and executing applets that test or execute in SDRAM. 
+.PP
+The advantage of using this applet is platform independence. On the INT6300, it is an alternative to downloading SDRAM Parameters with a VS_SET_SDRAM message and, consequently, elminates the need for an SDRAM configuration file. On the INT6400, it is an alternative to downloading and executing the Denali Applet. 
+.SH PREREUISITES
+Bootloader must be running.
+.SH DISCLAIMER
+Intellon image file structure and content is proprietary to Intellon Corporation, Ocala FL USA. Consequently, public information is not available. Intellon Corporation reserves the right to change file structure or content in future firmware releases without any obligation to notify or compensate users of this program.
+.SH EXAMPLES
+The following example uses program \fBint6ktest\fR to download and execute applet file \memctl.nvm\fR then applet file \fBmytest.nvm\fR. 
+.PP
+   # int6ktest memctl.nvm mytest.nvm
+   eth1 00:B0:52:00:00:01 Write Memory (00000040:6076)
+   eth1 00:B0:52:00:00:01 Wrote memctl.nvm
+   eth1 00:B0:52:00:00:01 Start memctl.nvm (0)
+   eth1 00:B0:52:00:00:01 Write Memory (00001000:4708)
+   eth1 00:B0:52:00:00:01 Wrote mytest.nvm
+   eth1 00:B0:52:00:00:01 Start mytest.nvm (0)
+.PP
+The next example uses program \fBnvmmerge\fR to combine the \fBmemctl\fR and \fBnvramtest\fR applet into one image file then uses program \fBint6ktest\fR to execute both applets in order at once.
+.PP
+   # nvmmerge memctl.nvm mytest.nvm > favorite.nvm
+   # int6ktest favorite.nvm
+   eth1 00:B0:52:00:00:01 Write Memory (00000040:6076)
+   eth1 00:B0:52:00:00:01 Wrote favorite.nvm
+   eth1 00:B0:52:00:00:01 Start favorite.nvm (0)
+   eth1 00:B0:52:00:00:01 Write Memory (00001000:4708)
+   eth1 00:B0:52:00:00:01 Wrote favorite.nvm
+   eth1 00:B0:52:00:00:01 Start favorite.nvm (1)
+.SH SEE ALSO
+.BR flashtest ( 7 ),
+.BR int6ktest ( 7 ),
+.BR marchloop ( 7 ),
+.BR memctl ( 7 )
+.SH CREDITS
+ Vlado Vidovic <vlado.vidovic@intellon.com>
+
+

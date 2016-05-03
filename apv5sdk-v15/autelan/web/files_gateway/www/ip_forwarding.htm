@@ -1,0 +1,67 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+xml_dmz=`config_read /config/firewall/dmz`
+xml_dmz_status=`config_getoption "$xml_dmz" status`
+xml_dmz_ip=`config_getoption "$xml_dmz" dmz_ip`
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>IP Forwarding</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+</head>
+
+<body bgcolor="#efefef">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1"><a href="firewall.htm" target="MainFrame">IP</a></td> 
+		  <td class="top1"><a href="mac.htm" target="MainFrame">MAC</a></td>
+		  <td class="top1"><a href="url.htm" target="MainFrame">URL</a></td>
+		  <td class="top1"><a href="dos.htm" target="MainFrame">DoS</a></td>
+		  <td class="top1"><a href="port_forwarding.htm" target="MainFrame">Virtual server</a></td>
+		  <td class="top1">DMZ</td>
+		  <td class="top1"><a href="upnp.htm" target="MainFrame">upnp</a></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">Firewall-->DMZ</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form method="post" action="<%= $firewall_action_cgi %>" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="IP Forwarding illustration">DMZ</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr align="center">
+          <td class="td_style" width="350">IP Address</td>
+          <td class="td_style" width="150">Enabled</td>
+        </tr>
+		<tr align="center">
+          <td class="td_style"><input type="text" name="ip_address" value="<%= $xml_dmz_ip %>" style="height:12px; width:88px"/></td>
+          <td class="td_style"><input type="checkbox" <% webui_radiobutton_check "$xml_dmz_status" "enable" %> value="enable" name="enabled"/></td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><input id="but" type="submit" name="ip_filter_commit" value="Submit"/></td>
+  </tr>
+</table>
+<input type="hidden" value="DMZ" name="SERVLET">
+</form>
+</div>
+</body>
+</html>

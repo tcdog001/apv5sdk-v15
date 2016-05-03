@@ -1,0 +1,109 @@
+#!/bin/sh
+. /usr/lib/web/xmlconf.sh
+
+#
+#usage()
+#
+usage()
+{
+	echo "changeip2 static IP netmask gateway firstdns secdns"
+	echo "changeip2 dhcp"
+	exit 1
+}
+#
+#setdhcp()
+#
+setdhcp()
+{
+	echo "changeip2 dhcp IP "
+	exit 1
+}
+
+CONFIG_XML=/etc/config/config.xml
+
+if [ "$1" == "dhcp" ];then
+	lan=`config_read "/config/network/lan"`
+	lan=`config_setoption "$lan" proto "$1"`
+	config_write "/config/network/lan" "$lan"
+	setdhcp
+fi
+if [ ! $# -eq 6 ];then
+#################################################################
+	lan=`config_read "/config/network/lan"`
+	for p in $@; do
+		STR=$p
+		STR1=`echo $STR | awk -F "=" '{print $1}'`
+		case $STR1 in
+			"PROTO")
+				PROTO=`echo $STR | awk -F "=" '{print $2}'`
+				lan=`config_setoption "$lan" proto "$PROTO"`
+				;;
+			"IPADDR")
+				IPADDR=`echo $STR | awk -F "=" '{print $2}'`
+				lan=`config_setoption "$lan" ipaddr "$IPADDR"` 
+				;;
+			"NETMASK")
+				NETMASK=`echo $STR | awk -F "=" '{print $2}'`
+				lan=`config_setoption "$lan" netmask "$NETMASK"` 
+				;;
+			"GATEWAY")
+				GATEWAY=`echo $STR | awk -F "=" '{print $2}'`
+				lan=`config_setoption "$lan" gateway "${GATEWAY}"`
+				;;
+			"FIRSTDNS")
+				FIRSTDNS=`echo $STR | awk -F "=" '{print $2}'`;
+				lan=`config_setoption "$lan" nameserver1 "${FIRSTDNS}"`
+				;;
+			"SECDNS")
+				SECDNS=`echo $STR | awk -F "=" '{print $2}'`;
+				lan=`config_setoption "$lan" nameserver2 "${SECDNS}"`
+				;;
+			*)
+				echo "Invalided Argument !"
+				;;
+		esac
+	done
+#	if [ -n $IPADDR ];then	
+#		lan=`config_setoption "$lan" ipaddr "$IPADDR"` 
+#	fi
+#	if [ -n $NETMASK ];then	
+#		lan=`config_setoption "$lan" netmask "$NETMASK"` 
+#	fi
+#	if [ -n $GATEWAY ];then	
+#		lan=`config_setoption "$lan" gateway "$GATEWAY"`
+#	fi
+#	if [ -n $FIRSTDNS ];then	
+#		lan=`config_setoption "$lan" nameserver1 "$FIRSTDNS"`
+#	fi
+#	if [ -n $SECDNS ];then	
+#		lan=`config_setoption "$lan" nameserver2 "$SECDNS"`
+#	fi
+	config_write "/config/network/lan" "$lan"
+#--------------------------------------------------------------#
+	if [ -n $GATEWAY ]; then
+		xml_sroute=`config_read /config/network/sroute`
+		xml_sroute=`config_setoption "$xml_sroute" route1 "$GATEWAY"`
+		config_write "/config/network/sroute" "$xml_sroute"
+	fi
+###############################################################
+	exit 1
+fi
+PROTO=$1
+IPADDR=$2
+NETMASK=$3
+GATEWAY=$4
+FIRSTDNS=$5
+SECDNS=$6
+
+lan=`config_read "/config/network/lan"`
+lan=`config_setoption "$lan" proto "$PROTO"`
+lan=`config_setoption "$lan" ipaddr "$IPADDR"`
+lan=`config_setoption "$lan" netmask "$NETMASK"`
+lan=`config_setoption "$lan" gateway "$GATEWAY"`
+lan=`config_setoption "$lan" nameserver1 "$FIRSTDNS"`
+lan=`config_setoption "$lan" nameserver2 "$SECDNS"`
+config_write "/config/network/lan" "$lan"
+
+xml_sroute=`config_read /config/network/sroute`
+xml_sroute=`config_setoption "$xml_sroute" route1 "$GATEWAY"`
+config_write "/config/network/sroute" "$xml_sroute"

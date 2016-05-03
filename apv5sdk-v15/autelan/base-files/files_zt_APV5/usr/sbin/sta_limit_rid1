@@ -1,0 +1,8 @@
+#!/bin/sh
+local interface=$1
+echo $1
+#iwpriv ${interface} set_stoptransmit 1
+iwpriv ${interface} stop_Trmit 1
+sleep 10
+#iwpriv ${interface} set_stoptransmit 0
+iwpriv ${interface} stop_Trmit 0

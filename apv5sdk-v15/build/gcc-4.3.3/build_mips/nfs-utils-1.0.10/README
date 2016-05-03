@@ -1,0 +1,65 @@
+This is version 1.0.1 of nfs-utils, the Linux NFS utility package.
+
+
+0. PROJECT RESOURCES
+
+Home page:  http://sourceforge.net/projects/nfs/
+
+To use the 'gss' support you must have kerberos-5 development 
+libraries installed.
+Otherwise use  "--disable-gss"
+
+To use nfsv4 support you need libevent and libnfsidmap development
+libraries.  They are available from 
+   http://www.monkey.org/~provos/libevent/
+   http://www.citi.umich.edu/projects/nfsv4/linux/libnfsidmap/
+Otherwise use --disable-nfsv4
+
+
+1. COMPILING WITHOUT PACKAGE MANAGEMENT
+
+To compile without using a package management system, unpack the
+sources and run these commands:
+
+    # ./configure
+    # make
+
+To install binaries and documenation, run this command:
+
+    # make install
+
+You will have to install the two NFS service scripts yourself.
+Service scripts for RedHat 6.x and 7.x are in etc/redhat.  They
+have been tested on RedHat 6.2 and 7.1.
+
+
+2. COMPILING WITH RPM
+
+On RedHat 6.2 and 7.1, you can use
+
+    # rpm -ta nfs-utils-1.0.1.tar.gz
+
+to build the source and binary RPMs.
+
+
+3. COMPILING FOR DEBIAN
+
+The nfs-utils tree has an up-to-date debian directory, so the usual
+debian build scripts should work.  The simplest way to build binary
+debs, however, is simply to become root (or use fakeroot) and run:
+
+    # debian/rules binary
+
+
+4. REQUIRED VERSIONS OF OTHER TOOLS
+
+Proper NFS operation requires a 'mount' program from util-linux 2.11f
+or later.
+
+
+Share And Enjoy!
+
+    --	the nfs-utils developers
+	<nfs@lists.sourceforge.net>
+	26 Dec 2001
+

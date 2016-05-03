@@ -1,0 +1,80 @@
+#!/bin/sh
+
+start()
+{
+mount -t jffs2 /dev/mtdblock3 /etc/config
+mount -t jffs2 /dev/mtdblock3 /jffs
+mknod /dev/wrcpu c 10 131 >dev/null 2>&1
+
+mkdir -p /tmp/crontabs
+mkdir -p /tmp/lib/misc
+mkdir -p /tmp/cert
+mkdir -p /tmp/snmp
+mkdir -p /tmp/wapi/config
+mkdir -p /tmp/logo
+
+cp /etc/wlan/etc/passwd /tmp/
+cp /etc/files.conf/wlan.conf /tmp/
+cp -rf /etc/files.conf/snmp/* /tmp/snmp/
+cp -rf /etc/files.conf/wapi/config/* /tmp/wapi/config/
+cp -rf /etc/files.conf/logo.jpg /tmp/logo/
+
+#by liuyanbo
+	if [ ! -f /etc/config/config.xml ]; then
+		cp -f /etc/defaults/config.xml /etc/config
+	fi
+		
+	if [ ! -f /etc/config/version ]; then
+		xml_upsystem_version="`cat /etc/version/version`"
+		echo $xml_upsystem_version > /etc/config/version
+	fi
+        if [ -e /etc/config/config.xml ];then
+	        /usr/sbin/xmlupgrade
+        fi
+	cp -f  /etc/defaults/session.xml /tmp
+	if [ -f /jffs/system ];then
+		echo "AP"
+	else
+		cp -f /etc/wlan/system /etc/config
+	fi
+
+	if [ -x /jffs/preconfig ];then
+		/jffs/preconfig
+	else
+		cp -f /etc/wlan/preconfig /jffs
+		/jffs/preconfig
+	fi
+	if [ -x /jffs/config ];then
+		/jffs/config
+	else
+		cp -f /etc/wlan/config /jffs
+		/jffs/config
+	fi
+	if [ -x /jffs/postconfig ];then
+		/jffs/postconfig
+	else
+		cp -f /etc/wlan/postconfig /jffs
+		/jffs/postconfig
+	fi 
+}
+
+stop()
+{
+    true
+}
+
+case "$2" in
+  boot)
+        start
+        ;;
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  *)
+        echo "Usage: $0 {boot|start|stop}"
+        exit 1
+esac
+

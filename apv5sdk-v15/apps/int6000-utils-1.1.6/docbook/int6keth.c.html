@@ -1,0 +1,624 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			int6keth.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='int6kecho.c.html' title=' int6kecho.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kf.c.html' title=' int6kf.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   int6keth.c - Intellon Ethernet PHY Settings;
+ *
+ *   this program sends and receives raw ethernet frames and so needs
+ *   root priviledges; if you install it using &quot;chmod 555&quot; and &quot;chown 
+ *   root:root&quot; then you must login as root to run it; otherwise, you 
+ *   can install it using &quot;chmod 4555&quot; and &quot;chown root:root&quot; so that 
+ *   anyone can run it; the program will refuse to run until you get
+ *   things right;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *. Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*&quot;
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdint.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/symbol.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../ether/channel.h&quot;
+#include &quot;../mme/mme.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../int6k/EthernetHeader.c&quot;
+#include &quot;../int6k/IntellonHeader.c&quot;
+#include &quot;../int6k/UnwantedPacket.c&quot;
+#include &quot;../int6k/devices.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../tools/alert.c&quot;
+#include &quot;../tools/assist.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/expect.c&quot;
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/uintspec.c&quot;
+#include &quot;../tools/hexdump.c&quot;
+#include &quot;../tools/hexencode.c&quot;
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/hexstring.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/checkfilename.c&quot;
+#include &quot;../tools/checksum32.c&quot;
+#include &quot;../tools/fdchecksum32.c&quot;
+#include &quot;../tools/strfbits.c&quot;
+#include &quot;../tools/filepart.c&quot;
+#include &quot;../tools/typename.c&quot;
+#include &quot;../tools/lookup.c&quot;
+#include &quot;../tools/synonym.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ether/openchannel.c&quot;
+#include &quot;../ether/closechannel.c&quot;
+#include &quot;../ether/readpacket.c&quot;
+#include &quot;../ether/sendpacket.c&quot;
+#include &quot;../ether/channel.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../mme/MMECode.c&quot;
+#endif
+
+/*====================================================================*
+ *   program constants;
+ *--------------------------------------------------------------------*/
+
+#define NEGOTIATE 2
+#define SPEEDS 3
+#define DUPLEX 2
+#define CONTROL 4
+#define ADVCAP 4
+
+static const struct _code_ negotiate [NEGOTIATE] = 
+
+{
+	{
+		0,
+		&quot;0ff&quot; 
+	},
+	{
+		1,
+		&quot;On&quot; 
+	}
+};
+
+static const struct _code_ advcap [ADVCAP] = 
+
+{
+	{
+		1,
+		&quot;100Full&quot; 
+	},
+	{
+		2,
+		&quot;100Half&quot; 
+	},
+	{
+		4,
+		&quot;10Full&quot; 
+	},
+	{
+		8,
+		&quot;10Half&quot; 
+	}
+};
+
+static const struct _code_ speeds [SPEEDS] = 
+
+{
+	{
+		0,
+		&quot;10&quot; 
+	},
+	{
+		1,
+		&quot;100&quot; 
+	},
+	{
+		2,
+		&quot;1000&quot; 
+	}
+};
+
+static const struct _code_ duplex [DUPLEX] = 
+
+{
+	{
+		0,
+		&quot;Half&quot; 
+	},
+	{
+		1,
+		&quot;Full&quot; 
+	}
+};
+
+static const struct _code_ control [CONTROL] = 
+
+{
+	{
+		0,
+		&quot;Off&quot; 
+	},
+	{
+		1,
+		&quot;Tx&quot; 
+	},
+	{
+		2,
+		&quot;Rx&quot; 
+	},
+	{
+		3,
+		&quot;On&quot; 
+	}
+};
+
+/*====================================================================*
+ *   program constants;
+ *--------------------------------------------------------------------*/
+
+#define RATES 3
+#define MODES 2
+#define LINKS 3
+#define FLOWS 4
+
+static const char * rates [RATES] = 
+
+{
+	&quot;10&quot;,
+	&quot;100&quot;,
+	&quot;1000&quot; 
+};
+
+static const char * modes [MODES] = 
+
+{
+	&quot;Half&quot;,
+	&quot;Full&quot; 
+};
+
+static const char * links [LINKS] = 
+
+{
+	&quot;Unknown&quot;,
+	&quot;Off&quot;,
+	&quot;On&quot; 
+};
+
+static const char * flows [FLOWS] = 
+
+{
+	&quot;Off&quot;,
+	&quot;Tx&quot;,
+	&quot;Rx&quot;,
+	&quot;On&quot; 
+};
+
+/*====================================================================*
+ *   program variables;
+ *--------------------------------------------------------------------*/
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+typedef struct __packed phy_settings 
+
+{
+	uint8_t MCONTROL;
+	uint8_t AUTONEGOTIATE;
+	uint8_t ADVCAPS;
+	uint8_t ESPEED;
+	uint8_t EDUPLEX;
+	uint8_t EFLOWCONTROL;
+}
+
+phy_settings;
+typedef struct __packed phy_readings 
+
+{
+	uint8_t MSTATUS;
+	uint8_t ESPEED;
+	uint8_t EDUPLEX;
+	uint8_t ELINKSTATUS;
+	uint8_t EFLOWCONTROL;
+}
+
+phy_readings;
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+/*====================================================================*
+ *
+ *   signed PHYSettings (struct channel * channel, struct phy_settings * settings, flag_t flags);
+ *
+ *   int6k.h
+ *
+ *   read and display Ethernet PHY settings or write then read and
+ *   display settings;
+ *
+ *   this program sends and receives raw ethernet frames and so needs
+ *   root priviledges; if you install it using &quot;chmod 555&quot; and &quot;chown 
+ *   root:root&quot; then you must login as root to run it; otherwise, you 
+ *   can install it using &quot;chmod 4555&quot; and &quot;chown root:root&quot; so that 
+ *   anyone can run it; the program will refuse to run until you get
+ *   things right;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *. Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+signed PHYSettings (struct channel * channel, struct phy_settings * settings, flag_t flags) 
+
+{
+	struct message message;
+	signed packetsize;
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_enet_settings_request 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MCONTROL;
+		uint8_t AUTONEGOTIATE;
+		uint8_t ADVCAPS;
+		uint8_t ESPEED;
+		uint8_t EDUPLEX;
+		uint8_t EFLOWCONTROL;
+	}
+	* request = (struct vs_enet_settings_request *) (&amp;message);
+	struct __packed vs_enet_settings_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint8_t ESPEED;
+		uint8_t EDUPLEX;
+		uint8_t ELINKSTATUS;
+		uint8_t EFLOWCONTROL;
+	}
+	* confirm = (struct vs_enet_settings_confirm *) (&amp;message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	char address [ETHER_ADDR_LEN * 3];
+	memset (&amp;message, 0, sizeof (message));
+	EthernetHeader (&amp;message.ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message.intellon, (VS_ENET_SETTINGS | MMTYPE_REQ));
+	request-&gt;MCONTROL = settings-&gt;MCONTROL;
+	request-&gt;AUTONEGOTIATE = settings-&gt;AUTONEGOTIATE;
+	request-&gt;ADVCAPS = settings-&gt;ADVCAPS;
+	request-&gt;ESPEED = settings-&gt;ESPEED;
+	request-&gt;EDUPLEX = settings-&gt;EDUPLEX;
+	request-&gt;EFLOWCONTROL = settings-&gt;EFLOWCONTROL;
+	if (sendpacket (channel, &amp;message, ETHER_MIN_LEN) &lt; 0) 
+	{
+		error (1, ECANCELED, INT6K_CANTSEND);
+	}
+	while ((packetsize = readpacket (channel, &amp;message, sizeof (message))) &gt; 0) 
+	{
+		if (UnwantedPacket (&amp;message, (VS_ENET_SETTINGS | MMTYPE_CNF))) 
+		{
+			continue;
+		}
+		if ((confirm-&gt;MSTATUS == 1) || (confirm-&gt;MSTATUS == 3)) 
+		{
+			error (0, 0, &quot;%s (%0X): &quot;, MMECode (confirm-&gt;intellon.MMTYPE, confirm-&gt;MSTATUS), confirm-&gt;MSTATUS);
+			continue;
+		}
+		if (_anyset (flags, INT6K_ANALYSE)) 
+		{
+			printf (&quot;Bits Mode Link Flow\n&quot;);
+			printf (&quot;%4d &quot;, confirm-&gt;ESPEED);
+			printf (&quot;%4d &quot;, confirm-&gt;EDUPLEX);
+			printf (&quot;%4d &quot;, confirm-&gt;ELINKSTATUS);
+			printf (&quot;%4d\n&quot;, confirm-&gt;EFLOWCONTROL);
+		}
+		else 
+		{
+			printf (&quot;%s %s &quot;, channel-&gt;name, hexstring (address, sizeof (address), channel-&gt;host, sizeof (channel-&gt;host)));
+			printf (&quot;Speed=%s &quot;, rates [confirm-&gt;ESPEED]);
+			printf (&quot;Duplex=%s &quot;, modes [confirm-&gt;EDUPLEX]);
+			printf (&quot;LinkStatus=%s &quot;, links [confirm-&gt;ELINKSTATUS]);
+			printf (&quot;FlowControl=%s\n&quot;, flows [confirm-&gt;EFLOWCONTROL]);
+		}
+	}
+	if (packetsize &lt; 0) 
+	{
+		error (1, ECANCELED, INT6K_CANTREAD);
+	}
+	return (0);
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char * argv[]);
+ *   
+ *   parse command line, populate int6k structure and perform selected 
+ *   operations; show help summary if asked; see getoptv and putoptv
+ *   to understand command line parsing and help summary display; see
+ *   int6k.h for the definition of struct int6k; 
+ *
+ *   the command line accepts multiple MAC addresses and the program 
+ *   performs the specified operations on each address, in turn; the
+ *   address order is significant but the option order is not; the
+ *   default address is a local broadcast that causes all devices on
+ *   the local H1 interface to respond but not those at the remote
+ *   end of the powerline;
+ *
+ *   the default address is 00:B0:52:00:00:01; omitting the address
+ *   will automatically address the local device; some options will
+ *   cancel themselves if this makes no sense;
+ *
+ *   the default interface is eth1 because most people use eth0 as 
+ *   their principle network connection; you can specify another 
+ *   interface with -i or define environment string PLC to make
+ *   that the default interface and save typing;
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	extern struct channel channel;
+	static const char *optv [] = 
+	{
+		&quot;a:d:ef:i:n:qrs:tvw&quot;,
+		&quot;device [device] [...] [&gt; stdout]&quot;,
+		&quot;Intellon Ethernet PHY Settings&quot;,
+		&quot;a s\tadvertise capabilities as s ['100Full'|'100Half'|10Full'|'10Half']&quot;,
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		&quot;i n\thost interface number [2]&quot;,
+
+#else
+
+		&quot;i s\thost interface name [&quot; CHANNEL_ETHDEVICE &quot;]&quot;,
+
+#endif
+
+		&quot;f s\tflow control is s ['on'|'tx'|'rx'|'off']&quot;,
+		&quot;d s\tduplex setting is s ['half'|'full']&quot;,
+		&quot;n s\tauto-negotiate mode is s ['on'|'off']&quot;,
+		&quot;q\tquiet mode&quot;,
+		&quot;r\tread settings from device&quot;,
+		&quot;s s\ttransmission speed in mbps is s ['10'|'100'|'1000']&quot;,
+		&quot;v\tverbose mode&quot;,
+		&quot;w\twrite settings to device&quot;,
+		(const char *) (0) 
+	};
+	struct phy_settings settings = 
+	{
+		0,
+		1,
+		0,
+		0,
+		0,
+		0 
+	};
+	flag_t flags = (flag_t)(0);
+	signed c;
+	if (getenv (PLCDEVICE)) 
+	{
+#if defined (WINPCAP) || defined (LIBPCAP)
+		channel.id = atoi (getenv (PLCDEVICE));
+#else
+		channel.name = strdup (getenv (PLCDEVICE));
+#endif
+	}
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'a':
+			if ((c = lookup (optarg, advcap, ADVCAP)) == -1) 
+			{
+				assist (optarg, &quot;capability&quot;, advcap, ADVCAP, stderr);
+			}
+			settings.ADVCAPS |= (uint8_t)(c);
+			break;
+		case 'd':
+			if ((c = lookup (optarg, duplex, DUPLEX)) == -1) 
+			{
+				assist (optarg, &quot;duplex&quot;, duplex, DUPLEX, stderr);
+			}
+			settings.EDUPLEX = (uint8_t)(c);
+			break;
+		case 'e':
+			dup2 (STDOUT_FILENO, STDERR_FILENO);
+			break;
+		case 'f':
+			if ((c = lookup (optarg, control, CONTROL)) == -1) 
+			{
+				assist (optarg, &quot;control&quot;, control, CONTROL, stderr);
+			}
+			settings.EFLOWCONTROL = (uint8_t)(c);
+			break;
+		case 'n':
+			if ((c = lookup (optarg, negotiate, NEGOTIATE)) == -1) 
+			{
+				assist (optarg, &quot;auto-negotiate&quot;, negotiate, NEGOTIATE, stderr);
+			}
+			settings.AUTONEGOTIATE = (uint8_t)(c);
+			break;
+		case 's':
+			if ((c = lookup (optarg, speeds, SPEEDS)) == -1) 
+			{
+				assist (optarg, &quot;speed&quot;, speeds, SPEEDS, stderr);
+			}
+			settings.ESPEED = (uint8_t)(c);
+			break;
+		case 't':
+			_setbits (flags, INT6K_ANALYSE);
+			break;
+		case 'i':
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+			channel.id = atoi (optarg);
+
+#else
+
+			channel.name = optarg;
+
+#endif
+
+			break;
+		case 'q':
+			_setbits (channel.flags, CHANNEL_SILENCE);
+			break;
+		case 'r':
+			settings.MCONTROL = 0;
+			break;
+		case 'v':
+			_setbits (channel.flags, CHANNEL_VERBOSE);
+			break;
+		case 'w':
+			settings.MCONTROL = 1;
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+
+#ifndef WIN32
+
+/*
+ *      raw packets require root priviledges on linux; one does not have to be
+ *      root when this program is installed setuid using 'chown root:root' and 
+ *      'chmod 4555';
+ */
+
+	if (geteuid ()) 
+	{
+		error (1, EPERM, INT6K_NEEDROOT);
+	}
+
+#endif
+
+	openchannel (&amp;channel);
+	if (!argc) 
+	{
+		PHYSettings (&amp;channel, &amp;settings, flags);
+	}
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		if (!hexencode (channel.peer, sizeof (channel.peer), synonym (*argv, devices, DEVICES))) 
+		{
+			error (1, errno, INT6K_BAD_MAC, *argv);
+		}
+		PHYSettings (&amp;channel, &amp;settings, flags);
+		argc--;
+		argv++;
+	}
+	closechannel (&amp;channel);
+	exit (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='int6kecho.c.html' title=' int6kecho.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kf.c.html' title=' int6kf.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

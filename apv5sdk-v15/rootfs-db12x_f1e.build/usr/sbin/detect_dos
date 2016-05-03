@@ -1,0 +1,64 @@
+#!/bin/sh
+echo "Start monitoring xdos attack ..." 
+
+IWPRIV=/usr/sbin/iwpriv
+IFCONFIG=/sbin/ifconfig
+LOGGER=/usr/bin/logger
+
+last_smac="NOMAC"
+wlan_name=ath0
+delay=2
+reaccess=300
+
+if [ ! -z $1 ];then
+wlan_name=$1
+fi 
+if [ ! -z $2 ];then
+delay=$2
+fi
+if [ ! -z $3 ];then
+reaccess=$3
+fi
+
+
+dmesg -c > /dev/null
+
+while true 
+do
+echo "detecting..."
+msgstr=`dmesg | tail -n 1 | grep SYN_FLOOD_DETECTED`
+macstr=`echo "$msgstr" | awk ' /MAC/{ print $4}'` 
+
+if [ ! -z $macstr ];then
+	echo "mac in packet log is [$macstr]"
+	smac=`echo $macstr | cut -d: -f7-12`
+	echo "smac of synattack is [$smac]"
+fi
+
+echo "last_smac is [$last_smac]"
+if [ ! -z $smac ] ; then
+	if [ "$smac" != "$last_smac" ] ; then 
+		ACTIONCMD="wlan $wlan_name add black list $smac and
+		kick sta $smac"
+		echo "New smac, action is [$ACTIONCMD]"
+		$IFCONFIG $wlan_name down
+		$IWPRIV $wlan_name maccmd 2
+		$IWPRIV $wlan_name addmac $smac
+		$IWPRIV $wlan_name kickmac $smac
+		$IFCONFIG $wlan_name up
+		$LOGGER -p syslog.alert "$msgstr"
+		last_smac=$smac
+		sleep $reaccess 
+		$IWPRIV $wlan_name delmac $smac
+		dmesg -c > /dev/null
+		last_smac="NOMAC"
+		smac="NOMAC"
+	else
+		echo "Same smac as before, no action."
+	fi
+
+fi
+
+sleep $delay 
+
+done

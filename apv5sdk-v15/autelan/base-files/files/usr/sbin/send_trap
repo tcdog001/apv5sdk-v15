@@ -1,0 +1,59 @@
+ #!/bin/sh 
+ 
+snmp_trap_conf="/etc/snmp/snmpd.conf"
+SNMPTRAP=/usr/sbin/snmptrap
+trap_addr=`cat $snmp_trap_conf | awk '/trapsink/{print $2}'`
+
+#OID_AP_ALERT=".1.3.6.1.4.1.31656.2.3.2.0.1"
+#OID_AP_FAULT=".1.3.6.1.4.1.31656.2.3.2.0.2"
+#OID_ALERT_TYPE=".1.3.6.1.4.1.31656.2.3.2.1.6.1.3"
+#OID_FAULT_TYPE=".1.3.6.1.4.1.31656.2.3.2.1.6.1.2"
+OID_AP_LEVEL=".1.3.6.1.4.1.31656.2.3.2.1.6.1.1"
+
+case $1 in  
+		apIPChangeAlarm )  
+	    $SNMPTRAP -v2c  -c  public  $trap_addr "" .1.3.6.1.4.1.31656.2.3.2.0.1 $OID_AP_LEVEL i 4 
+		;;  
+		apEncryptionTypeChange ) 
+	    $SNMPTRAP -v2c  -c  public  $trap_addr "" .1.3.6.1.4.1.31656.2.3.2.0.2 $OID_AP_LEVEL i 4 
+		;;  
+		apShareKeyChange )
+	    $SNMPTRAP -v2c  -c  public  $trap_addr "" .1.3.6.1.4.1.31656.2.3.2.0.3 $OID_AP_LEVEL i 4 
+ 		;; 
+		apChannelConfigChange ) 
+	    $SNMPTRAP -v2c  -c  public  $trap_addr "" .1.3.6.1.4.1.31656.2.3.2.0.4 $OID_AP_LEVEL i 4 
+ 		;;
+ 		DeviceInterferenceDetected ) 
+	    $SNMPTRAP -v2c  -c  public  $trap_addr "" .1.3.6.1.4.1.31656.2.3.2.0.5 $OID_AP_LEVEL i 4 
+ 		;; 
+		PowerCycleRegisteredAlarm )
+	    $SNMPTRAP -v2c  -c  public  $trap_addr "" .1.3.6.1.4.1.31656.2.3.2.0.6 $OID_AP_LEVEL i 4 
+ 		;; 
+ 		apFileTransAlarm )
+	    $SNMPTRAP -v2c  -c  public  $trap_addr "" .1.3.6.1.4.1.31656.2.3.2.0.7 $OID_AP_LEVEL i 4 
+ 		;;  
+ 		apUploadSucceed )
+	    $SNMPTRAP -v2c  -c  public  $trap_addr "" .1.3.6.1.4.1.31656.2.3.2.0.8 $OID_AP_LEVEL i 4 
+ 		;;   
+		STAOffline )
+	    $SNMPTRAP -v2c  -c  public  $trap_addr "" .1.3.6.1.4.1.31656.2.3.2.0.10 $OID_AP_LEVEL i 4 
+ 		;;  
+ 		dot11Deauthenticate )  
+ 		  $SNMPTRAP -v2c  -c  public  $trap_addr ""  1.2.840.10036.1.6.0.2
+ 		;;  
+ 	        dot11AuthenticateFail )  
+ 	          $SNMPTRAP -v2c  -c  public  $trap_addr ""  1.2.840.10036.1.6.0.3
+ 		;; 
+		STAOnline )
+	    $SNMPTRAP -v2c  -c  public  $trap_addr "" .1.3.6.1.4.1.31656.2.3.2.0.9 $OID_AP_LEVEL i 4 
+ 		;;
+ 		apWiFiFaultAlert )
+	    $SNMPTRAP -v2c  -c  public  $trap_addr "" .1.3.6.1.4.1.31656.2.3.2.0.11 $OID_AP_LEVEL i 1 
+ 		;;	
+		apPowerSupTroub )
+	    $SNMPTRAP -v2c  -c  public  $trap_addr "" .1.3.6.1.4.1.31656.2.3.2.0.12 $OID_AP_LEVEL i 1 
+		;;
+		*)  
+		  echo "Ignorant"  
+		;;  
+ esac    

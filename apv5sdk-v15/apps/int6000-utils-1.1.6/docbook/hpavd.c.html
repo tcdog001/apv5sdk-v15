@@ -1,0 +1,335 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			hpavd.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='hpav.c.html' title=' hpav.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='hpavkey.c.html' title=' hpavkey.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   hpavd.c - Homeplug AV Packet Daemon;
+ *   
+ *   this is an example program that prints Intellon Vendor Specific
+ *   HomePlug AV packets exchanged between hosts and Intellon devices 
+ *   connected to the local network;
+ *
+ *   the program can be run in foreground or background, as a daemon;
+ *
+ *   this program receives raw ethernet frames and so requires root
+ *   priviledges; if you install it using &quot;chmod 555&quot; and &quot;chown 
+ *   root:root&quot; then you must login as root to run it; otherwise, you 
+ *   can install it using &quot;chmod 4555&quot; and &quot;chown root:root&quot; so that 
+ *   anyone can run it; the program will refuse to run until you get
+ *   thing right;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	C. Maier, charles.maier@intellon.com
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;fcntl.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;ctype.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/signal.h&gt;
+#include &lt;sys/ioctl.h&gt;
+#include &lt;errno.h&gt;
+
+#ifdef __linux__
+#include &lt;net/if.h&gt;
+#include &lt;net/if_arp.h&gt;
+#include &lt;netpacket/packet.h&gt;
+#include &lt;signal.h&gt;
+#endif
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/putoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../int6k/intellon.h&quot;
+#include &quot;../int6k/homeplug.h&quot;
+#include &quot;../int6k/message.h&quot;
+#include &quot;../int6k/problem.h&quot;
+#include &quot;../mme/mme.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/hexdump.c&quot;
+#include &quot;../tools/hexstring.c&quot;
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/emalloc.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../mme/MMEPeek.c&quot;
+#include &quot;../mme/MMEName.c&quot;
+#include &quot;../mme/MMEMode.c&quot;
+#endif
+
+/*====================================================================*
+ *    program constants; 
+ *--------------------------------------------------------------------*/
+
+#define HPAV_DAEMON (1 &lt;&lt; 0)
+#define HPAV_VERBOSE (1 &lt;&lt; 1)
+#define HPAV_SILENCE (1 &lt;&lt; 2)
+#define HPAV_ERROR (1 &lt;&lt; 3)
+
+#define PLCDEVICE &quot;PLC&quot;
+#define ETHDEVICE &quot;eth1&quot;
+#define ETHNUMBER 2
+#define TIMEOUT 100
+#define BAILOUT 0
+
+/*====================================================================*
+ *   program variables;
+ *--------------------------------------------------------------------*/
+
+static bool loop = true;
+
+/*====================================================================*
+ *   
+ *   void terminate (signo_t signal);
+ *   
+ *   terminate the program; we want to ensure an orgaized program 
+ *   exit so that the original Ethernet adapter state is restored;
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+void terminate (signo_t signal) 
+
+{
+	loop = false;
+	return;
+}
+
+/*====================================================================*
+ *   
+ *   void function (signed fd, void * memory, signed extent, flag_t flags);
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static void function (signed fd, void * memory, signed extent, flag_t flags) 
+
+{
+	while (loop) 
+	{
+		signed length = recvfrom (fd, memory, extent, 0, (struct sockaddr *) (0), (socklen_t *)(0));
+		if (length &gt; 0) 
+		{
+			if (_allclr (flags, HPAV_SILENCE)) 
+			{
+				MMEPeek (memory, length, stdout);
+			}
+			if (_anyset (flags, HPAV_VERBOSE)) 
+			{
+				hexdump (memory, 0, length, stdout);
+			}
+		}
+	}
+	return;
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, char * argv[]);
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	static const char *optv [] = 
+	{
+		&quot;di:qv&quot;,
+		PUTOPTV_S_DIVINE,
+		&quot;HomePlug AV Packet Daemon&quot;,
+		&quot;d\trun in background as daemon&quot;,
+		&quot;i s\tuse host interface s [&quot; ETHDEVICE &quot;]&quot;,
+		&quot;q\tsuppress normal output&quot;,
+		&quot;v\tverbose messages on stdout&quot;,
+		(const char *) (0) 
+	};
+	struct message message;
+	struct sigaction sa;
+	struct ifreq ifreq = 
+	{
+		{
+			ETHDEVICE 
+		}
+	};
+	struct sockaddr_ll sockaddr = 
+	{
+		PF_PACKET,
+		htons (HOMEPLUG_MTYPE),
+		0x0000,
+		ARPHRD_ETHER,
+		PACKET_OTHERHOST,
+		ETHER_ADDR_LEN,
+		{
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00,
+			0x00 
+		}
+	};
+	flag_t state = (flag_t)(0);
+	flag_t flags = (flag_t)(0);
+	sock_t fd = -1;
+	signed c;
+	if (getenv (PLCDEVICE)) 
+	{
+		memcpy (ifreq.ifr_name, getenv (PLCDEVICE), sizeof (ifreq.ifr_name));
+	}
+	optind = 1;
+	opterr = 1;
+	optmin = 0;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'd':
+			_setbits (flags, HPAV_DAEMON);
+			break;
+		case 'i':
+			memcpy (ifreq.ifr_name, optarg, sizeof (ifreq.ifr_name));
+			break;
+		case 'q':
+			_setbits (flags, HPAV_SILENCE);
+			break;
+		case 'v':
+			_setbits (flags, HPAV_VERBOSE);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	if (geteuid ()) 
+	{
+		error (1, EPERM, INT6K_NEEDROOT);
+	}
+	if (_anyset (flags, HPAV_DAEMON))
+	{
+		pid_t pid = fork ();
+		if (pid &lt; 0) 
+		{
+			error (1, errno, &quot;razzlefrats!&quot;);
+		}
+		if (pid &gt; 0) 
+		{
+			exit (0);
+		}
+	}
+	memset (&amp;sa, 0, sizeof (struct sigaction));
+	sa.sa_handler = terminate;
+	sigaction (SIGTERM, &amp;sa, (struct sigaction *)(0));
+	sigaction (SIGQUIT, &amp;sa, (struct sigaction *)(0));
+	sigaction (SIGTSTP, &amp;sa, (struct sigaction *)(0));
+	sigaction (SIGINT, &amp;sa, (struct sigaction *)(0));
+	sigaction (SIGHUP, &amp;sa, (struct sigaction *)(0));
+	if ((fd = socket (sockaddr.sll_family, SOCK_RAW, sockaddr.sll_protocol)) == -1) 
+	{
+		error (1, errno, &quot;Can't create socket for %s&quot;, ifreq.ifr_name);
+	}
+	if (ioctl (fd, SIOCGIFFLAGS, &amp;ifreq) &lt; 0) 
+	{
+		error (1, errno, &quot;Can't read %s device state&quot;, ifreq.ifr_name);
+	}
+	state = ifreq.ifr_flags;
+	_setbits (ifreq.ifr_flags, (IFF_UP | IFF_BROADCAST | IFF_PROMISC));
+	_clrbits (ifreq.ifr_flags, (IFF_MULTICAST | IFF_ALLMULTI));
+	if (ioctl (fd, SIOCSIFFLAGS, &amp;ifreq) &lt; 0) 
+	{
+		error (1, errno, &quot;Can't change %s device state&quot;, ifreq.ifr_name);
+	}
+	if (ioctl (fd, SIOCGIFHWADDR, &amp;ifreq) == -1) 
+	{
+		error (1, errno, &quot;Can't get %s hardware address&quot;, ifreq.ifr_name);
+	}
+	memcpy (sockaddr.sll_addr, ifreq.ifr_ifru.ifru_hwaddr.sa_data, sizeof (sockaddr.sll_addr));
+	if (ioctl (fd, SIOCGIFINDEX, &amp;ifreq) == -1) 
+	{
+		error (1, errno, &quot;Can't get %s interface index&quot;, ifreq.ifr_name);
+	}
+	sockaddr.sll_ifindex = ifreq.ifr_ifindex;
+	if (bind (fd, (struct sockaddr *) (&amp;sockaddr), sizeof (struct sockaddr_ll)) == -1) 
+	{
+		error (1, errno, &quot;Can't bind socket to %s&quot;, ifreq.ifr_name);
+	}
+	function (fd, &amp;message, sizeof (message), flags);
+	ifreq.ifr_flags = state;
+	if (ioctl (fd, SIOCSIFFLAGS, &amp;ifreq) &lt; 0) 
+	{
+		error (1, errno, &quot;Can't restore %s device state&quot;, ifreq.ifr_name);
+	}
+	close (fd);
+	return (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='hpav.c.html' title=' hpav.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='hpavkey.c.html' title=' hpavkey.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

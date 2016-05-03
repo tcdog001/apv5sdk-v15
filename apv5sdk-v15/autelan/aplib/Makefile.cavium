@@ -1,0 +1,39 @@
+
+ROOTFSDIR := /home/shark/builddir/rootfs
+
+PKG_NAME := aplib
+PKG_RELEASEi := 1.0
+PKG_BUILD_DIR := src
+
+CAVIUM_CPPFLAGS ?= -I$(OCTEON_ROOT)/tools/mips64-octeon-linux-gnu/sys-root/usr/include
+CAVIUM_LDFLAGS ?= -L$(OCTEON_ROOT)/tools/mips64-octeon-linux-gnu/sys-root/usr/lib64
+EXTRA_LDFLAGS := -L$(ROOTFSDIR)/../source/libmxml-0.9.1/src/lib -lmxml
+CPPFLAGS := $(CAVIUM_CPPFLAGS)
+EXTRA_CPPFLAGS := -I$(ROOTFSDIR)/../source/libmxml-0.9.1/src/include
+
+TARGET_CROSS := mips64-octeon-linux-gnu-
+CC := $(TARGET_CROSS)gcc
+LD := $(TARGET_CROSS)ld
+AR := $(TARGET_CROSS)ar
+
+CP := cp -fpR
+
+.PHONY: all
+all: compile install
+
+.PHONY: compile
+compile:
+	$(MAKE) -C $(PKG_BUILD_DIR)/src -f Makefile.cavium \
+		EXTRA_LDFLAGS="$(EXTRA_LDFLAGS)" \
+		CPPFLAGS=$(CPPFLAGS) \
+		EXTRA_CPPFLAGS=$(EXTRA_CPPFLAGS) \
+		CC=$(CC) \
+		AR=$(AR)
+
+.PHONY: install
+install:
+	sudo $(CP) $(PKG_BUILD_DIR)/src/libapfunc.so $(ROOTFSDIR)/usr/lib64 
+	
+.PHONY: clean
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR)/src clean

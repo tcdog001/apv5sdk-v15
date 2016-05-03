@@ -1,0 +1,17 @@
+#!/bin/sh
+. /usr/lib/web/xmlconf.sh
+. /usr/lib/web/constant.sh
+
+xml_accessever=`config_read /config/administrator/accessever`
+xml_accessever_enable=`config_getoption "$xml_accessever" enable`
+xml_accessever_porthttp=`config_getoption "$xml_accessever" porthttp`
+xml_accessever_porthttps=`config_getoption "$xml_accessever" porthttps`
+echo "$xml_accessever_enable" >/tmp/a1
+if [ "$xml_accessever_enable" == "http" ];then
+			 killall mini_httpd  > /dev/null 2>&1
+		   /sbin/mini_httpd -d /www -u root -p $xml_accessever_porthttp  > /dev/null 2>&1
+
+else
+       killall mini_httpd  > /dev/null 2>&1
+    	 /sbin/mini_httpd -d /www -u root -p $xml_accessever_porthttps -E /sbin/mini_httpd.pem -S  > /dev/null 2>&1
+fi

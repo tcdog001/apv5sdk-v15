@@ -1,0 +1,141 @@
+#!/bin/sh
+
+OPT_FILE=/proc/sys/dev
+
+#usage()
+#usage
+usage()
+{
+    echo "usage:"
+    echo "          setantenna wifi[n] diversity [0/1]"
+    echo "                                                      0: on 1:off"
+    echo "          setantenna wifi[n] tx [0/1/2]"
+    echo "                                              0:auto 1:main 2:aux"
+    exit 1
+}
+
+#get_div_opt( wifiname, usr_opt )
+#high-txp can not set opt_num to 1
+get_div_opt()
+{
+	if  test ${NORMAL} -eq 0 && test  "${1}" = "wifi0" ;then
+		echo -n 0
+		return 0
+	fi
+	echo -n ${2}
+}
+
+#not_reverse( wifiname )
+not_reverse()
+{
+# set wifi1
+	if test "${1}" = "wifi1" ;then
+		return 1
+	fi
+# high-power card and use amplifier
+	if  test ${NORMAL} -eq 0 && test -f /jffs/tx-offset ;then
+		return 0
+    fi
+# senao card 
+ 	local OUI=`cat /tmp/.oui-wifi0`
+	if [ "${OUI}" == "00:02:6F" ] || [ "${OUI}" == "00:02:6f" ];then
+		return 0
+	fi
+#jw card
+	local OUI=`cat /tmp/.oui-wifi0`
+	#local PRD_Y=`wrcpuutil -i | awk -F":" '/product sn/{print $2}' | cut -b 13-14`
+	local PRD_Y=`pro_ctl_util  -i | awk -F":" '/product sn/{print $2}' | cut -b 13-14`
+	local PRD_M=`pro_ctl_util  -i | awk -F":" '/product sn/{print $2}' | cut -b 15`
+	if [ "${OUI}" == "00:08:9F" ] || [ "${OUI}" == "00:08:9f" ] || [ "${OUI}" == "00:0E:E8" ] || [ "${OUI}" == "00:0e:e8" ] || [ "${OUI}" == "78:44:76" ];then	
+		if [ 0${PRD_Y} -gt 09 ];then
+			return 0
+		elif [ 0${PRD_Y} -eq 09 ];then
+			echo "${PRD_M}" | grep [a-cA-C] -q
+			if [ ! $? -eq 0 ];then
+				if [ 0${PRD_M} -ge 09 ];then
+					return 0
+				fi
+			else
+				return 0
+			fi
+		fi
+	fi
+# others
+	return 1
+}
+
+#get_tx_opt( wifiname, usr_opt )
+#normal                   main:2   aux:1
+#high-txp | senao    main:1   aux:2
+#abg                        main:2   aux:1
+get_tx_opt()
+{
+    if  not_reverse $1 ;then
+    	echo -n ${2}
+		return 0
+    fi
+    case ${2} in
+    	0)
+    		echo -n 0
+    	;;
+    	1)
+    		echo -n 2
+    	;;
+    	2)
+    		echo -n 1
+    	;;
+    	*)
+    		usage
+    	;;
+    esac
+}
+
+if [ ! $# -eq 3 ];then
+    usage
+fi
+
+if [ ! -e ${OPT_FILE}/${1}  ];then
+    echo "error: ${1} not exist"
+    exit 1
+fi
+
+cat /tmp/device_info.xml | awk -F"<|>|[ ]+" '/product_model/{print $4}' | grep -q -e '^A[QG][0-9]\{4\}-[A-Z0-9]\{0,\}H[A-Z0-9]\{0,\}' 
+NORMAL=$?
+RESET_FLAG=0
+#pei add
+#cat /tmp/device_info.xml | awk '/product_model/' | grep -v "\-H" | grep -q "AQ2010"
+cat /tmp/device_info.xml | awk '/cpu_type/' | grep -q 'soc'
+ISCAVIUM=$?
+
+case ${2} in
+    diversity)
+        OPT_FILE=${OPT_FILE}/${1}/diversity
+        OPT_NUM=`get_div_opt ${1} ${3}`
+		if [ ${OPT_NUM} -eq 1 ];then
+			RESET_FLAG=1
+		fi
+    ;;
+    tx)
+	OPT_FILE_TMP=${OPT_FILE}/${1}/rxantenna
+        OPT_FILE=${OPT_FILE}/${1}/txantenna
+        OPT_NUM=`get_tx_opt ${1} ${3}`
+        echo "============================"
+		echo "setantenna : ${1} ${OPT_NUM}"
+		echo "============================"
+	echo ${OPT_NUM} > ${OPT_FILE_TMP} 
+    ;;
+    rx)
+	OPT_FILE=${OPT_FILE}/${1}/rxantenna
+	OPT_NUM=`get_tx_opt ${1} ${3}`
+    ;;
+    *)
+        usage
+    ;;
+esac    
+    
+#echo "echo ${OPT_NUM} > ${OPT_FILE}"
+echo ${OPT_NUM} > ${OPT_FILE}
+
+#if [ ${RESET_FLAG} -eq 1 ];then
+#    /sbin/sysreboot
+#fi

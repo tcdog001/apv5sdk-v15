@@ -1,0 +1,80 @@
+.NOTPARALLEL:
+
+ifeq ($(AQ_TYPE_PB44),1)
+PKG_BUILD_DIR = files
+else ifeq ($(AQ_TYPE),XJAP93)
+PKG_BUILD_DIR = files
+else ifeq ($(AQ_TYPE),AQ2000N)
+PKG_BUILD_DIR = files
+else ifeq ($(AQ_TYPE),AQ2000SNH)
+PKG_BUILD_DIR = files
+else ifeq ($(AQ_TYPE),XHPB44)
+PKG_BUILD_DIR = files
+else ifeq ($(AQ_TYPE),WNAP550)
+PKG_BUILD_DIR = files_ap83_netgear
+else
+PKG_BUILD_DIR = files_ap83_netgear
+endif
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+
+unexport LDFLAGS
+
+.PHONY: all
+all: install 
+
+
+.PHONY: install
+install:
+	cp -rf ${PKG_BUILD_DIR}/* ${ROOTFSDIR}/ 
+#ifeq ($(AQ_TYPE),AP2400-IFM)
+#	cp -rf ${PKG_BUILD_DIR}/etc/defaults/$(AQ_TYPE)config.xml ${ROOTFSDIR}/etc/defaults/config.xml
+#endif
+ifeq ($(AQ_TYPE),AP2400-IFM)
+	cp -rf ${PKG_BUILD_DIR}/www_cavium/* ${ROOTFSDIR}/www
+	cp -rf ${PKG_BUILD_DIR}/www_cavium_ar11n/* ${ROOTFSDIR}/www
+	rm -rf ${ROOTFSDIR}/www_cavium
+	rm -rf ${ROOTFSDIR}/www_cavium_ar11n
+	mv ${ROOTFSDIR}/usr/lib/web/sysinit.sh_cavium ${ROOTFSDIR}/usr/lib/web/sysinit.sh
+	mv ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium_ar11n ${ROOTFSDIR}/usr/lib/web/constant.sh
+	rm -rf ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium
+else ifeq ($(AQ_TYPE),AQ2000N)
+	cp -rf ${PKG_BUILD_DIR}/www_cavium/* ${ROOTFSDIR}/www
+	cp -rf ${PKG_BUILD_DIR}/www_cavium_ar11n/* ${ROOTFSDIR}/www
+	rm -rf ${ROOTFSDIR}/www_cavium
+	rm -rf ${ROOTFSDIR}/www_cavium_ar11n
+	mv ${ROOTFSDIR}/usr/lib/web/sysinit.sh_cavium ${ROOTFSDIR}/usr/lib/web/sysinit.sh
+	mv ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium_ar11n ${ROOTFSDIR}/usr/lib/web/constant.sh
+	rm -rf ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium
+else ifeq ($(AQ_TYPE),XJAP93)
+	cp -rf ${PKG_BUILD_DIR}/www_cavium/* ${ROOTFSDIR}/www
+	cp -rf ${PKG_BUILD_DIR}/www_cavium_ar11n/* ${ROOTFSDIR}/www
+	rm -rf ${ROOTFSDIR}/www_cavium
+	rm -rf ${ROOTFSDIR}/www_cavium_ar11n
+	mv ${ROOTFSDIR}/usr/lib/web/sysinit.sh_cavium ${ROOTFSDIR}/usr/lib/web/sysinit.sh
+	mv ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium_ar11n ${ROOTFSDIR}/usr/lib/web/constant.sh
+	rm -rf ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium
+else ifeq ($(AQ_TYPE),WNAP550)
+	cp -rf ${PKG_BUILD_DIR}/www_saveconfig/* ${ROOTFSDIR}/www
+	rm -rf ${ROOTFSDIR}/www_saveconfig
+	mv ${ROOTFSDIR}/usr/lib/web/sysinit.sh_cavium ${ROOTFSDIR}/usr/lib/web/sysinit.sh
+	mv ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium ${ROOTFSDIR}/usr/lib/web/constant.sh
+else ifeq ($(AQ_TYPE),AQ2000SNH)
+	cp -rf ${PKG_BUILD_DIR}/www_cavium/* ${ROOTFSDIR}/www
+	cp -rf ${PKG_BUILD_DIR}/www_cavium_ar11n/* ${ROOTFSDIR}/www
+	rm -rf ${ROOTFSDIR}/www_cavium
+	rm -rf ${ROOTFSDIR}/www_cavium_ar11n
+	mv ${ROOTFSDIR}/usr/lib/web/sysinit.sh_cavium ${ROOTFSDIR}/usr/lib/web/sysinit.sh
+	mv ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium_ar11n ${ROOTFSDIR}/usr/lib/web/constant.sh
+	rm -rf ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium
+else ifeq ($(AQ_TYPE),XHPB44)
+	cp -rf ${PKG_BUILD_DIR}/www_cavium/* ${ROOTFSDIR}/www
+	cp -rf ${PKG_BUILD_DIR}/www_cavium_ar11n/* ${ROOTFSDIR}/www
+	rm -rf ${ROOTFSDIR}/www_cavium
+	rm -rf ${ROOTFSDIR}/www_cavium_ar11n
+	mv ${ROOTFSDIR}/usr/lib/web/sysinit.sh_cavium ${ROOTFSDIR}/usr/lib/web/sysinit.sh
+	mv ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium_ar11n ${ROOTFSDIR}/usr/lib/web/constant.sh
+	rm -rf ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium
+endif

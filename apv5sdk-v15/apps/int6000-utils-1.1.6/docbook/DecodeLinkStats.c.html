@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			DecodeLinkStats.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='DecodeHostAction.c.html' title=' DecodeHostAction.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DecodeMfgString.c.html' title=' DecodeMfgString.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   int ihp_DecodeLinkStats (const uint8_t buffer [], size_t length, ihpapi_result_t * result);
+ *
+ *   ihp.h
+ *
+ *   decode buffer as a VS_LNK_STATS Confirm MME; update the structure 
+ *   named by the caller; 
+ *
+ *   return 0 on decode success and -1 on decode error;
+ *
+ *   See the INT6000 Firmware Technical Reference Manual
+ *   for more information;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon HomePlug AV Application Programming Interface;
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration and evaluation only; Not for production use;
+ *
+ *   Contributor(s): 
+ *	Charles Maier, charles.maier@intellon.com
+ *	Alex Vasquez, alex.vasquez@intellon.com
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef DECODELINKSTATS_SOURCE
+#define DECODELINKSTATS_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;string.h&gt;
+
+#include &quot;../ihpapi/ihp.h&quot;
+ 
+int ihp_DecodeLinkStats (const uint8_t buffer [], size_t length, ihpapi_result_t * result) 
+
+{
+	struct vs_lnk_stats_cnf 
+	{
+		struct header_vs header;
+		int8_t MSTATUS;
+		int8_t DIRECTION;
+		int8_t LID;
+		int8_t TEI;
+		int8_t LSTATS [287];
+	}
+	*confirm = (struct vs_lnk_stats_cnf *)(buffer);
+	ihpapi_getConnectInfoData_t * message = &amp;result-&gt;data.connInfo;
+	if (result == (ihpapi_result_t *)(0)) 
+	{
+		return (-1);
+	}
+	message-&gt;direction = confirm-&gt;DIRECTION;
+	message-&gt;lid = confirm-&gt;LID;
+	message-&gt;tei = confirm-&gt;TEI;
+	if (confirm-&gt;DIRECTION == 0) 
+	{
+		memcpy (message-&gt;lstats, confirm-&gt;LSTATS, 40);
+		result-&gt;dataLen = 43;
+	}
+	if (confirm-&gt;DIRECTION == 1) 
+	{
+		memcpy (message-&gt;lstats, confirm-&gt;LSTATS, 247);
+		result-&gt;dataLen = 250;
+	}
+	if (confirm-&gt;DIRECTION == 2) 
+	{
+		memcpy (message-&gt;lstats, confirm-&gt;LSTATS, 287);
+		result-&gt;dataLen = sizeof (ihpapi_getConnectInfoData_t);
+	}
+	result-&gt;validData = true;
+	result-&gt;opStatus.status = confirm-&gt;MSTATUS;
+	return (0);
+}
+
+#endif
+ 
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='DecodeHostAction.c.html' title=' DecodeHostAction.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DecodeMfgString.c.html' title=' DecodeMfgString.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

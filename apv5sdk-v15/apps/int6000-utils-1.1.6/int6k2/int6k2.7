@@ -1,0 +1,127 @@
+.TH int6k2 7 "Intellon Device Manager for Linux" "Intellon Linux Toolkit"
+.SH NAME 
+int6k2 - Intellon Device Manager for Linux
+.SH SYNOPSIS 
+\fBint6k2\fR [\fBoptions\fR] \fBdevice\fR [\fBdevice\fR] [\fB...\fR]
+.SH DESCRIPTION 
+This version of the Intellon Device Manager for Linux performs the basic device operations described in the Intellon HomePlug AV API Users Guide using Intellon HomePlug AV API software. THe program can be used to initialize devices, interrogate them and control them. It can also upgrade them when on-board NVRAM is present. It supports INT6000 devices and INT6300 devices with or without on-board NVRAM. See \fBint6k\fR for an alternative that uses raw Ethernet packets to perform similar operations.
+.PP
+This program is part of the Intellon Linux Toolkit. See the \fBilt\fR man page for an overview and installation instructions.
+.SH OPTIONS
+.TP
+.BR device
+The Media Access Control (MAC) address of some device. Addresses are 6 hexadecimal octets optionally separated by colon. For example, the addresses "00b052000001", "00:b0:52:00:00:01" and "00b052:000001" are all valid and equivalent. For convenience, the symbolic address "\fBlocal\fR" resolves to "00:b0:52:00:00:01" and the symbolic addresses "\fBall\fR" and "\fBbroadcast\fR" both resolve to "ff:ff:ff:ff:ff:ff". 
+.TP
+-\fBD\fR \fIxx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx\fR
+Define the 16 octet Device Access Key (DAK) in hex format. The DAK is used by the \fB-J\fR option. The symbolic names, "key1" and "key2" are recognized as described in the \fBKEYS\fR section.
+.TP
+-\fBF \fIoption\fR
+Intialize the device using \fBihpapi_InitializeDevice\fR. \fBoption\fR must be "INT6K_FLASH", "INT6K_NOFLASH" or "INT6K_FW_FLASH" as defined in the Intellon Homeplug AV API Users Guide.
+.TP 
+.RB - h
+Wait indefinitely for VS_HST_ACTION messages from devices and service them. This effectively behaves like an embedded host processor for upgrade and bootload purposes.
+.TP 
+-\fBi\fR \fIinterface\fR 
+Select the host Ethernet interface. All requests are sent via this interface and only reponses received via this interface are recognized. The default interface is \fBeth1\fR because most people use \fBeth0\fR as their principle network connection; however, if environment string "PLC" is defined then it takes precedence over the default interface. This option then takes precedence over either default.
+.TP 
+.RB - I
+Read the device parameter block using \fBihpapi_UpdateDevice\fR and print the firmware major revision number, PIB minor revision number, Device Access Key (DAK), Network Membership Key (NMK), MAC address and other information on stdout.
+.TP 
+.RB - J
+Set the Network Membership Key (NMK) on a remote device using \fBiphapi_SetKey\fR. This is similar to option \fB-K\fR but requires the remote device DAK in addition to NMK and MAC address. The NMK value is defined using option \fB\-K\fR unless you want to use the default value. The remote Device Access Key (DAK) is defined using option \fB\-D\fR unless you want to use the default value. Programming remote device keys is complicated. It is often easier to connect the device directly to the host and use option \fB-K\fR. The default value for both the DAK and NMK key is "key1" which as described in the \fBKEYS\fR section below.
+.TP 
+-\fBK\fR \fIxx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx\fR 
+Define the Network Membership Key (NMK) used by options \fB-M\fR or \fB\-J\fR. It may also be set to "key1" or "key2", in which case they will be replaced with the keys shown in the \fBKEYS\fR section below.
+.TP 
+.RB - m
+Read network topology information using \fBihpapi_GetNetworkInfo\fR.
+.TP 
+.RB - M
+Sets the Network Membership Key (NMK) on the local device using \fBihpapi_SetKey\fR. The NMK value is defined using option \fB\-K\fR unless you want to use the default value.
+.TP 
+\fB-l \fIcount\fR 
+Repeat command line operations \fIcount\fR times for each device. This is most often used for one device.
+.TP 
+-\fBn \fIfilename\fR 
+Read firmware from the device and write it to the named \fB.nvm\fR file using \fBihpapi_UpdateDevice\fR. No assumptions are made based on filename and no filename conventions are enforced. This option is performed before \fB-N\fR when both are specified.
+.TP 
+-\fBN \fIfilename\fR 
+Read the named \fB.nvm\fR file and write it to the device using \fBihpapi_InitializeDevice\fR. No assumptions are made based on filename and no filename conventions are enforced;
+however,
+files having invalid.nvm format will be rejected. This option is executed after \fB-n\fR when both are specified.
+.TP 
+-\fBp \fIfilename\fR 
+Read the device parameter block and write it to the named \fB.pib\fR file using \fBihpapi_UpdateDevice\fR. No assumptions are made based on filename and no filename convetions are enforced. This option is executed before \f-BP\fR when both are specified.
+.TP 
+-\fBP \fIfilename\fR 
+Read the named \fB.pib\fR and write it to the device using \fBihpapi_InitializeDevice\fR. No assumptions are made based on filename and no filename conventions are enforced;
+however,
+files having invalid.pib format will be rejected. This option is executed after \fB-p\fR when both are specified.
+.TP 
+.RB - q
+Suppresses status messages on stdout.
+.TP 
+.RB - r
+Read device firmware and hardware revision using \fBihpapi_GetVersionInfo\fR. Example output might look lik "eth0 00:B0:52:00:00:01 INT6300A0 INT6000-MAC-2-0-2000-1018-20070611-SP1-B NOT-UPGRADEABLE".
+.TP 
+.RB - R
+Reset the device using \fBihpapi_ResetDevice\fR. This option is executed after all others specified on the same command line.
+.TP 
+.RB - s
+Read the device manufacturer string using \fBihpapi_GetManufacturerInfo\fB.
+.TP 
+-\fBS \fIfilename\fR 
+Read the named \fB.config\fR file and write it to the device using \fBihpapi_SetSDRAMConfig\fR. No assumptions are make based on filename and no filename conventions are enforced. Do not confuse.config with.cfg files. See \fBchkcfg\fR and \fBconfig2cfg\fR for more information on SDRAM configuration file formats.
+.TP 
+-\fBT\fR 
+Reset device to factory defaults using \fBihapi_ResetFactoryDefaults\fR.
+.TP 
+-\fBv\fR 
+Prints additional information on stdout. In particular, this option dumps incoming and outgoing packets on stdout.
+.TP 
+-\fBw \fIseconds\fR 
+Define the number of \fIseconds\fR to wait before repeating command line options. This value only has effect when option \fB-l\fR is specified with a non-zero value.
+.TP 
+.RB - x
+Cause the program to exit immediately on the first error instead of continuing with remaining iterations, operations or devices. Normally, the program reports errors and moves on to the next operation, iteration or device depending on the command line.
+.TP 
+\fB-?\fR, \fB--help\fR 
+Displays program help information on stdout. This option takes precedence over all other options on the command line except \fB-!\fR and \fB--version\fR.
+.TP 
+-\fB!\fR, --\fBversion\fR 
+Displays program version information on stdout. This option takes precedence over all other options on the command line except \fB-?\fR or \fB--help\fR. Use this option when sending screen dumps to Intellon technical staff.
+.SH KEYS 
+Encryption keys are long, tedious to type and prone to error. The symbolic names "key1" and "key2" may be used when specifying key values for options \fB-D\fR and \fB-K\fR. Symbol "key1" translates to the HomePlug AV compliant hash for password "HomePlugAV". Symbol "key2" translates to the HomePlug AV compliant hash for password "HomePlugAV0123". The hashed value for a given pass phrase is different for DAK and NMK. These symbols are for convenience only.
+.SH EXAMPLES 
+The following set of examples illustrate a typical flash-less device initialization sequence. It assumes that the reader is familiar with difference between boot-from-flash and boot-from-host operations..PP The following command requests hardware and firmware revision information from the local device. Since no hardware address is specified, the default address, 00:B0:52:00:00:01, is used. The is sent over Ethernet interface \fBeth1\fR because that is the default Ethernet interface unless the environment variable \fBPLC\fR has been defined.
+.PP
+# int6k2 -r
+.PP 
+Since the following steps are only recognized by the bootloader program, verify that the previous command indicates that the Intellon bootloader is running..PP The following command downloads SDRAM Configuration file, 16MB_SDRAM.config, to the bootloader so that the bootloader knows can determine to store information that will be downloaded in successive steps. Normally, the bootloader would automatically read this information from NVRAM but there is no NVRAM in this example.
+.PP
+# int6k2 -S 16MB_SDRAM.config local
+.PP 
+Unlike programs \fBint6k\fR and \fBint6kf\fR, the SDRAM configuration configuration file used here specifies parameters as a 64 character ASCII hexadecimal character string instead of 32 binary bytes. This format is the same one used by the Intellon Windows Device Manager.
+.PP 
+The following command downloads PIB file, WA-NA.pib, and NVM file, vs-B-LA.nvm, one after the other under control of the bootloader and starts firmware execution when the download completes. This operation is multi-stage.
+.PP
+# int6k2 -P WA-NA.pib -N v3-B-LA.nvm local
+.PP 
+The following command, as above, requests hardware and firmware revision information from the local device. It convirms that the download was successful.
+.PP
+# int6k2 -r
+.SH REFERENCES 
+See the Intellon HomePlug AV API Users Guide for more information.
+.SH DISCLAIMER
+The Intellon HomePlug AV Application Programming Interfaces is proprietary to Intellon Corporation, Ocala FL USA. Consequently, public information is not available. Intellon Corporation reserves the right to modify the interface and the underlying functional behaviour in future software releases without any obligation to notify or compensate users of this program.
+.SH SEE ALSO
+.BR ilt ( 7 ),
+.BR int6k ( 7 ),
+.BR int6kf ( 7 ),
+.BR chknvm ( 7 ), 
+.BR chkpib ( 7 ), 
+.BR modpib ( 7 )
+.SH CREDITS
+ Charles Maier <charles.maier@intellon.com>
+ Alex Vasque <alex.vasquez@intellon.com>
+

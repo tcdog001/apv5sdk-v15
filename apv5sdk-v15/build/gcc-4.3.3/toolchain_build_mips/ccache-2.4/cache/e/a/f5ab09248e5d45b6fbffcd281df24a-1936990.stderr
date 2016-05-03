@@ -1,0 +1,2 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_xmit_ht.c: In function 'ath_tx_send_normal':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_xmit_ht.c:917: warning: unused variable 'sign'

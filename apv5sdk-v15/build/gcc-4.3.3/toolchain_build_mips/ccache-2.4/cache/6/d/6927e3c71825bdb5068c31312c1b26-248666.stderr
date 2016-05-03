@@ -1,0 +1,2 @@
+gps.c: In function 'gps_event_reg':
+gps.c:465: warning: integer constant is too large for 'long' type

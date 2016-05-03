@@ -1,0 +1,111 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_dhcp=`config_read /config/network/dhcp/dhcpserver`
+xml_dhcp_enable=`config_getoption "$xml_dhcp" enable`
+xml_dhcp_interface=`config_getoption "$xml_dhcp" interface`
+xml_dhcp_leasetime=`config_getoption "$xml_dhcp" leasetime`
+xml_dhcp_ipstart=`config_getoption "$xml_dhcp" ipstart`
+xml_dhcp_ipend=`config_getoption "$xml_dhcp" ipend`
+xml_dhcp_subnet=`config_getoption "$xml_dhcp" subnet`
+xml_dhcp_route=`config_getoption "$xml_dhcp" route`
+
+xml_lan=`config_read /config/network/lan`
+xml_lan_if=`config_getoption "$xml_lan" if`
+xml_lan_ipaddr=`config_getoption "$xml_lan" ipaddr`
+xml_lan_netmask=`config_getoption "$xml_lan" netmask`
+%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>LAN Settings</title>
+<% include_js lan_set.js %>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+</head>
+
+<body bgcolor="#efefef">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1"><a href="network.htm" target="MainFrame"><script language="javascript">replace(lan_settings_to_status)</script></a></td>
+          <td class="top1"><script language="javascript">replace(lan_settings_to_set)</script></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2"><script language="javascript">replace(lan_settings_submenu)</script></td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form method="post" action="<%= $action_cgi %>" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" ><script language="javascript">replace(lan_settings_dhcphead)</script></font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+		<tr>
+			<td class="td_style" width="150"><script language="javascript">replace(lan_settings_dhcpserver)</script></td>
+			<td class="td_style" width="350">
+			<input type="radio" <% webui_radiobutton_check "$xml_dhcp_enable" "yes" %> name="dhcpenable" value="yes"  /><script language="javascript">replace(lan_settings_dhcpenable)</script>
+			&nbsp;&nbsp; <input type="radio" <% webui_radiobutton_check "$xml_dhcp_enable" "no" %> name="dhcpenable" value="no" /><script language="javascript">replace(lan_settings_dhcpdisable)</script>
+			</td> 
+			</tr>
+			
+			<tr >
+			<td class="td_style"><script language="javascript">replace(lan_settings_dhcplease)</script> 
+			</td><td class="td_style"><input type="text" name="leasetime"  value="<%= "$xml_dhcp_leasetime" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td class="td_style"><script language="javascript">replace(lan_settings_dhcpmask)</script> 
+			</td><td class="td_style"><input type="text" name="subnet"  value="<%= "$xml_dhcp_subnet" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td class="td_style"><script language="javascript">replace(lan_settings_dhcpgateway)</script>
+			</td><td class="td_style"><input type="text" name="route"  value="<%= "$xml_dhcp_route" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td class="td_style"><script language="javascript">replace(lan_settings_dhcpiprange)</script> 
+			</td><td class="td_style"><input type="text" name="ipstart"  value="<%= "$xml_dhcp_ipstart" %>" >-<input type="text" name="ipend"  value="<%= "$xml_dhcp_ipend" %>" ></td>
+			</tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><font class="table_head" title="IP Setting illustration"><script language="javascript">replace(lan_settings_iphead)</script></font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="137"><script language="javascript">replace(lan_settings_ipaddress)</script> </td>
+          <td class="td_style" width="363"><input type="text" name="ip_address" value="<%= "$xml_lan_ipaddr" %>" style="height:12px; width:88px" /></td>
+        </tr>
+		<tr>
+          <td class="td_style"><script language="javascript">replace(lan_settings_ipmask)</script></td>
+          <td class="td_style"><input type="text" name="subnet_mask" value="<%= "$xml_lan_netmask" %>" style="height:12px; width:88px" /></td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><script language="javascript">replace(lan_settings_submit)</script></td>
+  </tr>
+</table>
+<input type="hidden" value="DHCP Setup" name="SERVLET">
+</form>
+</div>
+</body>
+</html>

@@ -1,0 +1,57 @@
+.NOTPARALLEL:
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR = src
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+CROSS=mips64-octeon-linux-gnu
+CC=${CROSS}-gcc
+
+ifeq ($(BOARD_TYPE),db12x)
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.31/net
+endif
+
+MAKE_ARGS:= KERNELPATH="$(KERNELDIR)" CROSS_COMPILE="$(TARGET_CROSS)" 
+
+unexport LDFLAGS
+
+.PHONY: all
+all: build install
+.PHONY: build
+
+ifeq ($(BOARD_TYPE),db12x)
+ifeq ($(SUB_TYPE),LTEFI)
+build:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.cavium && mv ${PKG_BUILD_DIR}/Makefile.cavium ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) LTEFI=1
+	echo "LTEFI finished"
+endif
+endif
+ifeq ($(SUB_TYPE),LTEFI_V2)
+build:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.cavium && mv ${PKG_BUILD_DIR}/Makefile.cavium ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) LTEFI_V2=1
+	echo "LTEFI finished"
+endif
+
+.PHONY: clean
+
+clean:
+	${MAKE} -C ${PKG_BUILD_DIR} clean
+
+#install dir /usr/bin
+.PHONY: install
+install: 
+	$(STRIP) ${PKG_BUILD_DIR}/check_lte
+	$(STRIP) ${PKG_BUILD_DIR}/acc_setget
+	$(STRIP) ${PKG_BUILD_DIR}/check_log
+	cp -f ${PKG_BUILD_DIR}/check_lte ${ROOTFSDIR}/usr/sbin
+	cp -f ${PKG_BUILD_DIR}/acc_setget ${ROOTFSDIR}/usr/sbin
+	cp -f ${PKG_BUILD_DIR}/check_log ${ROOTFSDIR}/usr/sbin
+	mkdir -p $(INSTALLDIR)
+	cd $(PKG_BUILD_DIR) && \
+	cp -f acc_mod.ko $(INSTALLDIR)/acc_mod.ko

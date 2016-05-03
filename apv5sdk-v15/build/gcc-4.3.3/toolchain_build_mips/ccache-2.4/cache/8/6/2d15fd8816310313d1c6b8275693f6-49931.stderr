@@ -1,0 +1,9 @@
+../src/mxml_path.c: In function 'mxml_node_get_path_new':
+../src/mxml_path.c:24: warning: incompatible implicit declaration of built-in function 'strlen'
+../src/mxml_path.c:28: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_path.c:36: warning: incompatible implicit declaration of built-in function 'strcpy'
+../src/mxml_path.c:40: warning: incompatible implicit declaration of built-in function 'free'
+../src/mxml_path.c: In function 'mxml_node_get_path_length':
+../src/mxml_path.c:63: warning: incompatible implicit declaration of built-in function 'strlen'
+../src/mxml_path.c: In function 'mxml_node_get_path':
+../src/mxml_path.c:85: warning: incompatible implicit declaration of built-in function 'strlen'

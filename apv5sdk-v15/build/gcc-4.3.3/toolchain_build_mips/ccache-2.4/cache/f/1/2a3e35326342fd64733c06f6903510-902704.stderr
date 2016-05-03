@@ -1,0 +1,7 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/check_lte/src/check_acc.c: In function 'shut_gpio_set':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/check_lte/src/check_acc.c:110: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/check_lte/src/check_acc.c: In function 'tasklet_action':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/check_lte/src/check_acc.c:130: warning: assignment from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/check_lte/src/check_acc.c: In function 'set_ap83_gpio_irq':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/check_lte/src/check_acc.c:171: warning: passing argument 2 of 'request_irq' from incompatible pointer type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/check_lte/src/check_acc.c:171: warning: ISO C90 forbids mixed declarations and code

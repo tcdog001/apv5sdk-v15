@@ -1,0 +1,225 @@
+<HTML>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<title></title>
+<base target="_self">
+<link rel="stylesheet" type="text/css" href="/CSS.CSS">
+<style>
+<!-- //
+.txt_m       { border: 1px solid #316AC5; background-color: #FFFFFF }
+.tbhead      { font-size: 12px }
+.s1          { font-size: 12px }
+.txt         { background-color: #DDDDD0 }
+
+.mypop       { border: 2px outset #FFFFFF; background-color: #336699 }
+.ptxt_center  { border: 0px solid #ECE9D8; background-color: #336699;}       
+.ptxt        { border: 0px solid #ECE9D8; background-color: #336699; float: left }
+.mytxt       { border: 1px ridge #E8E4D0; ; background-color:#FCFBF8 }
+.mysubmit	 {width:78;height:24;font-size:12px;margin:1px;border:0px solid #FFFFFF;cursor:hand;background-color:#FFFFFF}
+.tbhead1 {font-size: 12pt }
+// -->
+</style>
+</head>
+<SCRIPT src="/network.js"></SCRIPT>
+<SCRIPT src="/51w.js"></SCRIPT>
+<script language="JavaScript" type="text/JavaScript">
+function myclose()
+{
+//    	if(opener) 
+//        	opener.location.reload();
+//	window.close();
+}
+
+var errMsg="${ASK_CERT_INFO}";
+var isIE = (document.all)? true:false;
+var num_click = 0;
+var max_cert_period = ${MAX_CERT_PERIOD};
+
+function app_cert(theForm)
+{
+var T_Y = 365;
+var T_MO = 30;
+var DAYS =24;
+var T_H = 60;
+var T_M = 60;
+var TIMEOUT = 7305;
+
+        var time_unit=0;
+        time_unit = theForm.TIME.selectedIndex;
+
+	TIMEOUT = Math.floor(max_cert_period/3600/24)-1;
+	if (TIMEOUT <= 0)
+	{
+		alert("AS证书已过期，不能颁发新的证书！");
+		theForm.ASK_CERT_NAME.focus();
+                theForm.ASK_CERT_NAME.select();
+		return;
+	}
+
+
+        if (theForm.ASK_CERT_NAME.value == "")
+        {
+                alert("请输入证书执有者名称!");
+                theForm.ASK_CERT_NAME.focus();
+                theForm.ASK_CERT_NAME.select();
+                return;
+        }
+        if(theForm.ASK_CERT_NAME.value.length > 32)
+        {
+                alert("证书执有者名称不能超过32个字符");
+                theForm.ASK_CERT_NAME.focus();
+                theForm.ASK_CERT_NAME.select();
+                return;
+        }
+
+        var tmp_period = 0;
+
+        if (isIE)
+        {
+                tmp_period = theForm.CERT_PERIOD.value;
+        }
+        else
+        {
+                if (theForm.CERT_PERIOD.value.length == 0)
+                {
+                        alert("请输入证书有效期");
+                        return;
+                }
+                if (!IsNum(theForm.CERT_PERIOD.value))
+                {
+                        alert("证书有效期必须是一个大于零的整数," + theForm.CERT_PERIOD.value + "不是有效数值");
+                        return;
+                }
+                tmp_period = parseInt_dec(theForm.CERT_PERIOD.value);
+        }
+
+        if(tmp_period == 0)
+        {
+                theForm.CERT_PERIOD.focus();
+                theForm.CERT_PERIOD.select();
+
+                alert("请输入证书有效期");
+                return;
+        }
+
+        switch (time_unit)
+        {
+        case 0:
+                break;
+        case 1:
+                tmp_period = tmp_period*T_MO;
+                break;
+        default:
+                tmp_period = tmp_period*T_Y;
+                break;
+        }
+
+        if(tmp_period > TIMEOUT)
+        {
+                switch (time_unit)
+                {
+
+		case 0:
+			alert("有效期不能超过"+TIMEOUT+"天");
+			break;
+		case 1:
+			alert("有效期不能超过"+Math.floor(TIMEOUT/30)+"个月");
+			break;
+		default:
+			alert("有效期不能超过"+Math.floor(TIMEOUT/365)+"年");
+			break;
+
+                }
+                theForm.CERT_PERIOD.focus();
+                theForm.CERT_PERIOD.select();
+                return;
+        }
+        theForm.CERT_PERIOD.value = tmp_period;
+        theForm.action ="/cgi-bin/app_cert.cgi?max_cert_period="+max_cert_period;
+       /* 
+	if (theForm.ASK_CERT_TYPE[0].checked)
+        {
+                theForm.action ="/cgi-bin/app_cert.cgi?max_cert_period="+max_cert_period;
+        }
+        else
+                theForm.action ="/cgi-bin/user.wcr?max_cert_period="+max_cert_period;
+	*/
+        theForm.submit();
+	myclose();
+	theForm.CERT_PERIOD.value = "";
+}
+
+
+</script>
+<META http-equiv=Content-Type content="text/html; charset=gb2312">
+<link rel="stylesheet" type="text/css" href="/CSS.CSS">
+</HEAD>
+<BODY BGCOLOR=#336699 vlink=#0000FF  topMargin=0>
+  <FORM  name=fm1 ACTION="" METHOD=POST >
+	<table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" width="100%" id="AutoNumber4" height="240">
+		<tr>
+			<td width="27%" align="center"></td>
+			<td width="44%" align="center">
+			<FIELDSET   style="padding:2px; WIDTH: 373px; HEIGHT: 222px"> 
+        	<legend><font color="#FF6B09"><b>证书分发</b></font></legend>
+        <table border="0" width="102%" id="table3" height="88%" bgcolor="#E8ECE8"> 
+          <tr>
+            <td align=center width="123"> <p align="left"> 
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;证书类型：</td> 
+            <td align=left width="225">  
+					<input type="radio" value="1" name="ASK_CERT_TYPE" checked style="float: left"> 
+                   X.509证书&nbsp;&nbsp;<input type="radio" name="ASK_CERT_TYPE" disabled value="2">GBW证书</td> 
+          </tr> 
+          <tr> 
+            <td align=center height="18" width="346" colspan="2"> 
+			<hr>
+			</td> 
+          </tr> 
+          <tr>
+            <td align=left height="39" width="123"> 
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;持有者名称：</td> 
+            <td align=left height="39" width="225"> 
+			<input type="text" name="ASK_CERT_NAME" size="26" class="mytxt" maxlength="32" tabindex="0" style="ime-mode:Disabled"></td> 
+          </tr>
+          <tr> 
+            <td align=left height="50" width="123"> 
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;证书有效期：</td> 
+            <td align=left height="50" width="225"> 
+	 <input name="CERT_PERIOD" size="16" maxlength =5
+			onkeypress	= "return regInput(this,	/^[0-9]*$/,		String.fromCharCode(event.keyCode))"
+			onpaste		= "return regInput(this,	/^[0-9]*$/,		window.clipboardData.getData('Text'))"
+			ondrop		= "return regInput(this,	/^[0-9]*$/,		event.dataTransfer.getData('Text'))"
+		    class="mytxt" style="ime-mode:Disabled">&nbsp;&nbsp;
+&nbsp;
+          <select size="1" name="TIME" style="width =60; border-style: outset; border-width: 1" class="mytxt" tabindex="0"> 
+            <option value="0">天</option> 
+            <option value="1">月</option> 
+            <option value="2">年</option> 
+          </select> </td> 
+
+          </tr> 
+          <tr> 
+        <td width="100%" height="43" align=center bordercolor="#FFFFFF" bordercolorlight="#FFFFFF" bordercolordark="#C0C0C0" colspan="4"> 
+          <a href="javascript:app_cert(document.fm1);"> <img src=/image/0012a.gif border=0 width="78" height="24"></a>
+	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+	<a href="javascript:window.close();"><img src=/image/cancle1.gif border=0 width="78" height="24"></a> </td> 
+          </tr> 
+        </table> 
+      		</FIELDSET></td>
+			<td width="33%%" align="center">　</td>
+		</tr>
+	</table>
+	</FORM>
+	  </tr> 
+	</table>
+<table border="0" cellpadding="0" cellspacing="0" bordercolor="#111111" width="100%" id="table1" height="34"> 
+	  <tr> 
+	  </tr> 
+	</table>
+  </body>
+<SCRIPT language=JavaScript>
+if (errMsg.length > 0)
+	alert(errMsg);
+</SCRIPT>
+  </html>
+ 

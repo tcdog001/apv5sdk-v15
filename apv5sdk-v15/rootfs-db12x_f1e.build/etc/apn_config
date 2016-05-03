@@ -1,0 +1,14 @@
+isApnName=1
+apnName=cmnet
+ipv4AddrPref=0
+authPref=0
+isUserName=0
+username=
+password=
+pdpType=0
+ipFamilyPref=4
+callType=1
+connected_cmd=/tmp/udhcpc_discover
+disconnected_cmd=/tmp/udhcpc_release
+connected_v6_cmd=/tmp/udhcpc_v6_discover
+disconnected_v6_cmd=/tmp/udhcpc_v6_release

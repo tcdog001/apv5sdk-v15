@@ -1,0 +1,160 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+ xml_rogueapdetection=`config_read /config/network/rogueapdetection` 
+ xml_rogueapdetection_enable=`config_getoption "$xml_rogueapdetection" enable`
+ xml_rogueapdetection_if=`config_getoption "$xml_rogueapdetection" if`
+ xml_num=`echo $xml_rogueapdetection_if | awk -F'p' '{print $2}'`
+ ath_num=`expr $xml_num - 1`
+ 
+ for vap_allnum in `seq $NUM_ap`
+do
+	eval "xml_wlan_config_vap${vap_allnum}=\`config_read /config/network/vap${vap_allnum}\`"
+	eval "xml_wlan_vap${vap_allnum}_enable=\`config_getoption \"\$xml_wlan_config_vap${vap_allnum}\" create\`"
+done
+ 
+RogueAp_detection()
+{
+   	local xml_rogueapdetection=`config_read /config/network/rogueapdetection`
+	local xml_rogueapdetection_enable=`config_getoption "$xml_rogueapdetection" enable`
+	if [ "$xml_rogueapdetection" != "" ]; then
+		if [ "$xml_rogueapdetection_enable" == "yes" ];then
+			local scaninfo=`$IWLIST ath$ath_num scanning|sed '1d'`
+			echo "Scan completed :"
+      echo "$scaninfo"
+		fi
+	fi
+}
+ 
+ xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js wireless_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	
+	var allvap_num="<%= $NUM_ap %>";
+	var vapname="<%= $xml_rogueapdetection_if %>";
+	var array_vapcreate=["<%= $xml_wlan_vap1_enable %>","<%= $xml_wlan_vap2_enable %>","<%= $xml_wlan_vap3_enable %>","<%= $xml_wlan_vap4_enable %>","<%= $xml_wlan_vap5_enable %>","<%= $xml_wlan_vap6_enable %>","<%= $xml_wlan_vap7_enable %>","<%= $xml_wlan_vap8_enable %>","<%= $xml_wlan_vap9_enable %>","<%= $xml_wlan_vap10_enable %>","<%= $xml_wlan_vap11_enable %>","<%= $xml_wlan_vap12_enable %>",];
+	init_mmenu(flag);
+	init_wiremenu(flag);
+	init_rogue(flag);
+	
+	
+function myrefresh()
+{
+   document.form1.action="action.cgi";
+	 document.form1.submit(); 
+}
+setTimeout("myrefresh()",120000)
+
+function vapname_display()
+{
+	for(var i = 1;i <= allvap_num;i++)
+	{
+			if(array_vapcreate[i-1] == "yes")
+			{
+				var tmp_vapname="vap"+i;
+				if(vapname == tmp_vapname)
+				{
+				 		document.write("<option value='"+tmp_vapname+"' selected='selected' >"+tmp_vapname+"</option>");
+				}
+				else
+				{
+					  document.write("<option value='"+tmp_vapname+"' >"+tmp_vapname+"</option>");
+				}
+		  }
+	}
+}
+
+</script>
+</head>
+<body>
+<%in menu_wireless7.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form name="form0" method="post" action="<%= $action_cgi %>">
+  <div align="center">
+    <table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width=650>
+			      <tr>
+			        <td width="100%" align="left" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(rogue_create)</script></b></td>
+			      </tr>
+			      
+			      <tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+			      
+			      <tr>
+			        <td height="24" width="280" bordercolor="#ffffff"><script language="javascript">replace(rogue_vid)</script></td>
+				      <td width="370" bordercolor="#ffffff">
+				        <input type="checkbox" <% webui_checkbox_check "$xml_rogueapdetection_enable" "yes" %>  name="RogueAPEnable"    value="yes">&nbsp;
+				      </td>
+			      </tr>
+			      
+			      <tr>
+							<td  height="24" bordercolor="#ffffff" ><script language="javascript">replace(rogue_select_if)</script>&nbsp;</td>
+							<td  bordercolor="#ffffff" >
+							<select name="vapname" >
+							<script language="JavaScript" type="text/javascript">vapname_display()</script>
+							</select>	
+							</td>
+						</tr>
+			      
+			      <tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+			      </table>
+		        <table  align="center"  border="0" cellpadding="0" cellspacing="0" width=650>
+			      <tr>
+			        <td align="right"  height="40">
+			          <script language="javascript">replace(rogue_apply)</script>&nbsp;
+			        </td>
+			        
+			        <td align="left">&nbsp;
+				      <script language="javascript">replace(rogue_refresh)</script>
+				      </td>
+			      </tr>
+			      
+			      <tr>
+			        <td align="right"   colspan="2"><script language="javascript">replace(rogue_help)</script></td>
+			      </tr>
+			     </table>
+			     
+			     <table bgcolor="#f4f9fd"  align="center"    border="1" cellpadding="0" cellspacing="0" width=650 bordercolor="#f4f9fd">
+			      <tr><td bordercolor="#f4f9fd"><pre> <% RogueAp_detection %></pre></td></tr>
+			     </table>
+  </div>
+  <input type="hidden" value="rogueap" name="SERVLET">
+</form>
+<form name="form1" method="post" action="<%= $action_cgi %>">
+	<input type="hidden" value="rogue refresh" name="SERVLET">
+	</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>

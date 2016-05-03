@@ -1,0 +1,3 @@
+../src/mxml_file.c: In function 'mxml_read_file':
+../src/mxml_file.c:50: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_file.c:57: warning: incompatible implicit declaration of built-in function 'free'

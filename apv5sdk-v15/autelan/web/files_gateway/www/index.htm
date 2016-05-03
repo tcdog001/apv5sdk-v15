@@ -1,0 +1,34 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Autelan</title>
+</head>
+<frameset cols="*,843,*" frameborder="no" border="0" framespacing="0">
+	<frame src="blank.htm" name="leftBlank" id="leftBlank" title="leftBlank"/>
+	<frameset rows="2%,95%,*" frameborder="no" border="0" framespacing="0">
+		<frame src="blank.htm" name="topBlank" id="topBlank" title="topBlank" scrolling="no"/>
+		<frameset rows="120,5,*" frameborder="no" border="0" framespacing="0">
+			<frame src="logframe.htm" name="LogFrame" id="LogFrame" title="LogFrame" scrolling="no"/>
+			<frame src="blank.htm" name="rowSpace" id="rowSpace" title="rowSpace" scrolling="no"/>
+			<frameset cols="24%,5,*" frameborder="no" border="0" framespacing="0">
+				<frame src="leftframe.htm" name="LeftFrame" id="LeftFrame" title="LeftFrame" scrolling="no"/>
+				<frame src="blank.htm" name="colSpace" id="colSpace" title="colSpace" scrolling="no"/>
+				<frame src="router_state.htm" name="MainFrame" id="MainFrame" title="MainFrame" marginwidth="0" marginheight="0" />
+			</frameset>
+			<frame src="leftframe.htm" name="bottomBlank" id="bottomBlank" title="bottomBlank" scrolling="no"/>
+		</frameset>		
+		<frame src="blank.htm" name="bottomBlank" id="bottomBlank" title="bottomBlank" scrolling="no"/>
+	</frameset>
+	<frame src="blank.htm" name="rightBlank" id="rightBlank" title="rightBlank"/>
+</frameset>
+<noframes>
+<body>
+很抱歉，您使用的浏览器不支持框架功能，请转用新的浏览器。
+</body>
+</noframes>
+</html>

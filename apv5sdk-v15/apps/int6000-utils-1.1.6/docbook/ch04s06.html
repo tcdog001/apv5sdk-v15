@@ -1,0 +1,113 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Things to Remember</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><meta name="keywords" content="
+				int6k 
+				, 
+				powerline 
+				"><link rel="start" href="index.html" title="Intellon INT6000 Linux Toolkit"><link rel="up" href="ch04.html" title="Chapter 4.  Firmware"><link rel="prev" href="ch04s05.html" title="Boot from Host Configuration"><link rel="next" href="ch04s07.html" title="Caveats"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">
+			Things to Remember
+			</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch04s05.html">Prev</a> </td><th width="60%" align="center">Chapter 4. 
+		Firmware 
+		</th><td width="20%" align="right"> <a accesskey="n" href="ch04s07.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="bootload-rules"></a>
+			Things to Remember
+			</h2></div></div></div><p>
+			The Boot from Host configuration offers design flexibility but that flexibility also increases the possibilities. Remember that the processes described here are based on simple rules that ultimatey dictate why each process step is needed. Readers may find it helpful to review these rules.
+			</p><div class="orderedlist"><ol type="1"><li><p>
+					<span class="emphasis"><em>The Softloader and Bootloader have limited vocabulary</em></span>. 
+					</p><p>
+					The <span class="trademark">INT6000</span>™ Softloader recognizes only the <code class="constant">VS_SW_VER</code>, <code class="constant">VS_ST_MAC</code>, <code class="constant">VS_RS_DEV</code>, <code class="constant">VS_WR_MOD</code> and  messages. It does not recognize <code class="constant">VS_WR_MEM</code>. 
+					</p><p>
+					The <span class="trademark">INT6300</span>™ Bootloader recognizes only the <code class="constant">VS_SW_VER</code>, <code class="constant">VS_WR_MEM</code>, <code class="constant">VS_ST_MAC</code>, <code class="constant">VS_RS_DEV</code> and <code class="constant">VS_SET_SDRAM</code> messages. It does not recognize <code class="constant">VS_WR_MOD</code>.
+					</p><p>
+					The <span class="trademark">INT6400</span>™ Bootloader recognizes only the <code class="constant">VS_SW_VER</code>, <code class="constant">VS_WR_MEM</code>, <code class="constant">VS_ST_MAC</code>, <code class="constant">VS_RS_DEV</code> message. It recognizes <code class="constant">VS_SET_SDRAM</code> and responds to it but ignores it. It does not recognize <code class="constant">VS_WR_MOD</code>.
+					</p><p>
+Runtime firmware must be loaded before doing anything else,  such as flashing <acronym class="acronym">NVRAM</acronym>.
+					</p><div class="table"><a name="id2561423"></a><p class="title"><b>Table 4.1. 
+				Softloader/Bootloader MMEs
+				</b></p><div class="table-contents"><table summary="
+				Softloader/Bootloader MMEs
+				" border="1"><colgroup><col><col><col><col></colgroup><thead><tr><th>
+						MME
+						</th><th>
+						NAME
+						</th><th>
+						INT6000 Softloader
+						</th><th>
+						INT6300 Bootloader
+						</th><th>
+						INT6400 Bootloader
+						</th></tr></thead><tbody><tr><td>
+						0xA000
+						</td><td>
+						VS_SW_VER
+						</td><td>
+						Yes
+						</td><td>
+						Yes
+						</td><td>
+						Yes
+						</td></tr><tr><td>
+						0xA008
+						</td><td>
+						VS_WR_MEM
+						</td><td>
+						No
+						</td><td>
+						Yes 
+						</td><td>
+						Yes
+						</td></tr><tr><td>
+						0xA00C
+						</td><td>
+						VS_ST_MAC
+						</td><td>
+						Yes
+						</td><td>
+						Yes 
+						</td><td>
+						Yes
+						</td></tr><tr><td>
+						0xA01C
+						</td><td>
+						VS_RS_DEV
+						</td><td>
+						Yes
+						</td><td>
+						Yes
+						</td><td>
+						Yes
+						</td></tr><tr><td>
+						0xA020
+						</td><td>
+						VS_WR_MOD
+						</td><td>
+						Yes
+						</td><td>
+						No
+						</td><td>
+						No
+						</td></tr><tr><td>
+						0xA05C
+						</td><td>
+						VS_SDRAM
+						</td><td>
+						No
+						</td><td>
+						Yes
+						</td><td>
+						Not Really
+						</td></tr></tbody></table></div></div><br class="table-break"></li><li><p>
+					<span class="emphasis"><em>The Softloader,  Bootloader and runtime firmware treat some MMEs differently</em></span> because each is a different program. 
+					</p></li><li><p>
+					<span class="emphasis"><em>The local host is surrogate NVRAM</em></span>. When dedicated NVRAM is not available to a device, the device will request firmware and parameter storage services from the local host using <code class="constant">VS_HST_ACTION</code> messages. The local host must be programmed to detect and respond to these messages or the firmware will appear to hang. See program <a class="link" href="ch01s08.html#program-int6khost">int6khost</a> to demonstrate and experiment with this iteraction.
+					</p></li><li><p>
+					<span class="emphasis"><em>Only runtime firmware can commit changes to NVRAM</em></span>. Runtime firmware must be executing in order to write <acronym class="acronym">NVRAM</acronym> or upload to the local host. The Softloader and Bootloader cannot perform either operation.
+					</p></li><li><p>
+					<span class="emphasis"><em>All <acronym class="acronym">PIB</acronym> changes must be committed to NVRAM</em></span>. There are several things that can cause <acronym class="acronym">PIB</acronym> changes. When a <acronym class="acronym">PIB</acronym> change is needed,  the Working <acronym class="acronym">PIB</acronym> is copied to a scratch area and modified there. The Scratch <acronym class="acronym">PIB</acronym> must then be written to <acronym class="acronym">NVRAM</acronym> or sent to the local host for storage. The device then resets causing the stored <acronym class="acronym">PIB</acronym> to replace the Working <acronym class="acronym">PIB</acronym>. If a freshly downloaded <acronym class="acronym">PIB</acronym> changes for any reason then the cycle will repeat, automatically. 
+					</p></li><li><p>
+					<span class="emphasis"><em>Runtime firmware modifies the PIB after joining and before leaving an AVLN</em></span>. This will cause a device reset in each case. If the device is using the local host for persistent storage, runtime firmware will send the associated <code class="constant">VS_HST_ACTION</code> messages to the host and the host will send the associated <code class="constant">VS_RD_MOD</code> and <code class="constant">VS_RS_DEV</code> messages as per <a class="link" href="ch04s09.html" title="Update Local Host (INT6000/INT6300/INT6400)">Update Local Host</a>.
+					</p></li><li><p>
+					<span class="emphasis"><em>The Boot from Host process differs on the <span class="trademark">INT6000</span>™,  <span class="trademark">INT6300</span>™ and <span class="trademark">INT6400</span>™.</em></span> The <a class="link" href="ch04s08.html" title="Upgrade Device (INT6000/INT6300/INT6400)">Upgrade Device</a> and <a class="link" href="ch04s09.html" title="Update Local Host (INT6000/INT6300/INT6400)">Update Local Host</a> operations are the same for all three chipsets because they are firmware driven. The <a class="link" href="ch04s10.html" title="Boot from Host (INT6000)">Boot from Host</a> differs on each chipset because it is <span class="application">Softloader</span> driven on the <span class="trademark">INT6000</span>™ and <span class="application">Bootloader</span> driven on the <span class="trademark">INT6300</span>™ and <span class="trademark">INT6400</span>™. The <span class="application">Bootloader</span> on the latter two chipsets is identical except for the initialization of SDRAM parameters. 
+					</p></li></ol></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch04s05.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch04.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch04s07.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">
+			Boot from Host Configuration 
+			 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 
+			Caveats
+			</td></tr></table></div></body></html>

@@ -1,0 +1,58 @@
+#!/bin/sh
+if [ $# -ne 1 ] ;then
+	echo "Usage: sysupgrade version"
+	exit 1
+fi
+WRCPUUTIL=/usr/bin/pro_ctl_util
+MARK="`$WRCPUUTIL -T | awk -F':' '/kernel_num/{print $2}'`"
+
+begin_upgrade()
+{
+if [ $MARK -eq 1 ];then	
+	[ -e single_os ]
+	if [ $? -eq 0 ];then
+		/usr/sbin/aq2000upgrade pc018version.img
+	fi
+	[ -e double_os ]
+	if [ $? -eq 0 ];then
+		/usr/sbin/aq2000upgrade pc018version.img
+	fi
+elif [ $MARK -eq 2 ];then
+	[ -e single_os ]
+	if [ $? -eq 0 ];then
+		/usr/sbin/aq2000upgrade pc018version.img
+	fi
+	[ -e double_os ]
+	if [ $? -eq 0 ];then
+		/usr/sbin/woc_upgrade pc018version.img next
+	fi
+else 
+	echo not measure single_os or double_os
+	exit 1
+fi
+}
+if [ -e $1 ]; then
+	echo "file exist"
+	cd /tmp/
+	mv $1 version.tar
+    size=$(ls -l version.tar | awk -F " " '{print $5}')
+    echo $size
+    if [ $size -lt 5242880 ] || [ $size -gt 14680064 ];then
+        logger -s "wrong size"
+        exit 1
+    fi
+    tar -zxvf version.tar
+	if [ $? -ne 0 ]; then
+		logger -s "tar version faild"
+		exit 1
+	fi
+	sleep 1
+	rm version.tar
+	rm /jffs/preconfig
+	rm /jffs/config.ap83
+	killall acc_setget
+	rmmod acc_mod
+	begin_upgrade
+fi
+
+		

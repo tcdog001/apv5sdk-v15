@@ -1,0 +1,2 @@
+net/core/dev.c: In function 'handle_bridge':
+net/core/dev.c:2155: warning: initialization from incompatible pointer type

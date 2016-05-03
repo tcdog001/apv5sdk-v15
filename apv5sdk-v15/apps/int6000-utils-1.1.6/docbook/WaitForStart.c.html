@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			WaitForStart.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='WaitForReset.c.html' title=' WaitForReset.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='WaitForStop.c.html' title=' WaitForStop.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   int WaitForStart (struct int6k *int6k, char string [], signed length);
+ *
+ *   int6k.h
+ *
+ *   poll the device using VS_SW_VER messages until it responds or 
+ *   the allotted time expires; return 0 if the device responds within
+ *   the allotted time or -1 if it does not or if a transmission error
+ *   occurs;
+ *
+ *   retry is number of poll attempts before returning an error to
+ *   indicate that the bootloader or firmware failed to respond in
+ *   the allotted time; timer is the time between poll attempts;
+ *
+ *   See Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef WAITFORSTART_SOURCE
+#define WAITFORSTART_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;memory.h&gt;
+#include &lt;string.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/error.h&quot;
+
+int WaitForStart (struct int6k *int6k, char string [], signed length) 
+
+{
+
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_sw_ver_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint8_t MDEVICEID;
+		uint8_t MVERLENGTH;
+		char MVERSION [INT6K_VERSTRING];
+		uint8_t UPGRADEABLE;
+	}
+	* confirm = (struct vs_sw_ver_confirm *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	unsigned retry = int6k-&gt;retry;
+	while (retry--) 
+	{
+		signed status;
+		memset (message, 0, sizeof (struct message));
+		EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+		IntellonHeader (&amp;message-&gt;intellon, (VS_SW_VER | MMTYPE_REQ));
+		int6k-&gt;packetsize = ETHER_MIN_LEN;
+		if (SendMME (int6k) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+			return (-1);
+		}
+		status = ReadMME (int6k, (VS_SW_VER | MMTYPE_CNF));
+		if (status &lt; 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+			return (-1);
+		}
+		if (status &gt; 0) 
+		{
+			if (confirm-&gt;MSTATUS) 
+			{
+				Failure (int6k, &quot;Device will not start&quot;);
+				return (-1);
+			}
+			int6k-&gt;hardwareID = confirm-&gt;MDEVICEID;
+			strncpy (string, confirm-&gt;MVERSION, length);
+			if ((int6k-&gt;hardwareID == INT6000A1) &amp;&amp; !strcmp (string, INT6K_BOOTLOADER)) 
+			{
+				int6k-&gt;hardwareID = INT6300A0;
+			}
+			return (0);
+		}
+		if (retry) 
+		{
+			SLEEP (int6k-&gt;timer);
+		}
+	}
+	Failure (int6k, &quot;Device did not Start&quot;);
+	return (-1);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='WaitForReset.c.html' title=' WaitForReset.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='WaitForStop.c.html' title=' WaitForStop.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

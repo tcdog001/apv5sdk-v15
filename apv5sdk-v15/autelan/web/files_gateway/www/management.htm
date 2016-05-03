@@ -1,0 +1,83 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+SYS_INFO="/usr/bin/bmutil -p 2>/dev/null"
+device_name=`cat /proc/sys/kernel/hostname`
+device_sn=`$SYS_INFO | awk -F ":|[ ]+" '/product sn/{print $3}'`
+device_type=`$SYS_INFO | awk -F ":|[ ]+" '/product name/{print $3}'`
+device_mac=`$SYS_INFO | awk -F ":|[ ]+" '/product mac/{print $3}' `
+device_softversion=`cat /etc/version/version`#`cat /etc/version/buildno`
+device_hardversion1=`$SYS_INFO | awk -F ":" '/product sn/{print $2}' | cut -c10`
+device_hardversion2=`$SYS_INFO | awk -F ":" '/product sn/{print $2}' | cut -c11-12`
+device_hardversion=${device_hardversion1}.${device_hardversion2}
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Management</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+</head>
+
+<body bgcolor="#efefef">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+		  <td class="top1">Status</td>
+          <td class="top1"><a href="upgrade.htm" target="MainFrame">Upgrade</a></td>
+          <td class="top1"><a href="restore.htm" target="MainFrame">Restore</a></td>
+		  <td class="top1"><a href="manage.htm" target="MainFrame">Password</a></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">System-->Status</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="System Information illustration">System Information</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">System Name</td>
+          <td class="td_style" width="350"><%= "$device_name" %></td>
+        </tr>
+		<tr>
+          <td class="td_style">SN</td>
+          <td class="td_style" valign="top"><%= "$device_sn" %></td>
+        </tr>
+		<tr>
+          <td class="td_style">Device Type</td>
+          <td class="td_style" valign="top"><%= "$device_type" %></td>
+        </tr>
+		<tr>
+          <td class="td_style">BASE MAC</td>
+          <td class="td_style"><%= "$device_mac" %></td>
+        </tr>
+    <tr>
+          <td class="td_style">Software Version</td>
+          <td class="td_style"><%= "$device_softversion" %></td>
+        </tr>
+    <tr>
+          <td class="td_style">Hardware Version</td>
+          <td class="td_style"><%= "$device_hardversion" %></td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><a class="imgLink" href="#" onclick="window.parent.frames.MainFrame.location.reload();">Refresh</a></td>
+  </tr>
+</table>
+</div>
+</body>
+</html>

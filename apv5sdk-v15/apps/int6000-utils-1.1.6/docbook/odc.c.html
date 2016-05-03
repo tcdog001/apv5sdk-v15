@@ -1,0 +1,321 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			odc.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='nvrampeek.c.html' title=' nvrampeek.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='odd.c.html' title=' odd.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   odc.c - object driven compare;
+ *
+ *.  Motley Tools by Charles Maier; cmaier@cmassoc.net;
+ *:  Published 2005 by Charles Maier Associates for internal use;
+ *;  Released under GNU General Public License v2 and later;
+ *
+ *   Contributor(s):
+ *      Nathan Houghton &lt;nathan@brainwerk.org&gt;
+ *      Abdel Younes &lt;younes@leacom.fr&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+#include &lt;errno.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/putoptv.h&quot;
+#include &quot;../tools/version.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/sizes.h&quot;
+#include &quot;../tools/chars.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/hexview.c&quot;
+#include &quot;../tools/emalloc.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/alert.c&quot;
+#endif
+
+/*====================================================================*
+ *   program constants;
+ *--------------------------------------------------------------------*/
+
+#define _BARWIDTH 73
+
+/*====================================================================*
+ *   
+ *   void function (const char * filename[], flag_t flags);
+ *   
+ *   read definition file to determine the size of next object;
+ *   read next object from each binary file and compare; report
+ *   differences;
+ *   
+ *.  Motley Tools by Charles Maier; cmaier@cmassoc.net;
+ *:  Published 2005 by Charles Maier Associates for internal use;
+ *;  Released under GNU General Public License v2 and later;
+ *
+ *--------------------------------------------------------------------*/
+
+static void function (const char * filename [], flag_t flags) 
+
+{
+	unsigned lineno = 1;
+	unsigned object = 0;
+	unsigned offset = 0;
+	unsigned length = 0;
+	unsigned extent [2] = 
+	{
+		0,
+		0 
+	};
+	byte * buffer [2];
+	char symbol [_NAMESIZE];
+	char string [_LINESIZE];
+	char * sp;
+	signed fd [2];
+	signed c;
+	signed i;
+	for (i = 0; i &lt; 2; i++) 
+	{
+		if ((fd [i] = open (filename [i], O_BINARY|O_RDONLY)) == -1) 
+		{
+			error (1, errno, &quot;Can't open %s&quot;, filename [i]);
+		}
+		if ((extent [i] = lseek (fd [i], 0, SEEK_END)) == -1) 
+		{
+			error (1, errno, &quot;Can't size %s&quot;, filename [i]);
+		}
+		if (lseek (fd [i], 0, SEEK_SET)) 
+		{
+			error (1, errno, &quot;Can't home %s&quot;, filename [i]);
+		}
+	}
+	while ((c = getc (stdin)) != EOF) 
+	{
+		if ((c == '#') || (c == ';')) 
+		{
+			do 
+			{
+				c = getc (stdin);
+			}
+			while (nobreak (c));
+			lineno++;
+			continue;
+		}
+		if (isspace (c)) 
+		{
+			if (c == '\n') 
+			{
+				lineno++;
+			}
+			continue;
+		}
+		length = 0;
+		while (isdigit (c)) 
+		{
+			length *= 10;
+			length += c - '0';
+			c = getc (stdin);
+		}
+		while (isblank (c)) 
+		{
+			c = getc (stdin);
+		}
+		sp = symbol;
+		if (isalpha (c) || (c == '_')) 
+		{
+			do 
+			{
+				*sp++ = (char)(c);
+				c = getc (stdin);
+			}
+			while (isident (c));
+		}
+		while (isblank (c)) 
+		{
+			c = getc (stdin);
+		}
+		if (c == '[') 
+		{
+			*sp++ = (char)(c);
+			c = getc (stdin);
+			while (isblank (c)) 
+			{
+				c = getc (stdin);
+			}
+			while (isdigit (c)) 
+			{
+				*sp++ = (char)(c);
+				c = getc (stdin);
+			}
+			while (isblank (c)) 
+			{
+				c = getc (stdin);
+			}
+			*sp = (char)(0);
+			if (c != ']') 
+			{
+				error (1, EINVAL, &quot;Have '%s' but no ']' on line %d&quot;, symbol, lineno);
+			}
+			*sp++ = (char)(c);
+			c = getc (stdin);
+		}
+		*sp = (char)(0);
+		while (isblank (c)) 
+		{
+			c = getc (stdin);
+		}
+		sp = string;
+		while (nobreak (c)) 
+		{
+			*sp++ = (char)(c);
+			c = getc (stdin);
+		}
+		*sp = (char)(0);
+		if (length) 
+		{
+			buffer [0] = emalloc (length);
+			buffer [1] = emalloc (length);
+			if (read (fd [0], buffer [0], length) &lt; (signed)(length)) 
+			{
+				break;
+			}
+			if (read (fd [1], buffer [1], length) &lt; (signed)(length)) 
+			{
+				break;
+			}
+			if (memcmp (buffer [0], buffer [1], length)) 
+			{
+				if (!object++) 
+				{
+					for (c = 0; c &lt; _BARWIDTH; c++) 
+					{
+						putc ('-', stdout);
+					}
+					putc ('\n', stdout);
+				}
+				printf (&quot;%08X  %d %s\n&quot;, offset, length, symbol);
+				printf (&quot;--------  %s\n&quot;, filename [0]);
+				hexview (buffer [0], offset, length, stdout);
+				printf (&quot;--------  %s\n&quot;, filename [1]);
+				hexview (buffer [1], offset, length, stdout);
+				for (c = 0; c &lt; _BARWIDTH; c++) 
+				{
+					putc ('-', stdout);
+				}
+				putc ('\n', stdout);
+			}
+			free (buffer [0]);
+			free (buffer [1]);
+		}
+		offset += length;
+		lineno++;
+	}
+	if (extent [0] &gt; extent [1]) 
+	{
+		alert (&quot;%s exceeds %s&quot;, filename [0], filename [1]);
+	}
+	if (extent [1] &gt; extent [0]) 
+	{
+		alert (&quot;%s exceeds %s&quot;, filename [1], filename [0]);
+	}
+	close (fd [0]);
+	close (fd [1]);
+	return;
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char * argv []);
+ *   
+ *   
+ *.  Motley Tools by Charles Maier; cmaier@cmassoc.net;
+ *:  Published 2005 by Charles Maier Associates for internal use;
+ *;  Released under GNU General Public License v2 and later;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	static const char *optv [] = 
+	{
+		&quot;f:&quot;,
+		&quot;file file&quot;,
+		&quot;object driven compare&quot;,
+		&quot;f f\tobject definition file&quot;,
+		(const char *)(0) 
+	};
+	flag_t flags = (flag_t)(0);
+	signed c;
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch (c) 
+		{
+		case 'f':
+			if (!freopen (optarg, &quot;rb&quot;, stdin)) 
+			{
+				error (1, errno, &quot;Can't open %s&quot;, optarg);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	if (argc != 2) 
+	{
+		error (1, 0, &quot;Need two files to compare.&quot;);
+	}
+	function (argv, flags);
+	return (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='nvrampeek.c.html' title=' nvrampeek.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='odd.c.html' title=' odd.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

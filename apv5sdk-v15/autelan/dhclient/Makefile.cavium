@@ -1,0 +1,81 @@
+OCTEON_ROOT := /home/shark/cavium
+ROOTFSDIR := /home/shark/builddir/rootfs
+#file name and path declare
+PKG := dhclient
+VERSION := 4.1.0
+PKG_NAME := $(PKG)-$(VERSION)
+#PKG_BUILD_DIR := $(PKG_NAME)
+PKG_BUILD_DIR:=src
+
+CAVIUM_CPPFLAGS ?= -I$(OCTEON_ROOT)/tools/mips64-octeon-linux-gnu/sys-root/usr/include
+CAVIUM_LDFLAGS ?= -L$(OCTEON_ROOT)/tools/mips64-octeon-linux-gnu/sys-root/usr/lib64
+
+CROSS = mips64-octeon-linux-gnu
+
+#command replace
+CPDIR := sudo cp -r 
+CP := sudo cp -fpR
+MKDIR := mkdir -p
+MV := sudo mv
+STRIP := $(CROSS)-strip
+
+SSL_DIR := $(ROOTFSDIR)/../source/openssl-0.9.8f
+
+#configure option
+FPIC := -fPIC
+TARGET_CROSS ?= mips64-octeon-linux-gnu-
+TARGET_CC ?= $(TARGET_CROSS)gcc
+TARGET_CFLAGS =   
+EXTRA_CFLAGS = 
+TARGET_CPPFLAGS = $(CAVIUM_CPPFLAGS) 
+EXTRA_CPPFLAGS = 
+TARGET_LDFLAGS = $(CAVIUM_LDFLAGS)
+EXTRA_LDFLAGS = 
+GNU_TARGET_NAME ?= mips-linux
+#DISABLE_NLS ?= --disable-nls 
+TARGET_CONFIGURE_OPTS ?= \
+  AR=$(TARGET_CROSS)ar \
+  AS="$(TARGET_CC) -c $(TARGET_CFLAGS)" \
+  LD=$(TARGET_CROSS)ld \
+  NM=$(TARGET_CROSS)nm \
+  CC="$(TARGET_CC)" \
+  GCC="$(TARGET_CC)" \
+  CXX=$(TARGET_CROSS)g++ \
+  RANLIB=$(TARGET_CROSS)ranlib \
+  STRIP=$(TARGET_CROSS)strip \
+  OBJCOPY=$(TARGET_CROSS)objcopy \
+  OBJDUMP=$(TARGET_CROSS)objdump \
+  SIZE=$(TARGET_CROSS)size
+
+MAKE_FLAGS = \
+		$(TARGET_CONFIGURE_OPTS) \
+		CROSS="$(TARGET_CROSS)" \
+		ARCH="$(ARCH)"
+MAKE_VARS = \
+		CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+		CPPFLAGS="$(TARGET_CPPFALGS) $(EXTRA_CPPFLAGS)" \
+ 		CXXFLAGS="$(TARGET_CFALGS) $(EXTAR_CFLAGS)" \
+		LDFLAGS="$(TARGET_LDFLAGS) $(EXTRA_LDFLAGS)"
+
+TARGET_CFLAGS += -g -O2 
+
+.PHONY: all
+all: compile install 
+
+.PHONY: compile
+compile:
+	$(MAKE) -C $(PKG_BUILD_DIR) -f Makefile.cavium\
+		CFLAGS="$(TARGET_CFLAGS) -DHAVE_ISC_READER=1" \
+		BINDIR="/usr/sbin" \
+		all	
+
+.PHNOY: install
+install:
+	$(STRIP) $(PKG_BUILD_DIR)/client/dhclient
+	$(CP) $(PKG_BUILD_DIR)/client/dhclient $(ROOTFSDIR)/usr/sbin/
+	$(CP) $(PKG_BUILD_DIR)/client/dhclient.conf $(ROOTFSDIR)/etc/
+	$(CP) $(PKG_BUILD_DIR)/client/dhclient-script $(ROOTFSDIR)/etc/
+
+.PHONY: clean
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) clean

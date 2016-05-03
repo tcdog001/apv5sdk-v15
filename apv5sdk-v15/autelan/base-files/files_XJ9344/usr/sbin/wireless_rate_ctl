@@ -1,0 +1,68 @@
+#!/bin/sh
+
+if [ $# -le 1 ] ;then
+	echo "Usage: wireless_rate_ctl wifiN 11a/11b/11g/off ratemask"
+	exit 1
+fi
+
+#param wifi check
+if [ $1 != "wifi0" ] && [ $1 != "wifi1" ];then
+	echo "wifi assigned not right"
+	exit 1
+fi
+
+wifin=$1
+num=`echo $1 | grep -o '[0-9]\{1,\}'`
+MACWIFI="/jffs/.mac_wifi"
+
+if [ $# == 2 ] ; then
+	if [ $2 == "off" ] ; then
+			echo "switch off wireless rate control"
+			if [ -f /jffs/.set_rate_cap_on ];then
+					rm -rf /jffs/.set_rate_cap_on
+			fi
+			exit 1
+	fi
+else
+	if [ $# == 3 ] ; then
+		work_mode=$2
+		filename=${MACWIFI}${num}${work_mode}
+		echo $1
+		echo $2
+		echo $3
+		echo $filename
+		echo $3 > $filename
+		touch /jffs/.set_rate_cap_on
+		case "$1" in
+			wifi0)
+				if [ $2 == "11g" ];then
+				iwpriv wifi0 set_rate_mask_g $3
+				fi
+				if [ $2 == "11b" ];then
+			 	iwpriv wifi0 set_rate_mask_b $3
+				fi
+				if [ $2 == "11a" ];then
+		 		iwpriv wifi0 set_rate_mask_a $3
+				fi
+				iwpriv wifi0 set_rate_cap  0x80 
+				;;
+			wifi1)
+				if [ $2 == "11g" ];then
+				iwpriv wifi1 set_rate_mask_g $3
+				fi
+				if [ $2 == "11b" ];then
+		 		iwpriv wifi1 set_rate_mask_b $3
+				fi
+				if [ $2 == "11a" ];then
+		 		iwpriv wifi1 set_rate_mask_a $3
+				fi
+				iwpriv wifi0 set_rate_cap  0x80
+				;;
+			*)
+				echo "wifi assigned not right"
+				exit 1
+				;;
+		esac
+
+	fi
+fi

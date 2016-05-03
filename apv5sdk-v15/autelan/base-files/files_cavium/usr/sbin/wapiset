@@ -1,0 +1,187 @@
+#!/bin/sh
+CONF_FILE="/usr/sbin/wlan.conf"
+CONF_TMP="/usr/sbin/wlan.conf.tmp"
+
+#### wapi
+OPEN=0
+PSK=7
+CERT=11
+
+#### psk_type
+NONE="N/A"
+ASCII=0
+HEX=1
+
+#default
+ssid="autelan"
+ssid_hide=0
+wapi=$OPEN
+psk_type=$NONE
+psk=$NONE
+vlanid=$NONE
+qos=0
+max_sta=32
+
+#usage() 
+#print usage
+usage()
+{
+	echo usage
+	exit 0
+}
+
+#setcertconf( commandtype, val )
+#set certificate config
+#commandtype: cert name|cert type|asu ip|asu port
+#val: config val set to CONF_FILE
+setcertconf()
+{
+	local cmd="cat $CONF_FILE | awk 'BEGIN{FS=\"[ ]+|=\";OFS=\"=\";}{ if(\$1 == \"$1\" ){\$2=\"$2\";print \$0} else{print \$0} }' "
+	eval $cmd > $CONF_TMP
+	mv $CONF_TMP $CONF_FILE 
+}
+
+#addwlan( wlanname )
+addwlan()
+{
+	if [ ! $# -eq 1 ];then
+		usage
+	fi
+	local cmd="cat $CONF_FILE | awk 'BEGIN{flag=1}{if(\$1 == \"$1\"){flag=0;}if(\$0 !~ \"WLAN_END\"){print \$0;}}END{if(flag==1){print \"$1 $ssid $ssid_hide $wapi $psk_type $psk $vlanid $qos $max_sta \n[WLAN_END]\"}}'"		
+	eval $cmd > $CONF_TMP
+	mv $CONF_TMP $CONF_FILE
+}
+
+#delwlan( wlanname )
+delwlan()
+{
+	if [ ! $# -eq 1 ];then
+		usage
+	fi
+	local cmd="cat $CONF_FILE | awk '{if(\$1 != \"$1\"){print \$0}}'"
+	eval $cmd > $CONF_TMP
+	mv $CONF_TMP $CONF_FILE
+}
+
+#setwlan( wlanname, field, value )
+setwlan()
+{
+	if [ ! $# -eq 3 ];then
+		usage
+	fi
+	local filed=0
+	case $2 in 
+		ssid)
+			field=2
+			value="$3"
+		;;
+		mode)
+			field=4	
+			case $3 in
+				open)
+					value=$OPEN
+				;;
+				psk)
+					value=$PSK
+				;;
+				cert)
+					value=$CERT
+				;;
+				*)
+					usage
+				;;
+			esac
+		;;
+		psktype)
+			field=5
+			case $3 in
+				asc)
+					value=$ASCII
+				;;
+				hex)
+					value=$HEX
+				;;
+				*)
+					usage
+				;;
+			esac
+		;;
+		psk)
+			field=6
+			value="$3"
+		;;
+		*)
+			usage
+		;;
+	esac
+	local cmd="cat $CONF_FILE | awk '{if(\$1 != \"$1\"){print \$0}else{\$$field=\"$value\";print \$0}}'"
+	eval $cmd > $CONF_TMP
+	mv $CONF_TMP $CONF_FILE
+		
+}
+
+#setvapconf( para_list )
+#para_list: command parameter dealing with wlan
+setvapconf()
+{
+	if [ $# -lt 2 ];then
+		usage
+	fi
+	wlanname=$1
+	setopt=$2
+	shift 2	
+	case  $setopt in 
+		add)
+			addwlan $wlanname "$@"
+		;;
+		del)
+			delwlan $wlanname "$@"
+		;;
+		set)
+			setwlan $wlanname "$@"
+		;;
+		*)
+			usage
+		;;
+	esac
+	exit 0	
+}
+
+( [ $# -le 1 ] || [ "$1" = "-h" ] || [ "$1" = "--help"  ] ) && usage 
+[ ! -f $CONF_FILE ] && echo "error:config file not exist"
+
+case "$1" in
+	cacert)
+		field="CA_CERT_NAME"
+		value="$2"
+	;;
+	certname)
+		field="CERT_NAME"
+		value="$2"
+	;;
+	certtype)
+		field="CERT_INDEX"
+		value="$2"
+	;;
+	asuip)
+		field="ASU_IP"
+		value="$2"
+	;;
+	asuport)
+		field="ASU_PORT"
+		value="$2"
+	;;
+	authmode)
+		field="AUTH_MODE"
+		value="$2"
+	;;
+	wlan)
+		shift
+		setvapconf "$@"
+	;;
+	*)
+		usage
+	;;	
+esac
+
+setcertconf $field $value 

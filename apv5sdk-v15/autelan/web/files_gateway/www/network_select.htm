@@ -1,0 +1,70 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_set3g=`config_read /config/network/set_3g`
+xml_set3g_mode=`config_getoption "$xml_set3g" mode`
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Network Select</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+</head>
+
+<body bgcolor="#efefef">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1"><a href="3g_settings.htm" target="MainFrame">Status</a></td>
+          <td class="top1">Network Selection</td>		 
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">3G Settings-->Network Selection</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form name="form1" method="post" action="<%= $action_cgi %>" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="Band Selection Mode illustration">Band Selection Mode</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150"><input type="radio" name="network_type" <% webui_radiobutton_check "$xml_set3g_mode" "WCDMA_pre" %> value="WCDMA_pre" /></td>
+          <td class="td_style" width="350">WCDMA preferred </td>
+        </tr>
+		<tr>
+          <td class="td_style"><input type="radio" name="network_type" <% webui_radiobutton_check "$xml_set3g_mode" "only_WCDMA" %> value="only_WCDMA"/></td>
+          <td class="td_style">Only WCDMA </td>
+        </tr>
+		<tr>
+          <td class="td_style"><input type="radio" name="network_type" <% webui_radiobutton_check "$xml_set3g_mode" "GSM_pre" %> value="GSM_pre"/></td>
+          <td class="td_style">GSM preferred </td>
+        </tr>
+		<tr>
+          <td class="td_style"><input type="radio" name="network_type" <% webui_radiobutton_check "$xml_set3g_mode" "only_GSM" %> value="only_GSM"/></td>
+          <td class="td_style">Only GSM </td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><input id="but" type="submit" name="network_select_commit" value="Submit"/></td>
+  </tr>
+</table>
+<input type="hidden" value="Set_3G Apply" name="SERVLET">
+</form>
+</div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+[1] To run in EACS mode (for dynamic channel change)
+spectraldaemon eacs &
+
+[2] To run in classifier mode in current channel -
+spectraltool startscan
+spectraldaemon classify & OR spectraldaemon &
+
+Remember scan must be started separately as spectraldaemon does not start scan by itself unsless connected to the GUI.
+
+[3] To run with the GUI
+
+spectraldaemon channels minpwr -70 &
+
+To see all the available options, "spectraldaemon help" will print detailed usage.

@@ -1,0 +1,58 @@
+.TH chkpib 7 "Intellon Corporation" "int6000-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+chkpib Intellon Parameter File Validator
+.SH SYNOPSIS
+.BR chkpib
+.RI [ options ]
+.IR file
+.RI [ file ]
+[...]
+.SH DESCRIPTION
+The Intellon Parameter File Validator checks Intellon HomePlug AV parameter files for obvious errors, including obsolete format, wrong file size, bad checksums and read errors. It makes no attempt to check any internal information other than file length and checksum.
+.PP
+This program is part of the Intellon Linux Toolkit. See the \fBilt\fR man page for an overview and installation instructions.
+.SH OPTIONS
+.TP
+.RB - q
+Suppresses printing of progress messages.
+.TP
+.RB - v
+Print additional information such as the PIB header for each file processed. This information can be used to confirm pib version and distinguish one PIB file from another. 
+.TP
+.RB - ? ,-- help
+Print program help summary on stdout. This option takes precedence over other options on the command line. 
+.TP
+.RB - ! ,-- version
+Print program version information on stdout. This option takes precedence over other options on the command line. Usethis option when sending screen dumps to Intellon Technical Support so that they know exactly which version of the Linux Toolkit you are using.
+.SH ARGUMENTS
+.TP
+.IR file
+The name of a runtime parameter file. By convention, runtime parameter files have a \fB.pib\fR extention but this program does not enforce that convention. 
+.SH EXAMPLES
+The following example reads file abc.pib and validates it. The message shown indicates that the PIB version is recent, the file is the correct size, the checksum is valid computes and there are no read errors.
+.PP
+    # chkpib abc.pib
+    chkpib: abc.pib looks good
+.PP
+The following example reads three files in succession and reports on each one. You can suppress good news with the \fB-q\fR option.
+.PP
+    # chkpib abc.pib def.pib ghi.pib
+    chkpib: abc.pib looks good
+    chkpib: def.pib is not supported
+    chkpib: ghi.pib is corrupt
+.PP
+The following line will write a PIB File Index to file "index.txt". Basically, \fB-q\fR suppresses normal messages and \fB-v\fR causes extra output. The results is a simple index.
+.PP
+    # chkpib -qv *.pib > index.txt
+
+.SH DISCLAIMER
+PIB file structure and content is proprietary to Intellon Corporation, Ocala FL USA. Consequently, public information is not available. Intellon Corporation reserves the right to change the file structure or content in future firmware releases without any obligation to notify or compensate users of this program.
+.SH SEE ALSO
+.BR getpib (7 ),
+.BR modpib ( 7 ),
+.BR mrgpib ( 7 ),
+.BR pxe ( 7 ),
+.BR setpib ( 7 )
+.SH CREDITS
+ Charles Maier <charles.maier@intellon.com>
+ Nathan Houghton <nathan.houghton@intellon.com>

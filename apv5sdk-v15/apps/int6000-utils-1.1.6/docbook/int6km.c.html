@@ -1,0 +1,381 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			int6km.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='int6klog.c.html' title=' int6klog.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kmod.c.html' title=' int6kmod.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   int6km.c - Intellon INT6000 Memory Explorer 
+ *
+ *   read memory using one VS_RD_MEM message; limit is 1024 bytes at
+ *   any offset;
+ *
+ *   this program sends and receives raw ethernet frames and so needs
+ *   root priviledges; if you install it using &quot;chmod 555&quot; and &quot;chown 
+ *   root:root&quot; then you must login as root to run it; otherwise, you 
+ *   can install it using &quot;chmod 4555&quot; and &quot;chown root:root&quot; so that 
+ *   anyone can run it; the program will refuse to run until you get
+ *   things right;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*&quot;
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/putoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/symbol.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../ram/nvram.h&quot;
+#include &quot;../ram/sdram.h&quot;
+#include &quot;../nvm/nvm.h&quot;
+#include &quot;../pib/pib.h&quot;
+#include &quot;../mme/mme.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../int6k/devices.c&quot;
+#include &quot;../int6k/EthernetHeader.c&quot;
+#include &quot;../int6k/IntellonHeader.c&quot;
+#include &quot;../int6k/UnwantedPacket.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/basespec.c&quot;
+#include &quot;../tools/uintspec.c&quot;
+#include &quot;../tools/hexencode.c&quot;
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/hexdump.c&quot;
+#include &quot;../tools/hexview.c&quot;
+#include &quot;../tools/regview.c&quot;
+#include &quot;../tools/synonym.c&quot;
+#include &quot;../tools/error.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ether/channel.c&quot;
+#include &quot;../ether/openchannel.c&quot;
+#include &quot;../ether/closechannel.c&quot;
+#include &quot;../ether/readpacket.c&quot;
+#include &quot;../ether/sendpacket.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../mme/MMECode.c&quot;
+#endif
+
+/*====================================================================*
+ *   program constants;
+ *--------------------------------------------------------------------*/
+
+#define INT6KM_RELATIVE (1 &lt;&lt; 0)
+#define INT6KM_ABSOLUTE (1 &lt;&lt; 1)
+#define INT6KM_REGISTER (1 &lt;&lt; 2)
+#define INT6KM_HEADINGS (1 &lt;&lt; 3)
+
+/*====================================================================*
+ *
+ *   void ReadRAW (struct channel * channel, uint32_t offset, uint32_t length, flag_t flags);
+ *   
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static void ReadRAW (struct channel * channel, uint32_t offset, uint32_t length, flag_t flags) 
+
+{
+	struct message message;
+	signed packetsize;
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_rd_mem_request 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint32_t MOFFSET;
+		uint32_t MLENGTH;
+	}
+	* request = (struct vs_rd_mem_request *)(&amp;message);
+	struct __packed vs_rd_mem_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint32_t MOFFSET;
+		uint32_t MLENGTH;
+		uint8_t MBUFFER [INT6K_BLOCKSIZE];
+	}
+	* confirm = (struct vs_rd_mem_confirm *)(&amp;message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	memset (&amp;message, 0, sizeof (message));
+	EthernetHeader (&amp;message.ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message.intellon, (VS_RD_MEM | MMTYPE_REQ));
+	request-&gt;MOFFSET = HTOLE32 (offset);
+	request-&gt;MLENGTH = HTOLE32 (length);
+	if (sendpacket (channel, &amp;message, ETHER_MIN_LEN) == -1) 
+	{
+		error (1, ECANCELED, INT6K_CANTSEND);
+	}
+	while ((packetsize = readpacket (channel, &amp;message, sizeof (message))) &gt; 0) 
+	{
+		if (UnwantedPacket (&amp;message, (VS_RD_MEM | MMTYPE_CNF))) 
+		{
+			continue;
+		}
+		if (confirm-&gt;MSTATUS) 
+		{
+			error (0, 0, &quot;%s (%0X): %s&quot;, MMECode (confirm-&gt;intellon.MMTYPE, confirm-&gt;MSTATUS), confirm-&gt;MSTATUS, INT6K_WONTDOIT);
+			continue;
+		}
+		if (_anyset (flags, INT6KM_REGISTER)) 
+		{
+			if (_anyset (flags, INT6KM_HEADINGS)) 
+			{
+				printf (REGDUMP_HEADER);
+			}
+			regview (confirm-&gt;MBUFFER, LE32TOH (confirm-&gt;MOFFSET), LE32TOH (confirm-&gt;MLENGTH), stdout);
+			continue;
+		}
+		if (_anyset (flags, INT6KM_ABSOLUTE)) 
+		{
+			if (_anyset (flags, INT6KM_HEADINGS)) 
+			{
+				printf (HEXDUMP_HEADER);
+			}
+			hexview (confirm-&gt;MBUFFER, LE32TOH (confirm-&gt;MOFFSET), LE32TOH (confirm-&gt;MLENGTH), stdout);
+			continue;
+		}
+		if (_anyset (flags, INT6KM_HEADINGS)) 
+		{
+			printf (HEXDUMP_HEADER);
+		}
+		hexdump (confirm-&gt;MBUFFER, 0, LE32TOH (confirm-&gt;MLENGTH), stdout);
+	}
+	if (packetsize == -1) 
+	{
+		error (1, ECANCELED, INT6K_CANTREAD);
+	}
+	return;
+}
+
+/*====================================================================*
+ *
+ *   int main (int argc, const char * argv []);
+ *   
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	extern struct channel channel;
+	extern const struct _term_ devices [];
+	static const char *optv [] = 
+	{
+		&quot;aehi:l:o:qrv&quot;,
+		&quot;[device] [...]&quot;,
+		&quot;Intellon INT6000 Memory Explorer&quot;,
+		&quot;a\tdisplay absolute offsets&quot;,
+		&quot;e\tredirect stderr messages to stdout&quot;,
+		&quot;h\tdisplay simple headings&quot;,
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		&quot;i n\thost interface number [2]&quot;,
+
+#else
+
+		&quot;i s\thost interface name [&quot; CHANNEL_ETHDEVICE &quot;]&quot;,
+
+#endif
+
+		&quot;l n\tmemory length in bytes [4]&quot;,
+		&quot;o n\tmemory offset [0x00000000]&quot;,
+		&quot;q\tquiet mode&quot;,
+		&quot;r\tdisplay as binary registers&quot;,
+		&quot;v\tverbose mode&quot;,
+		(const char *) (0) 
+	};
+	flag_t flags = (flag_t) (0);
+	uint32_t offset = 0;
+	uint32_t length = 4;
+	signed c;
+	if (getenv (PLCDEVICE)) 
+	{
+#if defined (WINPCAP) || defined (LIBPCAP)
+		channel.id = atoi (getenv (PLCDEVICE));
+#else
+		channel.name = strdup (getenv (PLCDEVICE));
+#endif
+	}
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'a':
+			_setbits (flags, INT6KM_ABSOLUTE);
+			break;
+		case 'e':
+			dup2 (STDOUT_FILENO, STDERR_FILENO);
+			break;
+		case 'h':
+			_setbits (flags, INT6KM_HEADINGS);
+			break;
+		case 'i':
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+			channel.id = atoi (optarg);
+
+#else
+
+			channel.name = optarg;
+
+#endif
+
+			break;
+		case 'l':
+			length = (uint32_t)(uintspec (optarg, 0, 1024));
+			break;
+		case 'o':
+			offset = (uint32_t)(basespec (optarg, 16, sizeof (offset)));
+			break;
+		case 'q':
+			_setbits (channel.flags, CHANNEL_SILENCE);
+			break;
+		case 'r':
+			_setbits (flags, INT6KM_REGISTER);
+			break;
+		case 'v':
+			_setbits (channel.flags, CHANNEL_VERBOSE);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+
+#ifndef WIN32
+
+/*
+ *      raw packets require root priviledges on linux; one does not have to be
+ *      root when this program is installed; setuid using 'chown root:root' and 
+ *      'chmod 4555';
+ */
+
+	if (geteuid ()) 
+	{
+		error (1, EPERM, INT6K_NEEDROOT);
+	}
+
+#endif
+
+	if (_anyset (flags, INT6KM_REGISTER)) 
+	{
+		offset &amp;= ~(3);
+		length &amp;= ~(3);
+	}
+	openchannel (&amp;channel);
+	if (!argc) 
+	{
+		ReadRAW (&amp;channel, offset, length, flags);
+	}
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		if (!hexencode (channel.peer, sizeof (channel.peer), synonym (*argv, devices, DEVICES))) 
+		{
+			error (1, errno, INT6K_BAD_MAC, *argv);
+		}
+		ReadRAW (&amp;channel, offset, length, flags);
+		argv++;
+		argc--;
+	}
+	closechannel (&amp;channel);
+	return (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='int6klog.c.html' title=' int6klog.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kmod.c.html' title=' int6kmod.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,146 @@
+#OCTEON_ROOT := /home/qbuilder/guoziming/blackpb44/ar11nsdk/build
+ROOTFSDIR := /home/shark/builddir/rootfs
+#file name and path declare
+PKG := curl
+VERSION := 7.17.1
+PKG_NAME := $(PKG)-$(VERSION)
+#PKG_BUILD_DIR := $(PKG_NAME)
+PKG_BUILD_DIR:=src
+
+CAVIUM_CPPFLAGS ?= -I$(OCTEON_ROOT)/gcc-3.4.4-2.16.1/build_mips_nofpu/mips-linux-uclibc/sys-include
+CAVIUM_LDFLAGS ?= -L$(OCTEON_ROOT)/gcc-3.4.4-2.16.1/build_mips_nofpu/mips-linux-uclibc/lib
+PKG_INSTALL_DIR := $(shell pwd)/$(PKG_BUILD_DIR)/ipkg-install/$(PKG)
+
+SSL_DIR := $(ROOTFSDIR)/../openssl/src
+ZLIB_DIR := $(ROOTFSDIR)/../zlib-1.2.3
+GSSAPI_DIR := $(ROOTFSIDR)/../libgssapi/libgssapi-0.11/ipkg-install
+EXTRA_CPPFLAGS := -I$(SSL_DIR)/include -I$(ZLIB_DIR) 
+EXTRA_LDFLAGS := -L$(SSL_DIR) -lssl -lcrypto -L$(ZLIB_DIR) -lz
+
+#command replace
+CPDIR := cp -r 
+CP := cp -fpR
+MKDIR := mkdir -p
+MV := mv
+
+#configure option
+FPIC := -fPIC
+TARGET_CROSS ?= mips-linux-uclibc-
+TARGET_CC ?= $(TARGET_CROSS)gcc
+TARGET_CPPFLAGS ?= $(CAVIUM_CPPFLAGS) 
+TARGET_LDFLAGS ?= $(CAVIUM_LDFLAGS)
+CPPFLSGS = $(TARGET_CPPFLAGS) $(EXTRA_CPPFLAGS)
+LDFLAGS = $(TARGET_LDFLAGS) $(EXTRA_LDFLAGS)
+GNU_TARGET_NAME ?= mips-linux
+DISABLE_NLS ?= --disable-nls 
+TARGET_CONFIGURE_OPTS ?= \
+  AR=$(TARGET_CROSS)ar \
+  AS="$(TARGET_CC) -c $(TARGET_CFLAGS)" \
+  LD=$(TARGET_CROSS)ld \
+  NM=$(TARGET_CROSS)nm \
+  CC="$(TARGET_CC)" \
+  GCC="$(TARGET_CC)" \
+  CXX=$(TARGET_CROSS)g++ \
+  RANLIB=$(TARGET_CROSS)ranlib \
+  STRIP=$(TARGET_CROSS)strip \
+  OBJCOPY=$(TARGET_CROSS)objcopy \
+  OBJDUMP=$(TARGET_CROSS)objdump \
+  SIZE=$(TARGET_CROSS)size
+
+CONFIGURE_VARS = \
+                $(TARGET_CONFIGURE_OPTS) \
+                CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CXXFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CPPFLAGS="$(TARGET_CPPFLAGS) $(EXTRA_CPPFLAGS)" \
+                LDFLAGS="$(TARGET_LDFLAGS) $(EXTRA_LDFLAGS)" \
+			
+CONFIGURE_ARGS = \
+                --target=$(GNU_TARGET_NAME) \
+                --host=$(GNU_TARGET_NAME) \
+                --build=$(GNU_HOST_NAME) \
+                --program-prefix="" \
+                --program-suffix="" \
+                --prefix=/usr \
+                --exec-prefix=/usr \
+                --bindir=/usr/bin \
+                --sbindir=/usr/sbin \
+                --libexecdir=/usr/lib \
+                --sysconfdir=/etc \
+                --datadir=/usr/share \
+                --localstatedir=/var \
+                --mandir=/usr/man \
+                --infodir=/usr/info \
+                $(DISABLE_NLS)
+
+MAKE_FLAGS = \
+		$(TARGET_CONFIGURE_OPTS) \
+		CROSS="$(TARGET_CROSS)" \
+		ARCH="$(ARCH)"
+MAKE_VARS = \
+		CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+		CPPFLAGS="$(TARGET_CPPFALGS) $(EXTRA_CPPFLAGS)" \
+ 		CXXFLAGS="$(TARGET_CFALGS) $(EXTAR_CFLAGS)" \
+		LDFLAGS="$(TARGET_CFLAGS) $(EXTRA_LDFLAGS)"
+
+TARGET_CFLAGS += $(FPIC)
+
+CONFIGURE_ARGS += \
+        --enable-shared \
+        --enable-static \
+        --disable-thread \
+        --enable-cookies \
+        --enable-crypto-auth \
+        --enable-nonblocking \
+        --enable-file \
+        --enable-ftp \
+        --enable-http \
+        --enable-ipv6 \
+        --disable-ares \
+        --disable-debug \
+        --disable-dict \
+        --disable-gopher \
+        --disable-ldap \
+        --disable-manual \
+        --disable-sspi \
+        --disable-telnet \
+        --enable-tftp \
+        --disable-verbose \
+        --with-random="/dev/urandom" \
+        --with-ssl="$(SSL_DIR)" \
+	--with-gssapi="$(GSSAPI_DIR)" \
+        --without-ca-bundle \
+        --without-gnutls \
+        --without-krb4 \
+        --without-libidn \
+        --without-nss \
+        --with-zlib="$(ZLIB_DIR)" 
+
+CONFIGURE_VARS += \
+        LDFLAGS="$(EXTRA_LDFLAGS) " 
+
+
+.PHONY: all
+all: configure compile install 
+
+.PHONY: configure
+configure:
+	( cd $(PKG_BUILD_DIR) && \
+	  $(CONFIGURE_VARS) \
+	  ./configure \
+	  $(CONFIGURE_ARGS) \
+	)
+
+.PHONY: compile
+compile:
+	$(MAKE_VARS) \
+	$(MAKE) -C $(PKG_BUILD_DIR) \
+	$(MAKE_FLAGS)
+
+.PHONY: install
+install:
+	$(CP) $(PKG_BUILD_DIR)/lib/.libs/lib*.so* $(ROOTFSDIR)/lib
+
+.PHONY: clean
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) clean
+

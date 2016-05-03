@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			ihpapi.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='hpavkeys.c.html' title=' hpavkeys.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int64host.c.html' title=' int64host.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   ihpapi.c - HomePlug AV Application Programming Interface;
+ *
+ *   ihpapi.h
+ *
+ *   compile one monolithic module from all Intellon HomePlug AV API
+ *   modules; this can be used as, or instead of, a link library;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon HomePlug AV Application Programming Interface;
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration and evaluation only; Not for production use;
+ *
+ *   Contributor(s): 
+ *	Charles Maier, charles.maier@intellon.com
+ *	Alex Vasquez, alex.vasquez@intellon.com
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef IHPAPI_SOURCE
+#define IHPAPI_SOURCE
+ 
+/*====================================================================*
+ *   external source files; see ihpapi.h;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../ihpapi/GetConnectionInfo.c&quot;
+#include &quot;../ihpapi/GetManufacturerInfo.c&quot;
+#include &quot;../ihpapi/GetNetworkInfo.c&quot;
+#include &quot;../ihpapi/GetVersionInfo.c&quot;
+#include &quot;../ihpapi/ResetDevice.c&quot;
+#include &quot;../ihpapi/ResetToFactoryDefaults.c&quot;
+#include &quot;../ihpapi/InitializeDevice.c&quot;
+#include &quot;../ihpapi/SetKey.c&quot;
+#include &quot;../ihpapi/UpdateDevice.c&quot;
+#include &quot;../ihpapi/RxFrame.c&quot;
+#include &quot;../ihpapi/TxFrame.c&quot;
+#include &quot;../ihpapi/SequenceInProgress.c&quot;
+#include &quot;../ihpapi/SequenceTerminate.c&quot;
+#include &quot;../ihpapi/ManageEnetPHY.c&quot;
+#include &quot;../ihpapi/GetToneMap.c&quot;
+#include &quot;../ihpapi/GetRxToneMap.c&quot;
+#include &quot;../ihpapi/SetSDRAMConfig.c&quot;
+ 
+/*====================================================================*
+ *   internal source files; see ihp.h;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../ihpapi/EncodeEthernetHeader.c&quot;
+#include &quot;../ihpapi/EncodeIntellonHeader.c&quot;
+#include &quot;../ihpapi/DecodeEthernetPHYSettings.c&quot;
+#include &quot;../ihpapi/DecodeFlashNVM.c&quot;
+#include &quot;../ihpapi/DecodeGetNVM.c&quot;
+#include &quot;../ihpapi/DecodeGetVersion.c&quot;
+#include &quot;../ihpapi/DecodeHostAction.c&quot;
+#include &quot;../ihpapi/DecodeLinkStats.c&quot;
+#include &quot;../ihpapi/DecodeMfgString.c&quot;
+#include &quot;../ihpapi/DecodeNetworkInfo.c&quot;
+#include &quot;../ihpapi/DecodeReadModule.c&quot;
+#include &quot;../ihpapi/DecodeResetDevice.c&quot;
+#include &quot;../ihpapi/DecodeResetToFactoryDefaults.c&quot;
+#include &quot;../ihpapi/DecodeSetKey.c&quot;
+#include &quot;../ihpapi/DecodeStartMAC.c&quot;
+#include &quot;../ihpapi/DecodeWriteModule.c&quot;
+#include &quot;../ihpapi/DecodeWriteMemory.c&quot;
+#include &quot;../ihpapi/DecodeGetToneMap.c&quot;
+#include &quot;../ihpapi/DecodeGetRxToneMap.c&quot;
+#include &quot;../ihpapi/DecodeSetSDRAMCfg.c&quot;
+#include &quot;../ihpapi/SequenceReadModule.c&quot;
+#include &quot;../ihpapi/SequenceWriteModule.c&quot;
+#include &quot;../ihpapi/SequenceWriteMemory.c&quot;
+#include &quot;../ihpapi/FindFWHeader.c&quot;
+ 
+/*====================================================================*
+ *
+ *--------------------------------------------------------------------*/
+
+#endif
+ 
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='hpavkeys.c.html' title=' hpavkeys.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int64host.c.html' title=' int64host.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

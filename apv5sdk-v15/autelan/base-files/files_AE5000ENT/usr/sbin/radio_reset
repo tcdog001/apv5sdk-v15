@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if [ $1 = "enable" ];then
+rm -fr  /jffs/.high_perf
+touch /jffs/.u10
+cp /etc/wlan/postconfig_clean /jffs/postconfig
+rm -rf /jffs/preconfig
+echo C > /proc/kes_debug_flag
+sysreboot
+else
+rm -fr /jffs/.u10
+rm -fr /jffs/.high_perf
+cp /etc/wlan/postconfig  /jffs/postconfig
+echo C > /proc/kes_debug_flag
+sysreboot
+fi

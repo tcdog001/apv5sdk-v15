@@ -1,0 +1,9 @@
+#!/bin/sh
+MAIN_VER=`cat /etc/version/version`
+BUILD_NUM=`cat /etc/version/buildno`
+if [ ! 0${BUILD_NUM} -eq 0 ];then
+    echo "${MAIN_VER}.${BUILD_NUM}"
+else
+    echo "${MAIN_VER}"
+fi
+

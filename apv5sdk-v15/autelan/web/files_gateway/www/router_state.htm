@@ -1,0 +1,169 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+
+
+<%
+
+xml_3g_pro=`/usr/sbin/3Gstatue pro`
+xml_3g_actype=`/usr/sbin/3Gstatue actype`
+xml_3g_rst=`/usr/sbin/3Gstatue rst`
+
+%>
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Router State</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+</head>
+
+<body bgcolor="#efefef">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1">&nbsp;</td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">Gateway status</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="3G Information illustration">3G Information</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">Network Provider </td>
+          <td class="td_style" width="350"><%= $xml_3g_pro  %></td>
+        </tr>
+		<tr>
+          <td class="td_style">Network Type </td>
+          <td class="td_style"><%= $xml_3g_actype  %></td>
+        </tr>
+		<tr>
+          <td class="td_style">Roam</td>
+          <td class="td_style"><%= $xml_3g_rst  %></td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><font class="table_head" title="Wlan Current Status illustration">Wlan Current Status</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">ESSID</td>
+          <td class="td_style" width="350">Wireless work </td>
+        </tr>
+		<tr>
+          <td class="td_style">Channel</td>
+          <td class="td_style">6</td>
+        </tr>
+		<tr>
+          <td class="td_style">Rate</td>
+          <td class="td_style">best</td>
+        </tr>
+		<tr>
+          <td class="td_style">Security Lever </td>
+          <td class="td_style">Disable</td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><font class="table_head" title="WAN Information illustration">WAN Information</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">PPP Status </td>
+          <td class="td_style" width="350">Disconnected</td>
+        </tr>
+		<tr>
+          <td class="td_style">IP Address </td>
+          <td class="td_style">0.0.0.0</td>
+        </tr>
+		<tr>
+          <td class="td_style">Primary DNS </td>
+          <td class="td_style">0.0.0.0</td>
+        </tr>
+		<tr>
+          <td class="td_style">Security DNS</td>
+          <td class="td_style">0.0.0.0</td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><font class="table_head" title="LAN and WLAN Information illustration">LAN and WLAN Information</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">IP Address </td>
+          <td class="td_style" width="350">192.168.0.1</td>
+        </tr>
+		<tr>
+          <td class="td_style">Subnet Mask </td>
+          <td class="td_style">255.255.255.0</td>
+        </tr>
+		<tr>
+          <td class="td_style">Default Gateway </td>
+          <td class="td_style">192.168.0.1</td>
+        </tr>
+		<tr>
+          <td class="td_style">DHCP Server </td>
+          <td class="td_style">Enable</td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><font class="table_head" title="VOIP Information illustration">VOIP Information </font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">SIP Proxy Server </td>
+          <td class="td_style" width="350">&nbsp;</td>
+        </tr>
+		<tr>
+          <td class="td_style">SIP Register Server </td>
+          <td class="td_style">&nbsp;</td>
+        </tr>
+		<tr>
+          <td class="td_style">User Name </td>
+          <td class="td_style">&nbsp;</td>
+        </tr>
+		<tr>
+          <td class="td_style">Register Status </td>
+          <td class="td_style">Register Fail </td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><a class="imgLink" href="#" onclick="window.parent.frames.MainFrame.location.reload();">Refresh</a></td>
+  </tr>
+</table>
+</div>
+</body>
+</html>

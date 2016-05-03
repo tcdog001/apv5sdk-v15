@@ -1,0 +1,37 @@
+#!/bin/sh
+WLANCONFIG=/usr/sbin/wlanconfig
+IWPRIV=/usr/sbin/iwpriv
+IWCONFIG=/usr/sbin/iwconfig
+IFCONFIG=/sbin/ifconfig
+BRCTL=/usr/sbin/brctl
+MOUNT=bin/mount
+MV=/bin/mv
+#
+#usage()
+#
+usage()
+{
+	echo "Usage:"
+	echo "wds_ap_build  <interface> <essid> <channel>"
+}
+
+if [ ! $# -eq 3 ];then
+	usage
+	exit 1
+fi
+
+INTERFACE=$1
+ESSID=$2
+CHANNEL=$3
+${BRCTL} delif default eth0
+echo 1 > /proc/sys/net/capwap/wds_tunnel
+${WLANCONFIG} ${INTERFACE} create wlandev wifi1 wlanmode sta nosbeacon
+${BRCTL} addif default  ${INTERFACE} 
+${IWCONFIG} ${INTERFACE} channel ${CHANNEL}
+${IWCONFIG} ${INTERFACE} txpower 20
+${IWCONFIG} ${INTERFACE} essid ${ESSID}
+${IWPRIV} ${INTERFACE} wds 1
+${IFCONFIG} ${INTERFACE} up
+${MOUNT} -o remount +w /
+cd  /usr/sbin
+${MV} sta_access_limit sta_access_limit.bar

@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			Confirm.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='CMEncrypt.c.html' title=' CMEncrypt.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DecodeEthernetHeader.c.html' title=' DecodeEthernetHeader.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void Confirm (struct int6k *int6k, const char * message);
+ *   
+ *   int6k.h
+ *
+ *   Inform the user that an operation has completed; print the channel 
+ *   name, frame source address and user message on stdout unless the
+ *   INT6K_SILENCE flag is set;
+ *
+ *   this function is identical to Request () except that it prints the
+ *   packet source address instead of the template destination address;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef CONFIRM_SOURCE
+#define CONFIRM_SOURCE
+
+#include &lt;stdio.h&gt;
+#include &lt;stdarg.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/flags.h&quot;
+
+#ifdef __GNUC__
+
+__attribute__ ((format (printf, 2, 3))) 
+
+#endif
+
+void Confirm (struct int6k * int6k, const char *format, ...) 
+
+{
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+	if (_allclr (int6k-&gt;flags, INT6K_SILENCE)) 
+	{
+		char address [ETHER_ADDR_LEN * 3];
+		hexdecode (message-&gt;ethernet.OSA, sizeof (message-&gt;ethernet.OSA), address, sizeof (address));
+		fprintf (stderr, &quot;%s %s &quot;, channel-&gt;name, address);
+		if ((format) &amp;&amp; (*format)) 
+		{
+			va_list arglist;
+			va_start (arglist, format);
+			vfprintf (stderr, format, arglist);
+			va_end (arglist);
+		}
+		fprintf (stderr, &quot;\n&quot;);
+	}
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='CMEncrypt.c.html' title=' CMEncrypt.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DecodeEthernetHeader.c.html' title=' DecodeEthernetHeader.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

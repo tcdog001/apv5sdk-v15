@@ -1,0 +1,718 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			int6kwait.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='int6ktone.c.html' title=' int6ktone.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='intellon-snmp.c.html' title=' intellon-snmp.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   int6kwait.c - Intellon INT6000 Procrastinator;
+ *
+ *   wait for device events to start or finish before returning;
+ *   
+ *   this program sends and receives raw ethernet frames and so needs
+ *   root priviledges; if you install it using &quot;chmod 555&quot; and &quot;chown 
+ *   root:root&quot; then you must login as root to run it; otherwise, you 
+ *   can install it using &quot;chmod 4555&quot; and &quot;chown root:root&quot; so that 
+ *   anyone can run it; the program will refuse to run until you get
+ *   things right;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *      Abdel Younes &lt;younes@leacom.fr&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*&quot;
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;limits.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/symbol.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../int6k/int6k.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/uintspec.c&quot;
+#include &quot;../tools/hexdump.c&quot;
+#include &quot;../tools/hexencode.c&quot;
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/checkfilename.c&quot;
+#include &quot;../tools/synonym.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../int6k/Confirm.c&quot;
+#include &quot;../int6k/Display.c&quot;
+#include &quot;../int6k/Failure.c&quot;
+#include &quot;../int6k/ReadMME.c&quot;
+#include &quot;../int6k/Request.c&quot;
+#include &quot;../int6k/SendMME.c&quot;
+#include &quot;../int6k/devices.c&quot;
+#include &quot;../int6k/EthernetHeader.c&quot;
+#include &quot;../int6k/IntellonHeader.c&quot;
+#include &quot;../int6k/UnwantedPacket.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ether/openchannel.c&quot;
+#include &quot;../ether/closechannel.c&quot;
+#include &quot;../ether/readpacket.c&quot;
+#include &quot;../ether/sendpacket.c&quot;
+#include &quot;../ether/channel.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../mme/MMECode.c&quot;
+#endif
+
+/*====================================================================*
+ *
+ *   signed ResetAndWait (struct int6k * int6k);
+ * 
+ *   int6k.h
+ *
+ *   Reset the device using a VS_RS_DEV Request message; continue to
+ *   request resets each second until the device accepts the request
+ *   or the wait period expires;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual
+ *   for more information;
+ *   
+ *--------------------------------------------------------------------*/
+
+signed ResetAndWait (struct int6k * int6k) 
+
+{
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_rs_dev_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+	}
+	* confirm = (struct vs_rs_dev_confirm *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	signed retry = SECONDS (int6k-&gt;timer, int6k-&gt;retry);
+	Request (int6k, &quot;Reset when Ready&quot;);
+	while (retry-- &gt; 0) 
+	{
+		memset (message, 0, sizeof (struct message));
+		EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+		IntellonHeader (&amp;message-&gt;intellon, (VS_RS_DEV | MMTYPE_REQ));
+		int6k-&gt;packetsize = ETHER_MIN_LEN;
+		if (SendMME (int6k) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+			return (-1);
+		}
+		if (ReadMME (int6k, (VS_RS_DEV | MMTYPE_CNF)) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+			return (-1);
+		}
+		if (!confirm-&gt;MSTATUS) 
+		{
+			Confirm (int6k, &quot;Resetting ...&quot;);
+			return (0);
+		}
+		sleep (1);
+	}
+	return (-1);
+}
+
+/*====================================================================*
+ *
+ *   signed WaitForReset (struct int6k * int6k);
+ *
+ *   int6k.h
+ *
+ *   poll the device using VS_SW_VER messages until no confirmation 
+ *   messages are received indicating that the firmware has stopped 
+ *   running; return 0 if the firmware stops within the allotted time
+ *   or -1 if it does not or if transmission errors occur;
+ *
+ *   this function cannot distinguish between a software reset and 
+ *   hardware reset;
+ *
+ *   retry is number of times to poll the device before returniung
+ *   an error to indicate that the device failed to reset; timer is
+ *   the time between poll attempts;
+ *
+ *--------------------------------------------------------------------*/
+
+signed WaitForReset (struct int6k * int6k) 
+
+{
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+	unsigned retry = 0;
+	Request (int6k, &quot;Allow %d seconds for Reset&quot;, SECONDS (int6k-&gt;timer, int6k-&gt;retry));
+	while (retry &lt; int6k-&gt;retry) 
+	{
+		memset (message, 0, sizeof (struct message));
+		EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+		IntellonHeader (&amp;message-&gt;intellon, (VS_SW_VER | MMTYPE_REQ));
+		int6k-&gt;packetsize = ETHER_MIN_LEN;
+		if (SendMME (int6k) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+			return (-1);
+		}
+		if (ReadMME (int6k, (VS_SW_VER | MMTYPE_CNF)) == -1) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+			return (-1);
+		}
+		if (!int6k-&gt;packetsize) 
+		{
+			if (_allset (int6k-&gt;flags, (INT6K_WAITFORRESET | INT6K_ANALYSE))) 
+			{
+				Confirm (int6k, &quot;Waited %d seconds for Reset&quot;, SECONDS (int6k-&gt;timer, retry));
+			}
+			return (0);
+		}
+		if (++retry &lt; int6k-&gt;retry) 
+		{
+			SLEEP (int6k-&gt;timer);
+		}
+	}
+	if (_allset (int6k-&gt;flags, (INT6K_WAITFORRESET | INT6K_ANALYSE))) 
+	{
+		Confirm (int6k, &quot;Waited %d seconds for Reset&quot;, SECONDS (int6k-&gt;timer, retry));
+	}
+	return (-1);
+}
+
+/*====================================================================*
+ *
+ *   signed WaitForStart (struct int6k *int6k, char string [], signed length);
+ *
+ *   int6k.h
+ *
+ *   poll the device using VS_SW_VER messages until it responds or 
+ *   the allotted time expires; return 0 if the device responds within
+ *   the allotted time or -1 if it does not or if a transmission error
+ *   occurs;
+ *
+ *   retry is number of poll attempts before returning an error to
+ *   indicate that the bootloader or firmware failed to respond in
+ *   the allotted time; timer is the time between poll attempts;
+ *
+ *--------------------------------------------------------------------*/
+
+signed WaitForStart (struct int6k *int6k, char string [], signed length) 
+
+{
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_sw_ver_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint8_t MDEVICEID;
+		uint8_t MVERLENGTH;
+		char MVERSION [INT6K_VERSTRING];
+		uint8_t UPGRADEABLE;
+	}
+	* confirm = (struct vs_sw_ver_confirm *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	unsigned retry = 0;
+	Request (int6k, &quot;Allow %d seconds for Start&quot;, SECONDS (int6k-&gt;timer, int6k-&gt;retry));
+	while (retry &lt; int6k-&gt;retry) 
+	{
+		signed status;
+		memset (message, 0, sizeof (struct message));
+		EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+		IntellonHeader (&amp;message-&gt;intellon, (VS_SW_VER | MMTYPE_REQ));
+		int6k-&gt;packetsize = ETHER_MIN_LEN;
+		if (SendMME (int6k) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+			return (-1);
+		}
+		status = ReadMME (int6k, (VS_SW_VER | MMTYPE_CNF));
+		if (status &lt; 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+			return (-1);
+		}
+		if (status &gt; 0) 
+		{
+			if (confirm-&gt;MSTATUS) 
+			{
+				Failure (int6k, INT6K_WONTDOIT);
+				return (-1);
+			}
+			if (_allset (int6k-&gt;flags, (INT6K_WAITFORSTART | INT6K_ANALYSE))) 
+			{
+				Confirm (int6k, &quot;Waited %d seconds for Start&quot;, SECONDS (int6k-&gt;timer, retry));
+			}
+			strncpy (string, confirm-&gt;MVERSION, length);
+			return (0);
+		}
+		if (++retry &lt; int6k-&gt;retry) 
+		{
+			SLEEP (int6k-&gt;timer);
+		}
+	}
+	if (_allset (int6k-&gt;flags, (INT6K_WAITFORSTART | INT6K_ANALYSE))) 
+	{
+		Confirm (int6k, &quot;Waited %d seconds for Start&quot;, SECONDS (int6k-&gt;timer, retry));
+	}
+	return (-1);
+}
+
+/*====================================================================*
+ *   
+ *   signed WaitForAssoc (struct int6k * int6k);
+ *
+ *   int6k.h
+ *
+ *   poll the device using VS_NW_INFO messages and examine confirmation
+ *   messages until the device reports that a network exists and has at
+ *   least one station present on that network; return 0 if the device
+ *   associates within the allotted time or -1 if it does not or if 
+ *   transmission errors occur;
+ *
+ *   retry is number of times to poll the device before returing an 
+ *   error to indicate that the device di not associate in the allotted
+ *   time; timer is the time to wait in between poll attempts;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual
+ *   for more information;
+ *   
+ *--------------------------------------------------------------------*/
+
+signed WaitForAssoc (struct int6k * int6k) 
+
+{
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed station 
+	{
+		uint8_t DA [ETHER_ADDR_LEN];
+		uint8_t TEI;
+		uint8_t BDA [ETHER_ADDR_LEN];
+		uint8_t AVGTX;
+		uint8_t AVGRX;
+	}
+	* station;
+	struct __packed network 
+	{
+		uint8_t NID [HPAVKEY_NID_LEN];
+		uint8_t SNID;
+		uint8_t TEI;
+		uint8_t ROLE;
+		uint8_t CCO_MACADDR [6];
+		uint8_t CCO_TEI;
+		uint8_t NUMSTAS;
+		struct station station [1];
+	}
+	* network;
+	struct __packed networks 
+	{
+		uint8_t NUMAVLNS;
+		struct network network [1];
+	}
+	* networks = (struct networks *) (&amp;message-&gt;content);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	static byte broadcast [ETHER_ADDR_LEN] = 
+	{
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF,
+		0xFF 
+	};
+	unsigned retry = 0;
+	signed networkcount;
+	signed stationcount;
+	Request (int6k, &quot;Allow %d seconds for Assoc&quot;, SECONDS (int6k-&gt;timer, int6k-&gt;retry));
+	while (retry &lt; int6k-&gt;retry) 
+	{
+		memset (message, 0, sizeof (struct message));
+		EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+		IntellonHeader (&amp;message-&gt;intellon, (VS_NW_INFO | MMTYPE_REQ));
+		int6k-&gt;packetsize = ETHER_MIN_LEN;
+		if (SendMME (int6k) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+			return (-1);
+		}
+		while (ReadMME (int6k, (VS_NW_INFO | MMTYPE_CNF)) &gt; 0) 
+		{
+			network = (struct network *)(&amp;networks-&gt;network);
+			networkcount = networks-&gt;NUMAVLNS;
+			while (networkcount-- &gt; 0) 
+			{
+				station = (struct station *)(&amp;network-&gt;station);
+				stationcount = network-&gt;NUMSTAS;
+				while (stationcount-- &gt; 0) 
+				{
+					if (memcmp (station-&gt;DA, broadcast, sizeof (broadcast))) 
+					{
+						if (_allset (int6k-&gt;flags, (INT6K_WAITFORASSOC | INT6K_ANALYSE))) 
+						{
+							Confirm (int6k, &quot;Waited %d seconds for Assoc&quot;, SECONDS (int6k-&gt;timer, retry));
+						}
+						return (0);
+					}
+					station++;
+				}
+				network = (struct network *)(station);
+			}
+		}
+		if (++retry &lt; int6k-&gt;retry) 
+		{
+			SLEEP (int6k-&gt;timer);
+		}
+	}
+	if (_allset (int6k-&gt;flags, (INT6K_WAITFORASSOC | INT6K_ANALYSE))) 
+	{
+		Confirm (int6k, &quot;Waited %d seconds for Assoc&quot;, SECONDS (int6k-&gt;timer, retry));
+	}
+	return (-1);
+}
+
+/*====================================================================*
+ *   
+ *   void function (struct int6k *int6k, const char * firmware);
+ *
+ *   perform operations in a logical order;
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static void function (struct int6k *int6k, const char * firmware) 
+
+{
+	char revision [INT6K_VERSTRING];
+	if (_anyset (int6k-&gt;flags, INT6K_RESET_DEVICE)) 
+	{
+		if (ResetAndWait (int6k)) 
+		{
+			Failure (int6k, &quot;Device did not Reset.&quot;);
+		}
+	}
+	if (_anyset (int6k-&gt;flags, INT6K_WAITFORRESET)) 
+	{
+		if (WaitForReset (int6k)) 
+		{
+			Failure (int6k, &quot;Device did not Reset.&quot;);
+		}
+	}
+	if (_anyset (int6k-&gt;flags, INT6K_WAITFORSTART)) 
+	{
+		if (WaitForStart (int6k, revision, sizeof (revision))) 
+		{
+			Failure (int6k, &quot;Device did not Start.&quot;);
+		}
+		if ((firmware) &amp;&amp; (*firmware) &amp;&amp; strcmp (firmware, revision)) 
+		{
+			Failure (int6k, &quot;Started wrong firmware&quot;);
+		}
+	}
+	if (_anyset (int6k-&gt;flags, INT6K_WAITFORASSOC)) 
+	{
+		if (WaitForAssoc (int6k)) 
+		{
+			Failure (int6k, &quot;Device did not Assoc.&quot;);
+		}
+	}
+	if (int6k-&gt;pause) 
+	{
+		Request (int6k, &quot;Pause %d seconds&quot;, int6k-&gt;pause);
+		sleep (int6k-&gt;pause);
+	}
+	return;
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char * argv[]);
+ *   
+ *   parse command line, populate int6k structure and perform selected 
+ *   operations; show help summary if asked; see getoptv and putoptv
+ *   to understand command line parsing and help summary display; see
+ *   int6k.h for the definition of struct int6k; 
+ *
+ *   the command line accepts multiple MAC addresses and the program 
+ *   performs the specified operations on each address, in turn; the
+ *   address order is significant but the option order is not; the
+ *   default address is a local broadcast that causes all devices on
+ *   the local H1 interface to respond but not those at the remote
+ *   end of the powerline;
+ *
+ *   the default address is 00:B0:52:00:00:01; omitting the address
+ *   will automatically address the local device; some options will
+ *   cancel themselves if this makes no sense;
+ *
+ *   the default interface is eth1 because most people use eth0 as 
+ *   their principle network connection; you can specify another 
+ *   interface with -i or define environment string PLC to make
+ *   that the default interface and save typing;
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	extern struct channel channel;
+	extern const struct _term_ devices [];
+	static const char *optv [] = 
+	{
+		&quot;ac:ef:i:p:qrRstvxw:&quot;,
+		&quot;device [device] [...] [&gt; stdout]&quot;,
+		&quot;Intellon INT6000 Procrastinator&quot;,
+		&quot;a\twait for device assoc&quot;,
+		&quot;c n\tpolling retry count&quot;,
+		&quot;e\tredirect stderr messages to stdout&quot;,
+		&quot;f s\tconfirm firmware is revision s&quot;,
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		&quot;i n\thost interface number [2]&quot;,
+
+#else
+
+		&quot;i s\thost interface name [&quot; CHANNEL_ETHDEVICE &quot;]&quot;,
+
+#endif
+
+		&quot;p n\tpoll frequency per second [5]&quot;,
+		&quot;q\tquiet mode&quot;,
+		&quot;v\tverbose mode&quot;,
+		&quot;R\treset device and wait&quot;,
+		&quot;r\twait for device reset&quot;,
+		&quot;s\twait for device start&quot;,
+		&quot;t\tshow wait times&quot;,
+		&quot;w n\twait n seconds&quot;,
+		&quot;x\texit on error&quot;,
+		(const char *) (0) 
+	};
+
+#include &quot;../int6k/int6k-struct.c&quot;
+
+	const char * firmware = &quot;&quot;;
+	signed c;
+	if (getenv (PLCDEVICE)) 
+	{
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		channel.id = atoi (getenv (PLCDEVICE));
+
+#else
+
+		channel.name = strdup (getenv (PLCDEVICE));
+
+#endif
+
+	}
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'a':
+			_setbits (int6k.flags, INT6K_WAITFORASSOC);
+			break;
+		case 'c':
+			int6k.retry = (unsigned)(uintspec (optarg, 1, INT_MAX));
+			break;
+		case 'e':
+			dup2 (STDOUT_FILENO, STDERR_FILENO);
+			break;
+		case 'f':
+			firmware = optarg;
+			break;
+		case 'i':
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+			channel.id = atoi (optarg);
+
+#else
+
+			channel.name = optarg;
+
+#endif
+
+			break;
+		case 'p':
+			int6k.timer = _TIMER/(unsigned)(uintspec (optarg, 1, 10));
+			break;
+		case 'q':
+			_setbits (channel.flags, CHANNEL_SILENCE);
+			_setbits (int6k.flags, INT6K_SILENCE);
+			break;
+		case 'r':
+			_setbits (int6k.flags, INT6K_WAITFORRESET);
+			break;
+		case 'R':
+			_setbits (int6k.flags, INT6K_RESET_DEVICE);
+			break;
+		case 's':
+			_setbits (int6k.flags, INT6K_WAITFORSTART);
+			break;
+		case 't':
+			_setbits (int6k.flags, INT6K_ANALYSE);
+			break;
+		case 'v':
+			_setbits (channel.flags, CHANNEL_VERBOSE);
+			_setbits (int6k.flags, INT6K_VERBOSE);
+			break;
+		case 'w':
+			int6k.pause = (unsigned)(uintspec (optarg, 0, 3600));
+			break;
+		case 'x':
+			_setbits (int6k.flags, INT6K_BAILOUT);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+
+#ifndef WIN32
+
+/*
+ *      raw packets require root priviledges on linux; one does not have to be
+ *      root when this program is installed setuid using 'chown root:root' and 
+ *      'chmod 4555';
+ */
+
+	if (geteuid ()) 
+	{
+		error (1, EPERM, INT6K_NEEDROOT);
+	}
+
+#endif
+
+	openchannel (&amp;channel);
+	if (!(int6k.message = malloc (sizeof (struct message)))) 
+	{
+		error (1, errno, INT6K_ERR_MEMORY);
+	}
+	if (!argc) 
+	{
+		function (&amp;int6k, firmware);
+	}
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		if (!hexencode (channel.peer, sizeof (channel.peer), synonym (*argv, devices, DEVICES))) 
+		{
+			error (1, errno, INT6K_BAD_MAC, *argv);
+		}
+		function (&amp;int6k, firmware);
+		argv++;
+		argc--;
+	}
+	free (int6k.message);
+	closechannel (&amp;channel);
+	exit (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='int6ktone.c.html' title=' int6ktone.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='intellon-snmp.c.html' title=' intellon-snmp.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

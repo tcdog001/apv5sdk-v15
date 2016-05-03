@@ -1,0 +1,32 @@
+#!/bin/sh
+
+#parameter numbers check and usage
+if [ $# -ne 1 ] ;then
+    echo "Usage: boot_upgrade default           --- upgrade default bootloader"
+    echo "       boot_upgrade apv5-boot.bin  --- upgrade bootloader which you assign"
+    exit 1
+fi
+
+boot=`basename $1`
+
+#if image exist
+if [ $1 == "default" ] ;then
+    /usr/sbin/stop_monitor
+    killall wtpd
+    echo "upgrade default bootloader"
+    dd if=/usr/bin/u-boot.bin of=/dev/mtdblock0
+    echo "default bootloader upgrade done,start to reboot now"
+    echo k > /proc/kes_debug_flag
+    sysreboot
+elif [ $boot == "apv5-boot.bin" ] ;then
+    /usr/sbin/stop_monitor
+    killall wtpd
+    echo "upgrade bootloader which you assign"
+    dd if=$1 of=/dev/mtdblock0
+    echo "bootloader upgrade done,start to reboot now"
+    echo k > /proc/kes_debug_flag
+    sysreboot
+else
+    echo "wrong format, make sure the filename you assign is apv5-boot.bin"
+fi
+

@@ -1,0 +1,1209 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_config_vlan1=`config_read /config/network/vlan1`
+xml_vlan1_create=`config_getoption "$xml_config_vlan1" create`
+xml_vlan1_vid=`config_getoption "$xml_config_vlan1" vid`
+xml_vlan1_vlanname=`config_getoption "$xml_config_vlan1" vlanname`
+xml_vlan1_ifeth=`config_getoption "$xml_config_vlan1" ifeth`
+xml_vlan1_ifeth1=`config_getoption "$xml_config_vlan1" ifeth1`
+xml_vlan1_ipaddr=`config_getoption "$xml_config_vlan1" ipaddr`
+xml_vlan1_mask=`config_getoption "$xml_config_vlan1" netmask`
+
+xml_config_vlan2=`config_read /config/network/vlan2`
+xml_vlan2_create=`config_getoption "$xml_config_vlan2" create`
+xml_vlan2_vid=`config_getoption "$xml_config_vlan2" vid`
+xml_vlan2_vlanname=`config_getoption "$xml_config_vlan2" vlanname`
+xml_vlan2_ifeth=`config_getoption "$xml_config_vlan2" ifeth`
+xml_vlan2_ifeth1=`config_getoption "$xml_config_vlan2" ifeth1`
+xml_vlan2_ipaddr=`config_getoption "$xml_config_vlan2" ipaddr`
+xml_vlan2_mask=`config_getoption "$xml_config_vlan2" netmask`
+
+xml_config_vlan3=`config_read /config/network/vlan3`
+xml_vlan3_create=`config_getoption "$xml_config_vlan3" create`
+xml_vlan3_vid=`config_getoption "$xml_config_vlan3" vid`
+xml_vlan3_vlanname=`config_getoption "$xml_config_vlan3" vlanname`
+xml_vlan3_ifeth=`config_getoption "$xml_config_vlan3" ifeth`
+xml_vlan3_ifeth1=`config_getoption "$xml_config_vlan3" ifeth1`
+xml_vlan3_ipaddr=`config_getoption "$xml_config_vlan3" ipaddr`
+xml_vlan3_mask=`config_getoption "$xml_config_vlan3" netmask`
+
+xml_config_vlan4=`config_read /config/network/vlan4`
+xml_vlan4_create=`config_getoption "$xml_config_vlan4" create`
+xml_vlan4_vid=`config_getoption "$xml_config_vlan4" vid`
+xml_vlan4_vlanname=`config_getoption "$xml_config_vlan4" vlanname`
+xml_vlan4_ifeth=`config_getoption "$xml_config_vlan4" ifeth`
+xml_vlan4_ifeth1=`config_getoption "$xml_config_vlan4" ifeth1`
+xml_vlan4_ipaddr=`config_getoption "$xml_config_vlan4" ipaddr`
+xml_vlan4_mask=`config_getoption "$xml_config_vlan4" netmask`
+
+xml_config_vlan5=`config_read /config/network/vlan5`
+xml_vlan5_create=`config_getoption "$xml_config_vlan5" create`
+xml_vlan5_vid=`config_getoption "$xml_config_vlan5" vid`
+xml_vlan5_vlanname=`config_getoption "$xml_config_vlan5" vlanname`
+xml_vlan5_ifeth=`config_getoption "$xml_config_vlan5" ifeth`
+xml_vlan5_ifeth1=`config_getoption "$xml_config_vlan5" ifeth1`
+xml_vlan5_ipaddr=`config_getoption "$xml_config_vlan5" ipaddr`
+xml_vlan5_mask=`config_getoption "$xml_config_vlan5" netmask`
+
+xml_config_vlan6=`config_read /config/network/vlan6`
+xml_vlan6_create=`config_getoption "$xml_config_vlan6" create`
+xml_vlan6_vid=`config_getoption "$xml_config_vlan6" vid`
+xml_vlan6_vlanname=`config_getoption "$xml_config_vlan6" vlanname`
+xml_vlan6_ifeth=`config_getoption "$xml_config_vlan6" ifeth`
+xml_vlan6_ifeth1=`config_getoption "$xml_config_vlan6" ifeth1`
+xml_vlan6_ipaddr=`config_getoption "$xml_config_vlan6" ipaddr`
+xml_vlan6_mask=`config_getoption "$xml_config_vlan6" netmask`
+
+xml_config_vlan7=`config_read /config/network/vlan7`
+xml_vlan7_create=`config_getoption "$xml_config_vlan7" create`
+xml_vlan7_vid=`config_getoption "$xml_config_vlan7" vid`
+xml_vlan7_vlanname=`config_getoption "$xml_config_vlan7" vlanname`
+xml_vlan7_ifeth=`config_getoption "$xml_config_vlan7" ifeth`
+xml_vlan7_ifeth1=`config_getoption "$xml_config_vlan7" ifeth1`
+xml_vlan7_ipaddr=`config_getoption "$xml_config_vlan7" ipaddr`
+xml_vlan7_mask=`config_getoption "$xml_config_vlan7" netmask`
+
+xml_config_vlan8=`config_read /config/network/vlan8`
+xml_vlan8_create=`config_getoption "$xml_config_vlan8" create`
+xml_vlan8_vid=`config_getoption "$xml_config_vlan8" vid`
+xml_vlan8_vlanname=`config_getoption "$xml_config_vlan8" vlanname`
+xml_vlan8_ifeth=`config_getoption "$xml_config_vlan8" ifeth`
+xml_vlan8_ifeth1=`config_getoption "$xml_config_vlan8" ifeth1`
+xml_vlan8_ipaddr=`config_getoption "$xml_config_vlan8" ipaddr`
+xml_vlan8_mask=`config_getoption "$xml_config_vlan8" netmask`
+
+xml_config=`config_read /config/network/lan`
+xml_lan_if=`config_getoption "$xml_config" if`
+sys_default_ipaddr=`sys_get_interface_ipaddr "$xml_lan_if"`
+sys_ath0_ipaddr=`sys_get_interface_ipaddr ath0`
+sys_eth0_ipaddr=`sys_get_interface_ipaddr eth0`
+sys_vlan1_ipaddr=`sys_get_interface_ipaddr br$xml_vlan1_vid`
+sys_vlan2_ipaddr=`sys_get_interface_ipaddr br$xml_vlan2_vid`
+sys_vlan3_ipaddr=`sys_get_interface_ipaddr br$xml_vlan3_vid`
+sys_vlan4_ipaddr=`sys_get_interface_ipaddr br$xml_vlan4_vid`
+sys_vlan5_ipaddr=`sys_get_interface_ipaddr br$xml_vlan5_vid`
+sys_vlan6_ipaddr=`sys_get_interface_ipaddr br$xml_vlan6_vid`
+sys_vlan7_ipaddr=`sys_get_interface_ipaddr br$xml_vlan7_vid`
+sys_vlan8_ipaddr=`sys_get_interface_ipaddr br$xml_vlan8_vid`
+
+typevalidate()
+{
+	if [ "$DEV_eth1" == "enable" ]; then
+		echo "<td align=\"center\" bordercolor=\"#ffffff\"><input type=\"checkbox\" "
+		webui_checkbox_check "$1" "yes"
+		echo "name=\"$2\" value=\"yes\">&nbsp;</td>"
+	fi
+}
+
+typevalidate1()
+{
+	if [ "$DEV_eth1" == "enable" ]; then
+		echo "<td align=\"center\" width=\"100\" height=\"22\" bordercolor=\"#d9d9d9\" ><b>eth1&nbsp;</b></td>"
+	fi
+}
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js network_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	var xml_lan_if="<%= $xml_lan_if %>";
+	var sys_default_ipaddr="<%= $sys_default_ipaddr %>";
+	var sys_ath0_ipaddr="<%= $sys_ath0_ipaddr %>";
+	var sys_eth0_ipaddr="<%= $sys_eth0_ipaddr %>";
+	var xml_vlan1_create="<%= $xml_vlan1_create %>";
+	var xml_vlan2_create="<%= $xml_vlan2_create %>";
+	var xml_vlan3_create="<%= $xml_vlan3_create %>";
+	var xml_vlan4_create="<%= $xml_vlan4_create %>";
+	var xml_vlan5_create="<%= $xml_vlan5_create %>";
+	var xml_vlan6_create="<%= $xml_vlan6_create %>";
+	var xml_vlan7_create="<%= $xml_vlan7_create %>";
+	var xml_vlan8_create="<%= $xml_vlan8_create %>";
+	var xml_vlan1_vid="<%= $xml_vlan1_vid %>";
+	var xml_vlan2_vid="<%= $xml_vlan2_vid %>";
+	var xml_vlan3_vid="<%= $xml_vlan3_vid %>";
+	var xml_vlan4_vid="<%= $xml_vlan4_vid %>";
+	var xml_vlan5_vid="<%= $xml_vlan5_vid %>";
+	var xml_vlan6_vid="<%= $xml_vlan6_vid %>";
+	var xml_vlan7_vid="<%= $xml_vlan7_vid %>";
+	var xml_vlan8_vid="<%= $xml_vlan8_vid %>";
+	
+	init_mmenu(flag);
+	init_advmenu(flag);
+	init_vlan(flag);
+	function Ip() {
+    var reg = /^(\d{1,2}|1\d\d|2[0-1]\d|2[0-2][0-3])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+    var reg1 = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+    var regid = /^[0-9]{1,4}$/;
+    var vid11 = parseInt(document.all.vid1.value);
+    var vip1 = document.all.vlanip1;
+    var vm1 = document.all.vlanmask1;
+    var vid22 = parseInt(document.all.vid2.value); 
+    var vip2 = document.all.vlanip2;
+    var vm2 = document.all.vlanmask2;
+    var vid33 = parseInt(document.all.vid3.value);
+    var vip3 = document.all.vlanip3;
+    var vm3 = document.all.vlanmask3;
+    var vid44 = parseInt(document.all.vid4.value);
+    var vip4 = document.all.vlanip4;
+    var vm4 = document.all.vlanmask4;
+    var vid55 = parseInt(document.all.vid5.value);
+    var vip5 = document.all.vlanip5;
+    var vm5 = document.all.vlanmask5;
+    var vid66 = parseInt(document.all.vid6.value);
+    var vip6 = document.all.vlanip6;
+    var vm6 = document.all.vlanmask6;
+    var vid77 = parseInt(document.all.vid7.value);
+    var vip7 = document.all.vlanip7;
+    var vm7 = document.all.vlanmask7;
+    var vid88 = parseInt(document.all.vid8.value);
+    var vip8 = document.all.vlanip8;
+    var vm8 = document.all.vlanmask8; 
+		if(document.all.create1.checked == true ){
+		    if (!reg.test(vip1.value)&&vip1.value!="") {
+				     alert(vlan_alert_ip);
+				     vip1.focus();
+				     return false;
+			}
+			  
+			if (!reg1.test(vm1.value)&&vm1.value!="") {
+				     alert(vlan_alert_mask);
+				     vm1.focus();
+				     return false;
+			}
+			if (!regid.test(document.all.vid1.value)) {
+				     alert(vlan_alert_vid1);
+				     document.all.vid1.focus();
+				     return false;
+			}
+			else if (vid11 < 1 || vid11 > 4095){
+						alert(vlan_alert_range1);
+						document.all.vid1.focus();
+						return false;
+				}	
+		}
+		if(document.all.create2.checked == true ){
+			if (!reg.test(vip2.value)&&vip2.value!="") {
+				     alert(vlan_alert_ip);
+				     vip2.focus();
+				     return false;
+			}
+			  
+			if (!reg1.test(vm2.value)&&vm2.value!="") {
+				     alert(vlan_alert_mask);
+				     vm2.focus();
+				     return false;
+			}
+			if (!regid.test(document.all.vid2.value)) {
+				     alert(vlan_alert_vid2);
+				     document.all.vid2.focus();
+				     return false;
+			}
+			else if (vid22 < 1 || vid22 > 4095){
+						alert(vlan_alert_range2);
+						document.all.vid2.focus();
+						return false;
+				}
+			}
+		if(document.all.create3.checked == true ){
+			if (!reg.test(vip3.value)&&vip3.value!="") {
+				     alert(vlan_alert_ip);
+				     vip3.focus();
+				     return false;
+			}
+			  
+			if (!reg1.test(vm3.value)&&vm3.value!="") {
+				     alert(vlan_alert_mask);
+				     vm3.focus();
+				     return false;
+			}
+			if (!regid.test(document.all.vid3.value)) {
+				     alert(vlan_alert_vid3);
+				     document.all.vid3.focus();
+				     return false;
+			}
+			else if (vid33 < 1 || vid33 > 4095){
+						alert(vlan_alert_range3);
+						document.all.vid3.focus();
+						return false;
+			}
+		}
+		if(document.all.create4.checked == true ){
+			if (!reg.test(vip4.value)&&vip4.value!="") {
+				     alert(vlan_alert_ip);
+				     vip4.focus();
+				     return false;
+			}
+			  
+			if (!reg1.test(vm4.value)&&vm4.value!="") {
+				     alert(vlan_alert_mask);
+				     vm4.focus();
+				     return false;
+			}
+			if (!regid.test(document.all.vid4.value)) {
+				     alert(vlan_alert_vid4);
+				     document.all.vid4.focus();
+				     return false;
+			}
+			else if (vid44 < 1 || vid44 > 4095){
+						alert(vlan_alert_range4);
+						document.all.vid4.focus();
+						return false;
+			}	 
+		}
+		if(document.all.create5.checked == true ){
+			if (!reg.test(vip5.value)&&vip5.value!="") {
+				     alert(vlan_alert_ip);
+				     vip5.focus();
+				     return false;
+			}
+			  
+			if (!reg1.test(vm5.value)&&vm5.value!="") {
+				     alert(vlan_alert_mask);
+				     vm5.focus();
+				     return false;
+			}
+			if (!regid.test(document.all.vid5.value)) {
+				     alert(vlan_alert_vid5);
+				     document.all.vid5.focus();
+				     return false;
+			}
+			else if (vid55 < 1 || vid55 > 4095){
+						alert(vlan_alert_range5);
+						document.all.vid5.focus();
+						return false;
+			}	 
+		}
+		if(document.all.create6.checked == true ){  
+			if (!reg.test(vip6.value)&&vip6.value!="") {
+				     alert(vlan_alert_ip);
+				     vip6.focus();
+				     return false;
+			}
+			  
+			if (!reg1.test(vm6.value)&&vm6.value!="") {
+				     alert(vlan_alert_mask);
+				     vm6.focus();
+				     return false;
+			}
+			if (!regid.test(document.all.vid6.value)) {
+				     alert(vlan_alert_vid6);
+				     document.all.vid6.focus();
+				     return false;
+			}
+			else if (vid66 < 1 || vid66 > 4095){
+						alert(vlan_alert_range6);
+						document.all.vid6.focus();
+						return false;
+			}	 
+		}
+		if(document.all.create7.checked == true ){
+			if (!reg.test(vip7.value)&&vip7.value!="") {
+				     alert(vlan_alert_ip);
+				     vip7.focus();
+				     return false;
+			}
+			  
+			if (!reg1.test(vm7.value)&&vm7.value!="") {
+				     alert(vlan_alert_mask);
+				     vm7.focus();
+				     return false;
+			}
+			if (!regid.test(document.all.vid7.value)) {
+				     alert(vlan_alert_vid7);
+				     document.all.vid7.focus();
+				     return false;
+			}
+			else if (vid77 < 1 || vid77 > 4095){
+						alert(vlan_alert_range7);
+						document.all.vid7.focus();
+						return false;
+			}	 
+		} 
+		if(document.all.create8.checked == true ){
+			if (!reg.test(vip8.value)&&vip8.value!="") {
+				     alert(vlan_alert_ip);
+				     vip8.focus();
+				     return false;
+			}
+			  
+			if (!reg1.test(vm8.value)&&vm8.value!="") {
+				     alert(vlan_alert_mask);
+				     vm8.focus();
+				     return false;
+			}
+			if (!regid.test(document.all.vid8.value)) {
+				     alert(vlan_alert_vid8);
+				     document.all.vid8.focus();
+				     return false;
+			}
+			else if (vid88 < 1 || vid88 > 4095){
+						alert(vlan_alert_range8);
+						document.all.vid8.focus();
+						return false;
+			}	 
+		} 
+
+		if(document.all.create1.checked == true && xml_vlan1_create == "" ){
+			if(document.all.create2.checked == true && vid11 == vid22 && vip1.value != vip2.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create3.checked == true && vid11 == vid33 && vip1.value != vip3.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create4.checked == true && vid11 == vid44 && vip1.value != vip4.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create5.checked == true && vid11 == vid55 && vip1.value != vip5.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create6.checked == true && vid11 == vid66 && vip1.value != vip6.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create7.checked == true && vid11 == vid77 && vip1.value != vip7.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create8.checked == true && vid11 == vid88 && vip1.value != vip8.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(vip1.value!=""){
+				if(vip1.value == sys_default_ipaddr){
+					alert(alert_vlan1_ip+xml_lan_if+alert_vlan_error);
+					return false;
+				}
+				if(vip1.value == sys_ath0_ipaddr){
+					alert(alert_vlan1_ip+"ath0"+alert_vlan_error);
+					return false;
+				}
+				if(vip1.value == sys_eth0_ipaddr){
+					alert(alert_vlan1_ip+"eth0"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create2.checked == true && vip1.value == vip2.value && vid11 != vid22){
+					alert(alert_vlan1_ip+"vlan2"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create3.checked == true && vip1.value == vip3.value && vid11 != vid33){
+					alert(alert_vlan1_ip+"vlan3"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create4.checked == true && vip1.value == vip4.value && vid11 != vid44){
+					alert(alert_vlan1_ip+"vlan4"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create5.checked == true && vip1.value == vip5.value && vid11 != vid55){
+					alert(alert_vlan1_ip+"vlan5"+alert_vlan_error);	
+					return false;
+				}
+				if(document.all.create6.checked == true && vip1.value == vip6.value && vid11 != vid66){
+					alert(alert_vlan1_ip+"vlan6"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create7.checked == true && vip1.value == vip7.value && vid11 != vid77){
+					alert(alert_vlan1_ip+"vlan7"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create8.checked == true && vip1.value == vip8.value && vid11 != vid88){
+					alert(alert_vlan1_ip+"vlan8"+alert_vlan_error);
+					return false;
+				}
+			}
+	  }	
+	  if(document.all.create2.checked == true && xml_vlan2_create == "" ){
+		if(document.all.create1.checked == true && vid22 == vid11 && vip2.value != vip1.value ){
+			alert(alert_vid_vip_error);
+			return false;
+			}
+		if(document.all.create3.checked == true && vid22 == vid33 && vip2.value != vip3.value ){
+			alert(alert_vid_vip_error);
+			return false;
+			}
+		if(document.all.create4.checked == true && vid22 == vid44 && vip2.value != vip4.value ){
+			alert(alert_vid_vip_error);
+			return false;
+			}
+		if(document.all.create5.checked == true && vid22 == vid55 && vip2.value != vip5.value ){
+			alert(alert_vid_vip_error);
+			return false;
+			}
+		if(document.all.create6.checked == true && vid22 == vid66 && vip2.value != vip6.value ){
+			alert(alert_vid_vip_error);
+			return false;
+			}
+		if(document.all.create7.checked == true && vid22 == vid77 && vip2.value != vip7.value ){
+			alert(alert_vid_vip_error);
+			return false;
+			}
+		if(document.all.create8.checked == true && vid22 == vid88 && vip2.value != vip8.value ){
+			alert(alert_vid_vip_error);
+			return false;
+			}
+		if(vip2.value!=""){
+				if(vip2.value == sys_default_ipaddr){
+					alert(alert_vlan2_ip+xml_lan_if+alert_vlan_error);
+					return false;
+				}
+				if(vip2.value == sys_ath0_ipaddr){
+					alert(alert_vlan2_ip+"ath0"+alert_vlan_error);
+					return false;
+				}
+				if(vip2.value == sys_eth0_ipaddr){
+					alert(alert_vlan2_ip+"eth0"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create1.checked == true && vip2.value == vip1.value && vid22 != vid11){
+					alert(alert_vlan2_ip+"vlan1"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create3.checked == true && vip2.value == vip3.value && vid22 != vid33){
+					alert(alert_vlan2_ip+"vlan3"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create4.checked == true && vip2.value == vip4.value && vid22 != vid44){
+					alert(alert_vlan2_ip+"vlan4"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create5.checked == true && vip2.value == vip5.value && vid22 != vid55){
+					alert(alert_vlan2_ip+"vlan5"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create6.checked == true && vip2.value == vip6.value && vid22 != vid66){
+					alert(alert_vlan2_ip+"vlan6"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create7.checked == true && vip2.value == vip7.value && vid22 != vid77){
+					alert(alert_vlan2_ip+"vlan7"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create8.checked == true && vip2.value == vip8.value && vid22 != vid88){
+					alert(alert_vlan2_ip+"vlan8"+alert_vlan_error);
+					return false;
+				}
+		}
+	  }
+		 if(document.all.create3.checked == true && xml_vlan3_create == "" ){
+			if(document.all.create1.checked == true && vid33 == vid11 && vip3.value != vip1.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create2.checked == true && vid33 == vid22 && vip3.value != vip2.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create4.checked == true && vid33 == vid44 && vip3.value != vip4.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create5.checked == true && vid33 == vid55 && vip3.value != vip5.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create6.checked == true && vid33 == vid66 && vip3.value != vip6.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create7.checked == true && vid33 == vid77 && vip3.value != vip7.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create8.checked == true && vid33 == vid88 && vip3.value != vip8.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if( vip3.value!=""){
+				if(vip3.value == sys_default_ipaddr){
+					alert(alert_vlan3_ip+xml_lan_if+alert_vlan_error);
+					return false;
+				}
+				if(vip3.value == sys_ath0_ipaddr){
+					alert(alert_vlan3_ip+"ath0"+alert_vlan_error);
+					return false;
+				}
+				if(vip3.value == sys_eth0_ipaddr){
+					alert(alert_vlan3_ip+"eth0"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create1.checked == true && vip3.value == vip1.value && vid33 != vid11){
+					alert(alert_vlan3_ip+"vlan1"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create2.checked == true && vip3.value == vip2.value && vid33 != vid22){
+					alert(alert_vlan3_ip+"vlan2"+alert_vlan_error);	
+					return false;
+				}
+				if(document.all.create4.checked == true && vip3.value == vip4.value && vid33 != vid44){
+					alert(alert_vlan3_ip+"vlan4"+alert_vlan_error);	
+					return false;
+				}
+				if(document.all.create5.checked == true && vip3.value == vip5.value && vid33 != vid55){
+					alert(alert_vlan3_ip+"vlan5"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create6.checked == true && vip3.value == vip6.value && vid33 != vid66){
+					alert(alert_vlan3_ip+"vlan6"+alert_vlan_error);
+					
+					return false;
+				}
+				if(document.all.create7.checked == true && vip3.value == vip7.value && vid33 != vid77){
+					alert(alert_vlan3_ip+"vlan7"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create8.checked == true && vip3.value == vip8.value && vid33 != vid88){
+					alert(alert_vlan3_ip+"vlan8"+alert_vlan_error);
+					return false;
+				}
+		}
+	  }	
+	  if(document.all.create4.checked == true && xml_vlan4_create == "" ){
+			if(document.all.create1.checked == true && vid44 == vid11 && vip4.value != vip1.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create2.checked == true && vid44 == vid22 && vip4.value != vip2.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create3.checked == true && vid44 == vid33 && vip4.value != vip3.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create5.checked == true && vid44 == vid55 && vip4.value != vip5.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create6.checked == true && vid44 == vid66 && vip4.value != vip6.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create7.checked == true && vid44 == vid77 && vip4.value != vip7.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create8.checked == true && vid44 == vid88 && vip4.value != vip8.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if( vip4.value!=""){
+				if(vip4.value == sys_default_ipaddr){
+					alert(alert_vlan4_ip+xml_lan_if+alert_vlan_error);
+					return false;
+				}
+				if(vip4.value == sys_ath0_ipaddr){
+					alert(alert_vlan4_ip+"ath0"+alert_vlan_error);
+					return false;
+				}
+				if(vip4.value == sys_eth0_ipaddr){
+					alert(alert_vlan4_ip+"eth0"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create1.checked == true && vip4.value == vip1.value && vid44 != vid11){
+					alert(alert_vlan4_ip+"vlan1"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create2.checked == true && vip4.value == vip2.value && vid44 != vid22){
+					alert(alert_vlan4_ip+"vlan2"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create3.checked == true && vip4.value == vip3.value && vid44 != vid33){
+					alert(alert_vlan4_ip+"vlan3"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create5.checked == true && vip4.value == vip5.value && vid44 != vid55){
+					alert(alert_vlan4_ip+"vlan5"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create6.checked == true && vip4.value == vip6.value && vid44 != vid66){
+					alert(alert_vlan4_ip+"vlan6"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create7.checked == true && vip4.value == vip7.value && vid44 != vid77){
+					alert(alert_vlan4_ip+"vlan7"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create8.checked == true && vip4.value == vip8.value && vid44 != vid88){
+					alert(alert_vlan4_ip+"vlan8"+alert_vlan_error);
+					return false;
+				}
+			}
+	  }	
+		 if(document.all.create5.checked == true && xml_vlan5_create == "" ){
+			if(document.all.create1.checked == true && vid55 == vid11 && vip5.value != vip1.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create2.checked == true && vid55 == vid22 && vip5.value != vip2.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create3.checked == true && vid55 == vid33 && vip5.value != vip3.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create4.checked == true && vid55 == vid44 && vip5.value != vip4.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create6.checked == true && vid55 == vid66 && vip5.value != vip6.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create7.checked == true && vid55 == vid77 && vip5.value != vip7.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create8.checked == true && vid55 == vid88 && vip5.value != vip8.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(vip5.value!="" ){
+				if(vip5.value == sys_default_ipaddr){
+					alert(alert_vlan5_ip+xml_lan_if+alert_vlan_error);
+					return false;
+				}
+				if(vip5.value == sys_ath0_ipaddr){
+					alert(alert_vlan5_ip+"ath0"+alert_vlan_error);
+					return false;
+				}
+				if(vip5.value == sys_eth0_ipaddr){
+					alert(alert_vlan5_ip+"eth0"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create1.checked == true && vip5.value == vip1.value && vid55 != vid11){
+					alert(alert_vlan5_ip+"vlan1"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create2.checked == true && vip5.value == vip2.value && vid55 != vid22){
+					alert(alert_vlan5_ip+"vlan2"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create3.checked == true && vip5.value == vip3.value && vid55 != vid33){
+					alert(alert_vlan5_ip+"vlan3"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create4.checked == true && vip5.value == vip4.value && vid55 != vid44){
+					alert(alert_vlan5_ip+"vlan4"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create6.checked == true && vip5.value == vip6.value && vid55 != vid66){
+					alert(alert_vlan5_ip+"vlan6"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create7.checked == true && vip5.value == vip7.value && vid55 != vid77){
+					alert(alert_vlan5_ip+"vlan7"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create8.checked == true && vip5.value == vip8.value && vid55 != vid88){
+					alert(alert_vlan5_ip+"vlan8"+alert_vlan_error);
+					return false;
+				}
+			}
+	  }	
+	  if(document.all.create6.checked == true && xml_vlan6_create == "" ){
+			if(document.all.create1.checked == true && vid66 == vid11 && vip6.value != vip1.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create2.checked == true && vid66 == vid22 && vip6.value != vip2.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create3.checked == true && vid66 == vid33 && vip6.value != vip3.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create4.checked == true && vid66 == vid44 && vip6.value != vip4.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create5.checked == true && vid66 == vid55 && vip6.value != vip5.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create7.checked == true && vid66 == vid77 && vip6.value != vip7.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create8.checked == true && vid66 == vid88 && vip6.value != vip8.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(vip6.value!="" ){
+				if(vip6.value == sys_default_ipaddr){
+					alert(alert_vlan6_ip+xml_lan_if+alert_vlan_error);
+					return false;
+				}
+				if(vip6.value == sys_ath0_ipaddr){
+					alert(alert_vlan6_ip+"ath0"+alert_vlan_error);
+					return false;
+				}
+				if(vip6.value == sys_eth0_ipaddr){
+					alert(alert_vlan6_ip+"eth0"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create1.checked == true && vip6.value == vip1.value && vid66 != vid11){
+					alert(alert_vlan6_ip+"vlan1"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create2.checked == true && vip6.value == vip2.value && vid66 != vid22){
+					alert(alert_vlan6_ip+"vlan2"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create3.checked == true && vip6.value == vip3.value && vid66 != vid33){
+					alert(alert_vlan6_ip+"vlan3"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create4.checked == true && vip6.value == vip4.value && vid66 != vid44){
+					alert(alert_vlan6_ip+"vlan4"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create5.checked == true && vip6.value == vip5.value && vid66 != vid55){
+					alert(alert_vlan6_ip+"vlan5"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create7.checked == true && vip6.value == vip7.value && vid66 != vid77){
+					alert(alert_vlan6_ip+"vlan7"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create8.checked == true && vip6.value == vip8.value && vid66 != vid88){
+					alert(alert_vlan6_ip+"vlan8"+alert_vlan_error);
+					return false;
+				}
+			}
+	  }	
+	  if(document.all.create7.checked == true && xml_vlan7_create == "" ){
+			if(document.all.create1.checked == true && vid77 == vid11 && vip7.value != vip1.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create2.checked == true && vid77 == vid22 && vip7.value != vip2.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create3.checked == true && vid77 == vid33 && vip7.value != vip3.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create4.checked == true && vid77 == vid44 && vip7.value != vip4.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create5.checked == true && vid77 == vid55 && vip7.value != vip5.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create6.checked == true && vid77 == vid66 && vip7.value != vip6.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create8.checked == true && vid77 == vid88 && vip7.value != vip8.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(vip7.value!=""){
+				if(vip7.value == sys_default_ipaddr){
+					alert(alert_vlan7_ip+xml_lan_if+alert_vlan_error);
+					return false;
+				}
+				if(vip7.value == sys_ath0_ipaddr){
+					alert(alert_vlan7_ip+"ath0"+alert_vlan_error);
+					return false;
+				}
+				if(vip7.value == sys_eth0_ipaddr){
+					alert(alert_vlan7_ip+"eth0"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create1.checked == true && vip7.value == vip1.value && vid77 != vid11){
+					alert(alert_vlan7_ip+"vlan1"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create2.checked == true && vip7.value == vip2.value && vid77 != vid22){
+					alert(alert_vlan7_ip+"vlan2"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create3.checked == true && vip7.value == vip3.value && vid77 != vid33){
+					alert(alert_vlan7_ip+"vlan3"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create4.checked == true && vip7.value == vip4.value && vid77 != vid44){
+					alert(alert_vlan7_ip+"vlan4"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create5.checked == true && vip7.value == vip5.value && vid77 != vid55){
+					alert(alert_vlan7_ip+"vlan5"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create6.checked == true && vip7.value == vip6.value && vid77 != vid66){
+					alert(alert_vlan7_ip+"vlan6"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create8.checked == true && vip7.value == vip8.value && vid77 != vid88){
+					alert(alert_vlan7_ip+"vlan8"+alert_vlan_error);
+					return false;
+				}
+			}
+	  }	
+	  if(document.all.create8.checked == true  && xml_vlan8_create == "" ){
+			if(document.all.create1.checked == true && vid88 == vid11 && vip8.value != vip1.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create2.checked == true && vid88 == vid22 && vip8.value != vip2.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create3.checked == true && vid88 == vid33 && vip8.value != vip3.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create4.checked == true && vid88 == vid44 && vip8.value != vip4.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create5.checked == true && vid88 == vid55 && vip8.value != vip5.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create6.checked == true && vid88 == vid66 && vip8.value != vip6.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(document.all.create7.checked == true && vid88 == vid77 && vip8.value != vip7.value ){
+				alert(alert_vid_vip_error);
+				return false;
+				}
+			if(vip8.value!=""){
+				if(vip8.value == sys_default_ipaddr){
+					alert(alert_vlan8_ip+xml_lan_if+alert_vlan_error);
+					return false;
+				}
+				if(vip8.value == sys_ath0_ipaddr){
+					alert(alert_vlan8_ip+"ath0"+alert_vlan_error);
+					return false;
+				}
+				if(vip8.value == sys_eth0_ipaddr){
+					alert(alert_vlan8_ip+"eth0"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create1.checked == true && vip8.value == vip1.value && vid88 != vid11){
+					alert(alert_vlan8_ip+"vlan1"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create2.checked == true && vip8.value == vip2.value && vid88 != vid22){
+					alert(alert_vlan8_ip+"vlan2"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create3.checked == true && vip8.value == vip3.value && vid88 != vid33){
+					alert(alert_vlan8_ip+"vlan3"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create4.checked == true && vip8.value == vip4.value && vid88 != vid44){
+					alert(alert_vlan8_ip+"vlan4"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create5.checked == true && vip8.value == vip5.value && vid88 != vid55){
+					alert(alert_vlan8_ip+"vlan5"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create6.checked == true && vip8.value == vip6.value && vid88 != vid66){
+					alert(alert_vlan8_ip+"vlan6"+alert_vlan_error);
+					return false;
+				}
+				if(document.all.create7.checked == true && vip8.value == vip7.value && vid88 != vid77){
+					alert(alert_vlan8_ip+"vlan7"+alert_vlan_error);
+					return false;
+				}
+			}
+	  }		  	  
+		   	 document.all.vid1.disabled=false;
+			   document.all.vlanname1.disabled=false;
+		   	 document.all.vlanip1.disabled=false;
+		   	 document.all.vlanmask1.disabled=false;
+		   	 document.all.ifeth1.disabled=false;
+			  
+		   	 document.all.vid2.disabled=false;
+			   document.all.vlanname2.disabled=false;
+		   	 document.all.vlanip2.disabled=false;
+		   	 document.all.vlanmask2.disabled=false;
+		   	 document.all.ifeth2.disabled=false;
+			  
+		   	 document.all.vid3.disabled=false;
+			   document.all.vlanname3.disabled=false;
+		   	 document.all.vlanip3.disabled=false;
+		   	 document.all.vlanmask3.disabled=false;
+		   	 document.all.ifeth3.disabled=false;
+			  
+		   	 document.all.vid4.disabled=false;
+			   document.all.vlanname4.disabled=false;
+		   	 document.all.vlanip4.disabled=false;
+		   	 document.all.vlanmask4.disabled=false;
+		   	 document.all.ifeth4.disabled=false;
+			  
+		   	 document.all.vid5.disabled=false;
+			   document.all.vlanname5.disabled=false;
+		   	 document.all.vlanip5.disabled=false;
+		   	 document.all.vlanmask5.disabled=false;
+		   	 document.all.ifeth5.disabled=false;
+			  
+		   	 document.all.vid6.disabled=false;
+			   document.all.vlanname6.disabled=false;
+		   	 document.all.vlanip6.disabled=false;
+		   	 document.all.vlanmask6.disabled=false;
+		   	 document.all.ifeth6.disabled=false;
+			  
+		   	 document.all.vid7.disabled=false;
+			   document.all.vlanname7.disabled=false;
+		   	 document.all.vlanip7.disabled=false;
+		   	 document.all.vlanmask7.disabled=false;
+		   	 document.all.ifeth7.disabled=false;
+			  
+		   	 document.all.vid8.disabled=false;
+			   document.all.vlanname8.disabled=false;
+		   	 document.all.vlanip8.disabled=false;
+		   	 document.all.vlanmask8.disabled=false;
+		   	 document.all.ifeth8.disabled=false;
+overlayer();
+}
+
+function shielding(){
+   if(document.all.create1.checked == true ){
+   	 document.all.vid1.disabled=true;
+   	 document.all.vlanname1.disabled=true;
+   	 document.all.vlanip1.disabled=true;
+   	 document.all.vlanmask1.disabled=true;
+   	 document.all.ifeth1.disabled=true;
+	  }
+	  if(document.all.create2.checked == true ){
+   	 document.all.vid2.disabled=true;
+   	 document.all.vlanname2.disabled=true;
+   	 document.all.vlanip2.disabled=true;
+   	 document.all.vlanmask2.disabled=true;
+   	 document.all.ifeth2.disabled=true;
+	  }
+	  if(document.all.create3.checked == true ){
+   	 document.all.vid3.disabled=true;
+   	 document.all.vlanname3.disabled=true;
+   	 document.all.vlanip3.disabled=true;
+   	 document.all.vlanmask3.disabled=true;
+   	 document.all.ifeth3.disabled=true;
+	  }
+	  if(document.all.create4.checked == true ){
+   	 document.all.vid4.disabled=true;
+   	 document.all.vlanname4.disabled=true;
+   	 document.all.vlanip4.disabled=true;
+   	 document.all.vlanmask4.disabled=true;
+   	 document.all.ifeth4.disabled=true;
+	  }
+	  if(document.all.create5.checked == true ){
+   	 document.all.vid5.disabled=true;
+   	 document.all.vlanname5.disabled=true;
+   	 document.all.vlanip5.disabled=true;
+   	 document.all.vlanmask5.disabled=true;
+   	 document.all.ifeth5.disabled=true;
+	  }
+	  if(document.all.create6.checked == true ){
+   	 document.all.vid6.disabled=true;
+   	 document.all.vlanname6.disabled=true;
+   	 document.all.vlanip6.disabled=true;
+   	 document.all.vlanmask6.disabled=true;
+   	 document.all.ifeth6.disabled=true;
+	  }
+	  if(document.all.create7.checked == true ){
+   	 document.all.vid7.disabled=true;
+   	 document.all.vlanname7.disabled=true;
+   	 document.all.vlanip7.disabled=true;
+   	 document.all.vlanmask7.disabled=true;
+   	 document.all.ifeth7.disabled=true;
+	  }
+	  if(document.all.create8.checked == true ){
+   	 document.all.vid8.disabled=true;
+   	 document.all.vlanname8.disabled=true;
+   	 document.all.vlanip8.disabled=true;
+   	 document.all.vlanmask8.disabled=true;
+   	 document.all.ifeth8.disabled=true;
+	  }
+	  
+}	
+
+</script>
+</head>
+<body onLoad="shielding()">
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_network2.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return Ip()">
+<div align="center">
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+	
+	      <tr bgcolor="#d9d9d9">
+	      <td  align="center" width="20" height="22" bordercolor="#d9d9d9">&nbsp;</td>
+				<td  align="center" width="40"  bordercolor="#d9d9d9"><b><script language="javascript">replace(vlan_create)</script></b></td>				
+				<td  align="center" width="40"  bordercolor="#d9d9d9"><b><script language="javascript">replace(vlan_vid)</script></b></td>				
+				<td  align="center" width="120"  bordercolor="#d9d9d9"><b><script language="javascript">replace(vlan_name)</script></b></td>				
+				<td  align="center" width="150"  bordercolor="#d9d9d9"><b><script language="javascript">replace(vlan_ipaddr)</script></b></td>				
+				<td  align="center" width="150"  bordercolor="#d9d9d9"><b><script language="javascript">replace(vlan_mask)</script></b></td>
+				<td  align="center" width="50"  bordercolor="#d9d9d9"><b><script language="javascript">replace(vlan_eth0)</script></b></td>
+				<% typevalidate1  %>
+				<td  align="center" width="20"  bordercolor="#d9d9d9">&nbsp;</td>
+				</tr>
+        
+        <tr>
+				<td  height="10">
+				</td>
+	      </tr>
+        
+				<tr >
+				<td  align="center" height="28" ></td>
+				<td   align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan1_create" "yes" %> name="create1" value="yes">&nbsp;</td>		
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vid1" size="4" maxlength="4" value="<%= "$xml_vlan1_vid" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanname1" size="15" value="<%= "$xml_vlan1_vlanname" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanip1" size="15" value="<%= "$xml_vlan1_ipaddr" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanmask1" size="15" value="<%= "$xml_vlan1_mask" %>">&nbsp;</td>	
+				<td align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan1_ifeth" "yes" %> name="ifeth1" value="yes">&nbsp;</td>
+				<% typevalidate "$xml_vlan1_ifeth1" "ifeth11" %>
+				<td  align="center"  ></td>
+				</tr>
+				
+				<tr >
+				<td  align="center" height="28" ></td>
+				<td   align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan2_create" "yes" %> name="create2" value="yes">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vid2" size="4" maxlength="4" value="<%= "$xml_vlan2_vid" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanname2" size="15" value="<%= "$xml_vlan2_vlanname" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanip2" size="15" value="<%= "$xml_vlan2_ipaddr" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanmask2" size="15" value="<%= "$xml_vlan2_mask" %>">&nbsp;</td>
+				<td align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan2_ifeth" "yes" %> name="ifeth2" value="yes">&nbsp;</td>
+				<% typevalidate "$xml_vlan2_ifeth1" "ifeth22" %>
+				<td  align="center"  ></td>
+				</tr>
+				
+				<tr >
+				<td  align="center" height="28" ></td>
+				<td   align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan3_create" "yes" %> name="create3" value="yes">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vid3" size="4" maxlength="4" value="<%= "$xml_vlan3_vid" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanname3" size="15" value="<%= "$xml_vlan3_vlanname" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanip3" size="15" value="<%= "$xml_vlan3_ipaddr" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanmask3" size="15" value="<%= "$xml_vlan3_mask" %>">&nbsp;</td>
+				<td align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan1_ifeth" "yes" %> name="ifeth3" value="yes">&nbsp;</td>		
+				<% typevalidate "$xml_vlan3_ifeth1" "ifeth33" %>
+				<td  align="center"  ></td>
+				</tr>
+				
+				
+				<tr >
+				<td  align="center" height="28" ></td>
+				<td   align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan4_create" "yes" %> name="create4" value="yes">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vid4" size="4" maxlength="4" value="<%= "$xml_vlan4_vid" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanname4" size="15" value="<%= "$xml_vlan4_vlanname" %>">&nbsp;</td>				
+			  <td align="center" bordercolor="#ffffff"><input type="text" name="vlanip4" size="15" value="<%= "$xml_vlan4_ipaddr" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanmask4" size="15" value="<%= "$xml_vlan4_mask" %>">&nbsp;</td>
+				<td align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan4_ifeth" "yes" %> name="ifeth4" value="yes">&nbsp;</td>	
+				<% typevalidate "$xml_vlan4_ifeth1" "ifeth44" %>
+				<td  align="center"  ></td>
+				</tr>
+				
+				
+				<tr >
+				<td  align="center" height="28" ></td>
+				<td   align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan5_create" "yes" %> name="create5" value="yes">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vid5" size="4" maxlength="4" value="<%= "$xml_vlan5_vid" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanname5" size="15" value="<%= "$xml_vlan5_vlanname" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanip5" size="15" value="<%= "$xml_vlan5_ipaddr" %>">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vlanmask5" size="15" value="<%= "$xml_vlan5_mask" %>">&nbsp;</td>
+				<td align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan5_ifeth" "yes" %> name="ifeth5" value="yes">&nbsp;</td>
+				<% typevalidate "$xml_vlan5_ifeth1" "ifeth55" %>
+				<td  align="center"  ></td>
+				</tr>
+				
+				<tr >
+				<td  align="center" height="28" ></td>
+				<td   align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan6_create" "yes" %> name="create6" value="yes">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vid6" size="4" maxlength="4" value="<%= "$xml_vlan6_vid" %>">&nbsp;</td>			
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vlanname6" size="15" value="<%= "$xml_vlan6_vlanname" %>">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vlanip6" size="15" value="<%= "$xml_vlan6_ipaddr" %>">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vlanmask6" size="15" value="<%= "$xml_vlan6_mask" %>">&nbsp;</td>
+				<td  align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan6_ifeth" "yes" %> name="ifeth6" value="yes">&nbsp;</td>
+				<% typevalidate "$xml_vlan6_ifeth1" "ifeth66" %>
+				<td  align="center"  ></td>
+				</tr>
+				
+				<tr >
+				<td  align="center" height="28" ></td>
+				<td   align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan7_create" "yes" %> name="create7" value="yes">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vid7" size="4" maxlength="4" value="<%= "$xml_vlan7_vid" %>">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vlanname7" size="15" value="<%= "$xml_vlan7_vlanname" %>">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vlanip7" size="15" value="<%= "$xml_vlan7_ipaddr" %>">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vlanmask7" size="15" value="<%= "$xml_vlan7_mask" %>">&nbsp;</td>
+				<td  align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan7_ifeth" "yes" %> name="ifeth7" value="yes">&nbsp;</td>		
+				<% typevalidate "$xml_vlan7_ifeth1" "ifeth77" %>
+				<td  align="center"  ></td>
+				</tr>
+				
+				
+				<tr >
+				<td  align="center" height="28" ></td>
+				<td  align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan8_create" "yes" %> name="create8" value="yes">&nbsp;</td>				
+				<td align="center" bordercolor="#ffffff"><input type="text" name="vid8" size="4" maxlength="4" value="<%= "$xml_vlan8_vid" %>">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vlanname8" size="15" value="<%= "$xml_vlan8_vlanname" %>">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vlanip8" size="15" value="<%= "$xml_vlan8_ipaddr" %>">&nbsp;</td>				
+				<td  align="center" bordercolor="#ffffff"><input type="text" name="vlanmask8" size="15" value="<%= "$xml_vlan8_mask" %>">&nbsp;</td>
+				<td  align="center" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_vlan8_ifeth" "yes" %> name="ifeth8" value="yes">&nbsp;</td>
+				<% typevalidate "$xml_vlan8_ifeth1" "ifeth88" %>
+				<td  align="center"  ></td>
+				</tr>
+				
+				<tr>
+			<td  height="10">
+			</td>
+      </tr>
+				</table>
+		    <table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+				<tr>
+				<td  align="center" height="40" valign="middle" ><script language="javascript">replace(vlan_apply)</script>&nbsp;</td>
+				</tr>
+				<tr>
+        <td align="right"   colspan="2"><script language="javascript">replace(vlan_help)</script></td>
+      </tr>
+</table>
+</div>
+<input type="hidden" value="VLAN Setup" name="SERVLET" >
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

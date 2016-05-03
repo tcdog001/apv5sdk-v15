@@ -1,0 +1,251 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+xml_sroute=`config_read /config/network/sroute`
+xml_sroute_route2=`config_getoption "$xml_sroute" route2`
+xml_sroute_rtip2=`config_getoption "$xml_sroute" rtip2`
+xml_sroute_rtmask2=`config_getoption "$xml_sroute" rtmask2`
+xml_sroute_route3=`config_getoption "$xml_sroute" route3`
+xml_sroute_rtip3=`config_getoption "$xml_sroute" rtip3`
+xml_sroute_rtmask3=`config_getoption "$xml_sroute" rtmask3`
+xml_sroute_route4=`config_getoption "$xml_sroute" route4`
+xml_sroute_rtip4=`config_getoption "$xml_sroute" rtip4`
+xml_sroute_rtmask4=`config_getoption "$xml_sroute" rtmask4`
+
+xml_bnet=`config_read /config/network`
+xml_bnet_forward3=`config_getoption "$xml_bnet" forward3`
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+xml_nat=`config_read /config/firewall/nat`
+xml_nat_enable=`config_getoption "$xml_nat" enable`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js network_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	init_mmenu(flag);
+	init_basemenu(flag);
+	init_lan(flag);
+function Ip() 
+{
+	var x1 = document.getElementById("rtip2");
+	var x2 = document.getElementById("rtmask2");
+	var x3 = document.getElementById("route2");
+	var y1 = document.getElementById("rtip3");
+	var y2 = document.getElementById("rtmask3");
+	var y3 = document.getElementById("route3");
+	var z1 = document.getElementById("rtip4");
+	var z2 = document.getElementById("rtmask4");
+	var z3 = document.getElementById("route4");
+	var reg = /^(\d{1,2}|1\d\d|2[0-1]\d|2[0-2][0-3])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+  var reg1 = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+	var nat="<%= $xml_nat_enable %>";
+	if(nat == "yes" && document.getElementById("fw3").checked == false){
+		if (!confirm(bnet_efw3_alert))
+      	     return false;	
+	}   
+  if (!reg.test(x1.value)&&x1.value!="") {
+				     alert(bnet_alert_ip_error);
+				     x1.focus();
+				     return false;
+	}
+	  if (!reg1.test(x2.value)&&x2.value!="") {
+				     alert(bnet_alert_mask_error);
+				     x2.focus();
+				     return false;
+	}
+	  if (!reg.test(x3.value)&&x3.value!="") {
+				     alert(bnet_alert_gateway_error);
+				     x3.focus();
+				     return false;
+	}
+	  if (!reg.test(y1.value)&&y1.value!="") {
+				     alert(bnet_alert_ip_error);
+				     y1.focus();
+				     return false;
+	}
+	  if (!reg1.test(y2.value)&&y2.value!="") {
+				     alert(bnet_alert_mask_error);
+				     y2.focus();
+				     return false;
+	}
+	  if (!reg.test(y3.value)&&y3.value!="") {
+				     alert(bnet_alert_gateway_error);
+				     y3.focus();
+				     return false;
+	}
+	  if (!reg.test(z1.value)&&z1.value!="") {
+				     alert(bnet_alert_ip_error);
+				     z1.focus();
+				     return false;
+	}
+	  if (!reg1.test(z2.value)&&z2.value!="") {
+				     alert(bnet_alert_mask_error);
+				     z2.focus();
+				     return false;
+	}
+	  if (!reg.test(z3.value)&&z3.value!="") {
+				     alert(bnet_alert_gateway_error);
+				     z3.focus();
+				     return false;
+	}
+	  overlayer(); 
+}
+
+ 
+</script>
+</head>
+<body  >
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_network.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return Ip()">
+<div align="center">
+		<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+		  <tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(bnet_sroute)</script></b></td>
+			</tr>
+		  
+		  <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+
+			<tr >
+			<td align="right" height="20" bordercolor="#ffffff" width="280"><b><script language="javascript">replace(bnet_route2)</script></b>
+			</td><td align="right"  bordercolor="#ffffff" width="370">
+			</td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="20" bordercolor="#ffffff"><script language="javascript">replace(bnet_rip2)</script>
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="rtip2" id="rtip2" value="<%= "$xml_sroute_rtip2" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="20" bordercolor="#ffffff"><script language="javascript">replace(bnet_rmask2)</script>
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="rtmask2" id="rtmask2" value="<%= "$xml_sroute_rtmask2" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="20" bordercolor="#ffffff"><script language="javascript">replace(bnet_rgw2)</script>
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="route2" id="route2" value="<%= "$xml_sroute_route2" %>" ></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="20" bordercolor="#ffffff"><b><script language="javascript">replace(bnet_route3)</script></b>
+			</td><td align="right"  bordercolor="#ffffff">
+			</td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="20" bordercolor="#ffffff"><script language="javascript">replace(bnet_rip3)</script>
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="rtip3" id="rtip3" value="<%= "$xml_sroute_rtip3" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="20" bordercolor="#ffffff"><script language="javascript">replace(bnet_rmask3)</script>
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="rtmask3" id="rtmask3" value="<%= "$xml_sroute_rtmask3" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="20" bordercolor="#ffffff"><script language="javascript">replace(bnet_rgw3)</script>
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="route3" id="route3" value="<%= "$xml_sroute_route3" %>" ></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="20" bordercolor="#ffffff"><b><script language="javascript">replace(bnet_route4)</script></b>
+			</td><td align="right"  bordercolor="#ffffff">
+			</td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="20" bordercolor="#ffffff"><script language="javascript">replace(bnet_rip4)</script>
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="rtip4" id="rtip4" value="<%= "$xml_sroute_rtip4" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="20" bordercolor="#ffffff"><script language="javascript">replace(bnet_rmask4)</script>
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="rtmask4" id="rtmask4" value="<%= "$xml_sroute_rtmask4" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td align="right" height="20" bordercolor="#ffffff"><script language="javascript">replace(bnet_rgw4)</script>
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="route4" id="route4" value="<%= "$xml_sroute_route4" %>" ></td>
+			</tr>
+		  
+		  <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+
+      <tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(bnet_fw3)</script></b></td>
+			</tr>
+		  
+		  <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_bnet_forward3" "1" %> name="fw3" id="fw3" value="1" >&nbsp;</td>
+			<td  bordercolor="#ffffff"><script language="javascript">replace(bnet_efw3)</script></td>
+			</tr>
+		  
+	    <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>	
+		</table>
+		<table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+			<tr>
+			  <td align="center" height="40" valign="middle" colspan="2" ><script language="javascript" >replace(b_lansu)</script>&nbsp;</td>
+			</tr>
+			<tr>
+        <td align="right"   colspan="2"><script language="javascript">replace(rt_help)</script></td>
+      </tr>
+		</table>
+</div>
+<input type="hidden" value="Route Setup" name="SERVLET">
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

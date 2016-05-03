@@ -1,0 +1,4 @@
+#!/bin/sh
+FIRST_STA=`/usr/sbin/wlanconfig ath0 list sta | awk 'NR=="2" {print $1}'`
+echo kick $FIRST_STA
+/usr/sbin/iwpriv ath0 kickmac $FIRST_STA

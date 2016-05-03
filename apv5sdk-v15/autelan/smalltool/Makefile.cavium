@@ -1,0 +1,69 @@
+.NOTPARALLEL:
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR = src
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+CROSS=mips64-octeon-linux-gnu
+CC=${CROSS}-gcc
+
+TOOLCHAIN_ABI_64=y
+
+EXTRA_CFLAGS= -DMODE11N
+
+ifdef TOOLCHAIN_ABI_N32
+  export TOOLCHAIN_ABI=-mabi=n32
+  export LDFLAGS=-melf32btsmipn32
+  export LIBDIR=/usr/lib32
+endif
+
+ifdef TOOLCHAIN_ABI_64
+  export TOOLCHAIN_ABI=-mabi=64
+  export LDFLAGS=-melf64btsmip
+  export LIBDIR=/usr/lib64
+endif
+
+ifdef TOOLCHAIN_UCLIBC
+  export TOOLCHAIN_ABI=-muclibc
+  export LDFLAGS=-melf32btsmipn32
+  export LIBDIR=/uclibc/usr/lib
+endif
+
+
+unexport LDFLAGS
+
+.PHONY: all
+all: build install
+
+.PHONY: build
+build:
+	${MAKE} -C ${PKG_BUILD_DIR} EXTRA_CFLAGS="${EXTRA_CFLAGS}"
+
+.PHONY: clean
+
+clean:
+	${MAKE} -C ${PKG_BUILD_DIR} clean
+
+#install dir /usr/sbin
+.PHONY: install
+install: 
+	sudo cp -f ${PKG_BUILD_DIR}/mydaemon ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/set_mac ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/server ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/client ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/rate-stat ${ROOTFSDIR}/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/packet ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/ttycrl-write ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/checkimg ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/ttycrl-read ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/loopback ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/cpu_util_rate ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/wtpd_alarm ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/capture ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/myping ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/wtpd_alarm_all ${ROOTFSDIR}/usr/sbin
+	sudo cp -f ${PKG_BUILD_DIR}/iwlist_scan/iwlist_scan ${ROOTFSDIR}/usr/sbin

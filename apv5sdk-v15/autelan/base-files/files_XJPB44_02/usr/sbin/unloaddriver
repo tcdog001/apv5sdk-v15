@@ -1,0 +1,24 @@
+#!/bin/sh
+
+MOD_LIST=`lsmod`
+/usr/sbin/des_wlan
+#must wait destroy wlan
+sleep 2
+cd /lib/modules/2.6.15/net/
+echo unload wifi driver !!!
+    rmmod wlan_scan_ap
+    rmmod wlan_scan_sta
+    rmmod ath_pktlog
+    sleep 2
+    rmmod wlan_me
+    sleep 2
+    rmmod umac
+    sleep 2
+    rmmod ath_dev
+    rmmod ath_dfs
+    rmmod ath_spectral
+    rmmod ath_rate_atheros
+    rmmod ath_hal
+    rmmod asf
+    rmmod adf
+echo unload Success!!!

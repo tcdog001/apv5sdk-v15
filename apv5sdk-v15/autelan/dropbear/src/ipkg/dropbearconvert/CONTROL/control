@@ -1,0 +1,11 @@
+Package: dropbearconvert
+Version: 0.50-2
+Depends: 
+Provides: 
+Source: package/dropbear
+Section: utils
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: mips
+Description:  Utility for converting SSH keys
+ 

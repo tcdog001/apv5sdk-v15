@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			weeder.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='ttcp.7.html' title=' ttcp.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='toolkit.html' title=' Index Page '>NEXT</a>]
+			</div>
+<pre>
+weeder(7)                             Intellon Linux Toolkit                            weeder(7)
+
+NAME
+       weeder - Weeder Solid State Relay Module controller
+
+SYNOPSIS
+       weeder [options] attenuation
+
+DESCRIPTION
+       Set attenuation level on the Intellon Production Test System using a local RS-232 communi‐
+       cation port.
+
+OPTIONS
+       -e echo
+              Enable or disable echo mode. The value of echo can be 1=on or  0=off.  Alternately,
+              keywords  &quot;on&quot;  and  &quot;off&quot; can be used. Intellon recommends that you always disable
+              echo when using this program to speed relay switching.
+
+       -m mode
+              Enable or disable attenuation. The value of mode can be 1=on or 0=off. Alternately,
+              keywords &quot;on&quot; and &quot;off&quot; can be used.
+
+       -o units
+              Change  relay control module order. Individual relay control modules are assigned a
+              digital addresses that can be referenced using the UTF-8 letters &quot;[A-P]&quot; then  &quot;[a-
+              p]&quot;.  The  Intellon PTS is configured so that module &quot;B&quot; is activated before module
+              &quot;A&quot;. This options lets you specify some other module order. The  default  value  is
+              &quot;BA&quot;.
+
+       -p file
+              The  name  of  the  serial port. On Linux, the name is usually &quot;/dev/ttyS[0-4]&quot;. On
+              OS/X, the name is usually &quot;/dev/cua[0-4]&quot;. On Windows, the name is &quot;com[0-4]:&quot;. The
+              default is &quot;/dev/ttyS0&quot; on Linux and &quot;com1:&quot; on Windows.
+
+       -w wait
+              Wait  time  in  milliseconds.  Serial  I/O operation are slow and a delay is needed
+              after each write operation. Unfortunately, different operating systems require dif‐
+              ferent  wait  times.  This options lets you adjust the time. The default is 10 mil‐
+              liseconds which should be adequate on most systems.
+
+ARGUMENTS
+       attenuation
+              The desired attenuation in decibels. The value may be expressed in decimal,  binary
+              or  hexadecimal.  Binary  values  start with &quot;0b&quot; and hexadecimal values start with
+              &quot;0x&quot;.
+
+PORT SETTINGS
+       You must configure communications port settings before running this program. Settings  are
+       9600  baud, no parity, 8 data and 1 stop bit. See datasheet http://www.weedtech.com/wtssr-
+       m.pdf for more information.
+
+EXAMPLES
+       The following example turns the Weeder controller on and configures it for  72db  attenua‐
+       tion. Option -m is not necessary if the controller is already on.
+
+          # weeder -m 1 72
+
+       The  next  example  configures  the controller for 42db attenuation. There is no needed to
+       turn the controller on again because it remains on until turned off.
+
+          # weeder 42
+
+       The next example configures the controller for 56db attenuation and turns  the  controller
+       off.  Unfortunately,  the actual state of the controller is unpredictable. This means that
+       the attentuation argument should probably be omitted when turning the device off.
+
+          # weeder -m off 56
+
+REFERENCES
+       Information shown above applies to WTSSR-M Solid State Relay Module  by  Weeder  Technolo‐
+       gies,  90-A  Beal Pkwy NW, Fort Walton Beach FL 32548 USA; Tel +44 850 863 5723. Most, but
+       not all, of the text shown here was Copyright 2001-2006 by Weeder Technologies.
+
+SEE ALSO
+       ilt(7), WTSSR-M(7)
+
+CREDITS
+        Charles Maier &lt;charles.maier@intellon.com&gt;
+
+int6400-utils-linux                    Intellon Corporation                             weeder(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='ttcp.7.html' title=' ttcp.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='toolkit.html' title=' Index Page '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,105 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>AMiLDA™</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><meta name="keywords" content="
+				int6k 
+				, 
+				powerline 
+				"><link rel="start" href="index.html" title="Intellon INT6000 Linux Toolkit"><link rel="up" href="ch07.html" title="Chapter 7.  Embedded Applications"><link rel="prev" href="ch07s02.html" title="ADM5120™"><link rel="next" href="ch07s04.html" title="Busybox™"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">
+			<span class="productname">AMiLDA</span>™
+			</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s02.html">Prev</a> </td><th width="60%" align="center">Chapter 7. 
+		Embedded Applications
+		</th><td width="20%" align="right"> <a accesskey="n" href="ch07s04.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="eAMiLDA"></a>
+			<span class="productname">AMiLDA</span>™
+			</h2></div></div></div><p>
+			Intellon has been experimenting with the <span class="productname">AMiLDA</span>™ distribution for the <span class="productname">AMD5120</span>™. The <span class="productname">AMiLDA</span>™ distribution includes a <span class="productname">Linux</span>™ kernel, the <span class="productname">Busybox</span>™ application and the <span class="productname">uClib</span>™ library. Intellon has integrated the Intellon Linux Toolkit into a copy of this distribution for our own use.
+			</p><p>
+			This section documents the steps needed to compile <span class="productname">AMiLDA</span>™. The information is taken from public information available on the internet and our own experiences with <span class="productname">AMiLDA</span>™. Intellon does not endorse, recommend or support this hardwaer or software in any way. We merely provide some information as a courtesy to customers who may be interested.
+			</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="AMiLDA-compiling"></a>
+				Compiling
+				</h3></div></div></div><div class="orderedlist"><ol type="1"><li><p>
+						Obtain the <span class="productname">Edimax</span>™ toolchain, <code class="filename">tool-chain.tar.gz</code>, and save it in any location that your prefer.
+						</p></li><li><p>
+						Extract the <span class="productname">Edimax</span>™ toolchain to the root filesystem folder. The toolchain must be located there or compile errors will occur. The resulting folder, <code class="filename">/export/tools</code>, contains a pre-compiled set of build tools for the <span class="productname">ADM5120</span>™ that will execute in place of the normal tools installed on your system whenever the <span class="productname">AMiLDA</span>™ build stream is executed.
+						</p><pre class="screen">
+# tar -vzxf tool-chain.tar.gz -C /
+</pre></li><li><p>
+						Obtain the <span class="productname">AMiLDA</span>™ source tree and save it in any location that your prefer.
+						</p></li><li><p>
+						Extract the <span class="productname">AMiLDA</span>™ source tree to the folder <code class="filename">/usr/src</code>. The source tree must be located there or compile errors will occur. The resulting folder,  <code class="filename">/usr/src/AMiLDA</code>, contains a <span class="productname">Linux</span>™ kernel and custom applications.
+						</p><pre class="screen">
+# tar -vzxf AMILDA.tar.gz -C /usr/src
+</pre></li><li><p>
+						Before attempting a compile the kernel, install the <span class="application">bison</span> and <span class="application">flex</span> packages. This should install contemporary <span class="application">yacc</span>-style and <span class="application">lex</span>-style components needed by the kernel build stream.
+						</p><pre class="screen">
+# apt-get install bison flex
+</pre></li><li><p>
+						From folder <code class="filename">/usr/src/AMiLDA</code> execute command <span class="command"><strong>make clean</strong></span> to purge old kernel and application object files and temporary files created by previous builds.
+						</p></li><li><p>
+						From folder <code class="filename">/usr/src/AMiLDA/linux-2.4.32</code> execute command <span class="command"><strong>make oldconfig</strong></span> to build a new <code class="filename">.config</code> file.
+						</p><p>
+						If you encouter an error indicating that folder <code class="filename">include/asm</code> cannot be deleted because it is a directory then manually delete the directory with the command <span class="command"><strong>rm -fr include/asm</strong></span>. The folder will be replaced with a symbolic link during the build process. The folder contents is sometime included when the tree it archived because it is a symbolic link.
+						</p></li><li><p>
+						In folder <code class="filename">/usr/src/AMiLDA/linux-2.4.32</code> execute command <span class="command"><strong>make dep</strong></span> to build new kernel files.
+						</p></li><li><p>
+						In folder <code class="filename">/usr/src/AMiLDA</code> execute command <span class="command"><strong>make</strong></span> to build new system. This operation takes some time to complete. 
+						</p></li></ol></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="AMiLDA-images"></a>
+				Firmware Images
+				</h3></div></div></div><p>
+				The Intellon build stream creates two firmware image files. File <code class="filename">AMiLDA/linux/vmlinuz</code> is a standard <span class="productname">Linux</span>™ image file. It can be dowloaded directly into <span class="productname">ADM5120</span>™ <acronym class="acronym">SDRAM</acronym> and temporarily executed there. File <code class="filename">AMiLDA/image/vmlinuz</code> is an encapsulated version of the standard<span class="productname">Linux</span>™ image having an header and checksum. It can be dowloaded and flashed into <span class="productname">ADM5120</span>™ <acronym class="acronym">NVRAM</acronym> for permanent execution.
+				</p><p>
+				Program <span class="application">AMiLDA/image/cvimg</span> can be used to convert the standard <span class="productname">Linux</span>™ image file, <code class="filename">AMiLDA/linux/vmlinuz</code>, to an encapsulated image file. AN encapsulated image file is the only one needed to replicate your system on multiple <span class="productname">ADM5120</span>™ devices. You may also want to distribute script <code class="filename">flash.sh</code>, described in the next section, with the encapsulated image.
+				</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="AMiLDA-download"></a>
+				Downloading Images
+				</h3></div></div></div><p>
+				Intellon does not recommend using <span class="application">minicom</span> to download and flash firmware because it can be awkward to configure and change. Instead,  we recomend using one of the two <span class="application">expect</span> scripts included with our build stream. Establish a serial connection to the <span class="productname">ADM5120</span>™,  start one of the scripts then power-cycle the <span class="productname">ADM5120</span>™. The script will monitor the serial line for Boot Menu prompts and respond by downloading and flashing or executing the appropriate image. 
+				</p><p>
+				Both scripts are located in the <code class="filename">AMiLDA</code> folder. Both scripts have constants that name the serial <code class="constant">device</code> and download file. One script downloads and executed an image in SDRAM. The other downloads and flashes NVRAM then loads the image into SDRAM and executes it. 
+				</p><p>
+				Close all serial connections to the ADM5120 before running either script or download will fail. Start one of the scripts and power-cycle the ADM5120. Downloading should begin almost at once. Examples are shown below. Open a serial connection only after dowloading terminates.
+				</p><div class="example"><a name="id2577921"></a><p class="title"><b>Example 7.2. 
+					Using script <code class="filename">download.sh</code>
+					</b></p><div class="example-contents"><pre class="screen">
+# download.sh
+spawn [open ...]
+* Restart the router.
+
+ADM5120 Boot:
+
+
+
+Linux Loader Menu
+====================
+(a) Download vmlinuz to flash ...
+(b) Download vmlinuz to sdram (for debug) ...
+(c) Exit
+
+Please enter your key : Sending /usr/src/AMiLDA/linux/vmlinuz, 11165 blocks: Give your local XMODEM receive command now.
+Xmodem sectors/kbytes sent: 3965/495k
+</pre><p>
+					Script <span class="application">download.sh</span> will download the standard image file <code class="filename">AMiLDA/linux/vmlinuz</code> to <acronym class="acronym">SDRAM</acronym> and start execution using option <code class="constant">b</code> on the <span class="productname">ADM5120</span>™ boot menu. 
+					</p></div></div><br class="example-break"><div class="example"><a name="id2577975"></a><p class="title"><b>Example 7.3. 
+					Using script <code class="filename">flash.sh</code>
+					</b></p><div class="example-contents"><pre class="screen">
+# download.sh
+spawn [open ...]
+* Restart the router.
+
+ADM5120 Boot:
+
+
+
+Linux Loader Menu
+====================
+(a) Download vmlinuz to flash ...
+(b) Download vmlinuz to sdram (for debug) ...
+(c) Exit
+
+Please enter your key : Sending /usr/src/AMiLDA/linux/vmlinuz, 11165 blocks: Give your local XMODEM receive command now.
+Xmodem sectors/kbytes sent: 3965/495k
+</pre><p>
+					Script <span class="application">flash.sh</span> downloads the encapsulated image file <code class="filename">AMiLDA/image/vmlinuz</code> then flashes <acronym class="acronym">NVRAM</acronym> using option <code class="constant">a</code> on the <span class="productname">ADM5120</span>™ boot menu. 
+					</p></div></div><br class="example-break"><p>
+				To use these scripts,  you must first install the Linux <span class="application">expect</span> application. On GNU Linux based distributions, the command <span class="command"><strong>apt-get install expect</strong></span> will download and install it. Other distributions will require different commands. 
+				</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s04.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">
+			<span class="productname">ADM5120</span>™
+			 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 
+			<span class="productname">Busybox</span>™
+			</td></tr></table></div></body></html>

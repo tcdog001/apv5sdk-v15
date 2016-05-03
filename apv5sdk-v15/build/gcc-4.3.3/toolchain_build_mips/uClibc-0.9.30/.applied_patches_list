@@ -1,0 +1,12 @@
+uClibc-0.9.30-64bit-strtouq.patch
+uClibc-0.9.30-arm-fix-linuxthreads-sysdep.patch
+uClibc-0.9.30-unifdef-getline.patch
+uClibc-0.9.30-x86-2.6.28+-headers-fix.patch
+uClibc-0.9.30-xtensa-000p-fix-procfs.patch
+uClibc-0.9.30-xtensa-005-sigcontext.patch
+uClibc-0.9.30-xtensa-009-testandset.patch
+uClibc-0.9.30-xtensa-010-sigaction.c.patch
+uClibc-0.9.30-xtensa-011-sysdep.h.patch
+uClibc-0.9.30-xtensa-012-fnmatch_old.c.patch
+uClibc-0.9.30-xtensa-013-atomic.h.patch
+uClibc-0.9.30-xtensa-014-setjump.S.patch

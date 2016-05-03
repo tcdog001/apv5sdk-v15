@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			pxe.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='putoptv.c.html' title=' putoptv.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='qosinfo.c.html' title=' qosinfo.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   pxe.c - Intellon PIB XML Editor;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;ctype.h&gt;
+#include &lt;string.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;limits.h&gt;
+
+/*====================================================================*
+ *  custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../nodes/nodes.h&quot;
+#include &quot;../crypt/HPAVKey.h&quot;
+#include &quot;../pib/pib.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/emalloc.c&quot;
+#include &quot;../tools/fdchecksum_32.c&quot;
+#include &quot;../tools/checksum_32.c&quot;
+#include &quot;../tools/hexstring.c&quot;
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/alert.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/output.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../nodes/xmlattribute.c&quot;
+#include &quot;../nodes/xmlcontent.c&quot;
+#include &quot;../nodes/xmledit.c&quot;
+#include &quot;../nodes/xmlfree.c&quot;
+#include &quot;../nodes/xmlnode.c&quot;
+#include &quot;../nodes/xmlopen.c&quot;
+#include &quot;../nodes/xmlscan.c&quot;
+#include &quot;../nodes/xmlschema.c&quot;
+#include &quot;../nodes/xmlvalue.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../pib/pibfile.c&quot;
+#include &quot;../pib/pibpeek.c&quot;
+#include &quot;../pib/pibcodes.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../crypt/keys.c&quot;
+#endif
+
+/*====================================================================*
+ *
+ *   int main (int argc, const char * argv []);
+ *
+ *
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	static const char *optv [] = 
+	{
+		&quot;oE&quot;,
+		&quot;pib-file xml-file [xml-file] [...]&quot;,
+		&quot;Intellon PIB XML Editor&quot;,
+		&quot;o\tprint XML schema on stdout&quot;,
+		(const char *)(0) 
+	};
+	struct header_pib * header;
+	struct _file_ pib;
+	byte * buffer;
+	signed length;
+	signed c;
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char)(c)) 
+		{
+		case 'o':
+			xmlschema ();
+			return (1);
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	if (!argc--) 
+	{
+		return (0);
+	}
+	pib.name = *argv++;
+	if ((pib.file = open (pib.name, O_BINARY|O_RDONLY)) == -1) 
+	{
+		error (1, errno, &quot;Can't open %s&quot;, pib.name);
+	}
+	if (pibfile (&amp;pib)) 
+	{
+		error (1, errno, &quot;Bad PIB file: %s&quot;, pib.name);
+	}
+	if ((length = lseek (pib.file, 0, SEEK_END)) == -1) 
+	{
+		error (1, errno, &quot;Can't size %s&quot;, pib.name);
+	}
+	if (!(buffer = malloc (length))) 
+	{
+		error (1, errno, &quot;Can't load %s&quot;, pib.name);
+	}
+	if (lseek (pib.file, 0, SEEK_SET)) 
+	{
+		error (1, errno, &quot;Can't rewind %s&quot;, pib.name);
+	}
+	if (read (pib.file, buffer, length) &lt; length) 
+	{
+		error (1, errno, &quot;Can't read %s&quot;, pib.name);
+	}
+	close (pib.file);
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		struct node * markup = xmlopen (*argv);
+		xmledit (markup, buffer, length);
+		xmlfree (markup);
+		argc--;
+		argv++;
+	}
+	header = (struct header_pib *)(buffer);
+	header-&gt;CHECKSUM = 0;
+	header-&gt;CHECKSUM = checksum_32 (buffer, length, 0);
+	if ((pib.file = open (pib.name, O_BINARY|O_CREAT|O_RDWR|O_TRUNC, FILE_FILEMODE)) == -1) 
+	{
+		error (1, errno, &quot;Can't open %s&quot;, pib.name);
+	}
+	if (write (pib.file, buffer, length) &lt; length) 
+	{
+		error (1, errno, &quot;Can't save %s&quot;, pib.name);
+	}
+	close (pib.file);
+	return (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='putoptv.c.html' title=' putoptv.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='qosinfo.c.html' title=' qosinfo.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,9 @@
+debian/tmp/usr/share/man/man5/idmapd.conf*
+debian/tmp/usr/share/man/man8/gssd.8
+debian/tmp/usr/share/man/man8/idmapd.8
+debian/tmp/usr/share/man/man8/lockd.8
+debian/tmp/usr/share/man/man8/statd.8
+debian/tmp/usr/share/man/man8/nfsstat*
+debian/tmp/usr/share/man/man8/showmount*
+debian/tmp/usr/share/man/man8/idmapd*
+debian/tmp/usr/share/man/man8/rpcdebug.8

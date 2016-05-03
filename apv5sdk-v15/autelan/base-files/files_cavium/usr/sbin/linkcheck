@@ -1,0 +1,58 @@
+#!/bin/sh
+UP_COUNT=0
+DOWN_COUNT=0
+IF=eth0
+#0:down 1:up
+STATUS=0
+
+ETHTOOL="/usr/sbin/ethtool"
+
+if [ ! -z $1 ];then
+IF="$1"
+fi
+
+LINK_UP_COUNT="/tmp/link_count/link_up_count_${IF}"
+LINK_DOWN_COUNT="/tmp/link_count/link_down_count_${IF}"
+
+#eth_link_is_down(ifname)
+# ifname : eth{n}  n=0,1...
+eth_link_is_down()
+{
+    local link_statue=`$ETHTOOL $1 2>/dev/null | awk '/detected:/{print $3}'`
+    if [ "$link_statue" = "no"  ];then
+        return 0 
+    else
+        return 1
+    fi  
+}
+
+
+mkdir -p /tmp/link_count
+
+if eth_link_is_down $IF ;then
+    STATUS=0
+    DOWN_COUNT=$((${DOWN_COUNT}+1))
+else
+    STATUS=1
+    UP_COUNT=$((${UP_COUNT}+1))
+fi
+
+
+echo "${UP_COUNT}" > ${LINK_UP_COUNT}
+echo "${DOWN_COUNT}" > ${LINK_DOWN_COUNT}
+
+
+
+while :
+do
+
+
+
+if eth_link_is_down $IF ;then
+ [ $STATUS -eq 1 ] && STATUS=0 && DOWN_COUNT=$((${DOWN_COUNT}+1)) && echo "${DOWN_COUNT}" > ${LINK_DOWN_COUNT} 
+else
+ [ $STATUS -eq 0 ] && STATUS=1 && UP_COUNT=$((${UP_COUNT}+1)) && echo "${UP_COUNT}" > ${LINK_UP_COUNT} 
+fi
+
+sleep 3
+done

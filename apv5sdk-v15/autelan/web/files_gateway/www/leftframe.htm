@@ -1,0 +1,51 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<% include_js mmenu.js %>
+<script language="javascript" src="JAS.js"></script>
+</head>
+
+<body bgcolor="#ffbd38">
+<table width="99%" border="0" bgcolor="#f9fafc" cellpadding="0" cellspacing="0" style="padding-left:15px">
+  <tr id="tr1" height="25" class="orange">
+    <td><a class="left" href="router_state.htm" target="MainFrame"><span onclick="change_background(1);"><script language="javascript">replace(main_menu_gatewaystatus)</script></span></a></td>
+  </tr>
+   <tr height="5">
+  <td></td>
+  </tr>
+  <tr id="tr2" height="25" style="display:none">
+    <td><a class="left" href="wizard.htm" target="MainFrame"><span onclick="change_background(2);"><script language="javascript">replace(main_menu_wizard)</script></span></a></td>
+  </tr>
+  <tr id="tr3" height="25">
+    <td><a class="left" href="wan_status.htm" target="MainFrame"><span onclick="change_background(3);"><script language="javascript">replace(main_menu_wansetting)</script></span></a></td>
+  </tr>
+
+  <tr id="tr4" height="25">
+    <td><a class="left" href="3g_settings.htm" target="MainFrame"><span onclick="change_background(4);"><script language="javascript">replace(main_menu_3gsetting)</script></span></a></td>
+  </tr> 
+
+  <tr id="tr5" height="25">
+    <td><a class="left" href="network.htm" target="MainFrame"><span onclick="change_background(5);"><script language="javascript">replace(main_menu_lansetting)</script></span></a></td>
+  </tr> 
+  <tr id="tr6" height="25">
+    <td><a class="left" href="wlan_settings.htm" target="MainFrame"><span onclick="change_background(6);"><script language="javascript">replace(main_menu_wlansetting)</script></span></a></td>
+  </tr>
+  <tr id="tr7" height="25">
+    <td><a class="left" href="firewall.htm" target="MainFrame"><span onclick="change_background(7);"><script language="javascript">replace(main_menu_firewall)</script></span></a></td>
+  </tr>
+  <tr id="tr8" height="25">
+    <td><a class="left" href="voip.htm" target="MainFrame"><span onclick="change_background(8);"><script language="javascript">replace(main_menu_voip)</script></span></a></td>
+  </tr>
+  <tr id="tr9" height="25">
+    <td><a class="left" href="management.htm" target="MainFrame"><span onclick="change_background(9);"><script language="javascript">replace(main_menu_system)</script></span></a></td>
+  </tr>
+</table>
+</body>
+</html>

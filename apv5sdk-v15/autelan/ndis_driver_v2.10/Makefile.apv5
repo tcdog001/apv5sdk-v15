@@ -1,0 +1,53 @@
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR =src
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR = /tmp
+endif
+
+ifndef KERNELDIR
+ifeq ($(BOARD_TYPE),db12x)
+KERNELDIR := $(PWD)/../../ap83sdk/linux/kernels/mips-linux-2.6.31
+else
+KERNELDIR := $(PWD)/../../ap83sdk/linux/kernels/mips-linux-2.6.15
+endif
+endif
+ 
+ifeq ($(BOARD_TYPE),db12x)
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.31/usb
+else
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.15/usb
+endif
+
+ifeq ($(BOARD_TYPE),amcc)
+TARGET_CROSS := powerpc-apm-linux-gnu-
+else
+TARGET_CROSS := mips-linux-uclibc-
+endif
+
+MAKE_ARGS:= \
+	KERNELPATH="$(KERNELDIR)" \
+	CROSS_COMPILE="$(TARGET_CROSS)" \
+
+all:lc_ether install
+ifeq ($(BOARD_TYPE),db12x)
+ifeq ($(AQ_TYPE),AQ2000_X)
+lc_ether:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.cavium && mv ${PKG_BUILD_DIR}/Makefile.cavium ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean 
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) AQ2000_X=1
+else
+lc_ether:
+	echo "nothing to be done"
+endif
+endif
+
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean
+	
+install:lc_ether
+	mkdir -p $(INSTALLDIR)
+	cd $(PKG_BUILD_DIR) && \
+	cp -f lc_ether.ko $(INSTALLDIR)/lc_ether.ko
+

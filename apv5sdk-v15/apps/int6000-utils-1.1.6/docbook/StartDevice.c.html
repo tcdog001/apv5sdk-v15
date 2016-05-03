@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			StartDevice.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='StandardHeader.c.html' title=' StandardHeader.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='StartFirmware.c.html' title=' StartFirmware.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *  
+ *   int StartDevice (struct int6k * int6k);
+ *
+ *   int6k.h
+ *  
+ *   This int6kf plugin initialize a device having no NVRAM or blank 
+ *   or corrupted NVRAM; ensure Bootloader is running before starting; 
+ *   write SDRAM configuration then NVM and PIB files to SDRAM and 
+ *   start firmware execution; 
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *	Bill Wike &lt;bill.wike@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef STARTDEVICE_SOURCE
+#define STARTDEVICE_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../nvm/nvm.h&quot;
+#include &quot;../pib/pib.h&quot;
+
+int StartDevice (struct int6k * int6k) 
+
+{
+	struct header_nvm header_nvm;
+	struct header_pib header_pib;
+	uint32_t offset = INT6K_PIBOFFSET;
+	if (WriteCFG (int6k)) 
+	{
+		return (-1);
+	}
+	if (lseek (int6k-&gt;NVM.file, 0, SEEK_SET)) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't home %s&quot;, int6k-&gt;NVM.name);
+		return (-1);
+	}
+	if (read (int6k-&gt;NVM.file, &amp;header_nvm, sizeof (header_nvm)) &lt; sizeof (header_nvm)) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't read %s&quot;, int6k-&gt;NVM.name);
+		return (-1);
+	}
+	while (header_nvm.NEXTHEADER) 
+	{
+		if (lseek (int6k-&gt;NVM.file, LE32TOH (header_nvm.NEXTHEADER), SEEK_SET) == -1) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't home %s&quot;, int6k-&gt;NVM.name);
+			return (-1);
+		}
+		if (read (int6k-&gt;NVM.file, &amp;header_nvm, sizeof (header_nvm)) &lt; sizeof (header_nvm)) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't read %s&quot;, int6k-&gt;NVM.name);
+			return (-1);
+		}
+	}
+	if (WriteMEM (int6k, &amp;int6k-&gt;NVM, LE32TOH (header_nvm.IMAGEADDR), LE32TOH (header_nvm.IMAGELENGTH))) 
+	{
+		return (-1);
+	}
+	if (lseek (int6k-&gt;NVM.file, 0, SEEK_SET)) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't home %s&quot;, int6k-&gt;NVM.name);
+		return (-1);
+	}
+	if (lseek (int6k-&gt;PIB.file, 0, SEEK_SET)) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't home %s&quot;, int6k-&gt;PIB.name);
+		return (-1);
+	}
+	if (read (int6k-&gt;PIB.file, &amp;header_pib, sizeof (header_pib)) &lt; sizeof (header_pib)) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't read %s&quot;, int6k-&gt;PIB.name);
+		return (-1);
+	}
+	if (lseek (int6k-&gt;PIB.file, 0, SEEK_SET)) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;can't home %s&quot;, int6k-&gt;PIB.name);
+		return (-1);
+	}
+	if (ntohs (*(uint16_t *)(&amp;header_pib)) &lt; 0x0305) 
+	{
+		offset = LEGACY_PIBOFFSET;
+	}
+	if (WriteMEM (int6k, &amp;int6k-&gt;PIB, offset, LE16TOH (header_pib.PIBLENGTH))) 
+	{
+		return (-1);
+	}
+	if (StartFirmware (int6k, &amp;header_nvm)) 
+	{
+		return (-1);
+	}
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='StandardHeader.c.html' title=' StandardHeader.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='StartFirmware.c.html' title=' StartFirmware.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

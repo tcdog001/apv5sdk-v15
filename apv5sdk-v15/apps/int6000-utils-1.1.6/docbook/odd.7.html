@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			odd.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='odc.7.html' title=' odc.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='odx.7.html' title=' odx.7 '>NEXT</a>]
+			</div>
+<pre>
+odd(7)                                     Motley Tools                                    odd(7)
+
+NAME
+       odd - object driven dump utility
+
+SYNOPSIS
+       odd [options] file [file] [...]  [&gt;stdout]
+
+DESCRIPTION
+       Print an object driven dump on stdout. An object driven dump requires an object definition
+       file that contains the size and name of data regions and members within a binary object or
+       file.  Individual  data members are presented as independent data dumps within the larger,
+       overall data dump.
+
+OPTIONS
+       -f definitions
+              The name of the object definition file that contains the size, name and description
+              of  objects  within a binary file. The definition file is not modified. This option
+              is required. There is no default file.
+
+       -?,--help
+              Print program help summary on stdout.  This  option  takes  precedence  over  other
+              options on the command line.
+
+       -!,--version
+              Print  program  version  information  on  stdout. This option takes precedence over
+              other options on the command line. Usethis option  when  sending  screen  dumps  to
+              Intellon  Technical  Support  so  that they know exactly which version of the Linux
+              Toolkit you are using.
+
+ARGUMENTS
+       file   The name of a binary file. More than one binary file  may  be  specified  but  each
+              should conform to the object definition file or output will not be correct.
+
+EXAMPLES
+       The  following  is  an example object definition file for an Ethernet frame. Frame fields,
+       like ODA, OSA and ETHTYPE,  are defined by length in order of their appears in the  frame.
+       Array  subscripts  following object names are optional but, if present, become part of the
+       object name. Fields having no length are headers and will be ignored. Comments  and  blank
+       lines are also ignored.
+
+          # ========================================
+          #
+          # ----------------------------------------
+
+          0 header
+
+          6 ODA[6] Own Destination Address
+          6 OSA[6] Own Source Address
+          2 ETHTYPE Ethertype or frame length
+
+          # ========================================
+          #
+          # ----------------------------------------
+
+          0 body
+
+          1500 Payload[1500]
+
+          # ========================================
+          #
+          # ----------------------------------------
+
+          0 trailer
+
+          4 CRC Cyclical Redundancy Check
+
+       The following command uses object definition file ether.txt to identify and display member
+       fields within binary file abc.bin in hexadecimal dump format.
+
+          # odd -f ether.txt abc.bin
+
+SEE ALSO
+       grab(7), odc(7), odx(7)
+
+CREDITS
+        Charles Maier &lt;cmaier@cmassoc.net&gt;
+
+cmassoc-tools-1.6.3                                                                        odd(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='odc.7.html' title=' odc.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='odx.7.html' title=' odx.7 '>NEXT</a>]
+			</div>
+		</body>
+	</html>

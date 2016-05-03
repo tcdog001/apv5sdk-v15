@@ -1,0 +1,29 @@
+#!/bin/sh
+
+IWLIST=/usr/sbin/iwlist
+SCAN_INFO=/tmp/scan_info
+LEGAL_LIST=/jffs/legal_mac_list
+FLAG=0
+SEND_TRAP=/usr/sbin/send_trap
+
+$IWLIST $1 scanning > $SCAN_INFO
+
+det_mac_list=`cat $SCAN_INFO | awk '/Address/{print $5}'`
+
+for mac in $det_mac_list
+do
+    if [ -f $LEGAL_LIST ];then
+        cat $LEGAL_LIST | grep -q $mac
+        if [ $? -eq 1 ];then
+            FLAG=1
+        fi 
+    else
+        FLAG=1
+    fi
+done
+
+if [ $FLAG -eq 1 ];then
+    $SEND_TRAP UnsecureApDetected 1>/dev/null 2>&1
+fi
+
+cat $SCAN_INFO

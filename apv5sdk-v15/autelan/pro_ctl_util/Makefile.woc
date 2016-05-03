@@ -1,0 +1,41 @@
+.NOTPARALLEL:
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR = src
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+CROSS=mips64-octeon-linux-gnu
+CC=${CROSS}-gcc
+
+#TOOLCHAIN_ABI_64=y
+
+unexport LDFLAGS
+
+.PHONY: all
+all: build install
+.PHONY: build
+
+build:
+	${MAKE} -C $(PKG_BUILD_DIR) \
+		CC=$(CC) \
+	        CROSS_COMPILE=$(TARGET_CROSS) \
+		EXTRA_CFLAGS=$(TOOLCHAIN_ABI) \
+		ARCH=$(ARCH) \
+		IPKG_ARCH=$(ARCH)	\
+		#echo "AQ2000CN"	
+endif
+
+.PHONY: clean
+
+clean:
+	${MAKE} -C ${PKG_BUILD_DIR}   clean
+
+#install dir /usr/bin
+.PHONY: install
+install: 
+			 cp -f ${PKG_BUILD_DIR}/pro_ctl_util ${ROOTFSDIR}/usr/bin
+			 cp -f ${PKG_BUILD_DIR}/crc ${ROOTFSDIR}/usr/bin

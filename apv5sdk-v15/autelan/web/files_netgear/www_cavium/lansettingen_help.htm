@@ -1,0 +1,20 @@
+#!/usr/bin/haserl
+<html>
+        <head>
+                <title>Lan setting</title>
+        </head>
+        <body>
+        <br>set basic LAN attribute£¬ you can choose "Get IP from DHCP" or "Use Static IP" to set IP address
+1. Use Static IP:  you can set IP address by yourself; in this pattern, you should set IP address, subnet and you can 
+set default gateway address. all this three value should be input in dotted-decimal format, which like xxx.xxx.xxx.xxx
+in addition , you'd batter make sure that  there is no network device with the same IP address in your LAN to avoid 
+address conflict.
+
+2. Get IP from DHCP£ºget IP address by DHCP£»in this pattern £¬default gateway setting is invalid and you should aslo 
+set retry count; while in the retry count AP can not get IP address successfully , AP should use the latest IP address that 
+valid in "Use Static IP" pattern.  using DHCP get IP address can avoid address conflict effectively.  there should be a DHCP 
+server in the LAN.
+        <br>
+        </body>
+</html>
+

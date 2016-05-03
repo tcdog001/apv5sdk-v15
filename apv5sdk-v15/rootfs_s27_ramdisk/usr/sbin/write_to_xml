@@ -1,0 +1,46 @@
+#!/bin/sh
+usrname=$1
+passwd=$2
+echo $1
+echo $2
+MD5SUM=/usr/bin/md5sum
+CHECKSUM=/jffs/checksum
+CRYPT=/sbin/crypt
+CONFIG_XML=/etc/config/config.xml
+config_write()
+{
+    local xpath="$1"
+    local xml_config="$2"
+    echo "$xml_config" | xmlconf writeconf "$CONFIG_XML" "$xpath" - 2>/dev/null
+            #    ${MD5SUM} ${CONFIG_XML} | awk '{print $1}' > ${CHECKSUM}
+}
+config_read()
+{
+    local xpath="$1"
+    xmlconf readconf "$CONFIG_XML" "$xpath" 2>/dev/null
+}
+
+config_setoption()
+{
+    local xml_config="$1"
+    local optname="$2"
+    local optvalue="$3"
+    echo "$xml_config" | xmlconf setoption - "$optname" "$optvalue" 2>/dev/null
+}
+usage()
+{
+    echo "write_to_xml  [usrname] [passwd]"
+    exit 1
+}
+
+if [ ! $# -eq 2 ];then
+     usage
+fi
+local xml_config=`config_read /config/system`
+local pass_encoded=`$CRYPT "$passwd"`
+xml_config=`config_setoption "$xml_config" password "$pass_encoded"`
+xml_config=`config_setoption "$xml_config" username "$usrname"`
+config_write /config/system "$xml_config"
+                        
+                        
+                        

@@ -1,0 +1,278 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+xml_nat=`config_read /config/firewall/nat`
+xml_nat_enable=`config_getoption "$xml_nat" enable`
+
+xml_url=`config_read /config/firewall/urlfilter`
+xml_url_status=`config_getoption "$xml_url" status`
+xml_url_count=`config_getoption "$xml_url" rule_count`
+
+xml_url1=`config_getoption "$xml_url" url1`
+xml_url2=`config_getoption "$xml_url" url2`
+xml_url3=`config_getoption "$xml_url" url3`
+xml_url4=`config_getoption "$xml_url" url4`
+xml_url5=`config_getoption "$xml_url" url5`
+xml_url6=`config_getoption "$xml_url" url6`
+xml_url7=`config_getoption "$xml_url" url7`
+xml_url8=`config_getoption "$xml_url" url8`
+xml_url9=`config_getoption "$xml_url" url9`
+xml_url10=`config_getoption "$xml_url" url10`
+
+xml_bnet=`config_read /config/network`
+xml_bnet_forward3=`config_getoption "$xml_bnet" forward3`
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js network_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	init_mmenu(flag);
+	init_basemenu(flag);
+	init_lan(flag);
+function Ip() 
+{
+	var fw3="<%= $xml_bnet_forward3 %>";
+	if (fw3 == "0" && document.getElementById("natable").value == "yes"){
+		if (!confirm(firewall_natenable_alert))
+      	     return false;	
+	}
+	  overlayer(); 
+}
+
+function addrulecount()
+{
+	if(url_table.rows.length<12)
+	{
+		var count=parseInt(document.all.rule_num.value)+1;
+		document.all.rule_num.value = count;
+	}
+}
+function delrulecount()
+{
+	if(url_table.rows.length>3)
+	{
+		var count=parseInt(document.all.rule_num.value)-1;
+		document.all.rule_num.value = count;
+	}
+}
+function initrulecount()
+{
+	if( document.all.rule_num.value == "0")
+		document.all.rule_num.value = "1";
+}
+
+/*********************************************/
+/*control of url.htm                        */
+/*********************************************/
+var url_count="<%= $xml_url_count %>";
+var url_status="<%= $xml_url_status %>";
+var url_arr=["<%= $xml_url1 %>","<%= $xml_url2 %>","<%= $xml_url3 %>","<%= $xml_url4 %>","<%= $xml_url5 %>","<%= $xml_url6 %>","<%= $xml_url7 %>","<%= $xml_url8 %>","<%= $xml_url9 %>","<%= $xml_url10 %>"];
+var num = 1;
+var i = 0;
+function urltable_insRow(obj)
+{
+	if( obj == "first entry")
+	{
+		if( url_status == "enable")
+		{
+			for(var i=1;i<url_table.rows.length;i++)
+				document.getElementById("url_table").rows[i].style.display="";
+		}
+		else
+		{
+			for(var i=1;i<url_table.rows.length;i++)
+				document.getElementById("url_table").rows[i].style.display="none";
+		}
+		for( i=0; i<url_count; i++)
+		{
+			var td1 = "url_address" + String(i+1);
+			var row_num = "url_tr" + String(i+1);
+	
+			var newRow = document.getElementById('url_table').insertRow(url_table.rows.length-1);
+       	    		newRow.id = row_num;
+			var cell0 = newRow.insertCell(0);
+			cell0.innerHTML="&nbsp;";
+			var cell1 = newRow.insertCell(1);
+			cell1.innerHTML="<table width='350' border='0'><tr><td><input type='text' name='" + td1 +"' value='" + url_arr[i] + "' style='height:20px; width:140px'/></td></tr></table>";
+		}
+		num = i;
+	}
+	else
+	{
+	
+	if(url_table.rows.length<12)
+	{
+		num = num + 1;
+		var td1 = "url_address" + String(num);
+		var row_num = "url_tr" + String(num);
+	
+		var newRow = document.getElementById('url_table').insertRow(url_table.rows.length-1);
+        	newRow.id = row_num;
+		var cell0 = newRow.insertCell(0);
+		cell0.innerHTML="&nbsp;";
+		var cell1 = newRow.insertCell(1);
+		cell1.innerHTML="<table width='350' border='0'><tr><td><input type='text' name='" + td1 +"' style='height:20px; width:140px'/></td></tr></table>";
+		}
+		else
+	  	alert("Max number of fiter URL is 10!");
+	}
+
+}
+
+function urltable_delRow(){
+	if(url_table.rows.length>3)
+	{
+		num = num - 1;
+	 	document.getElementById('url_table').deleteRow(url_table.rows.length-2);
+	}
+	else
+	{
+		alert("There must be at least one url-filter entry!");
+	}
+}
+
+function url_radio_display(obj)
+{
+	if(parseInt(obj) == 1)
+	{
+		for(var i=1;i<url_table.rows.length;i++)
+			document.getElementById("url_table").rows[i].style.display="none";
+	}
+	else
+	{
+		for(var i=1;i<url_table.rows.length;i++)
+			document.getElementById("url_table").rows[i].style.display="";
+			
+		if( url_table.rows.length<3 )
+		{
+			var row_num = "url_tr1";
+	
+			var newRow = document.getElementById('url_table').insertRow(url_table.rows.length-1);
+        		newRow.id = row_num;
+			var cell0 = newRow.insertCell(0);
+			cell0.innerHTML="&nbsp;";
+			var cell1 = newRow.insertCell(1);
+			cell1.innerHTML="<table width='350' border='0'><tr><td><input type='text' name='url_address1' style='height:20px; width:140px'/></td></tr></table>";
+		}
+	}
+}
+
+</script>
+</head>
+<body  onload='urltable_insRow("first entry")'>
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_network4.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return Ip()">
+<div align="center">
+		<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+		  <tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(firewall_natchange)</script></b></td>
+			</tr>
+		  
+		  <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+
+			<tr>
+			<td align="left" height="24" width="280" bordercolor="#ffffff"><script language="javascript">replace(firewall_natchangestate)</script>&nbsp;</td>
+			<td align="left" width="370" bordercolor="#ffffff">
+			<input type="radio" <% webui_radiobutton_check "$xml_nat_enable" "yes" %> name="natable" id="natable" value="yes" ><script language="javascript">replace(firewall_natenable)</script>
+			&nbsp;&nbsp; <input type="radio" <% webui_radiobutton_check "$xml_nat_enable" "no" %> name="natable" value="no"  ><script language="javascript">replace(firewall_natdisable)</script>
+			</td> 
+			</tr>
+
+			<tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+			
+			<tr style="display:none">
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(firewall_urlfilter)</script></b></td>
+			</tr>
+		  
+		  <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+			
+			<tr style="display:none">
+			<td align="center" colspan="2"  bordercolor="#ffffff">
+			<table id="url_table" width="650" border="0"  bgcolor="#FFFFFF">
+	    <tr  style="display:none" >
+          <td  width="280"><script language="javascript">replace(firewall_urlfilterstatus)</script></td>
+          <td  width="370">
+		    <table width="370" border="0">
+              <tr>
+              	<td width="60"><input type="radio" name="url_filter" <% webui_radiobutton_check "$xml_url_status" "enable" %> value="enable" onclick="url_radio_display(2);initrulecount();"/><script language="javascript">replace(firewall_urlenable)</script></td>
+                <td width="290"><input type="radio" name="url_filter" <% webui_radiobutton_check "$xml_url_status" "disable" %> value="disable" onclick="url_radio_display(1);"/><script language="javascript">replace(firewall_urldisable)</script></td>
+              </tr>
+            </table>
+		  </td>
+        </tr>	
+		
+	<tr style="display:none">
+          <td >&nbsp;</td>
+          <td >
+		    <table  border="0">
+              <tr>
+                <td><script language="javascript">replace(firewall_settings_add)</script></td>
+                <td><script language="javascript">replace(firewall_settings_delete)</script></td>
+              </tr>
+            </table>
+		  </td>
+        </tr>
+	  </table>
+			</td> 
+			</tr>
+			
+			
+			<tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+		</table>
+		<table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+			<tr>
+			  <td align="center" height="40" valign="middle" colspan="2" ><script language="javascript" >replace(b_lansu)</script>&nbsp;</td>
+			</tr>
+			<tr>
+        <td align="right"   colspan="2"><script language="javascript">replace(firewall_settings_help)</script></td>
+      </tr>
+		</table>
+</div>
+<input type="hidden" value="URL filter" name="SERVLET">
+<input type="hidden" value="<%= $xml_url_count %>" name="rule_num">
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

@@ -1,0 +1,609 @@
+
+if [ $# -le 0 ];then
+    echo "error: need device type"
+    exit 0
+fi
+
+if [ -z $3 ];then
+    config_file_path=/tmp/device_info.xml
+else
+    config_file_path=$3
+    if [ ! -d $(dirname $config_file_path) ];then
+        echo "error: file path error"
+        exit 0
+    fi
+fi
+
+if [ ! -z $2 ];then
+    HV=`echo $2 | cut -b 1-3`
+fi
+
+case "$1" in
+AQ1000)
+	echo "AQ1000"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=abg
+			wifi0_max_power=20
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+			eth0=enable
+			eth1=enable
+	;;
+AQ1000-H)
+	echo "AQ1000-H"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=abg
+			wifi0_max_power=27
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ1010)
+	echo "AQ1010"
+	cpu_t=soc
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bg
+			wifi0_max_power=20
+	eth_n=1
+		eth0=enable
+	;;
+AQ1110)
+	echo "AQ1110"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bg
+			wifi0_max_power=20
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ1110-N)
+	echo "AQ1110-N"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=20
+			wifi0_txc=3
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ2010)
+	echo "AQ2010"
+	cpu_t=soc
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bg
+			wifi0_max_power=20
+	eth_n=1
+		eth0=enable
+	;;
+AQ2010V2)
+        echo "AQ2010V2"
+        cpu_t=soc
+        wifi_n=1
+                wifi0=enable
+                wifi0_mode=bg
+		wifi0_max_power=20
+        eth_n=1
+         	eth0=enable
+ 	;;
+AQ2010-H)
+        echo "AQ2010-H"
+        cpu_t=octeon5010
+        wifi_n=1
+                wifi0=enable
+                wifi0_mode=bg
+		wifi0_max_power=27
+        eth_n=1
+         	eth0=enable
+ 	;;
+AQ2010V2-H)
+        echo "AQ2010V2-H"
+        cpu_t=soc
+        wifi_n=1
+                wifi0=enable
+                wifi0_mode=bg
+		wifi0_max_power=27
+        eth_n=1
+         	eth0=enable
+ 	;;
+WG102-500-H)
+        echo "WG102-500"
+        cpu_t=soc
+        wifi_n=1
+                wifi0=enable
+                wifi0_mode=bg
+		wifi0_max_power=27
+        eth_n=1
+         	eth0=enable
+ 	;;
+WG103)
+        echo "WG103"
+        cpu_t=soc
+        wifi_n=1
+                wifi0=enable
+                wifi0_mode=bg
+		wifi0_max_power=20
+        eth_n=1
+         	eth0=enable
+ 	;;
+AQ2110)
+	echo "AQ2110"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bg
+			wifi0_max_power=20
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ2110-AG)
+	echo "AQ2110-AG"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=abg
+			wifi0_max_power=20
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ2120)
+	echo "AQ2120"
+	cpu_t=octeon5010
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=bg
+			wifi0_max_power=20
+		wifi1=enable
+			wifi1_mode=abg
+			wifi1_max_power=20
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ2110-N)
+	echo "AQ2110-N"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=20
+			wifi0_txc=3
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ2120-N)
+	echo "AQ2120-N"
+	cpu_t=octeon5010
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=20
+		wifi1=enable
+			wifi1_mode=an
+			wifi1_max_power=20
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ2110-H)
+	echo "AQ2110-H"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bg
+			wifi0_max_power=27
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ2120-H)
+	echo "AQ2120-H"
+	cpu_t=octeon5010
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=bg
+			wifi0_max_power=27
+		wifi1=enable
+			wifi1_mode=abg
+			wifi1_max_power=20
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ3110)
+	echo "AQ3110"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bg
+			wifi0_max_power=20
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ3120)
+	echo "AQ3120"
+	cpu_t=octeon5010
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=bg
+			wifi0_max_power=20
+		wifi1=enable
+			wifi1_mode=abg
+			wifi1_max_power=20
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ3110-N)
+	echo "AQ3100-N"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=20
+			wifi0_txc=3
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ3120-N)
+	echo "AQ3120-N"
+	cpu_t=octeon5010
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=20
+			wifi0_txc=3
+		wifi1=enable
+			wifi1_mode=an
+			wifi1_max_power=20
+			wifi1_txc=3
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ3110-H)
+	echo "AQ3110-H"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bg
+			wifi0_max_power=27
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ3000-EH)
+	echo "AQ3000-EH"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bg
+			wifi0_max_power=27
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ3120-H)
+	echo "AQ3120-H"
+	cpu_t=octeon5010
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=bg
+			wifi0_max_power=27
+		wifi1=enable
+			wifi1_mode=abg
+			wifi1_max_power=20
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ3000-E2AH)
+	echo "AQ3000-E2AH"
+	cpu_t=octeon5010
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=bg
+			wifi0_max_power=27
+		wifi1=enable
+			wifi1_mode=abg
+			wifi1_max_power=20
+	if [ "${HV}" = "1.2" ];then
+		eth_n=2
+	else
+		eth_n=1
+	fi
+		eth0=enable
+		eth1=enable
+	;;
+AQ2000-NH)
+	echo "AQ2000-NH"
+	cpu_t=soc
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=27
+			wifi0_txc=1
+		eth_n=1
+		eth1=enable
+	;;
+AQ2000-N)
+	echo "AQ2000-N"
+	cpu_t=soc
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=20
+			wifi0_txc=1
+		eth_n=1
+		eth1=enable
+	;;
+AQ2000-N2)
+    echo "AQ2000-N2"
+    cpu_t=soc
+    wifi_n=1
+        wifi0=enable
+            wifi0_mode=n
+            wifi0_max_power=20
+            wifi0_txc=3
+        eth_n=1
+        eth1=enable
+    ;;    
+AQ2000-EN2)
+	echo "AQ2000-EN2"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=20
+			wifi0_txc=3
+		eth_n=1
+		eth0=enable
+	;;
+AQ2000-EAN2)
+	echo "AQ2000-EAN2"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=an
+			wifi0_max_power=20
+			wifi0_txc=3
+		eth_n=1
+		eth0=enable
+	;;
+AQ2000-E2AN2)
+	echo "AQ2000-E2AN2"
+	cpu_t=octeon5010
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=an
+			wifi0_max_power=20
+			wifi0_txc=3
+		wifi1=enable
+			wifi1_mode=an
+			wifi1_max_power=20
+			wifi1_txc=3
+		eth_n=1
+		eth0=enable
+	;;
+AQ2000-ENH)
+	echo "AQ2000-ENH"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=27
+			wifi0_txc=1
+		eth_n=1
+		eth0=enable
+	;;
+AQ3000-ENH2)
+	echo "AQ3000-ENH2"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=27
+			wifi0_txc=1
+		eth_n=1
+		eth0=enable
+	;;
+AQ2000-SNH)
+	echo "AQ2000-SNH"
+	cpu_t=soc
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=27
+			wifi0_txc=1
+		eth_n=1
+		eth0=enable
+	;;
+AF4000-ENH3)
+	echo "AF4000-ENH3"
+	cpu_t=APM82181
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=30
+			wifi0_txc=3
+		eth_n=1
+		eth0=enable
+	;;
+AF4000-E2ANH3)
+	echo "AF4000-E2ANH3"
+	cpu_t=APM82181
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=30
+			wifi0_txc=3
+		wifi1=enable
+			wifi1_mode=an
+			wifi1_max_power=28
+			wifi1_txc=3
+		eth_n=1
+		eth0=enable
+	;;
+WNAP550)
+	echo "WNAP550"
+	cpu_t=soc
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=27
+			wifi0_txc=1
+		eth_n=1
+		eth0=enable
+	;;
+WNDAP350)
+	echo "WNDAP350"
+	cpu_t=soc
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=n
+			wifi0_max_power=20
+			wifi0_txc=3
+		wifi1=enable
+			wifi1_mode=an
+			wifi1_max_power=20
+			wifi1_txc=3
+		eth_n=1
+		eth0=enable
+	;;
+*)
+	echo "no such device type"
+	exit 0
+	;;
+esac
+
+echo "<device>" > $config_file_path
+echo "    <product_model>${1}</product_model>" >> $config_file_path
+echo "    <cpu_type>${cpu_t}</cpu_type>" >> $config_file_path
+echo "    <wifi_total>" >> $config_file_path
+echo "        <count>${wifi_n}</count>" >> $config_file_path
+echo "        <wifi_sol>" >> $config_file_path 
+for n in `seq $wifi_n`
+do
+n=$(($n-1))
+echo "            <wifi${n}>" >> $config_file_path
+eval "value=\$wifi${n}"
+echo "                <status>${value}</status>" >> $config_file_path
+eval "value=\$wifi${n}_mode"
+echo "                <mode>${value}</mode>" >> $config_file_path
+eval "value=\$wifi${n}_max_power"
+echo "                <max_power>$value</max_power>" >> $config_file_path
+limit=0
+if [ -f /jffs/tx-offset ];then
+	if [ ${n} -eq 0 ];then
+		limit=`cat /jffs/tx-offset`
+	fi
+fi
+echo "                <limit>${limit}</limit>" >> $config_file_path
+eval "value=\$wifi${n}_mode"
+if [ ${value} == "n" ]||[ ${value} == "an" ];then
+	eval "value=\$wifi${n}_txc"
+	echo "                <txchain>${value}</txchain>" >> $config_file_path
+fi
+echo "            </wifi$n>" >> $config_file_path
+done
+echo "        </wifi_sol>" >> $config_file_path
+echo "    </wifi_total>" >> $config_file_path
+echo "    <if_total>" >> $config_file_path
+echo "        <count>${eth_n}</count>" >> $config_file_path
+echo "        <if_sol>" >> $config_file_path
+for n in `seq $eth_n`
+do
+n=$(($n-1))
+echo "        <if${n}>" >> $config_file_path
+eval "value=\$eth${n}"
+echo "            <status>${value}</status>" >> $config_file_path
+echo "        </if${n}>" >> $config_file_path
+done
+echo "        </if_sol>" >> $config_file_path
+echo "    </if_total>" >> $config_file_path
+echo "</device>"  >> $config_file_path

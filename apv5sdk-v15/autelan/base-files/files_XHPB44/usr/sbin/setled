@@ -1,0 +1,55 @@
+#!/bin/sh
+
+PRO_CTL_UTIL=/usr/bin/pro_ctl_util
+usage()
+{
+        echo "setled sysled enable\disable\blink------"
+	echo "setled testled enable\disable\blink------gpio 1"
+        exit 1
+}
+if [ ! $# -eq 2 ];then
+        usage
+fi
+case $1 in
+  sysled) 
+	if [ "$2" == "enable" ];then
+		:
+    	else if [ "$2" == "disable" ];then
+    		:
+   	else if [ "$2" == "blink" ];then
+     	 	:	
+    	else 
+    		echo "wrong input" 		
+	fi
+	fi
+	fi
+        ;;
+  wifiled)
+	if [ "$2" == "enable" ];then   
+		$PRO_CTL_UTIL -d 5
+	else if [ "$2" == "disable" ];then
+		$PRO_CTL_UTIL -b 5
+	else if [ "$2" == "blink" ];then
+		$PRO_CTL_UTIL -u 5
+	else
+		echo "wrong input"	
+	fi
+	fi
+    	fi
+        ;;		
+  testled)
+	if [ "$2" == "enable" ];then
+		$PRO_CTL_UTIL -d 1
+	else if [ "$2" == "disable" ];then
+		$PRO_CTL_UTIL -b 1
+	else if [ "$2" == "blink" ];then
+		$PRO_CTL_UTIL -u 1
+	fi
+	fi
+	fi
+	;;
+  *)
+	echo "setled sysled enable\disable\blink------gpio 1 and 5"
+        echo "setled testled enable\disable\blink------gpio 5"
+	;;
+esac        

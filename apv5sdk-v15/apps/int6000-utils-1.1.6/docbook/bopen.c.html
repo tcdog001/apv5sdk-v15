@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			bopen.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='binout.c.html' title=' binout.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='buffer.c.html' title=' buffer.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void bclose(buffer_t * b);
+ *
+ *   buffer.h 
+ *
+ *   This function closes buffer structure and frees resources.
+ *  
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon HomePlug AV Application Programming Interface;
+ *:  Released 2007 by Intellon Corporation, Ocala FL USA;
+ *;  For demontration and evaluation only; Not for production use;
+ *
+ *   Contributor(s): 
+ *	A. Vasquez, alex.vasquez@intellon.com
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef BOPEN_SOURCE
+#define BOPEN_SOURCE
+#include &lt;errno.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdlib.h&gt;
+
+#include &quot;../tools/buffer.h&quot;
+
+buffer_t * bopen (uint8_t b [], size_t blen, size_t bseglen) 
+
+{
+	buffer_t * buffer;
+	if (b == 0) 
+	{
+		errno = EINVAL;
+		return (0);
+	}
+	if (blen == 0 || bseglen == 0) 
+	{
+		errno = EINVAL;
+		return (0);
+	}
+	if ((buffer = (buffer_t *)malloc (sizeof (buffer_t))) == 0) 
+	{
+		return (0);
+	}
+	buffer-&gt;bstart = buffer-&gt;bcurr = b;
+	buffer-&gt;bend = b + blen;
+	buffer-&gt;blen = blen;
+	buffer-&gt;bseglen = bseglen;
+	buffer-&gt;bcurrsegnum = 0;
+	return buffer;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='binout.c.html' title=' binout.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='buffer.c.html' title=' buffer.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

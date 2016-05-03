@@ -1,0 +1,15 @@
+#!/bin/sh
+if [ -f /jffs/AQ21mpci_*.e2p ];then
+	cur_ver=`avrutil -V | awk '/Version/{print}' | grep -o -e '[0-9]\{1,\}'`
+	new_ver=`find /jffs -name "AQ21mpci_*.e2p" | grep -o -e '_[0-9]\{1,\}' | grep -o -e '[0-9]\{1,\}'`
+	if [ $cur_ver -eq $new_ver ];then
+		echo "error:new file is the same as current file"
+		rm -f AQ21mpci_*.e2p
+		exit 1
+	fi
+	touch /jffs/sysrebootflag	
+	avrutil -U
+else
+	echo "error:no upgrade file of avr"
+	exit 1
+fi

@@ -1,0 +1,2 @@
+CWStevens.c: In function 'get_ifi_info':
+CWStevens.c:184: warning: unused variable 'sin6ptr'

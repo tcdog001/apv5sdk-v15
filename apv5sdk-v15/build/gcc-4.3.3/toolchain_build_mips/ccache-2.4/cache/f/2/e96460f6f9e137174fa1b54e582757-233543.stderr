@@ -1,0 +1,4 @@
+archival/libunarchive/get_header_tar.c: In function 'get_header_tar':
+archival/libunarchive/get_header_tar.c:140: warning: array subscript is above array bounds
+archival/libunarchive/get_header_tar.c:155: warning: array subscript is above array bounds
+archival/libunarchive/get_header_tar.c:158: warning: array subscript is above array bounds

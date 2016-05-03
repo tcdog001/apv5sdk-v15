@@ -1,0 +1,86 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+operate_status=$my_action_status
+my_action_status=""
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Management</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<script type="text/javascript">
+function validate_changepass()
+{
+	var flag="<%= $operate_status %>";
+	if(flag == "Change Password Successful")
+	{
+	  alert("Change Password Successful");
+	}
+	else if(flag == "Change Password Failed")
+	{
+		alert("Change Password Failed");
+	}
+
+}
+</script>
+</head>
+
+<body bgcolor="#efefef" onLoad="validate_changepass()">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+		  <td class="top1"><a href="management.htm" target="MainFrame">Status</a></td>
+          <td class="top1"><a href="upgrade.htm" target="MainFrame">Upgrade</a></td>
+          <td class="top1"><a href="restore.htm" target="MainFrame">Restore</a></td>
+		  <td class="top1">Password</td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">System-->Password</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form method="post" action="<%= $action_cgi %>" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="Administrator Management illustration">Administrator Management</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">Current User Name</td>
+          <td class="td_style" width="350"><input type="text" name="current_user_name" style="height:12px; width:150px" value="admin" disabled="disabled"/></td>
+        </tr>
+		<tr>
+          <td class="td_style">Current Password</td>
+          <td class="td_style"><input type="password" name="pass_old" style="height:12px; width:150px"/></td>
+        </tr>
+		<tr>
+          <td class="td_style">New Password</td>
+          <td class="td_style"><input type="password" name="pass_new" style="height:12px; width:150px"/></td>
+        </tr>
+		<tr>
+          <td class="td_style">Confirm Password</td>
+          <td class="td_style"><input type="password" name="pass_new_retype" style="height:12px; width:150px"/></td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><input id="but" type="submit" name="management_commit" value="Submit"/></td>
+  </tr>
+</table>
+<input type="hidden" value="Change Password" name="SERVLET">
+</form>
+</div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+# Copyright 2004, 2007 Free Software Foundation, Inc.
+
+#This file is part of GCC.
+
+#GCC is free software; you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation; either version 3, or (at your option)
+#any later version.
+
+#GCC is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License
+#along with GCC; see the file COPYING3.  If not see
+#<http://www.gnu.org/licenses/>.
+
+# GCC's Makefile fragment for libada.
+# libada needs some information from the GCC configure file at the moment,
+# and this exists to transfer that information in as clean a way as possible.
+
+exeext=
+libdir=${exec_prefix}/lib
+NOCOMMON_FLAG=
+WARN_CFLAGS=$(GCC_WARN_CFLAGS)
+gcc_tmake_file= $(srcdir)/config/mips/t-mips $(srcdir)/config/t-slibgcc-elf-ver $(srcdir)/config/t-linux
+gcc_xmake_file= $(srcdir)/config/x-linux
+host_cc_for_libada=/usr/bin/gcc -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/host_dir/include -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/host_dir/usr/include

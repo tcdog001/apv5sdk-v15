@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			hexin.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='hexencode.c.html' title=' hexencode.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='hexout.c.html' title=' hexout.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   size_t hexin (void * memory, size_t extent, FILE *fp);
+ *
+ *   memory.h
+ *
+ *   read a file and convert hexadecimal octets to binary bytes then 
+ *   store them in consecutive memory locations up to a given length; 
+ *   return the actual number of bytes stored;
+ *
+ *   digits may be consecutive or separated by white space consisting 
+ *   of spaces, tabs, linefeeds, carriage returns, formfeeds or other
+ *   characters such as punctuation; C-style or script-style comments 
+ *   are treated as white space;
+ *
+ *.  Motley Tools by Charles Maier &lt;cmaier@cmassoc.net&gt;;
+ *:  Published 2005 by Charles Maier Associates Limited;
+ *;  Released under the GNU General Public Licence v2 and later;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef HEXIN_SOURCE
+#define HEXIN_SOURCE
+
+#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/error.h&quot;
+
+#ifndef NUMBER_HEADER
+#define RADIX_HEX 16
+#define RADIX_DEC 10
+#endif
+
+size_t hexin (void * memory, size_t extent, FILE *fp) 
+
+{
+	uint8_t * origin = (byte *)(memory);
+	uint8_t * offset = (byte *)(memory);
+	unsigned digits = 0;
+	signed c;
+	while (((c = getc (fp)) != EOF) &amp;&amp; (c != ';') &amp;&amp; (extent)) 
+	{
+		if (c == '#') 
+		{
+			do 
+			{
+				c = getc (fp);
+			}
+			while ((c != '\n') &amp;&amp; (c != EOF));
+		}
+		else if (c == '/') 
+		{
+			c = getc (fp);
+			if (c == '/') 
+			{
+				do 
+				{
+					c = getc (fp);
+				}
+				while ((c != '\n') &amp;&amp; (c != EOF));
+			}
+			else if (c == '*') 
+			{
+				while ((c != '/') &amp;&amp; (c != EOF)) 
+				{
+					while ((c != '*') &amp;&amp; (c != EOF)) 
+					{
+						c = getc (fp);
+					}
+					c = getc (fp);
+				}
+			}
+		}
+		else if ((c &gt;= '0') &amp;&amp; (c &lt;= '9')) 
+		{
+			*offset *= RADIX_HEX;
+			*offset += c - '0';
+			if (digits++ &amp; 1) 
+			{
+				offset++;
+				extent--;
+			}
+		}
+		else if ((c &gt;= 'A') &amp;&amp; (c &lt;= 'F')) 
+		{
+			*offset *= RADIX_HEX;
+			*offset += RADIX_DEC;
+			*offset += c - 'A';
+			if (digits++ &amp; 1) 
+			{
+				offset++;
+				extent--;
+			}
+		}
+		else if ((c &gt;= 'a') &amp;&amp; (c &lt;= 'f')) 
+		{
+			*offset *= RADIX_HEX;
+			*offset += RADIX_DEC;
+			*offset += c - 'a';
+			if (digits++ &amp; 1) 
+			{
+				offset++;
+				extent--;
+			}
+		}
+	}
+	if (digits &amp; 1) 
+	{
+		error (0, ENOTSUP, &quot;Odd number of hex digits in source&quot;);
+		return (-1);
+	}
+	return (offset - origin);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='hexencode.c.html' title=' hexencode.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='hexout.c.html' title=' hexout.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

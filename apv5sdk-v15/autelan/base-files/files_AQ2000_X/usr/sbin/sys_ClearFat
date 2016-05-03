@@ -1,0 +1,11 @@
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+. /usr/lib/web/constant.sh
+. /usr/lib/web/sysinit.sh
+/usr/sbin/des_wlan
+stop_monitor
+local xml_config=`config_read /config/system`
+xml_config=`config_setoption "$xml_config" workmode "0"`
+config_write /config/system "$xml_config"
+sysctl -w dev.wifi0.thinap=1
+/usr/sbin/ap_monitor &

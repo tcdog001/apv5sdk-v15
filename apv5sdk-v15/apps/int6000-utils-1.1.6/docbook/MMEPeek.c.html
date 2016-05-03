@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			MMEPeek.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='MMEName.c.html' title=' MMEName.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='ManageEnetPHY.c.html' title=' ManageEnetPHY.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void MMEPeek (const void * memory, size_t length, FILE *fp);
+ *
+ *   mme.h
+ *   
+ *   print a HomePlug AV frame header on stdout in human readable 
+ *   format;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information on Intellon vendor specific header formats;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *   
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef MMPEEK_SOURCE
+#define MMPEEK_SOURCE
+
+#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+
+#include &quot;../int6k/homeplug.h&quot;
+#include &quot;../int6k/message.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../mme/mme.h&quot;
+
+#ifndef ETHER_ADDR_LEN
+#define ETHER_ADDR_LEN 6 /* normally defined in ethernet.h or if_ether.h */
+#endif
+
+void MMEPeek (const void * memory, size_t extent, FILE *fp) 
+
+{
+	char address [ETHER_ADDR_LEN * 3];
+	struct packet_eth 
+	{
+		uint8_t ODA [ETHER_ADDR_LEN];
+		uint8_t OSA [ETHER_ADDR_LEN];
+		uint16_t MTYPE;
+		uint8_t BODY [ETHERMTU];
+	}
+	* packet = (struct packet_eth *)(memory);
+	fprintf (fp, &quot;ODA=%s &quot;, hexstring (address, sizeof (address), packet-&gt;ODA, sizeof (packet-&gt;ODA)));
+	fprintf (fp, &quot;OSA=%s &quot;, hexstring (address, sizeof (address), packet-&gt;OSA, sizeof (packet-&gt;OSA)));
+	fprintf (fp, &quot;MTYPE=%04X &quot;, ntohs (packet-&gt;MTYPE));
+	if (ntohs (packet-&gt;MTYPE) == 0x88E1) 
+	{
+		struct header_mme * header = (struct header_mme *)(&amp;packet-&gt;BODY);
+		if (LE16TOH (header-&gt;MMTYPE) &lt; (unsigned)(MMTYPE_MS)) 
+		{
+			fprintf (fp, &quot;MMV=%02X &quot;, header-&gt;MMV);
+			fprintf (fp, &quot;MMTYPE=%04X &quot;, LE16TOH (header-&gt;MMTYPE));
+			fprintf (fp, &quot;FMI=%04X &quot;, LE16TOH (header-&gt;FMI));
+			fprintf (fp, &quot;%s.%s\n&quot;, MMEName (header-&gt;MMTYPE), MMEMode (header-&gt;MMTYPE));
+			return;
+		}
+		if (LE16TOH (header-&gt;MMTYPE) &lt; (unsigned)(MMTYPE_VS)) 
+		{
+			struct header_std * header = (struct header_std *)(&amp;packet-&gt;BODY);
+			fprintf (fp, &quot;MMV=%02X &quot;, header-&gt;MMV);
+			fprintf (fp, &quot;MMTYPE=%04X &quot;, LE16TOH (header-&gt;MMTYPE));
+			fprintf (fp, &quot;%s.%s\n&quot;, MMEName (header-&gt;MMTYPE), MMEMode (header-&gt;MMTYPE));
+			return;
+		}
+		if (LE16TOH (header-&gt;MMTYPE) &lt; (unsigned)(MMTYPE_XX)) 
+		{
+			struct header_int * header = (struct header_int *)(&amp;packet-&gt;BODY);
+			fprintf (fp, &quot;MMV=%02X &quot;, header-&gt;MMV);
+			fprintf (fp, &quot;MMTYPE=%04X &quot;, LE16TOH (header-&gt;MMTYPE));
+			fprintf (fp, &quot;OUI=%s &quot;, hexstring (address, sizeof (address), header-&gt;OUI, ETHER_ADDR_LEN/2));
+			fprintf (fp, &quot;%s.%s\n&quot;, MMEName (header-&gt;MMTYPE), MMEMode (header-&gt;MMTYPE));
+			return;
+		}
+	}
+	fprintf (fp, &quot;NON_HOMEPLUG_FRAME\n&quot;);
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='MMEName.c.html' title=' MMEName.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='ManageEnetPHY.c.html' title=' ManageEnetPHY.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,248 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			RxFrame.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='ResetToFactoryDefaults.c.html' title=' ResetToFactoryDefaults.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SDRAMInfo.c.html' title=' SDRAMInfo.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   int ihpapi_RxFrame (size_t length, uint8_t buffer [], ihpapi_result_t result);
+ *
+ *   ihpapi.h
+ *
+ *   This function decodes recived frames and provides the results to the application.
+ *   The information provided in the results structure allows the application to
+ *   futher process data or allows the API to continue sequencing an operation in
+ *   progress.
+ *
+ *   EFAULT if buffer/result address or size are invalid or illegal;
+ *   message version or vendor identifier is wrong and so decoding cannot 
+ *   be trusted;
+ *
+ *   EPERM means the frame is HomePlug protocol and is not
+ *   supported;
+ *
+ *   ENOSYS means unrecognized MME function or type;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon HomePlug AV Application Programming Interface;
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration and evaluation only; Not for production use;
+ *
+ *   Contributor(s): 
+ *	Alex Vasquez, alex.vasquez@intellon.com
+ *	Charles Maier, charles.maier@intellon.com
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef FRAMERECEIVED_SOURCE
+#define FRAMERECEIVED_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;string.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../tools/memory.h&quot;
+#include &quot;ihpapi.h&quot;
+#include &quot;ihp.h&quot;
+ 
+char ihpapi_version [] = IHPAPI_VERSION;
+
+int ihpapi_RxFrame (size_t length, uint8_t buffer [], ihpapi_result_t * result) 
+
+{
+	extern struct SeqCB scb;
+	int rc = -1;
+	uint8_t OUI [3] = 
+	{
+		0x00,
+		0xB0,
+		0x52 
+	};
+	TxInfo *tcb = &amp;scb.tcb;
+	BlockInfo block;
+	struct header_cnf * header = (struct header_cnf *)(buffer);
+	memset (result, 0, sizeof (* result));
+	result-&gt;opCode = IHPAPI_OPCODE_NOOP;
+	result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_NOOP;
+	result-&gt;opStatus.type = XX_MMTYPE_BAD;
+	result-&gt;opStatus.status = 0;
+	result-&gt;validData = false;
+	result-&gt;dataLen = 0;
+
+#if INTELLON_SAFEMODE
+ 
+	if (buffer == (uint8_t *)(0)) 
+	{
+		result-&gt;opStatus.status = errno = EFAULT;
+		return (-1);
+	}
+	if (result == (ihpapi_result_t *)(0)) 
+	{
+		result-&gt;opStatus.status = errno = EFAULT;
+		return (-1);
+	}
+
+#endif
+ 
+	if (ntohs (header-&gt;ethernet.MTYPE) != HOMEPLUG_MTYPE) 
+	{
+		result-&gt;opStatus.status = errno = EPERM;
+		return (-1);
+	}
+	if (header-&gt;intellon.MMV != INTELLON_MMV) 
+	{
+		result-&gt;opStatus.status = errno = EFAULT;
+		return (-1);
+	}
+	if (memcmp (header-&gt;intellon.OUI, OUI, sizeof (OUI))) 
+	{
+		result-&gt;opStatus.status = errno = EFAULT;
+		return (-1);
+	}
+	result-&gt;opStatus.type = intohs(header-&gt;intellon.MMTYPE);
+	memcpy (result-&gt;ODA, header-&gt;ethernet.ODA, IHPAPI_ETHER_ADDR_LEN);
+	memcpy (result-&gt;OSA, header-&gt;ethernet.OSA, IHPAPI_ETHER_ADDR_LEN);
+	switch (result-&gt;opStatus.type) 
+	{
+	case VS_HST_ACTION | MMTYPE_IND:
+		rc = ihp_DecodeHostAction (buffer, length, result);
+		memset (tcb, 0, sizeof (TxInfo));
+		tcb-&gt;txok = true;
+		memcpy (tcb-&gt;ODA, result-&gt;OSA, IHPAPI_ETHER_ADDR_LEN);
+		memcpy (tcb-&gt;OSA, result-&gt;ODA, IHPAPI_ETHER_ADDR_LEN);
+		if (!rc) 
+		{
+			tcb-&gt;HARRSPBLK.STATUS = 0x00;
+		}
+		else 
+		{
+			tcb-&gt;HARRSPBLK.STATUS = 0x01;
+		}
+		tcb-&gt;MMTYPE = VS_HST_ACTION | MMTYPE_RSP;
+		tcb-&gt;hdrlen = sizeof (HARRspBlock);
+		result-&gt;opCode = IHPAPI_OPCODE_HOST_ACTION_REQUEST;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_TRANSMIT;
+		break;
+	case VS_SW_VER | MMTYPE_CNF:
+		rc = ihp_DecodeGetVersion (buffer, length, result);
+		result-&gt;opCode = IHPAPI_OPCODE_GET_VERSION_INFO;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_COMPLETE;
+		break;
+	case VS_RS_DEV | MMTYPE_CNF:
+		rc = ihp_DecodeResetDevice (buffer, length, result);
+		result-&gt;opCode = IHPAPI_OPCODE_RESET_DEVICE;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_COMPLETE;
+		memset (&amp;scb, 0, sizeof (scb));
+		break;
+	case VS_FAC_DEFAULT | MMTYPE_CNF:
+		rc = ihp_DecodeResetToFactoryDefaults (buffer, length, result);
+		result-&gt;opCode = IHPAPI_OPCODE_RESET_TO_FACTORY_DEFAULTS;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_COMPLETE;
+		memset (&amp;scb, 0, sizeof (scb));
+		break;
+	case VS_SET_KEY | MMTYPE_CNF:
+		rc = ihp_DecodeSetKey (buffer, length, result);
+		result-&gt;opCode = IHPAPI_OPCODE_SET_KEY;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_COMPLETE;
+		break;
+	case VS_MFG_STRING | MMTYPE_CNF:
+		rc = ihp_DecodeMfgString (buffer, length, result);
+		result-&gt;opCode = IHPAPI_OPCODE_GET_MANUFACTURER_INFO;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_COMPLETE;
+		break;
+	case VS_LNK_STATS | MMTYPE_CNF:
+		rc = ihp_DecodeLinkStats (buffer, length, result);
+		result-&gt;opCode = IHPAPI_OPCODE_GET_CONNECTION_INFO;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_COMPLETE;
+		break;
+	case VS_NW_INFO | MMTYPE_CNF:
+		rc = ihp_DecodeNetworkInfo (buffer, length, result);
+		result-&gt;opCode = IHPAPI_OPCODE_GET_NETWORK_INFO;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_COMPLETE;
+		break;
+	case VS_TONE_MAP_CHAR | MMTYPE_CNF:
+		rc = ihp_DecodeGetToneMapInfo (buffer, length, result);
+		result-&gt;opCode = IHPAPI_OPCODE_GET_TONE_MAP_INFO;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_COMPLETE;
+		break;
+	case VS_RX_TONE_MAP_CHAR | MMTYPE_CNF:
+		rc = ihp_DecodeGetRxToneMapInfo (buffer, length, result);
+		result-&gt;opCode = IHPAPI_OPCODE_GET_RX_TONE_MAP_INFO;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_COMPLETE;
+		break;
+	case VS_ENET_SETTINGS | MMTYPE_CNF:
+		rc = ihp_DecodeEthernetPHYSettings (buffer, length, result);
+		result-&gt;opCode = IHPAPI_OPCODE_MANAGE_ENET_PHY;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_COMPLETE;
+		break;
+	case VS_SET_SDRAM | MMTYPE_CNF:
+		rc = ihp_DecodeSetSDRAMCfg (buffer, length, result);
+		result-&gt;opCode = IHPAPI_OPCODE_SET_SDRAM_CONFIG;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_COMPLETE;
+		break;
+	case VS_WR_MEM | MMTYPE_CNF:
+		rc = ihp_SequenceWriteMemory (buffer, length, result);
+		break;
+	case VS_WR_MOD | MMTYPE_CNF:
+		rc = ihp_SequenceWriteModule (buffer, length, result);
+		break;
+	case VS_RD_MOD | MMTYPE_CNF:
+		rc = ihp_SequenceReadModule (buffer, length, result);
+		break;
+	case VS_MOD_NVM | MMTYPE_CNF:
+		rc = ihp_DecodeFlashNVM (buffer, length, result, &amp;block);
+		result-&gt;opCode = scb.opcode;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_COMPLETE;
+		memset (&amp;scb, 0, sizeof (scb));
+		break;
+	case VS_ST_MAC | MMTYPE_CNF:
+		rc = ihp_DecodeStartMAC (buffer, length, result, &amp;block);
+		result-&gt;opCode = scb.opcode;
+		result-&gt;opCompltCode = IHPAPI_OPCMPLTCODE_COMPLETE;
+		memset (&amp;scb, 0, sizeof (scb));
+		break;
+	default:
+		result-&gt;opStatus.status = errno = ENOSYS;
+		result-&gt;opStatus.type = XX_MMTYPE_BAD;
+	}
+	return (rc);
+}
+
+#endif
+ 
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='ResetToFactoryDefaults.c.html' title=' ResetToFactoryDefaults.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SDRAMInfo.c.html' title=' SDRAMInfo.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

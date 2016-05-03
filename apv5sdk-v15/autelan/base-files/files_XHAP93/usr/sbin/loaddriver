@@ -1,0 +1,18 @@
+#!/bin/sh
+
+echo load wifi driver!!!
+insmod ath_hal.ko;
+insmod wlan.ko;
+insmod ath_dfs.ko;
+insmod ath_rate_atheros.ko;
+insmod ath_dev.ko countrycode=156 new_dispatch_mac=1
+insmod ath_pci.ko
+insmod ath_pktlog.ko;
+insmod wlan_acl.ko;
+insmod wlan_ccmp.ko;
+insmod wlan_scan_ap.ko;
+insmod wlan_scan_sta.ko;
+insmod wlan_tkip.ko;
+insmod wlan_wep.ko;
+insmod wlan_xauth.ko;
+echo load Success!!!

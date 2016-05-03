@@ -1,0 +1,72 @@
+#file name and path declare
+ 
+PKG := hostapd
+VERSION := 0.6.6
+SRC_DIR := ${PKG}-${VERSION}/hostapd
+
+#command replace 
+CPDIR := cp -r 
+CP := cp -f 
+MKDIR := mkdir -p
+MV := mv 
+STRIP = $(TARGET_CROSS)strip
+
+#make option
+TARGET_CROSS ?= mips-linux-uclibc-
+TARGET_CC ?= $(TARGET_CROSS)gcc
+TARGET_CPPFLAGS ?= $(CAVIUM_CPPFLAGS)
+TARGET_LDFLAGS ?= $(CAVIUM_LDFLAGS)
+GNU_TARGET_NAME ?= mips-linux
+DISABLE_NLS ?= --disable-nls
+TARGET_CONFIGURE_OPTS ?= \
+  AR=$(TARGET_CROSS)ar \
+  AS="$(TARGET_CC) -c $(TARGET_CFLAGS)" \
+  LD=$(TARGET_CROSS)ld \
+  NM=$(TARGET_CROSS)nm \
+  CC="$(TARGET_CC)" \
+  GCC="$(TARGET_CC)" \
+  CXX=$(TARGET_CROSS)g++ \
+  RANLIB=$(TARGET_CROSS)ranlib \
+  STRIP=$(TARGET_CROSS)strip \
+  OBJCOPY=$(TARGET_CROSS)objcopy \
+  OBJDUMP=$(TARGET_CROSS)objdump \
+  SIZE=$(TARGET_CORSS)size 
+
+# lijiyong modified for woc
+ifeq ($(AQ_TYPE),AQ2000CN)
+MADWIFI_DIR := $(ROOTFSDIR)/../woc_11n
+else
+MADWIFI_DIR := $(ROOTFSDIR)/../ar11n
+endif
+
+MADWIFI_H := $(MADWIFI_DIR)/wlan -I $(MADWIFI_DIR)/wlan/linux
+OPENSSL_DIR := $(ROOTFSDIR)/../openssl/src
+
+export CFLAGS=-MMD -O2 -Wall -g -D_BYTE_ORDER=_BIG_ENDIAN -DATH_WPS_IE
+
+.PHONY: all
+all: clean  compile install
+
+.PHONY: compile
+compile:
+	$(MAKE) -C $(SRC_DIR) \
+		$(TARGET_CONFIGURE_OPTS) \
+		MADWIFI_H="$(MADWIFI_H)" \
+		SSL_H=$(OPENSSL_DIR)/include \
+		LIBS="-L$(OPENSSL_DIR) -lssl -lcrypto" \
+
+.PHONY: install
+install:
+	$(STRIP) $(SRC_DIR)/hostapd
+	$(CP) $(SRC_DIR)/hostapd $(ROOTFSDIR)/usr/sbin/hostapd	 
+
+.PHONY: clean
+clean: 
+	$(MAKE) -C $(SRC_DIR) clean
+	rm -rf $(ROOTFSDIR)/usr/sbin/hostapd 
+	
+.PHONY: uninstall
+uninstall:
+	rm -rf $(ROOTFSDIR)/usr/sbin/hostapd 
+
+	

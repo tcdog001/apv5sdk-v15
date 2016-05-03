@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			status.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='showtoken.c.html' title=' showtoken.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='strdecr.c.html' title=' strdecr.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void status (int status, errno_t number, const char *format, ...);
+ *
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef OOPS_SOURCE
+#define OOPS_SOURCE
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdarg.h&gt;
+#include &lt;string.h&gt;
+
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/format.h&quot;
+#include &quot;../cgi/page.h&quot;
+
+#ifdef __GNUC__
+
+__attribute__ ((format (printf, 3, 4))) 
+
+#endif
+
+signed report (signed margin, errno_t number, const char *format, ...) 
+
+{
+	output (margin++, &quot;&lt;div class='%s'&gt;&quot;, STYLE_STATUS);
+	output (margin++, &quot;&lt;h2 class='%s'&gt;&quot;, STYLE_STATUS);
+	if (number) 
+	{
+		printf (&quot;%s: &quot;, strerror (number));
+	}
+	if ((format) &amp;&amp; (*format)) 
+	{
+		va_list arglist;
+		va_start (arglist, format);
+		vfprintf (stdout, format, arglist);
+		va_end (arglist);
+	}
+	output (margin--, &quot;&lt;/h2&gt;&quot;);
+	output (margin--, &quot;&lt;/div&quot;);
+	return (margin);
+}
+
+void status (int status, errno_t number, const char *format, ...) 
+
+{
+	signed margin = 0;
+	margin = DivisionHeader (margin, STYLE_HEADER);
+	margin = DivisionOption (margin, STYLE_OPTION);
+	output (margin++, &quot;&lt;div class='%s'&gt;&quot;, STYLE_STATUS);
+	output (margin++, &quot;&lt;h2 class='%s'&gt;&quot;, STYLE_STATUS);
+	if (number) 
+	{
+		printf (&quot;%s: &quot;, strerror (number));
+	}
+	if ((format) &amp;&amp; (*format)) 
+	{
+		va_list arglist;
+		va_start (arglist, format);
+		vfprintf (stdout, format, arglist);
+		va_end (arglist);
+	}
+	output (margin, &quot;&lt;input type='submit' class='%s' name='%s' value='%s' title=' Return to Operation '&gt;&quot;, STYLE_STATUS, SUBMIT_ACTION, ACTION_RETURN);
+	output (margin--, &quot;&lt;/h2&gt;&quot;);
+	output (margin--, &quot;&lt;/div&quot;);
+	margin = DivisionDevice (margin, STYLE_DEVICE);
+	margin = DivisionFooter (margin, STYLE_FOOTER);
+	exit (1);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='showtoken.c.html' title=' showtoken.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='strdecr.c.html' title=' strdecr.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

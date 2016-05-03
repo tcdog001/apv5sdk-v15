@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			pibsize.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='pibrump.c.html' title=' pibrump.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='psgraph.c.html' title=' psgraph.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void pibsize ();
+ *
+ *   pib.h
+ *
+ *   display PIB section offsets and lengths in bytes; 
+ *
+ *   this function is not needed for proper toolkit operation; it is
+ *   used for testing and maintenance and may be deleted;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef PIBSIZE_SOURCE
+#define PIBSIZE_SOURCE
+
+#include &lt;stdio.h&gt;
+
+#include &quot;../pib/pib.h&quot;
+
+#ifndef offset
+#define offset(struct, member) (signed)(&amp;struct.member)-(signed)(&amp;struct)
+#endif
+
+int main (int argc, const char * argv []) 
+
+{
+	struct PIB3_3 PIB;
+	printf (&quot;offset length\n&quot;);
+	printf (&quot;0x%04X %6d PIB.VersionHeader\n&quot;, offset (PIB, VersionHeader), sizeof (PIB.VersionHeader));
+	printf (&quot;0x%04X %6d PIB.LocalDeviceConfig\n&quot;, offset (PIB, LocalDeviceConfig), sizeof (PIB.LocalDeviceConfig));
+	printf (&quot;0x%04X %6d PIB.StaticNetworkConfig\n&quot;, offset (PIB, StaticNetworkConfig), sizeof (PIB.StaticNetworkConfig));
+	printf (&quot;0x%04X %6d PIB.InterfaceConfig\n&quot;, offset (PIB, InterfaceConfig), sizeof (PIB.InterfaceConfig));
+	printf (&quot;0x%04X %6d PIB.IGMPConfig\n&quot;, offset (PIB, IGMPConfig), sizeof (PIB.IGMPConfig));
+	printf (&quot;0x%04X %6d PIB.QoSParameters\n&quot;, offset (PIB, QoSParameters), sizeof (PIB.QoSParameters));
+	printf (&quot;0x%04X %6d PIB.ToneNotchParameters\n&quot;, offset (PIB, ToneNotchParameters), sizeof (PIB.ToneNotchParameters));
+	printf (&quot;0x%04X %6d PIB.FeatureConfiguration\n&quot;, offset (PIB, FeatureConfiguration), sizeof (PIB.FeatureConfiguration));
+	printf (&quot;0x%04X %6d PIB.V3_0Configuration\n&quot;, offset (PIB, V3_0Configuration), sizeof (PIB.V3_0Configuration));
+	printf (&quot;0x%04X %6d PIB.V3_1Configuration\n&quot;, offset (PIB, V3_1Configuration), sizeof (PIB.V3_1Configuration));
+	printf (&quot;0x%04X %6d PIB.V3_3Configuration\n&quot;, offset (PIB, V3_3Configuration), sizeof (PIB.V3_3Configuration));
+
+// printf (&quot;0x%04X %6d PIB.FeatureGroupEnablement\n&quot;, offset (PIB, FeatureGroupEnablement), sizeof (PIB.FeatureGroupEnablement));
+
+	printf (&quot;0x%04X %6d PIB\n&quot;, sizeof (PIB), sizeof (PIB));
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='pibrump.c.html' title=' pibrump.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='psgraph.c.html' title=' psgraph.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

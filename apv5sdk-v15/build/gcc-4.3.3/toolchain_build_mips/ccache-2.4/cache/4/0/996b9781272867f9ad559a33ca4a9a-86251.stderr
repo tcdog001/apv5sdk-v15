@@ -1,0 +1,48 @@
+dlmalloc.c: In function 'do_check_chunk':
+dlmalloc.c:1633: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c: In function 'do_check_inuse_chunk':
+dlmalloc.c:1698: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c: In function 'malloc_extend_top':
+dlmalloc.c:1970: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:1998: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2028: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2030: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2041: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c: In function 'malloc':
+dlmalloc.c:2244: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2244: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2252: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2257: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2262: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2317: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2326: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2328: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2343: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2355: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2359: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2361: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2362: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c: In function 'free':
+dlmalloc.c:2430: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2443: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2482: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2482: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c: In function 'realloc':
+dlmalloc.c:2593: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2598: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2603: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2604: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2636: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2645: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2646: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c: In function 'calloc':
+dlmalloc.c:2895: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2896: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c: In function 'malloc_trim':
+dlmalloc.c:2986: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:2996: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:3007: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:3011: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:3013: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:3020: warning: dereferencing type-punned pointer will break strict-aliasing rules
+dlmalloc.c:3022: warning: dereferencing type-punned pointer will break strict-aliasing rules

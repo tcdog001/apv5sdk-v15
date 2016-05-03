@@ -1,0 +1,64 @@
+.NOTPARALLEL:
+ifeq ($(AQ_TYPE),WNAP210)
+PKG_BUILD_DIR = files_ap83_netgear
+else ifeq ($(AQ_TYPE),WNAP350)
+PKG_BUILD_DIR = files_ap83_netgear
+else ifeq ($(AQ_TYPE),WNAP550)
+PKG_BUILD_DIR = files_ap83_netgear
+else ifeq ($(SUB_TYPE),LTEFI)
+PKG_BUILD_DIR = files_lte
+else ifeq ($(SUB_TYPE),LTEFI_V2)
+PKG_BUILD_DIR = files_lte
+PKG_BUILD_DIR1 = files_ltev2
+else ifeq ($(SUB_TYPE),AE1000_N2)
+PKG_BUILD_DIR = files_lte
+else
+PKG_BUILD_DIR = files
+endif
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+unexport LDFLAGS
+
+.PHONY: all
+all: install 
+
+
+.PHONY: install
+install:
+	cp -rf ${PKG_BUILD_DIR}/* ${ROOTFSDIR}/ 
+ifeq ($(SUB_TYPE),LTEFI)
+	cp -rf ${PKG_BUILD_DIR}/www_lte/* ${ROOTFSDIR}/www
+	rm -rf ${ROOTFSDIR}/www_lte
+	cp -rf ${PKG_BUILD_DIR}/etc/defaults/config.xml.lte ${ROOTFSDIR}/etc/defaults/config.xml
+else ifeq ($(SUB_TYPE),LTEFI_V2)
+	cp -rf ${PKG_BUILD_DIR1}/* ${ROOTFSDIR}/
+	cp -rf ${PKG_BUILD_DIR}/www_lte/* ${ROOTFSDIR}/www
+	cp -rf ${PKG_BUILD_DIR1}/www_lte/* ${ROOTFSDIR}/www
+	rm -rf ${ROOTFSDIR}/www_lte
+	cp -rf ${PKG_BUILD_DIR1}/etc/defaults/config.xml.lte ${ROOTFSDIR}/etc/defaults/config.xml
+else ifeq ($(SUB_TYPE),AE1000_N2)
+	cp -rf ${PKG_BUILD_DIR}/www_lte/* ${ROOTFSDIR}/www
+	rm -rf ${ROOTFSDIR}/www_lte
+	cp -rf ${PKG_BUILD_DIR}/etc/defaults/config.xml.lte ${ROOTFSDIR}/etc/defaults/config.xml
+else
+	cp -rf ${PKG_BUILD_DIR}/www_cavium/* ${ROOTFSDIR}/www
+	cp -rf ${PKG_BUILD_DIR}/www_cavium_apv5/* ${ROOTFSDIR}/www
+	rm -rf ${ROOTFSDIR}/www_cavium
+	rm -rf ${ROOTFSDIR}/www_cavium_ar11n
+endif
+	mv ${ROOTFSDIR}/usr/lib/web/sysinit.sh_cavium ${ROOTFSDIR}/usr/lib/web/sysinit.sh
+	mv ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium_ar11n ${ROOTFSDIR}/usr/lib/web/constant.sh
+	mv ${ROOTFSDIR}/usr/lib/web/function.sh_apv5 ${ROOTFSDIR}/usr/lib/web/function.sh
+ifeq ($(MESH_SWITCH),1)
+	cp -rf file_mesh_apv5/* ${ROOTFSDIR}/
+endif
+	rm -rf ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium
+#	mkdir -p ${ROOTFSDIR}/etc/files.conf/
+#	cp -rf ${ROOTFSDIR}/www/image/logo.jpg ${ROOTFSDIR}/etc/files.conf/
+#	mkdir -p /tmp/logo/
+#	rm -rf /tmp/logo/logo.jpg
+#	mv ${ROOTFSDIR}/www/image/logo.jpg /tmp/logo/
+#	ln -sf /tmp/logo/logo.jpg ${ROOTFSDIR}/www/image/logo.jpg
+

@@ -1,0 +1,22 @@
+#!/bin/sh
+judge=1
+count=0
+
+#echo for the device first up or restart
+echo \#############################>> /jffs/burn_in_log
+
+#loop check
+while [ $judge -eq 1 ]; do
+
+#count add
+let count+=1
+
+#calculate the currently time
+hour=`date +"%H"`
+minutes=`date +"%M"`
+seconds=`date +"%S"`
+
+#write the information into the file
+echo "count:$count       uptime:$hour:$minutes:$seconds" >> /jffs/burn_in_log
+sleep 3600
+done

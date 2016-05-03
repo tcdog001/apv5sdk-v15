@@ -1,0 +1,7 @@
+Version 1.0
+   XML pre-defined entities parsing.
+   XML internal entities parsing.
+   More styles in input-output
+   Configure/defines for open()/read() functions on non posix sytems.
+
+   

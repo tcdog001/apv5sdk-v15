@@ -1,0 +1,17 @@
+In file included from shell/mxml_output.c:13:
+shell/mxml.h:27: warning: function declaration isn't a prototype
+shell/mxml.h:32: warning: function declaration isn't a prototype
+shell/mxml.h:37: warning: function declaration isn't a prototype
+shell/mxml.h:64: warning: function declaration isn't a prototype
+shell/mxml.h:137: warning: function declaration isn't a prototype
+shell/mxml_output.c: In function 'mxml_output_new':
+shell/mxml_output.c:22: warning: implicit declaration of function 'malloc'
+shell/mxml_output.c:22: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_output.c:30: warning: implicit declaration of function 'free'
+shell/mxml_output.c:30: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_output.c: In function 'mxml_output_destroy':
+shell/mxml_output.c:59: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_output.c: In function 'mxml_output_string':
+shell/mxml_output.c:81: warning: implicit declaration of function 'strlen'
+shell/mxml_output.c: In function 'mxml_output_func_to_handle':
+shell/mxml_output.c:130: warning: implicit declaration of function 'write'

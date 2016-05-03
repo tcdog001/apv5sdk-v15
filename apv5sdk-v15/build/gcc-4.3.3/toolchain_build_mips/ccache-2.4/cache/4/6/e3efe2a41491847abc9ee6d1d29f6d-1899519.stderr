@@ -1,0 +1,4 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_beacon.c: In function 'ath_beacon_setup':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_beacon.c:413: warning: format '%s' expects type 'char *', but argument 2 has type 'int'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_beacon.c:413: warning: too few arguments for format
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../lmac/ath_dev/ath_beacon.c:320: warning: unused variable 'ic'

@@ -1,0 +1,28 @@
+#!/bin/sh
+MOD_LIST=`lsmod`
+
+CHECK_LIST="ath_hal wlan ath_rate_atheros ath_dev ath_pktlog wlan_acl wlan_ccmp wlan_scan_ap wlan_scan_sta wlan_tkip wlan_wep wlan_xauth"
+
+RESET_FLAG=0
+
+for check_mod in ${CHECK_LIST}
+do
+	echo ${MOD_LIST} | grep ${check_mod} -q
+	res_mod=$?	
+	if [ ! ${res_mod} -eq 0 ];then
+		echo "mod ${check_mod} not exist"
+		RESET_FLAG=1
+	fi
+done
+
+echo ${MOD_LIST} | grep -E "ath_pci|ath_ahb" -q
+if [ ! $? -eq 0 ];then
+	echo "mod ath_pci/ath_ahb not exist"
+	RESET_FLAG=1
+fi
+
+if [ ${RESET_FLAG} -eq 1 ];then
+	echo "mod_check error , reboot now"
+	echo p > /proc/kes_debug_flag
+	/sbin/sysreboot
+fi

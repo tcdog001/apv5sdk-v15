@@ -1,0 +1,44 @@
+upgrade.c:16: warning: initialization makes pointer from integer without a cast
+upgrade.c:17: warning: initialization makes pointer from integer without a cast
+upgrade.c:18: warning: initialization makes pointer from integer without a cast
+upgrade.c:19: warning: initialization makes pointer from integer without a cast
+upgrade.c:23: warning: initialization makes pointer from integer without a cast
+upgrade.c:24: warning: initialization makes pointer from integer without a cast
+upgrade.c:25: warning: initialization makes pointer from integer without a cast
+upgrade.c:26: warning: initialization makes pointer from integer without a cast
+upgrade.c:30: warning: initialization makes pointer from integer without a cast
+upgrade.c:31: warning: initialization makes pointer from integer without a cast
+upgrade.c:32: warning: initialization makes pointer from integer without a cast
+upgrade.c:33: warning: initialization makes pointer from integer without a cast
+upgrade.c:35: warning: initialization makes pointer from integer without a cast
+upgrade.c:36: warning: initialization makes pointer from integer without a cast
+upgrade.c:38: warning: initialization makes pointer from integer without a cast
+upgrade.c:39: warning: initialization makes pointer from integer without a cast
+upgrade.c: In function 'make_magic_data':
+upgrade.c:65: warning: 'return' with a value, in function returning void
+upgrade.c: In function 'crc_kernel2':
+upgrade.c:157: warning: passing argument 1 of 'flash_sect_erase' makes integer from pointer without a cast
+upgrade.c:157: warning: passing argument 2 of 'flash_sect_erase' makes integer from pointer without a cast
+upgrade.c:160: warning: passing argument 2 of 'flash_write' makes integer from pointer without a cast
+upgrade.c: In function 'crc_kernel1':
+upgrade.c:210: warning: passing argument 1 of 'flash_sect_erase' makes integer from pointer without a cast
+upgrade.c:210: warning: passing argument 2 of 'flash_sect_erase' makes integer from pointer without a cast
+upgrade.c:213: warning: passing argument 2 of 'flash_write' makes integer from pointer without a cast
+upgrade.c: In function 'crc_flash':
+upgrade.c:272: warning: passing argument 1 of 'flash_sect_erase' makes integer from pointer without a cast
+upgrade.c:272: warning: passing argument 2 of 'flash_sect_erase' makes integer from pointer without a cast
+upgrade.c:273: warning: 'return' with a value, in function returning void
+upgrade.c:275: warning: passing argument 2 of 'flash_write' makes integer from pointer without a cast
+upgrade.c:278: warning: 'return' with a value, in function returning void
+upgrade.c:294: warning: passing argument 1 of 'flash_sect_erase' makes integer from pointer without a cast
+upgrade.c:294: warning: passing argument 2 of 'flash_sect_erase' makes integer from pointer without a cast
+upgrade.c:295: warning: 'return' with a value, in function returning void
+upgrade.c:297: warning: passing argument 2 of 'flash_write' makes integer from pointer without a cast
+upgrade.c:300: warning: 'return' with a value, in function returning void
+upgrade.c:307: warning: 'return' with a value, in function returning void
+upgrade.c:232: warning: unused variable 'crc_rootfs'
+upgrade.c:232: warning: unused variable 'crc_kernel'
+upgrade.c:231: warning: unused variable 'lenth2'
+upgrade.c:231: warning: unused variable 'lenth'
+upgrade.c:231: warning: unused variable 'crc_value2'
+upgrade.c:231: warning: unused variable 'crc_value'

@@ -1,0 +1,25 @@
+#!/bin/sh
+CONFIG_XML=/etc/config/config.xml
+CRYPT=/sbin/crypt
+#
+#usage
+#
+usage()
+{
+    echo "set_usr_passwd  [usrname] [passwd]"
+    exit 1
+}
+
+if [ ! $# -eq 2 ];then
+     usage
+fi
+usrname=$1
+passwd=$2	 
+local pass_encoded=`$CRYPT "$passwd"` 
+/usr/sbin/write_to_xml $usrname $passwd &
+local awk_program="BEGIN{FS=\":\"; OFS=\":\";}{if(\$0~/:admin:/){\$1=\"$usrname\"; \$2=\"$pass_encoded\";} print \$0;}"
+cat /tmp/passwd | awk "$awk_program" > /tmp/passwd_tmp
+mv /tmp/passwd_tmp /tmp/passwd
+if [ -e /jffs/passwd ];then
+ cp -p /tmp/passwd  /jffs/
+fi

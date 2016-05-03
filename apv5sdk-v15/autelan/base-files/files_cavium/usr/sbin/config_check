@@ -1,0 +1,18 @@
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+
+if [ ! -z ${1}  ];then
+	CONFIG_XML="${1}"
+fi
+
+local xml_system=`config_read /config/system`
+local xml_system_version=`config_getoption "$xml_system" version`
+
+if [ -z ${xml_system_version} ];then
+	echo "fault"
+	exit 1
+fi
+
+echo "ok"
+
+

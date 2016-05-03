@@ -1,0 +1,2 @@
+detector.c: In function 'detector_vlog':
+detector.c:3741: warning: 'return' with a value, in function returning void

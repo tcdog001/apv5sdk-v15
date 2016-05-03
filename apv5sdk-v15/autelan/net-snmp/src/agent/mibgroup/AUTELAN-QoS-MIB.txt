@@ -1,0 +1,301 @@
+--********************************************************************************
+--* Autelan-Ac-QoS-Capable-Parameter
+--********************************************************************************
+AUTELAN-QoS-MIB DEFINITIONS ::= BEGIN
+IMPORTS	
+	autelan-wireless
+			FROM AUTELAN-GROUP-SMI
+--   	PhysAddress, 
+--	TEXTUAL-CONVENTION, 
+--	TruthValue,
+--   	NOTIFICATION-GROUP, 
+--	OBJECT-GROUP, 
+--	MODULE-COMPLIANCE
+--       			FROM SNMPv2-CONF
+	DisplayString
+				FROM SNMPv2-TC
+   	MODULE-IDENTITY, 
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+   	Integer32, 
+--	Unsigned32, 
+--	Counter32,
+--	TimeTicks,
+	enterprises
+       			FROM SNMPv2-SMI;
+       			
+autelanQosGroup MODULE-IDENTITY
+    LAST-UPDATED "200903120000Z"        -- Feb 12th, 2009
+    ORGANIZATION " AuteLan Network Management Working Group
+                  http://www.autelan.com"
+    CONTACT-INFO
+        "General Discussion: support@autelan.com
+         To Subscribe: http://www.autelan.com
+         Liu Tao
+         Autelan Technology Ltd.,NO.1 Agricultural University Sourth Street,Haidian
+         District,Beijing,China(100084)
+         Email:  liutao@autelan.com."
+    DESCRIPTION
+        "Copyright (C) 2009 The Internet Society.  This version of
+         the MIB module is part of RFC xxx; see the RFC itself
+         for full legal notices.
+         This MIB module contains managed object definitions for
+         the AuteLan Protocol."
+    REVISION    "200903120000Z"
+    DESCRIPTION
+        "Initial version published as RFC xxx."
+         ::= {autelan-wireless  3 }
+         
+dot11QosBasicConfig             OBJECT IDENTIFIER 	::= { autelanQosGroup  1 }
+
+--********************************************************************************
+--*   Qos 
+--********************************************************************************
+		dot11QosTotalBW OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        ACCESS  read-write
+		        STATUS  current
+		        DESCRIPTION
+		        "QoS to protect the distribution of the total bandwidth of the 
+		        business."
+		        ::= {dot11QosBasicConfig   1}
+		        
+		dot11QosResScale OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        ACCESS  read-write
+		        STATUS  current
+		        DESCRIPTION
+		        "QoS resources to protect business occupancy percentage."
+		        ::= {dot11QosBasicConfig   2}
+		        
+		dot11QosShareBW OBJECT-TYPE
+			 SYNTAX  INTEGER 
+		        ACCESS  read-write
+		        STATUS  current
+		        DESCRIPTION
+		        "QoS category of business shared bandwidth."
+		        ::= {dot11QosBasicConfig   3}
+		        
+		dot11QosResShareScale OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        ACCESS  read-write
+		        STATUS  current
+		        DESCRIPTION
+		        "QoS category of business shared bandwidth percentage of total 
+		        resources."
+		        ::= {dot11QosBasicConfig   4}
+		        
+		dot11OperAtpArithmetic OBJECT-TYPE
+		        SYNTAX OCTET STRING
+		        ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		        "Between different types of operations scheduling algorithe name."
+		        ::= {dot11QosBasicConfig   5}
+		        
+		dot11UseResGrabPolicy OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        ACCESS  read-write
+		        STATUS  current
+		        DESCRIPTION
+		        "Whether or not to use the resources to seize Strategy."
+		        ::= {dot11QosBasicConfig   6}
+		        
+		dot11ResPolicyName OBJECT-TYPE
+		        SYNTAX OCTET STRING
+		        ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		        " the name of resources strategy to seize"
+		        ::= {dot11QosBasicConfig   7}
+		        
+		dot11UseResShovePolicy OBJECT-TYPE
+		        SYNTAX OCTET STRING
+		        ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		        "Whether the use of resources diverted Strategy."
+		        ::= {dot11QosBasicConfig   8}
+		        
+		dot11ResShoveName OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        ACCESS  read-write
+		        STATUS  current
+		        DESCRIPTION
+		        "Strategy names of resources diverted."
+		        ::= {dot11QosBasicConfig   9}
+
+
+--********************************************************************************
+--*   Qos  Table
+--********************************************************************************
+
+              dot11AcQosTable OBJECT-TYPE
+				SYNTAX SEQUENCE OF Dot11AcQosEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION 
+        	       		"AC device configuration management functions QoS performance
+        	       		configuration parameters."
+				::= {autelanQosGroup     2}
+		
+		 dot11AcQosEntry OBJECT-TYPE
+				SYNTAX  Dot11AcQosEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+				"AutelanAcQoSEntry form of an entry."
+				INDEX { dot11QosTrafficClass }
+			::= { dot11AcQosTable  1 }
+
+		Dot11AcQosEntry ::=
+			SEQUENCE {
+		    		dot11QosTrafficClass  				INTEGER,
+		    		dot11AvgRate						INTEGER,
+				dot11MaxDegree					INTEGER,
+				dot11PolicyPRI						INTEGER,
+		    		dot11ResShovePRI					INTEGER,
+		    		dot11ResGrabPRI					INTEGER,
+				dot11MaxPallel 					INTEGER,
+				dot11Bandwidth					INTEGER,
+				dot11BandwidthScale				INTEGER,
+				dot11UseFlowEqtQueue				INTEGER,
+				dot11SingleFlowMaxQueue			INTEGER,
+				dot11FlowAvgRate					INTEGER,
+				dot11FlowMaxDegree				INTEGER,
+				dot11UseWREDPolicy				INTEGER,
+				dot11UseTrafficShaping				INTEGER,
+				dot11lRowStatus					RowStatus}
+			
+
+            dot11QosTrafficClass OBJECT-TYPE
+			SYNTAX INTEGER { background(1), bestEffort(2), video(3), voice(4)}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" provide the type of business  QoS mechanisms"
+	    	  ::= { dot11AcQosEntry 1 }
+
+	    dot11AvgRate  OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-write
+		        STATUS current
+		        DESCRIPTION  
+		        	"The average rate of business."
+	    	   ::= { dot11AcQosEntry 2 }
+
+	    dot11MaxDegree  OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-write
+		        STATUS current
+		        DESCRIPTION  
+		       	 	"The greatest degree of operational contingencies."
+	   	   ::= { dot11AcQosEntry 3 }
+	        
+	   dot11PolicyPRI    OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-write
+		        STATUS current
+		        DESCRIPTION  
+		        	"Operations scheduling priority."
+		    ::= { dot11AcQosEntry 4}
+	    
+	dot11ResShovePRI  OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-write
+		        STATUS current
+		        DESCRIPTION  
+		        	"Diverted resources to business priorities."
+		    ::= { dot11AcQosEntry  5}
+	    
+	dot11ResGrabPRI    OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-write
+		        STATUS current
+		        DESCRIPTION  
+		       	 	"Resources to seize business priority."
+		    ::= { dot11AcQosEntry  6}
+	    
+	dot11MaxPallel OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-create
+		        STATUS current
+		        DESCRIPTION  
+		        	"The largest number of concurrent operations"
+		    ::= { dot11AcQosEntry   7 }
+	    
+      dot11Bandwidth OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-create
+		        STATUS current
+		        DESCRIPTION
+		        	"Operational bandwidth allocation"
+		    ::= { dot11AcQosEntry   8}
+    
+	dot11BandwidthScale OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-create
+		        STATUS current
+		        DESCRIPTION
+		        	"Bandwidth occupied by the business allocation percentage of the total bandwidth"
+		    ::= { dot11AcQosEntry   9}
+    
+	dot11UseFlowEqtQueue OBJECT-TYPE
+	        SYNTAX INTEGER
+	        ACCESS read-create
+	        STATUS current
+	        DESCRIPTION
+	        	"Whether or not to use flow-based fair queuing."
+	    ::= { dot11AcQosEntry   10}
+    
+	dot11SingleFlowMaxQueue OBJECT-TYPE
+	        SYNTAX INTEGER
+	        ACCESS read-create
+	        STATUS current
+	        DESCRIPTION
+	        	"The largest single flow queue length."
+	    ::= { dot11AcQosEntry   11}
+    
+	dot11FlowAvgRate OBJECT-TYPE
+	        SYNTAX INTEGER
+	        ACCESS read-create
+	        STATUS current
+	        DESCRIPTION
+	        	"The average flow rate."
+	    ::= { dot11AcQosEntry  12 }
+    
+	dot11FlowMaxDegree OBJECT-TYPE
+	        SYNTAX INTEGER
+	        ACCESS read-create
+	        STATUS current
+	        DESCRIPTION
+	        	 "the largest sudden degree of  flow "
+	    ::= { dot11AcQosEntry   13}
+    
+	dot11UseWREDPolicy OBJECT-TYPE
+	        SYNTAX INTEGER
+	        ACCESS read-create
+	        STATUS current
+	        DESCRIPTION
+	       	 	"Whether or not to use WRED algorithm."
+	    ::= { dot11AcQosEntry   14 }
+    
+	dot11UseTrafficShaping OBJECT-TYPE
+	        SYNTAX INTEGER
+	        ACCESS read-create
+	        STATUS current
+	        DESCRIPTION
+	        	"Whether or not to use traffic shaping(Traffic Shaping)."
+	    ::= { dot11AcQosEntry    15 }
+
+       dot11lRowStatus OBJECT-TYPE    
+	        SYNTAX      RowStatus   
+	        MAX-ACCESS  read-create   
+	        STATUS      current   
+	        DESCRIPTION       
+	        "This variable is used to create, modify, and/or delete a row   in this table."    
+	      ::= { dot11AcQosEntry  16 }
+
+    
+END
+

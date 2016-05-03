@@ -1,0 +1,53 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>API Message Handling</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><meta name="keywords" content="
+				int6k 
+				, 
+				powerline 
+				"><link rel="start" href="index.html" title="Intellon INT6000 Linux Toolkit"><link rel="up" href="ch03.html" title="Chapter 3.  Software"><link rel="prev" href="ch03s15.html" title="Frame Encoding"><link rel="next" href="ch04.html" title="Chapter 4.  Firmware"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">
+			API Message Handling 
+</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch03s15.html">Prev</a> </td><th width="60%" align="center">Chapter 3. 
+		Software 
+		</th><td width="20%" align="right"> <a accesskey="n" href="ch04.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="message-handling"></a>
+			API Message Handling 
+</h2></div></div></div><p>The following code structure illustrates how the Intellon Embedded API can be used to process incoming vendor-specific messages using Embedded API functions. Notice that only two Embedded API functions, <code class="constant">ihpapi_RxFrame</code> and <code class="constant">ihpapi_TxFrame</code>, are called. Between them, they manage the sequence of operations needed to support Host Action Required messages received from Intellon chipsets using a local host.</p><div class="example"><a name="id2556697"></a><p class="title"><b>Example 3.11. 
+				Message Handling Loop
+				</b></p><div class="example-contents"><pre class="programlisting">
+#include &lt;stdint.h&gt;
+#include &lt;errno.h&gt;    
+#include &lt;transport.h&gt;
+
+#include "ihpapi.h"   
+
+int8_t packet [ETHER_MAX_LEN]
+size_t length;
+ihpapi_result_t result;
+ihpapi_status_t status;
+     
+read(&amp;amp;length, packet);                                   
+if (isHomePlugEthertype(&amp;frame))
+{                  
+ 	if (ihpapi_RxFrame(sizeof (packet), packet, &amp;result))  
+	{
+       		processErrorStatus(&amp;amp;result.opStatus)
+	}
+    	else
+	{
+       		if(IHPAPI_OPCODE_NOOP == result.opcode) 
+		{
+           			processTheResponse(&amp;result);
+       		}	 
+		length = ihpapi_TxFrame(sa, da,  sizeof (packet), packet, &amp;status)
+		if (length)
+		{
+			send (length, packet);
+		}
+  	}
+}  
+</pre></div></div><br class="example-break"><p>
+			The application must provide raw packet <code class="function">read</code> and <code class="function">send</code> functions for the targetenvironment because the Embedded API does not presume to know anything about the environment. The Linux Toolkit <a class="ulink" href="readpacket.c.html" target="_top">readpacket</a> and <a class="ulink" href="sendpacket.c.html" target="_top">sendpacket</a> are examples of such functions.
+			</p><p>
+			The application must also provide <code class="function">processErrorStatus</code> and <code class="function">processTheResponse</code> functions or logical equivalents. These can take several forms depending on the application. Examples can be seen in various components of program <a class="ulink" href="int6k2.c.html" target="_top">int6k2</a> where function <a class="ulink" href="RdModWrPib2.c.html" target="_top">RdModWrPib2</a> may be the best example. Others include <a class="ulink" href="FactoryDefaults2.c.html" target="_top">FactoryDefaults2</a>, <a class="ulink" href="HostActionWait2.c.html" target="_top">HostActionWait2</a>, <a class="ulink" href="Identity2.c.html" target="_top">Identity2</a>,  <a class="ulink" href="MfgString2.c.html" target="_top">MfgString2</a>, <a class="ulink" href="NetworkInfo2.c.html" target="_top">NetworkInfo2</a>, <a class="ulink" href="ReadMAC2.c.html" target="_top">ReadMAC2</a>, <a class="ulink" href="ReadPIB2.c.html" target="_top">ReadPIB2</a>, <a class="ulink" href="ResetDevice2.c.html" target="_top">ResetDevice2</a>, <a class="ulink" href="SetKey2.c.html" target="_top">SetKey2</a>, <a class="ulink" href="SetSDRAM2.c.html" target="_top">SetSDRAM2</a>, <a class="ulink" href="Upgrade2.c.html" target="_top">Upgrade2</a> and <a class="ulink" href="VersionInfo2.c.html" target="_top">VersionInfo2</a>.
+			</p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03s15.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch03.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch04.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">
+			Frame Encoding 
+			 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 4. 
+		Firmware 
+		</td></tr></table></div></body></html>

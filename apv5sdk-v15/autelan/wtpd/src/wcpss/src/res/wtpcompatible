@@ -1,0 +1,19 @@
+# Config File for AC. Lines beginning with # and blank lines will be ignored
+
+</AP_SW_MODEL>AQ2010
+
+# SW version name of the AP
+</AP_SW_VERSION_NAME>1.0.9
+
+# SW version image path of the AP
+</AP_SW_VERSION_IMAGE_PATH>AW1.1.9.1.Q1.img
+
+</AP_RADIO_NUM>1
+
+</AP_RADIO_TYPE>5
+
+</AP_BSS_NUM>8
+
+</AP_SW_CODE>2010
+
+#end

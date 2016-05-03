@@ -1,0 +1,41 @@
+#!/bin/sh
+touch 13
+echo into update_stage2
+if [ -z $1 ] || [ ! -f $1 ]; then
+	logger -s "$0 <firmware-file> [netboot]"
+	exit 1
+fi
+
+FIRMWARE_FILE=$1
+
+BOOT_TYPE="flashboot"
+
+# 
+# Unmount the old FS partitions
+#
+sync
+sleep 4
+if [ $BOOT_TYPE == "flashboot" ]; then
+	echo "*** Unmounting existing file systems"
+	/bin/umount /oldroot/dev/pts
+	/bin/umount /oldroot/proc
+	/bin/umount /oldroot/etc
+	/bin/umount /oldroot/var
+	/bin/umount -l /oldroot/
+fi
+touch 14
+#echo umount ok!!!
+
+touch 15
+/bin/update_img_tool if=$FIRMWARE_FILE ke=/dev/mtdblock1 fs=/dev/mtdblock2
+if [ $? -ne 0 ];then
+	echo "Update image tool  error!"
+	echo y > /proc/kes_debug_flag
+	sysreboot
+	reboot
+fi
+sync
+sleep 1
+echo y > /proc/kes_debug_flag
+sysreboot
+reboot

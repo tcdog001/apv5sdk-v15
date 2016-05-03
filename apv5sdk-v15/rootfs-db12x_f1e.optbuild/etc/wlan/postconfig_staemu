@@ -1,0 +1,8 @@
+#!/bin/sh
+showsysinfo
+echo "==========================="
+echo "system check:"
+/usr/sbin/mount_check
+/usr/sbin/dev_check
+echo "==========================="
+/jffs/emu_sta &

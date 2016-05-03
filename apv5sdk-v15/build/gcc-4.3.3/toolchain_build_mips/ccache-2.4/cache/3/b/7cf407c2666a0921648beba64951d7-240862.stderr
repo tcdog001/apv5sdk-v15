@@ -1,0 +1,5 @@
+networking/ftpgetput.c: In function 'ftp_send':
+networking/ftpgetput.c:262: warning: assignment discards qualifiers from pointer target type
+networking/ftpgetput.c:272: warning: assignment discards qualifiers from pointer target type
+networking/ftpgetput.c:273: warning: assignment discards qualifiers from pointer target type
+networking/ftpgetput.c:284: warning: use of 'll' length modifier with 's' type character

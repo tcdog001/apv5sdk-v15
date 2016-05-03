@@ -1,0 +1,83 @@
+OCTEON_ROOT := /home/shark/cavium
+ROOTFSDIR := /home/shark/builddir/rootfs
+
+#file name and path declare
+PKG := tr69
+VERSION := 
+PKG_NAME := src
+#$(PKG)
+PKG_BUILD_DIR := $(PKG_NAME)
+
+CAVIUM_CPPFLAGS ?= -I$(OCTEON_ROOT)/tools/mips64-octeon-linux-gnu/sys-root/usr/include
+CAVIUM_LDFLAGS ?= -L$(OCTEON_ROOT)/tools/mips64-octeon-linux-gnu/sys-root/usr/lib64
+PKG_INSTALL_DIR := $(shell pwd)/$(PKG_BUILD_DIR)/ipkg-install/$(PKG)
+
+
+#configure option
+TARGET_CROSS ?= mips64-octeon-linux-gnu-
+TARGET_CC ?= $(TARGET_CROSS)gcc
+TARGET_LD ?= $(TARGET_CROSS)ld
+
+#command rpl
+PDIR := sudo cp -r 
+CP := sudo cp -fpR 
+MKDIR := mkdir -p
+MV := sudo mv 
+STRIP = $(TARGET_CROSS)strip
+
+GSOAP_DIR := $(ROOTFSDIR)/../source/gsoap/src/soapcpp2
+CURL_DIR := $(ROOTFSDIR)/../source/curl/src
+GSSAPI_DIR := $(ROOTFSDIR)/../source/libgssapi/src/ipkg-install
+ZLIB_DIR := $(ROOTFSDIR)/../source/zlib-1.2.3
+SSL_DIR := $(ROOTFSDIR)/../source/openssl/src
+APLIB_DIR := $(ROOTFSDIR)/../source/aplib
+
+#start make (all - compile install)
+.PHONY: all
+all: compile install
+  
+.PHONY: compile
+compile:
+	{ \
+	  $(MAKE) -C $(PKG_BUILD_DIR) \
+		-f Makefile.cavium \
+	    	TARGET_CC="$(TARGET_CC)" \
+		TARGET_LD="$(TARGET_LD)" \
+		SOAP_CPPFLAGS="-I$(GSOAP_DIR) -I$(GSOAP_DIR)/import" \
+		SOAP_LDFLAGS="-L$(GSOAP_DIR) -lgsoapck" \
+		CURL_CFLAGS="-I$(CURL_DIR)/include" \
+		CURL_LDFLAGS="-L$(CURL_DIR)/lib/.libs -lcurl" \
+		EXTRA_CFLAGS="-I$(GSSAPI_DIR)/include -I$(ZLIB_DIR) -I$(SSL_DIR)/include -I$(APLIB_DIR)/src/include" \
+		EXTRA_LDFLAGS="$(CAVIUM_LDFLAGS) -lpthread -L$(SSL_DIR) -lcrypto -lssl -L$(ZLIB_DIR) -lz -L$(APLIB_DIR)/src/src -lapfunc" \
+		SOAPCPP="$(OCTEON_ROOT)/tools/bin/soapcpp2" \
+		STATIC_LIB="-L$(GSSAPI_DIR)/lib -lgssapi -L$(GSOAP_DIR) -lgsoapck" \
+		VPATH="$(GSOAP_DIR)" ;}
+
+.PHONY: install
+install:
+	{ $(STRIP) $(PKG_BUILD_DIR)/cwmp && \
+	  $(CP) $(PKG_BUILD_DIR)/cwmp $(ROOTFSDIR)/usr/bin && \
+	  $(STRIP) $(PKG_BUILD_DIR)/LocalManager && \
+	  $(CP) $(PKG_BUILD_DIR)/LocalManager $(ROOTFSDIR)/usr/bin && \
+	  $(STRIP) $(PKG_BUILD_DIR)/datamodel && \
+	  $(CP) $(PKG_BUILD_DIR)/datamodel $(ROOTFSDIR)/usr/bin && \
+	  $(STRIP) $(PKG_BUILD_DIR)/DownloadManager && \
+	  $(CP) $(PKG_BUILD_DIR)/DownloadManager $(ROOTFSDIR)/usr/bin && \
+	  $(STRIP) $(PKG_BUILD_DIR)/UploadManager && \
+	  $(CP) $(PKG_BUILD_DIR)/UploadManager $(ROOTFSDIR)/usr/bin && \
+	  $(CP) $(PKG_BUILD_DIR)/../files/* $(ROOTFSDIR)/usr/bin ;}
+
+.PHONY: clean
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) clean
+
+
+
+
+
+
+
+
+
+
+

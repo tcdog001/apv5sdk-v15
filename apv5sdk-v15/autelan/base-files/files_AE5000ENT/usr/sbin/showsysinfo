@@ -1,0 +1,151 @@
+#!/bin/sh
+
+#common
+WRCPUUTIL=/usr/bin/pro_ctl_util
+if [ -d /jffs/.OEM ];then
+	PATHVENDOR=/jffs/.OEM
+	if [ ! -f /jffs/.OEM/.company_name ];then
+		COMPANY_NAME="`$WRCPUUTIL -i|awk -F':' '/company name/{print $2}'`"
+		PRODUCT_TYPE="`$WRCPUUTIL -i|awk -F':' '/product type/{print $2}'`"
+		SERIAL_NUMBER="`$WRCPUUTIL -i|awk -F':' '/SN/{print $2}'`"
+		MAC="`$WRCPUUTIL -i|awk -F':' '/MAC/{print $2":"$3":"$4":"$5":"$6":"$7}'`"
+		SOFT_VERSION="`cat /etc/version/version`#`cat /etc/version/buildno`"
+#		SOFT_VERSION=1.3
+		MAIN_VER="`echo $SERIAL_NUMBER | cut -b 10`"
+		MINOR_VER="`echo $SERIAL_NUMBER | cut -b 11-12`"
+		HARD_VERSION="$MAIN_VER.$MINOR_VER"
+#		HARD_VERSION=2.0
+	else
+		COMPANY_NAME="`cat $PATHVENDOR/.company_name`"
+		if [ -f /jffs/.OEM/.product_name ];then
+			PRODUCT_TYPE="`cat $PATHVENDOR/.product_name`"
+		else
+			PRODUCT_TYPE="`$WRCPUUTIL -i|awk -F':' '/product type/{print $2}'`"
+		fi
+		if [ -f /jffs/.OEM/.sn ];then
+			SERIAL_NUMBER="`cat $PATHVENDOR/.sn`"
+		else
+			SERIAL_NUMBER="`$WRCPUUTIL -i|awk -F':' '/SN/{print $2}'`"
+		fi
+		if [ -f /jffs/.OEM/.mac_eth0 ];then
+#			MAC=`cat $PATHVENDOR/.mac_eth0`
+			temp_mac="`cat $PATHVENDOR/.mac_eth0`"
+			MAC="`/sbin/set_mac org $temp_mac`"
+		else
+			MAC="`$WRCPUUTIL -i|awk -F':' '/MAC/{print $2":"$3":"$4":"$5":"$6":"$7}'`"
+		fi
+		if [ -f /jffs/.OEM/.software_version ];then
+			if [ -f /jffs/.OEM/.build_no ];then
+				SOFT_VERSION="`cat $PATHVENDOR/.software_version`#`cat $PATHVENDOR/.build_no`"
+			else
+				SOFT_VERSION="`cat $PATHVENDOR/.software_version`"
+			fi
+		else
+			SOFT_VERSION="`cat /etc/version/version`#`cat /etc/version/buildno`"
+#			SOFT_VERSION=1.3
+		fi
+		if [ -f /jffs/.OEM/.hardware_version ];then
+			HARD_VERSION="`cat $PATHVENDOR/.hardware_version`"
+		else
+			MAIN_VER="`echo $SERIAL_NUMBER | cut -b 10`"
+			MINOR_VER="`echo $SERIAL_NUMBER | cut -b 11-12`"
+			HARD_VERSION="$MAIN_VER.$MINOR_VER"
+#			HARD_VERSION=2.0
+		fi
+	fi
+else
+	COMPANY_NAME="`$WRCPUUTIL -i|awk -F':' '/company name/{print $2}'`"
+	PRODUCT_TYPE="`$WRCPUUTIL -i|awk -F':' '/product type/{print $2}'`"
+	SERIAL_NUMBER="`$WRCPUUTIL -i|awk -F':' '/SN/{print $2}'`"
+	MAC="`$WRCPUUTIL -i|awk -F':' '/MAC/{print $2":"$3":"$4":"$5":"$6":"$7}'`"
+#	SERIAL_NUMBER=${MAC}
+	SOFT_VERSION="`cat /etc/version/version`#`cat /etc/version/buildno`"
+#	SOFT_VERSION=1.3
+	MAIN_VER="`echo $SERIAL_NUMBER | cut -b 10`"
+	MINOR_VER="`echo $SERIAL_NUMBER | cut -b 11-12`"
+	HARD_VERSION="$MAIN_VER.$MINOR_VER"
+#	HARD_VERSION=2.0
+fi
+	AP_MODE="`cat /proc/sys/dev/wifi0/thinap`"
+
+#show
+echo "    Company Name:$COMPANY_NAME"
+echo "              SN:$SERIAL_NUMBER"
+if [ $AP_MODE = "1" ];then
+	echo "         Ap Mode:thinap"
+else
+	echo "         Ap Mode:fatap"
+fi
+echo "     Device Type:$PRODUCT_TYPE"
+echo "             MAC:$MAC"
+
+#soft_version by company
+if [ `echo $COMPANY_NAME|grep -o -i -e 'DATANG'` ];then
+	Temp_COMPANY_NAME=DATANG
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'HONGXIN'` ];then
+	Temp_COMPANY_NAME=HONGXIN
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'FIBERHOME'` ];then
+	Temp_COMPANY_NAME=HONGXIN
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'COMBA'` ];then
+	Temp_COMPANY_NAME=COMBA
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'Alcatel'` ];then
+	Temp_COMPANY_NAME=Alcatel
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'sunnada'` ];then
+	Temp_COMPANY_NAME=sunnada
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'Postcom'` ];then
+	Temp_COMPANY_NAME=Postcom
+else
+	Temp_COMPANY_NAME=Autelan
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+case $Temp_COMPANY_NAME in
+	DATANG ) 
+		SOFT_VERSION="V5.0.1.1"
+		HARD_VERSION="V1.2.0"
+		;;
+	HONGXIN ) 
+		SOFT_VERSION="3.6.2"
+		HARD_VERSION="2.5"
+		;;
+	COMBA ) 
+		SOFT_VERSION="4.7.1.1"
+		HARD_VERSION="V2.0"
+		;;
+	Alcatel ) 
+		SOFT_VERSION="V4.2"
+		HARD_VERSION="A1"
+		;;
+	sunnada ) 
+		SOFT_VERSION="V4.0"
+		HARD_VERSION="V4.0"
+		;;
+	Postcom ) 
+		SOFT_VERSION="V1.3.0.0"
+		HARD_VERSION="V2.4"
+		;;
+	Autelan ) 
+		SOFT_VERSION="`cat /etc/version/version`#`cat /etc/version/buildno`"
+#		SOFT_VERSION="1.3"
+#		HARD_VERSION="2.0"
+		;;
+esac	
+
+
+if [ -f /jffs/.OEM/.software_version ];then
+	if [ -f /jffs/.OEM/.build_no ];then
+		SOFT_VERSION="`cat $PATHVENDOR/.software_version`#`cat $PATHVENDOR/.build_no`"
+	else
+		SOFT_VERSION="`cat $PATHVENDOR/.software_version`"
+	fi
+fi
+if [ -f /jffs/.OEM/.hardware_version ];then
+	HARD_VERSION="`cat $PATHVENDOR/.hardware_version`"
+fi
+
+echo "Software Version:$SOFT_VERSION"
+echo "Hardware Version:$HARD_VERSION"

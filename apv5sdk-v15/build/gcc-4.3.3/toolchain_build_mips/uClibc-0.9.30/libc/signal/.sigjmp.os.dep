@@ -1,0 +1,69 @@
+libc/signal/sigjmp.os: libc/signal/sigjmp.c include/libc-symbols.h \
+  include/bits/uClibc_arch_features.h \
+  /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include/stddef.h \
+  include/setjmp.h include/features.h include/bits/uClibc_config.h \
+  include/sys/cdefs.h include/libc-internal.h include/bits/stackinfo.h \
+  include/bits/setjmp.h include/sgidefs.h include/bits/sigset.h \
+  include/signal.h include/bits/types.h include/bits/wordsize.h \
+  include/bits/kernel_types.h include/bits/typesizes.h \
+  include/bits/pthreadtypes.h include/bits/sched.h include/bits/signum.h \
+  include/time.h include/bits/siginfo.h include/bits/sigaction.h \
+  include/bits/sigcontext.h include/bits/sigstack.h include/ucontext.h \
+  include/sys/ucontext.h include/bits/sigthread.h
+
+include/libc-symbols.h:
+
+include/bits/uClibc_arch_features.h:
+
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include/stddef.h:
+
+include/setjmp.h:
+
+include/features.h:
+
+include/bits/uClibc_config.h:
+
+include/sys/cdefs.h:
+
+include/libc-internal.h:
+
+include/bits/stackinfo.h:
+
+include/bits/setjmp.h:
+
+include/sgidefs.h:
+
+include/bits/sigset.h:
+
+include/signal.h:
+
+include/bits/types.h:
+
+include/bits/wordsize.h:
+
+include/bits/kernel_types.h:
+
+include/bits/typesizes.h:
+
+include/bits/pthreadtypes.h:
+
+include/bits/sched.h:
+
+include/bits/signum.h:
+
+include/time.h:
+
+include/bits/siginfo.h:
+
+include/bits/sigaction.h:
+
+include/bits/sigcontext.h:
+
+include/bits/sigstack.h:
+
+include/ucontext.h:
+
+include/sys/ucontext.h:
+
+include/bits/sigthread.h:
+cmd_libc_signal_sigjmp.os := /home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/bin/mips-linux-uclibc-gcc -c libc/signal/sigjmp.c -o libc/signal/sigjmp.os -include include/libc-symbols.h -Wall -Wstrict-prototypes -fno-strict-aliasing -march=mips32r2 -mtune=mips32r2 -mabi=32 -fno-stack-protector -fno-builtin -nostdinc -Iinclude -I. -Ilibc/sysdeps/linux/mips -fno-asm -msoft-float -DUCLIBC_INTERNAL -std=gnu99 -Os -funit-at-a-time -fno-tree-loop-optimize -fno-tree-dominator-opts -fno-strength-reduce -mno-split-addresses -Ilibpthread/linuxthreads.old/sysdeps/unix/sysv/linux/mips -Ilibpthread/linuxthreads.old/sysdeps/mips -Ilibpthread/linuxthreads.old/sysdeps/unix/sysv/linux -Ilibpthread/linuxthreads.old/sysdeps/pthread -Ilibpthread/linuxthreads.old -Ilibpthread -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/linux/include/ -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3//include-fixed -I/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/lib/gcc/mips-linux-uclibc/4.3.3/include -DNDEBUG "-mno-split-addresses" -fPIC -MT libc/signal/sigjmp.os -MD -MP -MF libc/signal/.sigjmp.os.dep

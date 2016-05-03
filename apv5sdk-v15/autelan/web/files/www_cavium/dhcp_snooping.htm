@@ -1,0 +1,168 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+
+xml_dhcpsnoop=`config_read /config/network/dhcp/dhcpsnooping`
+xml_dhcpsnoop_enable=`config_getoption "$xml_dhcpsnoop" enable`
+xml_dhcpsnoop_interface=`config_getoption "$xml_dhcpsnoop" interface`
+xml_dhcpsnoop_info=`config_getoption "$xml_dhcpsnoop" info`
+
+for vap_allnum in `seq $NUM_ap`
+do
+	eval "xml_wlan_config_vap${vap_allnum}=\`config_read /config/network/vap${vap_allnum}\`"
+	eval "xml_wlan_vap${vap_allnum}_enable=\`config_getoption \"\$xml_wlan_config_vap${vap_allnum}\" enable\`"
+done
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js network_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	var allvap_num="<%= $NUM_ap %>";
+	var vapname="<%= $xml_dhcpsnoop_interface %>";
+	var array_vapcreate=["<%= $xml_wlan_vap1_enable %>","<%= $xml_wlan_vap2_enable %>","<%= $xml_wlan_vap3_enable %>","<%= $xml_wlan_vap4_enable %>","<%= $xml_wlan_vap5_enable %>","<%= $xml_wlan_vap6_enable %>","<%= $xml_wlan_vap7_enable %>","<%= $xml_wlan_vap8_enable %>","<%= $xml_wlan_vap9_enable %>","<%= $xml_wlan_vap10_enable %>","<%= $xml_wlan_vap11_enable %>","<%= $xml_wlan_vap12_enable %>",];
+	init_mmenu(flag);
+	init_basemenu(flag);
+	init_lan(flag);
+function Ip() 
+{
+	  overlayer(); 
+}
+
+function vapname_display()
+{
+	for(var i = 1;i <= allvap_num;i++)
+	{
+			if(array_vapcreate[i-1] == "yes")
+			{
+				var tmp_vapname="vap"+i;
+				var tmp_ath="ath"+(i-1);
+				if(vapname == tmp_vapname)
+				{
+				 		document.write("<option value='"+tmp_ath+"' selected='selected' >"+tmp_vapname+"</option>");
+				}
+				else
+				{
+					  document.write("<option value='"+tmp_ath+"' >"+tmp_vapname+"</option>");
+				}
+		  }
+	}
+} 
+</script>
+</head>
+<body  >
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_network5.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return Ip()">
+<div align="center">
+		<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+			<tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(dhcpsnooping_title)</script></b></td>
+			</tr>
+		  
+		  <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+			
+			<tr>
+			<td align="left" height="24" width="280" bordercolor="#ffffff"><script language="javascript">replace(dhcpsnooping_enablestate)</script>&nbsp;</td>
+			<td align="left" width="370" bordercolor="#ffffff">
+			<input type="radio" <% webui_radiobutton_check "$xml_dhcpsnoop_enable" "yes" %> name="dhcpsnoopenable" value="yes"  /><script language="javascript">replace(dhcpsnooping_enable)</script>
+			&nbsp;&nbsp; <input type="radio" <% webui_radiobutton_check "$xml_dhcpsnoop_enable" "no" %> name="dhcpsnoopenable" value="no"  /><script language="javascript">replace(dhcpsnooping_disable)</script>
+			</td> 
+			</tr>
+			
+			<tr >
+			<td align="left" height="20" bordercolor="#ffffff"><script language="javascript">replace(dhcpsnooping_trustif)</script>&nbsp;
+			</td><td align="left" bordercolor="#ffffff">
+				<select name="dsif" >
+					<option value="eth0" <% webui_listbox_select "$xml_dhcpsnoop_interface" "eth0" %>>eth0</option>
+				<% 
+				if [ "$DEV_eth1" == "enable" ];then
+				%>
+					<option value="eth1" <% webui_listbox_select "$xml_dhcpsnoop_interface" "eth1" %>>eth1</option>
+				<%
+				fi
+				%>			
+							<script language="JavaScript" type="text/javascript">vapname_display()</script>
+				</select>
+			</tr>
+			
+			<tr >
+			<td align="left" height="20" bordercolor="#ffffff"><script language="javascript">replace(dhcpsnooping_option82field)</script>&nbsp;
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="dsinfo"  value="<%= "$xml_dhcpsnoop_info" %>" ></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+			
+			<tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(dhcpsnooping_usersleaseinfo)</script></b></td>
+			</tr>
+		  
+		  <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" bordercolor="#ffffff"><label>
+				<textarea name="messages" cols="100" rows="10"><%
+					if [ -f "/tmp/dhcpsnooping.log" ]; then
+						cat /tmp/dhcpsnooping.log
+					fi
+			%></textarea></label>
+			</td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+		</table>
+		<table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+			<tr>
+			  <td align="center" height="40" valign="middle" colspan="2" ><script language="javascript" >replace(b_lansu)</script>&nbsp;</td>
+			</tr>
+			<tr>
+        <td align="right"   colspan="2"><script language="javascript">replace(dhcpsnooping_settings_help)</script></td>
+      </tr>
+		</table>
+</div>
+<input type="hidden" value="DHCP Snooping" name="SERVLET">
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

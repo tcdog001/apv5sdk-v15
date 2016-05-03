@@ -1,0 +1,339 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% response_headers %>
+
+<%
+local xml_vap=`config_read /config/network`
+local vapnum=`config_getoption "$xml_vap" vapnum`
+local xml_wlwan=`config_read /config/network/vap$vapnum`
+local WLWAN=`config_getoption "$xml_wlwan" if`
+IWLIST=/usr/sbin/iwlist
+TMP_FILE=/tmp/vap_scan
+AWK_FILE=/usr/sbin/get_vaprate.awk
+$IWLIST $WLWAN scanning > $TMP_FILE 2>/dev/null
+NUM_VAP=`cat $TMP_FILE 2>/dev/null|grep -e 'Mode:' 2>/dev/null|awk -F':' '{print $2}' 2>/dev/null|wc -l 2>/dev/null`
+for vapnum in `seq $NUM_VAP`
+do
+	eval "mode$vapnum=\`cat $TMP_FILE 2>/dev/null|grep -e 'Mode:' 2>/dev/null|awk -F':' '{print \$2}' 2>/dev/null|sed -n '${vapnum}p' 2>/dev/null\`"
+	eval "ssid$vapnum=\`cat $TMP_FILE 2>/dev/null|grep -e 'ESSID:' 2>/dev/null|awk -F'\"' '{print \$2}' 2>/dev/null|sed -n '${vapnum}p' 2>/dev/null\`"
+	eval "encrypt$vapnum=\`cat $TMP_FILE 2>/dev/null|grep -e 'Encryption key:' 2>/dev/null|awk -F':' '{print \$2}' 2>/dev/null|sed -n '${vapnum}p' 2>/dev/null\`"
+	eval "mac$vapnum=\`cat $TMP_FILE 2>/dev/null|grep -e 'Address:' 2>/dev/null|awk -F': ' '{print \$2}' 2>/dev/null|sed -n '${vapnum}p' 2>/dev/null\`"
+	eval "channel$vapnum=\`cat $TMP_FILE 2>/dev/null|grep -e 'Frequency:' 2>/dev/null|awk -F':' '{print \$2}' 2>/dev/null|sed -n '${vapnum}p' 2>/dev/null\`"
+	eval "signal$vapnum=\`cat $TMP_FILE 2>/dev/null|grep -i -o -e 'Signal level=-[0-9]\{1,3\}' 2>/dev/null|awk -F'=' '{print \$2}' 2>/dev/null|sed -n '${vapnum}p' 2>/dev/null\`"
+	[ $vapnum -lt 10 ]&&eval "rate$vapnum=\`cat $TMP_FILE 2>/dev/null |awk 'BEGIN{RS=\"Cell\"}/0$vapnum -/{print \$0}'|awk -f $AWK_FILE | awk '{b=NF-1; print \$b }' | tail -n1 2>/dev/null\`"
+	[ $vapnum -ge 10 ]&&eval "rate$vapnum=\`cat $TMP_FILE 2>/dev/null |awk 'BEGIN{RS=\"Cell\"}/$vapnum -/{print \$0}'|awk -f $AWK_FILE | awk '{b=NF-1; print \$b }' | tail -n1 2>/dev/null\`"
+done
+
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>VAP Scanning</title>
+<link rel="stylesheet" href="Css/style.css" type="text/css"/>
+<script type="text/javascript">
+var vap_num="<%= $NUM_VAP %>";
+var array_mode=["<%= $mode1 %>","<%= $mode2 %>","<%= $mode3 %>","<%= $mode4 %>","<%= $mode5 %>","<%= $mode6 %>","<%= $mode7 %>","<%= $mode8 %>","<%= $mode9 %>","<%= $mode10 %>","<%= $mode11 %>","<%= $mode12 %>","<%= $mode13 %>","<%= $mode14 %>","<%= $mode15 %>","<%= $mode16 %>","<%= $mode17 %>","<%= $mode18 %>","<%= $mode19 %>","<%= $mode20 %>"];
+var array_ssid=["<%= $ssid1 %>","<%= $ssid2 %>","<%= $ssid3 %>","<%= $ssid4 %>","<%= $ssid5 %>","<%= $ssid6 %>","<%= $ssid7 %>","<%= $ssid8 %>","<%= $ssid9 %>","<%= $ssid10 %>","<%= $ssid11 %>","<%= $ssid12 %>","<%= $ssid13 %>","<%= $ssid14 %>","<%= $ssid15 %>","<%= $ssid16 %>","<%= $ssid17 %>","<%= $ssid18 %>","<%= $ssid19 %>","<%= $ssid20 %>"];
+var array_encrypt=["<%= $encrypt1 %>","<%= $encrypt2 %>","<%= $encrypt3 %>","<%= $encrypt4 %>","<%= $encrypt5 %>","<%= $encrypt6 %>","<%= $encrypt7 %>","<%= $encrypt8 %>","<%= $encrypt9 %>","<%= $encrypt10 %>","<%= $encrypt11 %>","<%= $encrypt12 %>","<%= $encrypt13 %>","<%= $encrypt14 %>","<%= $encrypt15 %>","<%= $encrypt16 %>","<%= $encrypt17 %>","<%= $encrypt18 %>","<%= $encrypt19 %>","<%= $encrypt20 %>"];
+var array_mac=["<%= $mac1 %>","<%= $mac2 %>","<%= $mac3 %>","<%= $mac4 %>","<%= $mac5 %>","<%= $mac6 %>","<%= $mac7 %>","<%= $mac8 %>","<%= $mac9 %>","<%= $mac10 %>","<%= $mac11 %>","<%= $mac12 %>","<%= $mac13 %>","<%= $mac14 %>","<%= $mac15 %>","<%= $mac16 %>","<%= $mac17 %>","<%= $mac18 %>","<%= $mac19 %>","<%= $mac20 %>"];
+var array_channel=["<%= $channel1 %>","<%= $channel2 %>","<%= $channel3 %>","<%= $channel4 %>","<%= $channel5 %>","<%= $channel6 %>","<%= $channel7 %>","<%= $channel8 %>","<%= $channel9 %>","<%= $channel10 %>","<%= $channel11 %>","<%= $channel12 %>","<%= $channel13 %>","<%= $channel14 %>","<%= $channel15 %>","<%= $channel16 %>","<%= $channel17 %>","<%= $channel18 %>","<%= $channel19 %>","<%= $channel20 %>"];
+var array_signal=["<%= $signal1 %>","<%= $signal2 %>","<%= $signal3 %>","<%= $signal4 %>","<%= $signal5 %>","<%= $signal6 %>","<%= $signal7 %>","<%= $signal8 %>","<%= $signal9 %>","<%= $signal10 %>","<%= $signal11 %>","<%= $signal12 %>","<%= $signal13 %>","<%= $signal14 %>","<%= $signal5 %>","<%= $signal6 %>","<%= $signal17 %>","<%= $signal8 %>","<%= $signal9 %>","<%= $signal20 %>"];
+var array_rate=["<%= $rate1 %>","<%= $rate2 %>","<%= $rate3 %>","<%= $rate4 %>","<%= $rate5 %>","<%= $rate6 %>","<%= $rate7 %>","<%= $rate8 %>","<%= $rate9 %>","<%= $rate10 %>","<%= $rate11 %>","<%= $rate12 %>","<%= $rate13 %>","<%= $rate14 %>","<%= $rate15 %>","<%= $rate16 %>","<%= $rate17 %>","<%= $rate18 %>","<%= $rate19 %>","<%= $rate20 %>"];
+function get_vapinfo()
+{
+	if(vap_num > 20)
+	{
+		vap_num = 20;
+	}
+	for(i=1;i<=vap_num;i++)   
+  {
+  	var tl = document.getElementById("tableList");
+  	var tr_id = "t" + i;
+  	document.getElementById(tr_id).style.display = "";
+		var j = i - 1;
+		
+		
+		if(document.uniqueID) 
+		{
+			if(i == 1)
+			{     
+    		var obj1 = document.createElement("<input type='radio' name='vapselect' checked onClick='document.all.cssid.value=\""+array_ssid[j]+"\"'>");      
+			}
+			else
+			{
+				var obj1 = document.createElement("<input type='radio' name='vapselect' onClick='document.all.cssid.value=\""+array_ssid[j]+"\"'>");      
+			}
+		} 
+		else
+		{      
+	    var obj1 = document.createElement("INPUT");
+			obj1.type = "radio";
+			obj1.name = "vapselect"; 
+			obj1.onclick = function(){document.all.cssid.value=array_ssid[j];}  
+		}  
+		
+		tl.rows[i].cells[0].innerText = array_mode[j];
+		tl.rows[i].cells[1].innerText = array_ssid[j];
+		tl.rows[i].cells[2].innerText = array_encrypt[j];
+		tl.rows[i].cells[3].innerText = array_channel[j];
+		tl.rows[i].cells[4].innerText = array_rate[j];
+		tl.rows[i].cells[5].innerText = array_signal[j];
+		tl.rows[i].cells[6].innerText = array_mac[j];
+	  tl.rows[i].cells[7].appendChild(obj1);        
+  }    
+}
+function get_ssid()
+{
+	var goback = document.all.cssid.value;
+	if(goback == "")
+	{
+		goback = array_ssid[0];
+	}
+	window.opener.form_sta.ssidname.value = goback;
+	window.close();
+}
+
+function cancel_getssid()
+{
+	window.close();
+}
+</script>
+</head>
+
+<body bgcolor="#efefef" onload="get_vapinfo()" >
+<div style="padding-top:20px; padding-left:70px">
+<form method="post" action="" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="VAP Scanning">Please select one item to connect</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table name="tableList" id="tableList" width="500" border="0" class="main" bgcolor="#FFFFFF">
+    <tr>
+			<td class="td_style" >Type</td>
+			<td class="td_style" >SSID</td>
+			<td class="td_style" >Security</td>
+			<td class="td_style" >Frequency</td>
+			<td class="td_style" >Rate(Mb/s)</td>
+			<td class="td_style" >Signal(dBm)</td>
+			<td class="td_style" >AP MAC</td>
+			<td class="td_style" >Selection</td>
+		</tr>   
+		
+		<tr id="t1" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t2" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t3" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t4" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t5" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t6" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t7" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t8" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t9" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t10" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t11" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t12" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t13" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t14" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t15" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t16" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t17" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>   
+		<tr id="t18" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>  
+		<tr id="t19" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr> 
+		<tr id="t20" style="display:none">
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+			<td class="td_style" ></td>
+		</tr>  
+		<tr >
+          <td colspan="8" ></td>
+      </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td align="right"><input type="button" name="confirm" value="Confirm" onClick="get_ssid()" /><input type="button" name="cancel" value="Cancel" onClick="cancel_getssid()"  /></td>
+  </tr>
+</table>
+<input type="hidden" name="cssid" value="" >
+</form>
+</div>
+</body>
+</html>

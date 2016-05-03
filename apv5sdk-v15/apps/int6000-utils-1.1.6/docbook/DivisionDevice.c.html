@@ -1,0 +1,230 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			DivisionDevice.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='Display.c.html' title=' Display.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DivisionFooter.c.html' title=' DivisionFooter.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   signed DivisionDevice (signed margin, const char * style);
+ *
+ *   page.h
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef UNIT_SOURCE
+#define UNIT_SOURCE
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/format.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../ether/channel.h&quot;
+#include &quot;../ether/ether.h&quot;
+#include &quot;../cgi/session.h&quot;
+#include &quot;../cgi/page.h&quot;
+
+/*====================================================================*
+ *
+ *   signed select_source (signed margin, const char * style);
+ *   
+ *   display a drop-down list of host network interfaces and a submit
+ *   buttion;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed select_source (signed margin, const char * style) 
+
+{
+	extern struct session session;
+	struct if_nameindex * interfaces;
+	struct if_nameindex * interface;
+	output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+	output (margin, &quot;&lt;input class='%s' type='submit' name='%s' value='%s' title=' Select this Network Interface '&gt;&quot;, style, SUBMIT_ACTION, ACTION_SOURCE);
+	output (margin--, &quot;&lt;/th&gt;&quot;);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;select class='%s' name='%s'&gt;&quot;, style, SUBMIT_SOURCE);
+	for (interface = interfaces = if_nameindex (); interface-&gt;if_index; interface++) 
+	{
+		if (!strcmp (interface-&gt;if_name, session.source)) 
+		{
+			output (margin++, &quot;&lt;option class='%s' value='%s' selected&gt;&quot;, style, interface-&gt;if_name);
+		}
+		else 
+		{
+			output (margin++, &quot;&lt;option class='%s' value='%s'&gt;&quot;, style, interface-&gt;if_name);
+		}
+		output (margin, &quot;%*s&quot;, (signed)(sizeof (interface-&gt;if_name)), interface-&gt;if_name);
+		output (margin--, &quot;&lt;/option&gt;&quot;);
+	}
+	if_freenameindex (interfaces);
+	output (margin--, &quot;&lt;/select&gt;&quot;);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	return (margin);
+}
+
+/*====================================================================*
+ *
+ *   signed select_device (signed margin, const char * style);
+ *   
+ *   display a drop-down list of accessible powerline devices and an associated submit buttion;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed select_device (signed margin, const char * style) 
+
+{
+	extern struct channel channel;
+	extern struct session session;
+	extern struct message message;
+	extern const byte localcast [ETHER_ADDR_LEN];
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed station 
+	{
+		uint8_t LDA [ETHER_ADDR_LEN];
+		uint8_t TEI;
+		uint8_t BDA [ETHER_ADDR_LEN];
+		uint8_t AVGTX;
+		uint8_t AVGRX;
+	}
+	* station;
+	struct __packed network 
+	{
+		uint8_t NID [7];
+		uint8_t SNID;
+		uint8_t TEI;
+		uint8_t ROLE;
+		uint8_t CCO_MAC [ETHER_ADDR_LEN];
+		uint8_t CCO_TEI;
+		uint8_t NUMSTAS;
+		struct station station [1];
+	}
+	* network;
+	struct __packed networks 
+	{
+		uint8_t NUMAVLNS;
+		struct network network [1];
+	}
+	* networks = (struct networks *) (&amp;message.content);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+	output (margin, &quot;&lt;input class='%s' type='submit' name='%s' value='%s' title=' Select this Powerline Device '&gt;&quot;, style, SUBMIT_ACTION, ACTION_DEVICE);
+	output (margin--, &quot;&lt;/th&gt;&quot;);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;select class='%s' name='%s'&gt;&quot;, style, SUBMIT_DEVICE);
+	memset (&amp;message, 0, sizeof (message));
+	EthernetHeader (&amp;message.ethernet, localcast, channel.host);
+	IntellonHeader (&amp;message.intellon, (VS_NW_INFO | MMTYPE_REQ));
+	if (sendpacket (&amp;channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+	{
+		error (1, ECANCELED, INT6K_CANTSEND);
+	}
+	while (readpacket (&amp;channel, &amp;message, sizeof (message)) &gt; 0) 
+	{
+		char address [ETHER_ADDR_LEN * 3];
+		if (UnwantedPacket (&amp;message, (VS_NW_INFO | MMTYPE_CNF))) 
+		{
+			continue;
+		}
+		hexdecode (message.ethernet.OSA, sizeof (message.ethernet.OSA), address, sizeof (address));
+		if (!memcmp (message.ethernet.OSA, session.device.MAC, ETHER_ADDR_LEN)) 
+		{
+			output (margin++, &quot;&lt;option class='%s' value='%s' selected&gt;&quot;, style, address);
+		}
+		else 
+		{
+			output (margin++, &quot;&lt;option class='%s' value='%s'&gt;&quot;, style, address);
+		}
+		output (margin, &quot;L %s&quot;, address);
+		output (margin--, &quot;&lt;/option&gt;&quot;);
+		network = (struct network *)(networks-&gt;network);
+		while (networks-&gt;NUMAVLNS-- &gt; 0) 
+		{
+			station = (struct station *)(network-&gt;station);
+			while (network-&gt;NUMSTAS-- &gt; 0) 
+			{
+				hexdecode (station-&gt;LDA, sizeof (station-&gt;LDA), address, sizeof (address));
+				if (!memcmp (station-&gt;LDA, session.device.MAC, ETHER_ADDR_LEN)) 
+				{
+					output (margin++, &quot;&lt;option class='%s' value='%s' selected&gt;&quot;, style, address);
+				}
+				else 
+				{
+					output (margin++, &quot;&lt;option class='%s' value='%s'&gt;&quot;, style, address);
+				}
+				output (margin, &quot;R %s&quot;, address);
+				output (margin--, &quot;&lt;/option&gt;&quot;);
+				station++;
+			}
+			network = (struct network *)(station);
+		}
+	}
+	output (margin--, &quot;&lt;/select&gt;&quot;);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	return (margin);
+}
+
+/*====================================================================*
+ *
+ *   signed DivisionDevice (signed margin, const char * style);
+ *
+ *   print the source/device selection division on stdout;
+ *
+ *--------------------------------------------------------------------*/
+
+signed DivisionDevice (signed margin, const char * style) 
+
+{
+	output (margin++, &quot;&lt;div class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;table class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+	margin = select_source (margin, STYLE_SOURCE);
+	margin = select_device (margin, STYLE_DEVICE);
+	output (margin--, &quot;&lt;/tr&gt;&quot;);
+	output (margin--, &quot;&lt;/table&gt;&quot;);
+	output (margin--, &quot;&lt;/div&gt;&quot;);
+	return (margin);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='Display.c.html' title=' Display.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DivisionFooter.c.html' title=' DivisionFooter.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

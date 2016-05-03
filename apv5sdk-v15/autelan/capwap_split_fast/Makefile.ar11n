@@ -1,0 +1,77 @@
+PWD := ${shell pwd}
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR =src
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR = /tmp/changzhimin-rootfs
+endif
+
+ifndef KERNELDIR
+#KERNELDIR := $(PWD)/../../ap83sdk/linux/kernels/mips-linux-2.6.15
+endif 
+
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE),db12x)
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.31/net
+else
+ifeq ($(BOARD_TYPE),amcc)
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.36/net
+else
+ifeq ($(BOARD_TYPE),armada370)
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/$(KERNELVER)/net
+else
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.15/net
+endif
+endif
+endif
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE), amcc)
+TARGET_CROSS := powerpc-apm-linux-gnu-
+else
+ifeq ($(BOARD_TYPE), armada370)
+TARGET_CROSS := arm-marvell-linux-gnueabi-
+else
+TARGET_CROSS := mips-linux-uclibc-
+endif
+endif
+#wangyu add end
+
+
+MAKE_ARGS:= \
+	KERNELPATH="$(KERNELDIR)" \
+	CROSS_COMPILE="$(TARGET_CROSS)" \
+
+all:capwap_split_fast install
+
+ifeq ($(BOARD_TYPE),db12x)
+capwap_split_fast:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.ap83 && mv ${PKG_BUILD_DIR}/Makefile.ap83 ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) PC018=1
+	echo "finished"
+else
+ifeq ($(BOARD_TYPE),amcc)
+capwap_split_fast:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.ap83 && mv ${PKG_BUILD_DIR}/Makefile.ap83 ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) APM82181=1
+	echo "finished"
+else
+capwap_split_fast:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.ap83 && mv ${PKG_BUILD_DIR}/Makefile.ap83 ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) 
+	echo "finished"
+endif
+endif
+
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean
+	
+install:capwap_split_fast
+	mkdir -p $(INSTALLDIR)
+	cd $(PKG_BUILD_DIR) && \
+	cp -f capwap_split_fast.ko $(INSTALLDIR)
+
+

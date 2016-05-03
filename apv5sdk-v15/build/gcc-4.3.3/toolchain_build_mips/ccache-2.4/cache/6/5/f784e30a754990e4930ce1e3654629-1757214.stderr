@@ -1,0 +1,4 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_output.c: In function 'WIFIPOS_PING_SEND':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_output.c:71: warning: unused variable 'ret'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_output.c: In function 'wlan_vap_send':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_output.c:996: warning: label 'out' defined but not used

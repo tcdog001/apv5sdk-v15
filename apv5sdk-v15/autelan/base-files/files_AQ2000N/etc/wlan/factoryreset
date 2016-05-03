@@ -1,0 +1,24 @@
+#!/bin/sh
+
+get_value()
+{
+	local switch="`pro_ctl_util -k`"
+	echo ${switch}
+	if [ ${switch} -eq 1 ];then
+		:
+	else	
+		/sbin/sysfactoryreset
+		echo f > /proc/kes_debug_flag
+		/sbin/sysreboot	
+	fi	
+}
+
+while :
+do
+sleep 5
+factory_reset_flag="`pro_ctl_util -L | awk -F " " '/factory reset/ {print $4}'`" 
+echo $factory_reset_flag
+if [ $factory_reset_flag == 3 ]; then
+	get_value
+fi	
+done

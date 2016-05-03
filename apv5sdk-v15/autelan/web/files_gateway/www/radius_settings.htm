@@ -1,0 +1,170 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_config=`config_read /config/network/radius`
+
+xml_wlan_radiusip=`config_getoption "$xml_config" radiusip`
+xml_wlan_authport=`config_getoption "$xml_config" authport`
+xml_wlan_sharekey=`config_getoption "$xml_config" sharekey`
+
+xml_wlan_radiusip1=`config_getoption "$xml_config" radiusip1`
+xml_wlan_authport1=`config_getoption "$xml_config" authport1`
+xml_wlan_sharekey1=`config_getoption "$xml_config" sharekey1`
+
+xml_wlan_radiusaip=`config_getoption "$xml_config" radiusaip`
+xml_wlan_acceptport=`config_getoption "$xml_config" acceptport`
+xml_wlan_asharekey=`config_getoption "$xml_config" asharekey`
+
+xml_wlan_radiusaip1=`config_getoption "$xml_config" radiusaip1`
+xml_wlan_acceptport1=`config_getoption "$xml_config" acceptport1`
+xml_wlan_asharekey1=`config_getoption "$xml_config" asharekey1`
+
+xml_wlan_wepbit=`config_getoption "$xml_config" wepbit`
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>WLAN Settings</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<script type="text/javascript">
+function valid_range(this1, min, max) 
+{
+   var value = parseInt(this1.value);
+   var reg = /^[0-9]{0,5}$/;
+   if (!reg.test(this1.value))
+   {
+       alert(this1.name + "may have illegal characters or its size great than 5 .");
+   }
+   else if (value < min || value > max)
+   {
+		   alert(this1.name + " value is out of range .");
+   }
+}
+        
+</script>
+</head>
+
+<body bgcolor="#efefef">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1"><a href="wlan_settings.htm" target="MainFrame">WLAN State</a></td>
+          <td class="top1"><a href="wlan_set.htm" target="MainFrame">WLAN Settings</a></td>
+          <td class="top1"><a href="security_settings.htm" target="MainFrame">Security Settings</a></td>
+		  <td class="top1">Radius Settings</td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">WLAN Settings-->Radius Settings</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form method="post" action="<%= $action_cgi %>" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" >Radius Authentication Server</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+			<tr>
+			<td class="td_style" width="150">Primary Auth Server IP</td>
+			<td class="td_style" width="350"><input type="text" name="radiusip" value="<%= "$xml_wlan_radiusip" %>"  </td>
+			</tr>
+			
+			<tr>
+			<td class="td_style">Authentication Port</td>
+			<td class="td_style"><input type="text" name="authport" value="<%= "$xml_wlan_authport" %>" onBlur="valid_range(this,10,65535)"></td>
+			</tr>
+			
+			<tr>
+			<td class="td_style">Shared Key</td>
+			<td class="td_style"><input type="text" name="sharekey" value="<%= "$xml_wlan_sharekey" %>"></td>
+			</tr>
+			
+			<tr>
+			<td class="td_style"></td>
+			</tr>
+			
+			<tr>
+			<td class="td_style">Second Auth Server IP</td>
+			<td class="td_style"><input type="text" name="radiusip1" value="<%= "$xml_wlan_radiusip1" %>"  </td>
+			</tr>
+			
+			<tr>
+			<td class="td_style">Authentication Port</td>
+			<td class="td_style"><input type="text" name="authport1" value="<%= "$xml_wlan_authport1" %>" onBlur="valid_range(this,10,65535)"></td>
+			</tr>
+			
+			<tr>
+			<td class="td_style">Shared Key</td>
+			<td class="td_style"><input type="text" name="sharekey1" value="<%= "$xml_wlan_sharekey1" %>"></td>
+			</tr>
+	  </table>
+	</td>
+  </tr>
+  
+  <tr>
+    <td><font class="table_head" >Radius Account Server</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+			<tr>
+			<td class="td_style" width="150">Primary Account IP</td>
+			<td class="td_style" width="350"><input type="text" name="radiusaip" value="<%= "$xml_wlan_radiusaip" %>"  </td>
+			</tr>
+			
+			<tr>
+			<td class="td_style">Account Port</td>
+			<td class="td_style"><input type="text" name="acceptport" value="<%= "$xml_wlan_acceptport" %>" onBlur="valid_range(this,10,65535)"></td>
+			</tr>
+			
+			<tr>
+			<td class="td_style">Shared Key</td>
+			<td class="td_style"><input type="text" name="asharekey" value="<%= "$xml_wlan_asharekey" %>"></td>
+			</tr>
+			
+			<tr>
+			<td class="td_style"></td>
+			</tr>
+			
+			<tr>
+			<td class="td_style">Second Account IP</td>
+			<td class="td_style"><input type="text" name="radiusaip1" value="<%= "$xml_wlan_radiusaip1" %>"  </td>
+			</tr>
+			
+			<tr>
+			<td class="td_style">Account Port</td>
+			<td class="td_style"><input type="text" name="acceptport1" value="<%= "$xml_wlan_acceptport1" %>" onBlur="valid_range(this,10,65535)"></td>
+			</tr>
+			
+			<tr>
+			<td class="td_style">Shared Key</td>
+			<td class="td_style"><input type="text" name="asharekey1" value="<%= "$xml_wlan_asharekey1" %>"></td>
+			</tr>
+	  </table>
+	</td>
+  </tr>
+  
+  <tr>
+    <td><input id="but" type="submit" name="security_setting_commit" value="Submit"/></td>
+  </tr>
+</table>
+<input type="hidden" value="RADIUS Setup" name="SERVLET">
+</form>
+</div>
+</body>
+</html>

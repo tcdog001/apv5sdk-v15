@@ -1,0 +1,91 @@
+#!/bin/sh
+
+start()
+{
+echo "Mounting file systems"
+mount -a
+#mount -o remount +w /
+mount -t ramfs -n none /tmp
+mount -rw -t jffs2 /dev/mtdblock2 /etc/config
+mount -rw -t jffs2 /dev/mtdblock2 /jffs
+mount -t sysfs sysfs /sys 
+#mount -t tmpfs tmpfs /dev
+
+mknod /dev/wrcpu c 10 131 >dev/null 2>&1
+#Added by duanmingzhe for detect jffs space
+touch /jffs/space_detect
+flag=$?
+rm /jffs/space_detect
+if [ $flag -eq 1 ]; then
+    rm /jffs/apmon_log
+fi
+#end duanmingzhe
+mkdir -p /jffs/hostapd/
+mkdir -p /tmp/cert
+cp -rf /etc/files.conf/wlan.conf /tmp/
+mkdir -p /tmp/crontabs
+#cp -f /etc/defaults/config.xml /etc/config 
+#by sundaolian
+ln -sf /tmp/resolv.conf.auto /etc/resolv.conf
+#by liuyanbo
+	if [ ! -f /etc/config/config.xml ]; then
+		cp -f /etc/defaults/config.xml /etc/config
+	fi
+		
+	if [ ! -f /etc/config/version ]; then
+		xml_upsystem_version="`cat /etc/version/version`"
+		echo $xml_upsystem_version > /etc/config/version
+	fi
+        if [ -e /etc/config/config.xml ];then
+	        /usr/sbin/xmlupgrade
+        fi
+	cp -f /etc/defaults/session.xml /tmp
+	if [ -f /jffs/system ];then
+		echo "AP"
+	else
+		cp -f /etc/wlan/system /etc/config
+	fi
+
+	if [ -x /jffs/preconfig ];then
+		/jffs/preconfig
+	else
+		cp -f /etc/wlan/preconfig /jffs
+		/jffs/preconfig
+	fi
+	if [ -x /jffs/config.ap83 ];then
+		/jffs/config.ap83
+	else
+		cp -f /etc/wlan/config.ap83 /jffs
+		chmod 755 /jffs/config.ap83	
+		/jffs/config.ap83
+	fi
+	if [ -x /jffs/postconfig ];then
+		/jffs/postconfig
+	else
+		cp -f /etc/wlan/postconfig /jffs
+		/jffs/postconfig
+	fi
+	#/usr/sbin/iwevent & 
+	#/sbin/rate-stat &
+}
+
+stop()
+{
+    true
+}
+
+case "$2" in
+  boot)
+        start
+        ;;
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  *)
+        echo "Usage: $0 {boot|start|stop}"
+        exit 1
+esac
+

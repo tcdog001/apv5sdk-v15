@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			xmlfree.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='xmledit.c.html' title=' xmledit.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='xmlnode.c.html' title=' xmlnode.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   NODE * xmlfree (NODE * node);
+ *
+ *   nodes.h
+ *
+ *   recursively free document nodes; minimize recursion depth by 
+ *   following node-&gt;below only and not following node-&gt;after;
+ *
+ *.  Motley Tools by Charles Maier &lt;cmaier@cmassoc.net&gt;;
+ *:  Published 2006 by Charles Maier Associates Limited;
+ *;  Released under the GNU General Public Licence v2 and later;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef XMLFREE_SOURCE
+#define XMLFREE_SOURCE
+
+#include &lt;stdlib.h&gt;
+#include &lt;memory.h&gt;
+
+#include &quot;../nodes/nodes.h&quot;
+
+void xmlfree (NODE * node) 
+
+{
+	NODE * temp;
+	while (node) 
+	{
+		if (node-&gt;above) 
+		{
+			node-&gt;above-&gt;below = (NODE *)(0);
+		}
+		else 
+		{
+			free (node-&gt;text);
+		}
+		if (node-&gt;prior) 
+		{
+			node-&gt;prior-&gt;after = (NODE *)(0);
+		}
+		xmlfree (node-&gt;below);
+		temp = node;
+		node = node-&gt;after;
+		memset (temp, 0, sizeof (NODE));
+		free (temp);
+	}
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='xmledit.c.html' title=' xmledit.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='xmlnode.c.html' title=' xmlnode.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

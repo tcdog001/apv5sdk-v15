@@ -1,0 +1,4 @@
+#!/bin/sh
+#pro_ctl_util -d 17
+pro_ctl_util -d 15
+pro_ctl_util -d 19

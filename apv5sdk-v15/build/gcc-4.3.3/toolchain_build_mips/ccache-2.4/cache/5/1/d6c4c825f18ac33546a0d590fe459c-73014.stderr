@@ -1,0 +1,26 @@
+../src/mxml_node.c: In function 'mxml_node_new':
+../src/mxml_node.c:24: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_node.c: In function 'mxml_node_clone':
+../src/mxml_node.c:152: warning: incompatible implicit declaration of built-in function 'strlen'
+../src/mxml_node.c:153: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_node.c:154: warning: incompatible implicit declaration of built-in function 'memcpy'
+../src/mxml_node.c:158: warning: incompatible implicit declaration of built-in function 'strlen'
+../src/mxml_node.c:159: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_node.c:160: warning: incompatible implicit declaration of built-in function 'memcpy'
+../src/mxml_node.c: In function 'mxml_node_destroy':
+../src/mxml_node.c:207: warning: incompatible implicit declaration of built-in function 'free'
+../src/mxml_node.c: In function 'mxml_node_read_data':
+../src/mxml_node.c:270: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_node.c:326: warning: incompatible implicit declaration of built-in function 'realloc'
+../src/mxml_node.c: In function 'mxml_node_read_name':
+../src/mxml_node.c:417: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_node.c:418: warning: incompatible implicit declaration of built-in function 'memcpy'
+../src/mxml_node.c: In function 'mxml_node_read_directive':
+../src/mxml_node.c:450: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_node.c:464: warning: incompatible implicit declaration of built-in function 'realloc'
+../src/mxml_node.c: In function 'mxml_node_read_pi':
+../src/mxml_node.c:500: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_node.c:537: warning: incompatible implicit declaration of built-in function 'realloc'
+../src/mxml_node.c: In function 'mxml_node_read_comment':
+../src/mxml_node.c:590: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_node.c:635: warning: incompatible implicit declaration of built-in function 'realloc'

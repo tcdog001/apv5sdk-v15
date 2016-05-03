@@ -1,0 +1,195 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			grab.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='gpioinfo.c.html' title=' gpioinfo.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='havebreak.c.html' title=' havebreak.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   grab.c - byte stream grabber
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Nathan Houghton &lt;nathan@brainwerk.org&gt;
+ *      Abdel Younes &lt;younes@leacom.fr&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*&quot;
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/putoptv.h&quot;
+#include &quot;../tools/version.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/basespec.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/efreopen.c&quot;
+#endif
+
+/*====================================================================*
+ *   constants;
+ *--------------------------------------------------------------------*/
+
+#define GRAB_VERBOSE (1 &lt;&lt; 0)
+#define GRAB_SILENCE (1 &lt;&lt; 1)
+#define GRAB_NEWLINE (1 &lt;&lt; 2)
+
+/*====================================================================*
+ *
+ *   void function (size_t offset, size_t length, flag_t flags);
+ *
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static void function (size_t offset, size_t length, flag_t flags) 
+
+{
+	signed c;
+	while (offset--) 
+	{
+		if ((c = getc (stdin)) == EOF) 
+		{
+			error (1, errno, &quot;Can't read file&quot;);
+		}
+	}
+	while (length--) 
+	{
+		if ((c = getc (stdin)) == EOF) 
+		{
+			error (1, errno, &quot;Can't read stdin&quot;);
+		}
+		putc (DIGITS_HEX [(c &gt;&gt; 4) &amp; 0x0f], stdout);
+		putc (DIGITS_HEX [(c &gt;&gt; 0) &amp; 0x0f], stdout);
+	}
+	if (_anyset (flags, GRAB_NEWLINE)) 
+	{
+		putc ('\n', stdout);
+	}
+	return;
+}
+
+/*====================================================================*
+ *
+ *   int main (int argc, const char * argv []);
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	static const char *optv [] = 
+	{
+		&quot;l:no:qv&quot;,
+		PUTOPTV_S_FILTER,
+		&quot;byte stream grabber&quot;,
+		&quot;l n\tlength to read in bytes&quot;,
+		&quot;n\tappend newline on output&quot;,
+		&quot;o x\toffset to read in bytes&quot;,
+		&quot;q\tquiet mode&quot;,
+		&quot;v\tverbose mode&quot;,
+		(const char *) (0) 
+	};
+	size_t offset = 0;
+	size_t length = 0;
+	flag_t flags = (flag_t)(0);
+	signed c;
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch (c) 
+		{
+		case 'l':
+			length = (size_t)(basespec (optarg, 10, sizeof (size_t)));
+			break;
+		case 'o':
+			offset = (size_t)(basespec (optarg, 16, sizeof (size_t)));
+			break;
+		case 'n':
+			_setbits (flags, GRAB_NEWLINE);
+			break;
+		case 'q':
+			_setbits (flags, GRAB_SILENCE);
+			break;
+		case 'v':
+			_setbits (flags, GRAB_VERBOSE);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	if (!argc) 
+	{
+		function (offset, length, flags);
+	}
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		if (efreopen (*argv, &quot;rb&quot;, stdin)) 
+		{
+			function (offset, length, flags);
+		}
+		argc--;
+		argv++;
+	}
+	return (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='gpioinfo.c.html' title=' gpioinfo.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='havebreak.c.html' title=' havebreak.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

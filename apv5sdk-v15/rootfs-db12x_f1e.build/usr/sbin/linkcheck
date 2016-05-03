@@ -1,0 +1,46 @@
+#!/bin/sh
+UP_COUNT=0
+DOWN_COUNT=0
+IF=eth0
+#0:down 1:up
+STATUS=0
+
+IFCONFIG="/sbin/ifconfig"
+
+if [ ! -z $1 ];then
+IF="$1"
+fi
+
+LINK_UP_COUNT="/tmp/link_count/link_up_count_${IF}"
+LINK_DOWN_COUNT="/tmp/link_count/link_down_count_${IF}"
+
+mkdir -p /tmp/link_count
+
+echo "${UP_COUNT}" > ${LINK_UP_COUNT}
+echo "${DOWN_COUNT}" > ${LINK_DOWN_COUNT}
+
+downstatus=0
+upstatus=0 
+
+while :
+do
+msgup=`dmesg | tail -n 2 | grep '(eth0) entering forwarding state' 2>/dev/null`
+msgdown=`dmesg | tail -n 2 | grep '(eth0) entering disabled state' 2>/dev/null`
+if [ -n "$msgup" ];then
+  if [ $upstatus == 0 ];then
+  UP_COUNT=$((${UP_COUNT}+1)) && echo "${UP_COUNT}" > ${LINK_UP_COUNT}
+  echo upcount=$UP_COUNT
+  upstatus=1
+  downstatus=0
+  fi
+fi
+if [ -n "$msgdown" ];then
+  if [ $downstatus == 0 ];then
+ DOWN_COUNT=$((${DOWN_COUNT}+1)) && echo "${DOWN_COUNT}" > ${LINK_DOWN_COUNT} 
+  echo downcount=$DOWN_COUNT
+  downstatus=1
+  upstatus=0
+  fi
+fi
+sleep 3
+done

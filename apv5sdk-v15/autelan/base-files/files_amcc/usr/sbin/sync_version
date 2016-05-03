@@ -1,0 +1,124 @@
+#!/bin/sh
+
+#/usr/sbin/stop_monitor & >/dev/null 2>&1
+#killall wtpd & > /dev/null 2>&1
+FLAG="`df | awk '{ if($6 == "/")print $1 }' | grep -e "[0-9]" -o`"
+WRCPUUTIL=/usr/bin/pro_ctl_util
+usage()
+{	
+	echo "wrong input"
+	echo "set_version current/next"
+	exit 1
+}
+SOFT_VERSION="`cat /etc/version/version`#`cat /etc/version/buildno`"
+kernel1_crc="`$WRCPUUTIL -J | awk -F ':' '/crc_kernel/{print $2}'`"
+rootfs1_crc="`$WRCPUUTIL -J | awk -F ':' '/crc_rootfs/{print $2}'`"
+kernel1_lenth="`$WRCPUUTIL -J | awk -F ':' '/kernel_lenth/{print $2}'`"
+rootfs1_lenth="`$WRCPUUTIL -J | awk -F ':' '/rootfs_lenth/{print $2}'`"
+
+kernel2_crc="`$WRCPUUTIL -K | awk -F ':' '/crc_kernel/{print $2}'`"
+rootfs2_crc="`$WRCPUUTIL -K | awk -F ':' '/crc_rootfs/{print $2}'`"
+kernel2_lenth="`$WRCPUUTIL -K | awk -F ':' '/kernel_lenth/{print $2}'`"
+rootfs2_lenth="`$WRCPUUTIL -K | awk -F ':' '/rootfs_lenth/{print $2}'`"
+echo $kernel1_crc
+echo $rootfs1_crc
+echo $kernel1_lenth
+echo $rootfs1_lenth
+
+echo $kernel2_crc
+echo $rootfs2_crc
+echo $kernel2_lenth
+echo $rootfs2_lenth
+
+case $1 in
+  next)
+	if [ $FLAG -eq 3 ];then
+#		touch 101
+		dd if=/dev/mtdblock2 of=/dev/mtdblock4 
+		if [ $? -ne 0 ];then
+			logger -s "ERROR: failed to copy kernel image"
+			exit 1
+		fi
+		sync
+		sleep 1
+		$WRCPUUTIL -V $kernel1_crc -S 40152
+		sync
+		sleep 1
+		$WRCPUUTIL -V $kernel1_lenth -S 40168
+#		touch 11
+		dd if=/dev/mtdblock3 of=/dev/mtdblock5
+		if [ $? -ne 0 ];then
+			logger -s "ERROR: failed to copy rootfs image"
+			exit 2
+		fi
+		sync
+		sleep 1
+		$WRCPUUTIL -V $rootfs1_crc -S 40156
+		sync
+		sleep 1
+		$WRCPUUTIL -V $rootfs1_lenth -S 40172
+		sync
+		sleep 1
+		echo $SOFT_VERSION
+		$WRCPUUTIL -P $SOFT_VERSION -O 40188
+		sync
+		sleep 1
+#		sbin/sysreboot
+#		$WRCPUUTIL -V 2 -S 40176
+	fi
+	if [ $FLAG -eq 5 ];then
+#		touch 201
+		dd if=/dev/mtdblock4 of=/dev/mtdblock2 
+		if [ $? -ne 0 ];then
+			logger -s "ERROR: failed to copy kernel image"
+			exit 1
+		fi
+		sync
+		sleep 1
+		$WRCPUUTIL -V $kernel2_crc -S 40144
+		sync
+		sleep 1
+                $WRCPUUTIL -V $kernel2_lenth -S 40160
+#		touch 301
+		dd if=/dev/mtdblock5 of=/dev/mtdblock3 
+		if [ $? -ne 0 ];then
+			logger -s "ERROR: failed to copy kernel image"
+			exit 1
+		fi
+		sync
+		sleep 1
+		$WRCPUUTIL -V $rootfs2_crc -S 40148
+		sync
+		sleep 1
+                $WRCPUUTIL -V $rootfs2_lenth -S 40164
+		sync
+		sleep 1
+		echo $SOFT_VERSION
+		$WRCPUUTIL -P $SOFT_VERSION -O 40180
+		sync
+		sleep 1
+#		/sbin/sysreboot	
+#		$WRCPUUTIL -V 1 -S 40176
+	fi
+		;;
+  current)
+	echo "after reboot please input (sync_version next) to sync version"
+	sleep 3
+#	OPT="`$WRCPUUTIL -C|awk -F':' '/opt/{print $2}'`"
+	if [ $FLAG -eq 3 ];then
+		$WRCPUUTIL -V 2 -S 40176
+		sleep 1
+		echo q > /proc/kes_debug_flag
+		/sbin/sysreboot
+	fi
+	if [ $FLAG -eq 5 ];then
+		$WRCPUUTIL -V 1 -S 40176
+		sleep 1
+		echo q > /proc/kes_debug_flag
+		/sbin/sysreboot
+	fi
+	;;
+  *)
+	usage
+	;;
+esac

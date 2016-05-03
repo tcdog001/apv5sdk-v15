@@ -1,0 +1,78 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+operate_status=$my_action_status
+my_action_status=""
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Upgrade</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<script type="text/javascript">
+function validate()
+{
+	  if(document.all.uploadfile.value == ""){      
+	  	  alert("please indicate the file or path");
+	  	   return false;
+   	   }
+} 
+
+function validate_upgrade()
+{
+	var flag="<%= $operate_status %>";
+	if(flag=="Firmware Upgrade Successful")
+	{
+	  alert("Firmware Upgrade Successful!Please wait 120 seconds for restart.");
+	  setTimeout("top.open('http://<%= $HTTP_HOST %>', '_top')", (120 * 1000));
+	}
+	else if(flag == "Firmware Upgrade Failed")
+	{
+		alert("Firmware Upgrade Failed");
+	}
+}
+</script>
+</head>
+
+<body bgcolor="#efefef" onload="validate_upgrade()">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+		  <td class="top1"><a href="management.htm" target="MainFrame">Status</a></td>
+          <td class="top1">Upgrade</td>
+          <td class="top1"><a href="restore.htm" target="MainFrame">Restore</a></td>
+		  <td class="top1"><a href="manage.htm" target="MainFrame">Password</a></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">System-->Upgrade</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form method="post" action="<%= $upgrade_cgi %>" enctype="multipart/form-data" onsubmit="return validate()">
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="Upgrade Router illustration">Upgrade Router</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+		<tr>
+          <td class="td_style">Locate New Firmware</td>
+          <td class="td_style"><input type="file" name="uploadfile" value="uploadfile"/><input id="but" type="submit" name="upgrade_firmware" value="Upgrade" style="float:none; margin-left:10px"/></td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+</table>
+</form>
+</div>
+</body>
+</html>

@@ -1,0 +1,504 @@
+struct variable4 wapiPwlanAp_variables[] = {
+
+#define SYSLOGMSGLEVEL        231      
+{SYSLOGMSGLEVEL,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  { 17, 5 }},
+
+
+#define SYSLOGMSGSEND		230
+{SYSLOGMSGSEND, ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  { 17, 4 }},
+
+#define SYSLOGLEVEL		229
+{SYSLOGLEVEL,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  { 17, 3 }},
+
+#define SYSLOGSERVERIP	228
+{SYSLOGSERVERIP,  ASN_IPADDRESS,  RWRITE,  var_wapiPwlanAp, 2,  { 17, 2 }},
+
+#define SYSLOGENABLE		227
+{SYSLOGENABLE,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  { 17, 1 }},
+
+
+#define WAPIBASICFLASH		1
+{WAPIBASICFLASH,  ASN_OCTET_STR,  RONLY ,  var_wapiPwlanAp, 2,  { 1, 34 }},
+#define WAPIBASICCPU		2
+{WAPIBASICCPU,  ASN_OCTET_STR,  RONLY ,  var_wapiPwlanAp, 2,  { 1, 26 }},
+#define WAPIBASIC80211G		3
+//{WAPIBASIC80211G,  ASN_OCTET_STR,  RONLY ,  var_wapiPwlanAp, 2,  {5, 6 }},
+#define WAPIBASICMEMORY		4
+{WAPIBASICMEMORY,  ASN_OCTET_STR,  RONLY ,  var_wapiPwlanAp, 2,  { 1, 25 }},
+#define WAPIBASIC80211B		5
+//{WAPIBASIC80211B,  ASN_OCTET_STR,  RONLY ,  var_wapiPwlanAp, 2,  {5, 5 }},
+#define WAPIBASICMAC		6
+{WAPIBASICMAC,  ASN_OCTET_STR,  RONLY ,  var_wapiPwlanAp, 2,  {1, 2 }},
+#define WAPIHARDWAREVERSION		7
+{WAPIHARDWAREVERSION,  ASN_OCTET_STR,  RONLY ,  var_wapiPwlanAp, 2,  {1, 1 }},
+#define WAPIAPTYPE		8
+//{WAPIAPTYPE,  ASN_OCTET_STR,  RONLY ,  var_wapiPwlanAp, 2,  {5, 8 }},
+
+#define WAPIALARMFLAG		9
+{WAPIALARMFLAG,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {7, 1 }},
+#define WAPIAPSOFTPRIMVERSION		10
+//{WAPIAPSOFTPRIMVERSION,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  {4, 1 }},
+#define WAPIAPSOFTSECONDVERSION		11
+//{WAPIAPSOFTSECONDVERSION,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  {4,5 }},
+
+#define WAPIAPSOFTDEBUG               12 
+//{WAPIAPSOFTDEBUG,  ASN_INTEGER ,  RWRITE,  var_wapiPwlanAp, 2,  {4, 2 }},
+
+#define WAPIALARMTIMES		13
+{WAPIALARMTIMES,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  { 7, 13 }},
+
+#define WAPICONFIGTXPOWER		14
+//{WAPICONFIGTXPOWER,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 5 }},
+#define WAPICONFIGREBOOT		15
+{WAPICONFIGREBOOT,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  { 7, 6 }},
+#define WAPICONFIGRTSTHRESHOLD	16
+//{WAPICONFIGRTSTHRESHOLD,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 8 }},
+#define WAPICONFIGDTIMPERIOD		17
+//{WAPICONFIGDTIMPERIOD,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 9 }},
+#define WAPICONFIGLANIP		18
+{WAPICONFIGLANIP,  ASN_IPADDRESS,  RWRITE,  var_wapiPwlanAp, 3,  { 2, 5, 2 }},
+#define WAPICONFIGLANGATEWAY		19
+{WAPICONFIGLANGATEWAY,  ASN_IPADDRESS,  RWRITE,  var_wapiPwlanAp, 3,  { 2, 5, 4 }},
+#define WAPICONFIGLANMASK		20
+{WAPICONFIGLANMASK,  ASN_IPADDRESS,  RWRITE,  var_wapiPwlanAp, 3,  { 2, 5, 3 }},
+#define WAPICONFIGWIRELESSMODEBG		21
+//{WAPICONFIGWIRELESSMODEBG,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 10 }},
+#define WAPICONFIGHOSTNAME		22
+//{WAPICONFIGHOSTNAME,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  {2, 4 }},
+
+#define WAPICONFIGBEACONINTERVAL		23
+//{WAPICONFIGBEACONINTERVAL,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 7 }},
+#define WAPICONFIGWIRELESSMODEA  	24
+//{WAPICONFIGWIRELESSMODEA,  ASN_INTEGER,  RONLY,  var_wapiPwlanAp, 2,  {2, 6 }},
+#define WAPICONFIGFACTORYDEFAULT		25
+{WAPICONFIGFACTORYDEFAULT,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  { 7, 7 }},
+
+#define ALARMID		26
+//{ALARMID,  ASN_OCTET_STR,  RWRITE,  var_wapiApAlarmAdminTable, 4,  { 8,3, 1, 1 }},
+#define ALARMNAME		27
+//{ALARMNAME,  ASN_OCTET_STR,  RWRITE,  var_wapiApAlarmAdminTable, 4,  {8, 3, 1, 2 }},
+#define ALARMLEVEL		28
+//{ALARMLEVEL,  ASN_OCTET_STR,  RWRITE,  var_wapiApAlarmAdminTable, 4,  {8, 3, 1, 3 }},
+#define ALARMTYPE		29
+//{ALARMTYPE,  ASN_OCTET_STR,  RWRITE,  var_wapiApAlarmAdminTable, 4,  { 8,3, 1, 4 }},
+#define ALARMREASON		30
+//{ALARMREASON,  ASN_OCTET_STR,  RWRITE,  var_wapiApAlarmAdminTable, 4,  {8, 3, 1, 5 }},
+#define ALARMCREATTIMES		31
+//{ALARMCREATTIMES,  ASN_OCTET_STR,  RWRITE,  var_wapiApAlarmAdminTable, 4,  {8, 3, 1, 6 }},
+#define ALARMELIMINATETIMES		32
+//{ALARMELIMINATETIMES,  ASN_OCTET_STR,  RWRITE,  var_wapiApAlarmAdminTable, 4,  {8, 3, 1, 7 }},
+#define ALARMSTATE		33
+//{ALARMSTATE,  ASN_INTEGER,  RWRITE,  var_wapiApAlarmAdminTable, 4,  { 8,3, 1, 8 }},
+#define ALARMHEADING		34
+//{ALARMHEADING,  ASN_OCTET_STR,  RWRITE,  var_wapiApAlarmAdminTable, 4,  {8, 3, 1, 9 }},
+#define ALARMCONTENT		35
+//{ALARMCONTENT,  ASN_OCTET_STR,  RWRITE,  var_wapiApAlarmAdminTable, 4,  {8, 3, 1, 10 }},
+
+#define WAPISERVERURL		36
+//{WAPISERVERURL,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  {6, 1 }},
+#define WAPISTARTUPGRADE		37
+//{WAPISTARTUPGRADE,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {6, 2}},
+
+
+#define WAPINTPSERVERIP             38
+{WAPINTPSERVERIP,  ASN_IPADDRESS,  RWRITE,  var_wapiPwlanAp, 2,  {9, 1 }},
+#define WAPINTPNETTIMES             39
+{WAPINTPNETTIMES,  ASN_UNSIGNED,  RWRITE,  var_wapiPwlanAp, 2,  {9, 3 }},
+
+#define WAPIASTYPE              40
+{WAPIASTYPE,  ASN_INTEGER,  RONLY,  var_wapiPwlanAp, 2,  {16, 1 }},
+#define WAPIASIP              41
+{WAPIASIP,  ASN_IPADDRESS,  RWRITE,  var_wapiPwlanAp, 2,  {16, 2 }},
+#define WAPIASPORT              42
+{WAPIASPORT,  ASN_INTEGER,  RONLY,  var_wapiPwlanAp, 2,  {16, 3 }},
+#define WAPICERTTYPE             43
+{WAPICERTTYPE,  ASN_INTEGER,  RONLY,  var_wapiPwlanAp, 2,  {16, 4 }},
+#define WAPICERTSTATE              44
+{WAPICERTSTATE,  ASN_INTEGER,  RONLY,  var_wapiPwlanAp, 2,  {16, 5 }},
+#define WAPIASCERT              45
+{WAPIASCERT,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  {16, 6 }},
+#define WAPIUSERCERT            46
+{WAPIUSERCERT,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  {16, 7}},
+#define WAPIINSTALLCERT              47
+{WAPIINSTALLCERT,  ASN_INTEGER,  RONLY,  var_wapiPwlanAp, 2,  {16, 8}},
+
+#define WAPICONFIGVERSION              48
+{WAPICONFIGVERSION,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 1 }},
+#define WAPICONTROLLEDAUTHCONTROL              49
+{WAPICONTROLLEDAUTHCONTROL,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 2 }},
+#define WAPICONTROLLEDPORTCONTROL              50
+{WAPICONTROLLEDPORTCONTROL,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 3 }},
+#define WAPIOPTIONIMPLEMENTED              51
+{WAPIOPTIONIMPLEMENTED,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 4 }},
+#define WAPIPREAUTHENTICATIONIMPLEMENTED              52
+{WAPIPREAUTHENTICATIONIMPLEMENTED,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 5 }},
+#define WAPIENABLED              53
+{WAPIENABLED,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 6 }},
+#define WAPIPREAUTHENTICATIONENABLED              54
+{WAPIPREAUTHENTICATIONENABLED,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 7 }},
+#define WAPICONFIGUNICASTKEYSSUPPORTED              55
+{WAPICONFIGUNICASTKEYSSUPPORTED,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 8 }},
+#define WAPICONFIGUNICASTREKEYMETHOD             56
+{WAPICONFIGUNICASTREKEYMETHOD ,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 9 }},
+#define WAPICONFIGUNICASTREKEYTIME              57
+{WAPICONFIGUNICASTREKEYTIME,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 10 }},
+#define WAPICONFIGUNICASTREKEYPACKETS             58
+{WAPICONFIGUNICASTREKEYPACKETS,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 11 }},
+#define WAPICONFIGMULTICASTCIPHER              59
+{WAPICONFIGMULTICASTCIPHER,  ASN_OCTET_STR,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 12 }},
+#define WAPICONFIGMULTICASTREKEYMETHOD               60
+{WAPICONFIGMULTICASTREKEYMETHOD ,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 13 }},
+#define WAPICONFIGMULTICASTREKEYTIME              61
+{WAPICONFIGMULTICASTREKEYTIME,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 14 }},
+#define WAPICONFIGMULTICASTREKEYPACKETS               62
+{WAPICONFIGMULTICASTREKEYPACKETS ,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 15 }},
+#define WAPICONFIGMULTICASTREKEYSTRICT               63
+{WAPICONFIGMULTICASTREKEYSTRICT ,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 16 }},
+#define WAPICONFIGPSKVALUE               64
+{WAPICONFIGPSKVALUE ,  ASN_OCTET_STR,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 17 }},
+#define WAPICONFIGPSKPASSPHRASE              65
+{WAPICONFIGPSKPASSPHRASE,  ASN_UNSIGNED,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 18 }},
+#define WAPICONFIGCERTIFICATEUPDATECOUNT              66
+{WAPICONFIGCERTIFICATEUPDATECOUNT,  ASN_UNSIGNED,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 19 }},
+#define WAPICONFIGMULTICASTUPDATECOUNT               67
+{WAPICONFIGMULTICASTUPDATECOUNT ,  ASN_UNSIGNED,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 20 }},
+#define WAPICONFIGUNICASTUPDATECOUNT               68
+{WAPICONFIGUNICASTUPDATECOUNT ,  ASN_UNSIGNED,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 21 }},
+#define WAPICONFIGMULTICASTCIPHERSIZE               69
+{WAPICONFIGMULTICASTCIPHERSIZE ,  ASN_UNSIGNED,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 22 }},
+#define WAPICONFIGBKLIFETIME               70
+{WAPICONFIGBKLIFETIME ,  ASN_UNSIGNED,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 23 }},
+#define WAPICONFIGBKREAUTHTHRESHOLD              71
+{WAPICONFIGBKREAUTHTHRESHOLD,  ASN_UNSIGNED,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 24 }},
+#define WAPICONFIGSATIMEOUT              72
+{WAPICONFIGSATIMEOUT,  ASN_UNSIGNED,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 25 }},
+#define WAPIAUTHENTICATIONSUITESELECTED              73
+{WAPIAUTHENTICATIONSUITESELECTED,  ASN_OCTET_STR,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 26 }},
+#define WAPIUNICASTCIPHERSELECTED               74
+{WAPIUNICASTCIPHERSELECTED ,  ASN_OCTET_STR,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 27 }},
+#define WAPIMULTICASTCIPHERSELECTED               75
+{WAPIMULTICASTCIPHERSELECTED ,  ASN_OCTET_STR,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 28 }},
+#define WAPIBKIDUSED              76
+{WAPIBKIDUSED,  ASN_OCTET_STR,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 29 }},
+#define WAPIAUTHENTICATIONSUITEREQUESTED               77
+{WAPIAUTHENTICATIONSUITEREQUESTED ,  ASN_OCTET_STR,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 30 }},
+#define WAPIUNICASTCIPHERREQUESTED              78
+{WAPIUNICASTCIPHERREQUESTED,  ASN_OCTET_STR,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 31 }},
+#define WAPIGROUPCIPHERREQUESTED              79
+{WAPIGROUPCIPHERREQUESTED,  ASN_OCTET_STR,  RONLY,  var_wapiApwapiConfigTable, 4,  { 12, 1, 1, 32 }}, 
+#define WAPIMULTICASTCIPHERREQUESTED              80
+{WAPIMULTICASTCIPHERREQUESTED,  ASN_OCTET_STR,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 32 }},
+
+#define WAPIRWCOMMUNITY            81
+{WAPIRWCOMMUNITY,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  {7, 3 }},
+#define WAPIROCOMMUNITY              82
+{WAPIROCOMMUNITY,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  { 7, 2 }},
+#define WAPITRAPIP              83
+{WAPITRAPIP,  ASN_IPADDRESS,  RWRITE,  var_wapiPwlanAp, 2,  { 7, 5 }},
+
+#define WAPIAPSOFTWAREVENDOR              84
+{WAPIAPSOFTWAREVENDOR,  ASN_OCTET_STR,  RONLY,  var_wapiPwlanAp, 2,  {1, 13 }},
+#define WAPIAPSOFTWARENAME              85
+{WAPIAPSOFTWARENAME,  ASN_OCTET_STR,  RONLY,  var_wapiPwlanAp, 2,  {1, 14 }},
+
+#define WAPIAPPOWERMGMT              86
+{WAPIAPPOWERMGMT,  ASN_INTEGER,  RONLY,  var_wapiPwlanAp, 4,  { 4, 1, 1, 26 }},
+#define WAPIAPLOADBALANCE              87
+//{WAPIAPLOADBALANCE,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 14 }},
+#define WAPIAPMULTIMODEACCESSCONTROL              88
+//{WAPIAPMULTIMODEACCESSCONTROL,  ASN_INTEGER,  RONLY,  var_wapiPwlanAp, 2,  {2, 18 }},
+#define WAPIDOT11QOSENABLED              89
+//{WAPIDOT11QOSENABLED,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 19 }},
+#define WAPIAPSYSNEID              90
+{WAPIAPSYSNEID,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  { 1, 17 }},
+#define WAPIAPSYSHOSTNAME              91
+{WAPIAPSYSHOSTNAME,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  {1, 3 }},
+#define WAPIAPSYSLOCATION              92
+//{WAPIAPSYSLOCATION,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  {2, 22 }},
+#define WAPIBASICMANUFACTURER              93
+{WAPIBASICMANUFACTURER,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  {1, 27 }},
+#define WAPICONFIGUSERSEPARATE              94
+//{WAPICONFIGUSERSEPARATE,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 15 }},
+#define WAPICONFIGUSERSQOS              95
+//{WAPICONFIGUSERSQOS,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 30 }},
+#define WAPICONFIGBANDWIDTHQOS              96
+//{WAPICONFIGBANDWIDTHQOS,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 28 }},
+#define WAPICONFIGMULTIMODEACCESSSTATE              97
+//{WAPICONFIGMULTIMODEACCESSSTATE,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 27 }},
+#define WAPICONFIGWAPISTATE              98
+//{WAPICONFIGWAPISTATE,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 26 }},
+
+#define WAPIAPCONFIGBSSID              99
+//{WAPIAPCONFIGBSSID,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  {2, 34 }},
+#define WAPIBSSIDNUMINESSID              100
+{WAPIBSSIDNUMINESSID,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {1, 16 }},
+#define WAPIAPCONFIGBSSIDNUM             101
+//{WAPIAPCONFIGBSSIDNUM,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 37 }},
+#define WAPIEAPAUTHENSUPPORT              102
+//{WAPIEAPAUTHENSUPPORT,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 39 }},
+#define WAPIAPWORKMODE              103
+//{WAPIAPWORKMODE,  ASN_INTEGER,  RONLY,  var_wapiPwlanAp, 2,  {2, 40 }},
+#define WAPIAPTXRATES              104
+{WAPIAPTXRATES,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 4,  { 4, 1, 1, 4 }},
+#define WAPIAPDOT11AANTENNAGAIN              105
+{WAPIAPDOT11AANTENNAGAIN,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 4,  { 4, 1, 1, 35 }},
+#define WAPIAPDOT11GANTENNAGAIN              106
+{WAPIAPDOT11GANTENNAGAIN,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 4,  { 4, 1, 1, 36 }},
+#define WAPICONDNSSERVER              107
+{WAPICONDNSSERVER,  ASN_IPADDRESS,  RWRITE,  var_wapiPwlanAp, 3,  { 2, 5, 5 }},
+#define WAPIDOT11QOSTRAFFICCLASS              108
+//{WAPIDOT11QOSTRAFFICCLASS,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  {2, 49 }},
+
+
+#define WAPICONFIGUNICASTCIPHER              109
+{WAPICONFIGUNICASTCIPHER,  ASN_OCTET_STR,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 33 }},
+#define WAPICONFIGUNICASTCIPHERENABLED              110
+{WAPICONFIGUNICASTCIPHERENABLED,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 34 }},
+#define WAPICONFIGUNICASTCIPHERSIZE              111
+{WAPICONFIGUNICASTCIPHERSIZE,  ASN_INTEGER, RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 35 }},
+#define WAPICONFIGAUTHENTICATIONSUITE              112
+{WAPICONFIGAUTHENTICATIONSUITE,  ASN_OCTET_STR,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 36 }},
+#define WAPICONFIGAUTHENTICATIONSUITEENABLED              113
+{WAPICONFIGAUTHENTICATIONSUITEENABLED,  ASN_INTEGER,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 37 }},
+#define WAPIIFINDEX              114
+{WAPIIFINDEX,  ASN_INTEGER, RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 38}},
+#define WAPIIFNMAE             115
+{WAPIIFNMAE,  ASN_OCTET_STR,  RONLY,  var_wapiApwapiConfigTable, 4,  { 16, 9, 1, 39 }},
+
+#define CHSTATSCHANNEL		116
+{CHSTATSCHANNEL,  ASN_INTEGER,  RWRITE,  var_wapiApWifiInterfaceStatisticsTable, 4,  { 4, 1, 1, 3 }},
+#define CHSTATSNUMSTATIONS		117
+//{CHSTATSNUMSTATIONS,  ASN_INTEGER,  RONLY,   var_wapiApWifiInterfaceStatisticsTable, 4,  { 17, 1, 1, 2 }},
+#define CHSTATSTOTPKTS		118
+//{CHSTATSTOTPKTS,  ASN_INTEGER,  RONLY,   var_wapiApWifiInterfaceStatisticsTable, 4,  { 17, 1, 1, 3 }},
+#define CHSTATSTOTBYTES		119
+//{CHSTATSTOTBYTES,  ASN_INTEGER,  RONLY,   var_wapiApWifiInterfaceStatisticsTable, 4,  { 17, 1, 1, 4 }},
+#define CHSTATSTOTRETRYPKTS		120
+//{CHSTATSTOTRETRYPKTS,  ASN_INTEGER,  RONLY,   var_wapiApWifiInterfaceStatisticsTable, 4,  { 17, 1, 1, 5 }},
+#define CHSTATSTOTFRAGMENTEDPKTS		121
+//{CHSTATSTOTFRAGMENTEDPKTS,  ASN_INTEGER,  RONLY,   var_wapiApWifiInterfaceStatisticsTable, 4,  { 17, 1, 1, 6 }},
+#define CHSTATSTOTPHYERRPKTS		122
+//{CHSTATSTOTPHYERRPKTS,  ASN_INTEGER,  RONLY,   var_wapiApWifiInterfaceStatisticsTable, 4,  { 17, 1, 1, 7 }},
+#define CHSTATSTOTMACERRPKTS		123
+//{CHSTATSTOTMACERRPKTS,  ASN_INTEGER,  RONLY,   var_wapiApWifiInterfaceStatisticsTable, 4,  { 17, 1, 1, 8 }},
+#define CHSTATSFRAMEERRORRATE		124
+//{CHSTATSFRAMEERRORRATE,  ASN_INTEGER,  RONLY,   var_wapiApWifiInterfaceStatisticsTable, 4,  { 17, 1, 1, 9 }},
+#define CHSTATSFRAMERETRYRATE		125
+//{CHSTATSFRAMERETRYRATE,  ASN_INTEGER,  RONLY,   var_wapiApWifiInterfaceStatisticsTable, 4,  { 17, 1, 1, 10 }},
+#define CHSTATSFRAMENONUNICASTRATE		126
+//{CHSTATSFRAMENONUNICASTRATE,  ASN_INTEGER,  RONLY,   var_wapiApWifiInterfaceStatisticsTable, 4,  { 17, 1, 1, 11 }},
+#define CHSTATSFRAMEBANDWIDTHRATE		127
+//{CHSTATSFRAMEBANDWIDTHRATE,  ASN_INTEGER,  RONLY,   var_wapiApWifiInterfaceStatisticsTable, 4,  { 17, 1, 1, 12 }},
+#define CHSTATSFRAMEFRAGMENTATIONRATE		128
+//{CHSTATSFRAMEFRAGMENTATIONRATE,  ASN_INTEGER,  RONLY,   var_wapiApWifiInterfaceStatisticsTable, 4,  { 17, 1, 1, 13 }},
+#define CHSTATSMONITOREDTIME		129
+//{CHSTATSMONITOREDTIME,  ASN_INTEGER,  RWRITE,  var_wapiApWifiInterfaceStatisticsTable, 4,  { 17, 1, 1, 14 }},
+
+
+#define WAPISTATSINDEX		130
+//{WAPISTATSINDEX,  ASN_UNSIGNED,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 1 }},
+#define WAPISTAADDRESS		131
+//{WAPISTAADDRESS,  ASN_OCTET_STR,  RWRITE,  var_wapiStatsTable, 4,  { 18, 1, 1, 2 }},
+#define WAPISTATSVERSION		132
+//{WAPISTATSVERSION,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 3 }},
+#define CONTROLLEDPORTSTATUS		133
+//{CONTROLLEDPORTSTATUS,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 4 }},
+#define SELECTEDUNICASTCIPHER		134
+//{SELECTEDUNICASTCIPHER,  ASN_OCTET_STR,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 5 }},
+#define WPIREPLAYCOUNTER		135
+//{WPIREPLAYCOUNTER,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 6 }},
+#define WPIDECRYPTABLEERRORS		136
+//{WPIDECRYPTABLEERRORS,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 7 }},
+#define WPIMICERRORS		137
+//{WPIMICERRORS,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 8 }},
+#define WAISIGNATUREERRORS		138
+//{WAISIGNATUREERRORS,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 9 }},
+#define WAIHMACERRORS		139
+//{WAIHMACERRORS,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 10 }},
+#define WAIAUTHENTICATIONRESULTFAILURES		140
+//{WAIAUTHENTICATIONRESULTFAILURES,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 11 }},
+#define WAIDISCARDCOUNTERS		141
+//{WAIDISCARDCOUNTERS,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 12 }},
+#define WAITIMEOUTCOUNTERS		142
+//{WAITIMEOUTCOUNTERS,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 13 }},
+#define WAIFORMATERRORS		143
+//{WAIFORMATERRORS,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 14 }},
+#define WAICERTIFICATEHANDSHAKEFAILURES		144
+//{WAICERTIFICATEHANDSHAKEFAILURES,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 15 }},
+#define WAIUNICASTHANDSHAKEFAILURES		145
+//{WAIUNICASTHANDSHAKEFAILURES,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 16 }},
+#define WAIMULTICASTHANDSHAKEFAILURES		146
+//{WAIMULTICASTHANDSHAKEFAILURES,  ASN_INTEGER,  RONLY,   var_wapiStatsTable, 4,  { 18, 1, 1, 17 }},
+
+#define STAADDRESS		147
+{STAADDRESS,  ASN_OCTET_STR,  RONLY,   var_wapiWlanUserTable, 4,  { 5, 4, 1, 2 }},
+#define STATXPKTS		148
+{STATXPKTS,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 5, 4, 1, 6 }},
+#define STATXBYTES		149
+{STATXBYTES,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 5, 4, 1, 8 }},
+#define STARXPKTS		150
+{STARXPKTS,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 5, 4, 1, 5 }},
+#define STARXBYTES		151
+{STARXBYTES,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 5, 4, 1, 7 }},
+#define STATXRETRYPKTS		152
+{STATXRETRYPKTS,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 5, 4, 1, 14 }},
+#define STARXRETRYPKTS		153
+{STARXRETRYPKTS,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 5, 4, 1, 15 }},
+#define STATXFRAGMENTEDPKTS		154
+//{STATXFRAGMENTEDPKTS,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 8 }},
+#define STARXFRAGMENTEDPKTS		155
+//{STARXFRAGMENTEDPKTS,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 9 }},
+#define STARECEIVEERRPKTS		156
+//{STARECEIVEERRPKTS,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 10 }},
+#define STATXTOTSIGNAL		157
+//{STATXTOTSIGNAL,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 11 }},
+#define STATXSIGNALPKTS		158
+//{STATXSIGNALPKTS,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 12 }},
+#define STAFRAMENONUNICASTRATE		159
+//{STAFRAMENONUNICASTRATE,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 13 }},
+#define STAFRAMEBANDWIDTHRATE		160
+//{STAFRAMEBANDWIDTHRATE,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 14 }},
+#define BGUSERASSOCOUNT		161
+//{BGUSERASSOCOUNT,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 15 }},
+#define AUSERASSOCOUNT		162
+//{AUSERASSOCOUNT,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 16 }},
+#define BGUSERASSOFAILCOUNT		163
+//{BGUSERASSOFAILCOUNT,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 17 }},
+#define AUSERASSOFAILCOUNT		164
+//{AUSERASSOFAILCOUNT,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 18 }},
+#define BGUSERASSOREASSOCOUNT		165
+//{BGUSERASSOREASSOCOUNT,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 19 }},
+#define AUSERASSOREASSOCOUNT		166
+//{AUSERASSOREASSOCOUNT,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 20 }},
+#define SMENFAINSUFFICIENTRESOURCE		167
+//{SMENFAINSUFFICIENTRESOURCE,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 21 }},
+#define INACROAMINGSUCCRATE		168
+//{INACROAMINGSUCCRATE,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 22 }},
+#define OUTACROAMINGSUCCRATE		169
+//{OUTACROAMINGSUCCRATE,  ASN_INTEGER,  RONLY,   var_wapiWlanUserTable, 4,  { 15, 1, 1, 23 }},
+
+#define APSNRBSSIDAVERAGESIGNALSTRENGTH		170
+//{APSNRBSSIDAVERAGESIGNALSTRENGTH,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 1 }},
+#define APSNRBSSIDSIGNALPKTS		171
+//{APSNRBSSIDSIGNALPKTS,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 2 }},
+#define APSNRBSSIDHIGHESTRXSIGNALSTRENGTH		172
+{APSNRBSSIDHIGHESTRXSIGNALSTRENGTH,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 5, 2, 1, 9 }},
+#define APSNRBSSIDLOWESTRXSIGNALSTRENGTH		173
+{APSNRBSSIDLOWESTRXSIGNALSTRENGTH,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 5, 2, 1, 4 }},
+#define APSNRBSSIDSAMPLETIME		174
+//{APSNRBSSIDSAMPLETIME,  ASN_INTEGER,  RWRITE,  var_wapiApWirelessTable, 4,  { 16, 1, 1, 5 }},
+#define WAPIAPUPLINKDATETHROUGHPUT		175
+//{WAPIAPUPLINKDATETHROUGHPUT,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 6 }},
+#define WAPIAPDOWNLINKDATETHROUGHPUT		176
+//{WAPIAPDOWNLINKDATETHROUGHPUT,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 7 }},
+#define WAPIAPUPLINKUPDOWNTIMES		177
+//{WAPIAPUPLINKUPDOWNTIMES,  ASN_UNSIGNED,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 8 }},
+#define WAPIAPDOWNLINKUPDOWNTIMES		178
+//{WAPIAPDOWNLINKUPDOWNTIMES,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 9 }},
+#define WARPTLOCTETSINQUEUE		179
+//{WARPTLOCTETSINQUEUE,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 10 }},
+#define WARPTLPACKETSINQUEUE		180
+//{WARPTLPACKETSINQUEUE,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 11 }},
+#define WARPTLAVGDATARATE		181
+//{WARPTLAVGDATARATE,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 12 }},
+#define WARPTLOUTPACKETS		182
+//{WARPTLOUTPACKETS,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 13 }},
+#define WARPTLINPACKETS		183
+//{WARPTLINPACKETS,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 14 }},
+#define UPLINKSLOTTIMEEFFAVG		184
+//{UPLINKSLOTTIMEEFFAVG,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 15 }},
+#define WARPTLPHYDATARATE		185
+//{WARPTLPHYDATARATE,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 16 }},
+#define WARPTLPHYTXDISTRIBUTION		186
+//{WARPTLPHYTXDISTRIBUTION,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 17 }},
+#define WARPTLPHYRXDISTRIBUTION		187
+//{WARPTLPHYRXDISTRIBUTION,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 18 }},
+#define WARPTLPHYFAILEDTRANSMISSION		188
+//{WARPTLPHYFAILEDTRANSMISSION,  ASN_INTEGER,  RONLY,   var_wapiApWirelessTable, 4,  { 16, 1, 1, 19 }},
+
+#define WAPIESSIDIFINDEX		189
+//{WAPIESSIDIFINDEX,  ASN_INTEGER,  RONLY,   var_IwnAPESSIDTable, 4,  {2, 35, 1, 1 }},
+#define WAPIDEVNAME		190
+//{WAPIDEVNAME,  ASN_OCTET_STR,  RONLY,   var_IwnAPESSIDTable, 4,  {2, 35, 1, 2 }},
+#define APCONFIGBSSID		191
+//{APCONFIGBSSID,  ASN_OCTET_STR,  RONLY,   var_IwnAPESSIDTable, 4,  {2, 35, 1, 3 }},
+#define APDOT11DESIREDSSID		192
+//{APDOT11DESIREDSSID,  ASN_OCTET_STR,  RWRITE,   var_IwnAPESSIDTable, 4,  {2, 35, 1,4 }},
+#define APMAXSIMULTUSERS		193
+//{APMAXSIMULTUSERS,  ASN_INTEGER,  RWRITE,   var_IwnAPESSIDTable, 4,  {2, 35, 1,5}},
+#define APMAXSIMULTTRAFFIC		194
+{APMAXSIMULTTRAFFIC,  ASN_INTEGER,  RWRITE,   var_IwnAPESSIDTable, 4,  { 4, 1, 1, 29 }},
+#define APBSSIDENCRYPTION		195
+//{APBSSIDENCRYPTION,  ASN_INTEGER,  RWRITE,   var_IwnAPESSIDTable, 4,  {2, 35, 1, 7}},
+
+
+#define WAPIDOT11AUTHENTICATIONALGORITHM		196
+{WAPIDOT11AUTHENTICATIONALGORITHM,  ASN_INTEGER,  RONLY ,  var_wapiPwlanAp, 4,  { 6, 2, 1, 9 }},
+#define FRAMERETRYRATEEXCEEDED		197
+//{FRAMERETRYRATEEXCEEDED,  ASN_INTEGER,  RONLY ,  var_wapiPwlanAp, 2,  {2,53 }},
+ #define DFSFREECOUNTBELOWTHRESHOLD		198
+//{DFSFREECOUNTBELOWTHRESHOLD,  ASN_INTEGER,  RONLY ,  var_wapiPwlanAp, 2,  {2, 54 }},
+#define BEACONTIMEOUT		199
+//{BEACONTIMEOUT,  ASN_INTEGER,  RONLY ,  var_wapiPwlanAp, 2,  {2, 55 }},
+#define MICHAELERROROVERTHRESHOLD		200
+//{MICHAELERROROVERTHRESHOLD,  ASN_INTEGER,  RONLY ,  var_wapiPwlanAp, 2,  {2, 56 }},
+#define VAPMISSINGBSSIDRANGE		201
+//{VAPMISSINGBSSIDRANGE,  ASN_INTEGER,  RONLY ,  var_wapiPwlanAp, 2,  {2, 57 }},
+#define VAPMISCONFIGURED		202
+//{VAPMISCONFIGURED,  ASN_INTEGER,  RONLY ,  var_wapiPwlanAp, 2,  {2, 58 }},
+
+#define WAPIMSSIDIFINDEX		203
+{WAPIMSSIDIFINDEX,  ASN_INTEGER,  RONLY,   var_wapiMssidTable, 4, { 6, 2, 1, 1 }},
+#define WAPIMSSIDDEVNAME		204
+{WAPIMSSIDDEVNAME,  ASN_OCTET_STR,  RONLY,   var_wapiMssidTable, 4, { 10, 3, 1, 2 }},
+#define WAPIMSSIDWLANSSID		205
+{WAPIMSSIDWLANSSID,  ASN_OCTET_STR,  RWRITE,  var_wapiMssidTable, 4, { 6, 2, 1, 3 }},
+#define WAPIMSSIDHIDESSID		206
+{WAPIMSSIDHIDESSID,  ASN_INTEGER,  RWRITE,  var_wapiMssidTable, 4, { 6, 2, 2, 4 }},
+#define WAPIMSSIDWAPI		207
+{WAPIMSSIDWAPI,  ASN_INTEGER,  RWRITE,  var_wapiMssidTable, 4, { 6, 2, 1, 8 }},
+#define WAPIMSSIDPSKTYPE		208
+//{WAPIMSSIDPSKTYPE,  ASN_INTEGER,  RWRITE,  var_wapiMssidTable, 4, { 10, 3, 1, 6 }},
+#define WAPIMSSIDPSK		209
+//{WAPIMSSIDPSK,  ASN_OCTET_STR,  RWRITE,  var_wapiMssidTable, 4, { 10, 3, 1, 7 }},
+#define WAPIMSSIDVLANID		210
+{WAPIMSSIDVLANID,  ASN_INTEGER,  RWRITE,  var_wapiMssidTable, 4, { 6, 2, 1, 5 }},
+#define WAPIMSSIDQOS		211
+//{WAPIMSSIDQOS,  ASN_INTEGER,  RWRITE,  var_wapiMssidTable, 4, { 10, 3, 1, 9 }},
+#define WAPIMSSIDMACPOLICY		212
+//{WAPIMSSIDMACPOLICY,  ASN_INTEGER,  RWRITE,  var_wapiMssidTable, 4, { 10, 3, 1, 10 }},
+#define WAPIMSSIDMAXUSER		213
+{WAPIMSSIDMAXUSER,  ASN_INTEGER,  RWRITE,  var_wapiMssidTable, 4, { 4, 1, 1, 28 }},
+
+#define WAPISSIDNUMBER		214
+{WAPISSIDNUMBER,  ASN_INTEGER,  RONLY,  var_wapiPwlanAp, 2,  { 1, 15 }},
+#define WAPIVLANONOFF		215
+{WAPIVLANONOFF,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  { 1, 8 }},
+#define WAPIMSSIDADD		216
+//{WAPIMSSIDADD,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  { 10, 4 }},
+#define WAPIMSSIDDEL		217
+//{WAPIMSSIDDEL,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  { 10, 5 }},
+////{WAPIMSSIDDEL,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  { 10, 5 }},
+
+#define WAPIAPARF		218
+//{WAPIAPARF,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  { 2, 59 }},
+#define WAPIAPBRF		219
+//{WAPIAPBRF,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  { 2, 60 }},
+#define WAPIAPWZC		220
+//{WAPIAPWZC,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  { 2, 61}},
+#define WAPIAPFREQUENCYSWITCH		221
+{WAPIAPFREQUENCYSWITCH,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 4,  { 4, 1, 1, 21 }},
+#define WAPICONFIGPID		222
+//{WAPICONFIGPID,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  {2, 63}},
+
+#define WAPICONFIGFILE		223
+//{WAPICONFIGFILE,  ASN_OCTET_STR,  RWRITE,  var_wapiPwlanAp, 2,  {13, 1}},
+#define WAPISTARTCONFIGAP		224
+//{WAPISTARTCONFIGAP,  ASN_INTEGER,  RWRITE,  var_wapiPwlanAp, 2,  { 13, 2 }},
+#define WAPIMEMUSAGE               225 
+{WAPIMEMUSAGE,  ASN_INTEGER,  RONLY,  var_wapiPwlanAp, 2,  { 1, 24 }},
+#define WAPICPUUSAGE               226 
+{WAPICPUUSAGE,  ASN_INTEGER,  RONLY,  var_wapiPwlanAp, 2,  { 1, 23 }},
+};
+
+

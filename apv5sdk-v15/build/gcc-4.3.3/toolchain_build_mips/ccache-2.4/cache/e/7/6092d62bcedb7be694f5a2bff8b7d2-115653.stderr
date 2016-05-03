@@ -1,0 +1,11 @@
+extensions/libxt_NATTYPE.c:53: warning: 'struct ipt_entry' declared inside parameter list
+extensions/libxt_NATTYPE.c:53: warning: its scope is only this definition or declaration, which is probably not what you want
+extensions/libxt_NATTYPE.c: In function 'parse':
+extensions/libxt_NATTYPE.c:55: warning: unused variable 'portok'
+extensions/libxt_NATTYPE.c: At top level:
+extensions/libxt_NATTYPE.c:103: warning: 'struct ipt_ip' declared inside parameter list
+extensions/libxt_NATTYPE.c:113: warning: 'struct ipt_ip' declared inside parameter list
+extensions/libxt_NATTYPE.c:127: warning: initialization from incompatible pointer type
+extensions/libxt_NATTYPE.c:128: warning: initialization from incompatible pointer type
+extensions/libxt_NATTYPE.c:130: warning: initialization from incompatible pointer type
+extensions/libxt_NATTYPE.c:131: warning: initialization from incompatible pointer type

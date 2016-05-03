@@ -1,0 +1,84 @@
+.NOTPARALLEL:
+
+ifndef ROOTFSDIR
+ROOTFSDIR := /home/shark/builddir/rootfs
+endif
+
+PKG := busybox
+ifeq ($(BOARD_TYPE), armada370)
+VERSION := 1.18.4
+DIR := src18
+else
+VERSION := 1.4.2
+DIR := src
+endif
+BUSYBOX_LINKS := `xargs < ${DIR}/busybox.links`
+
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE), amcc)
+CC := powerpc-apm-linux-gnu-gcc
+TARGET_CROSS ?= powerpc-apm-linux-gnu-
+ARCH ?= "powerpc-apm"
+else
+ifeq ($(BOARD_TYPE), armada370)
+CC := arm-marvell-linux-gnueabi-gcc
+TARGET_CROSS ?= arm-marvell-linux-gnueabi-
+ARCH ?= "arm"
+else
+CC := mips-linux-uclibc-gcc
+TARGET_CROSS ?= mips-linux-uclibc-
+TOOLCHAIN_ABI ?= -mabi=32
+ARCH ?= "mips"
+endif
+endif
+#wangyu add end
+CP := cp -fpR
+INSTALL_DIR := $(DIR)/_install
+
+EXTRA_CFLAGS += -DAPV5
+
+.PHONY: all
+all: build install 
+
+.PHONY: build
+build:
+	${MAKE} -C $(DIR) \
+		CC=$(CC) \
+		CROSS_COMPILE=$(TARGET_CROSS) \
+		EXTRA_CFLAGS=$(EXTRA_CFLAGS) \
+		ARCH=$(ARCH) \
+		IPKG_ARCH=$(ARCH) \
+		all
+
+.PHONY: install
+install:
+	$(MAKE) -C $(DIR) \
+		CC=$(CC) \
+	 	CROSS_COMPILE=$(TARGET_CROSS) \
+		EXTRA_CFLAGS=$(EXTRA_CFLAGS) \
+		ARCH=$(ARCH) \
+		IPKG_ARCH=$(ARCH) \
+		install 
+	#lyb add start
+	#$(CP) $(INSTALL_DIR)/bin/busybox  $(ROOTFSDIR)/bin/busybox_new
+	#rm -f $(ROOTFSDIR)/bin/grep
+	#touch  /bin/busybox_new
+	#ln -sf /bin/busybox_new  $(ROOTFSDIR)/bin/grep
+	#ln -sf /bin/busybox_new  $(ROOTFSDIR)/bin/ash
+	#ln -sf /bin/busybox_new  $(ROOTFSDIR)/bin/sh
+	#ln -sf /bin/busybox_new  $(ROOTFSDIR)/usr/bin/awk
+	#ln -sf /bin/busybox_new  $(ROOTFSDIR)/usr/bin/cut
+	#ln -sf /bin/busybox_new  $(ROOTFSDIR)/usr/bin/head
+	#ln -sf /bin/busybox_new  $(ROOTFSDIR)/bin/sed
+	#lyb add end
+	$(CP) $(INSTALL_DIR)/bin/*  $(ROOTFSDIR)/bin/
+	$(CP) $(INSTALL_DIR)/sbin/*  $(ROOTFSDIR)/sbin/
+	$(CP) $(INSTALL_DIR)/usr/bin/*  $(ROOTFSDIR)/usr/bin/
+	$(CP) $(INSTALL_DIR)/usr/sbin/*  $(ROOTFSDIR)/usr/sbin/
+	$(CP) $(DIR)/examples/mdev.conf  $(ROOTFSDIR)/etc/
+	mkdir -p $(ROOTFSDIR)/sys	
+	
+.PHONY: clean
+clean:	
+	${MAKE} -C $(DIR) clean
+

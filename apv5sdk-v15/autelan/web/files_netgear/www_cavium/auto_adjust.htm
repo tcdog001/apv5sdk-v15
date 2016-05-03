@@ -1,0 +1,303 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_linkdetect=`config_read /config/network/intelligence/linkdetect`
+xml_linkdetect_eth0=`config_getoption "$xml_linkdetect" vap_eth0`
+xml_linkdetect_eth1=`config_getoption "$xml_linkdetect" vap_eth1`
+xml_linkdetect_interval=`config_getoption "$xml_linkdetect" interval`
+xml_linkdetect_upip=`config_getoption "$xml_linkdetect" upip`
+xml_linkdetect_uptime=`config_getoption "$xml_linkdetect" uptime`
+  	
+xml_autochannel=`config_read /config/network/intelligence/autochannel`
+xml_autochannel_wifi0=`config_getoption "$xml_autochannel" channel_wifi0`
+xml_autochannel_wifi1=`config_getoption "$xml_autochannel" channel_wifi1`
+xml_autochannel_interval=`config_getoption "$xml_autochannel" interval`
+
+xml_autopower=`config_read /config/network/intelligence/autopower`
+xml_autopower_wifi0=`config_getoption "$xml_autopower" power_wifi0`
+xml_autopower_wifi1=`config_getoption "$xml_autopower" power_wifi1`
+xml_autopower_interval=`config_getoption "$xml_autopower" interval`
+
+xml_load=`config_read /config/network/intelligence/loadbalance`
+xml_load_enable=`config_getoption "$xml_load" enable`
+xml_load_threshold=`config_getoption "$xml_load" wifi0threshold`
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js wireless_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script type="text/javascript">
+var flag="<%= $xml_session_lang %>";
+var wifi1_enable="<%= $DEV_wifi1 %>";
+var eth1_enable="<%= $DEV_eth1 %>";
+	init_mmenu(flag);
+	init_wiremenu(flag);
+	init_adv(flag);
+function valvalidate() 
+{
+	   	overlayer();
+}       
+
+
+function isNull()
+{
+	
+}
+
+function atAlerm()
+{
+	
+}
+
+function vap_specific()
+{
+	 
+}
+
+function shielding()
+{
+		if(eth1_enable != "enable")
+		{
+				document.getElementById("tr_eth1").style.display="none";
+	  }
+	  if(wifi1_enable != "enable")
+		{
+				document.getElementById("tr_wifi10").style.display="none";
+				document.getElementById("tr_wifi11").style.display="none";
+	  }
+	 	
+}
+
+</script>
+</head>
+<body onLoad="shielding()">
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_wireless8.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+
+  <div align="center">
+    <table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+    	<tr>
+					<td bordercolor="#d9d9d9">	
+						           <form action="action.cgi" method="post" name="form0" id="form0" onsubmit="return valvalidate()">					
+                        <table  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+										      <tr>
+												<td width="100%"  colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(iset_uplink_detect)</script></b></td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+												
+												<tr>
+													<td align="right" height="24" bordercolor="#ffffff" width="280"><script language="javascript">replace(iset_eth0_disable)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" width="370">
+													<select name="linkdetecteth0" onChange="vap_specific()">
+														<option value="ignore" <% webui_listbox_select "$xml_linkdetect_eth0" "ignore" %>>ignore</option>
+										        <option value="link-off" <% webui_listbox_select "$xml_linkdetect_eth0" "link-off" %> >link-off</option>
+										        <option value="access-off" <% webui_listbox_select "$xml_linkdetect_eth0" "access-off" %>>access-off</option>
+													</select>	
+													</td>
+												</tr>
+												
+												<tr id="tr_eth1">
+													<td align="right" height="24" bordercolor="#ffffff" width="280"><script language="javascript">replace(iset_eth1_disable)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" width="370">
+													<select name="linkdetecteth1" onChange="vap_specific()">
+														<option value="ignore" <% webui_listbox_select "$xml_linkdetect_eth1" "ignore" %>>ignore</option>
+										        <option value="link-off" <% webui_listbox_select "$xml_linkdetect_eth1" "link-off" %> >link-off</option>
+										        <option value="access-off" <% webui_listbox_select "$xml_linkdetect_eth1" "access-off" %>>access-off</option>
+													</select>	
+													</td>
+												</tr>
+												
+												<tr>
+													<td align="right" height="24" bordercolor="#ffffff" ><script language="javascript">replace(iset_detect_interval)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" >
+													 <input name="detectime" type="text" size="7" maxlength="4" value="<%= "$xml_linkdetect_interval" %>"  ><script language="javascript">replace(iset_minutes)</script>
+													</td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+												
+												<tr>
+													<td align="right" height="24" bordercolor="#ffffff" ><script language="javascript">replace(iset_uplink_ip)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" >
+													 <input name="detectupip" type="text"   value="<%= "$xml_linkdetect_upip" %>"  >&nbsp;
+													</td>
+												</tr>
+												
+												<tr>
+													<td align="right" height="24" bordercolor="#ffffff" ><script language="javascript">replace(iset_detect_interval)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" >
+													 <input name="detecuptime" type="text" size="7" maxlength="4" value="<%= "$xml_linkdetect_uptime" %>"  ><script language="javascript">replace(iset_minutes)</script>
+													</td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+										     </table>
+										    <table  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+										      <tr>
+												<td width="100%"  colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(iset_load_balance)</script></b></td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+												
+												<tr>
+													<td align="right" height="24" bordercolor="#ffffff" width="280"><script language="javascript">replace(iset_lb_enable)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" width="370">
+													<input type="checkbox" <% webui_checkbox_check "$xml_load_enable" "1" %> name="loadenable" value="1">
+													</td>
+												</tr>
+												
+												<tr>
+													<td align="right" height="24" bordercolor="#ffffff" ><script language="javascript">replace(iset_lb_threshold)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" >
+													 <input name="loadthreshold" type="text" size="7" maxlength="1" value="<%= "$xml_load_threshold" %>"  > 
+													</td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+										     </table>
+												<table  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+										      <tr>
+												<td width="100%"  colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(iset_channel_auto)</script></b></td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+												
+												<tr>
+													<td align="right" height="24" bordercolor="#ffffff" width="280"><script language="javascript">replace(iset_wifi0_chanauto)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" width="370">
+													<input type="checkbox" <% webui_checkbox_check "$xml_autochannel_wifi0" "wifi0" %> name="wifi0enable" value="wifi0">
+													</td>
+												</tr>
+												
+												<tr id="tr_wifi10">
+													<td align="right" height="24" bordercolor="#ffffff" ><script language="javascript">replace(iset_wifi1_chanauto)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" >
+													<input type="checkbox" <% webui_checkbox_check "$xml_autochannel_wifi1" "wifi1" %> name="wifi1enable" value="wifi1">
+													</td>
+												</tr>
+
+												<tr>
+													<td align="right" height="24" bordercolor="#ffffff" ><script language="javascript">replace(iset_adjust_interval)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" >
+													 <input name="channelctime" type="text" size="7" maxlength="4" value="<%= "$xml_autochannel_interval" %>"  ><script language="javascript">replace(iset_minutes)</script>
+													</td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+										     </table>
+										    <table  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+										      <tr>
+												<td width="100%"  colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(iset_power_auto)</script></b></td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+												
+												<tr>
+													<td align="right" height="24" bordercolor="#ffffff" width="280"><script language="javascript">replace(iset_wifi0_powerauto)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" width="370">
+													<select name="powercwifi0" onChange="vap_specific()">
+														<option value="ignore" <% webui_listbox_select "$xml_autopower_wifi0" "ignore" %>>ignore</option>
+										        <option value="inc" <% webui_listbox_select "$xml_autopower_wifi0" "inc" %> >increment</option>
+										        <option value="dec" <% webui_listbox_select "$xml_autopower_wifi0" "dec" %>>decrement</option>
+													</select>
+													</td>
+												</tr>
+												
+												<tr id="tr_wifi11">
+													<td align="right" height="24" bordercolor="#ffffff" ><script language="javascript">replace(iset_wifi1_powerauto)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" >
+													<select name="powercwifi1" onChange="vap_specific()">
+														<option value="ignore" <% webui_listbox_select "$xml_autopower_wifi1" "ignore" %>>ignore</option>
+										        <option value="inc" <% webui_listbox_select "$xml_autopower_wifi1" "inc" %> >increment</option>
+										        <option value="dec" <% webui_listbox_select "$xml_autopower_wifi1" "dec" %>>decrement</option>
+													</select>
+													</td>
+												</tr>
+
+												<tr>
+													<td align="right" height="24" bordercolor="#ffffff" ><script language="javascript">replace(iset_adjust_interval)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" >
+													 <input name="powerctime" type="text" size="7" maxlength="4" value="<%= "$xml_autopower_interval" %>"  ><script language="javascript">replace(iset_minutes)</script>
+													</td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+										     </table>
+							 </td>
+       </tr>
+     </table>
+		                      <table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+											    <tr>
+											     <td align="center" height="40px" valign="middle" >
+											       <script language="javascript">replace(adv_apply)</script>
+											      </td>
+											     </tr>
+											     <tr>
+										        <td align="right"   colspan="2"><script language="javascript">replace(iset_help)</script></td>
+										      </tr>
+    </table>
+      <input type="hidden" name="SERVLET" value="Intelligence setup">
+    </form>
+  </div>
+
+
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

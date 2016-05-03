@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			OptionFirmware.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='NetworkTraffic.c.html' title=' NetworkTraffic.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='OptionIdentity.c.html' title=' OptionIdentity.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed OptionFirmware (signed margin, const char * style);
+ *   
+ *   page.h
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef OPTIONFIRMWARE_SOURCE
+#define OPTIONFIRMWARE_SOURCE
+
+#include &quot;../tools/format.h&quot;
+#include &quot;../cgi/page.h&quot;
+
+signed OptionFirmware (signed margin, const char * style) 
+
+{
+	output (margin++, &quot;&lt;div class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;table class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;fieldset class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;legend class='%s'&gt;&quot;, style);
+	output (margin, &quot;%s&quot;, &quot;File Select&quot;);
+	output (margin--, &quot;&lt;/legend&gt;&quot;);
+	output (margin++, &quot;&lt;table class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+	output (margin, &quot;PIB File&quot;);
+	output (margin--, &quot;&lt;/th&gt;&quot;);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin, &quot;&lt;input type='file' name='%s'/&gt;&quot;, FIELD_PIB);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin--, &quot;&lt;/tr&gt;&quot;);
+	output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+	output (margin, &quot;NVM File&quot;);
+	output (margin--, &quot;&lt;/th&gt;&quot;);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin, &quot;&lt;input type='file' name='%s'/&gt;&quot;, FIELD_NVM);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin--, &quot;&lt;/tr&gt;&quot;);
+	output (margin--, &quot;&lt;/table&gt;&quot;);
+	output (margin--, &quot;&lt;/fieldset&gt;&quot;);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin--, &quot;&lt;/tr&gt;&quot;);
+	output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin, &quot;&lt;input type='submit' class='%s' name='%s' value='%s' title=' Change Configuration '&gt;&quot;, style, SUBMIT_ACTION, ACTION_CONFIGURE);
+	output (margin, &quot;&lt;input type='submit' class='%s' name='%s' value='%s' title=' Change Configuration and Firmware '&gt;&quot;, style, SUBMIT_ACTION, ACTION_UPGRADE);
+	output (margin, &quot;&lt;input type='submit' class='%s' name='%s' value='%s' title=' Restore Factory Defaults '&gt;&quot;, style, SUBMIT_ACTION, ACTION_DEFAULT);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin--, &quot;&lt;/tr&gt;&quot;);
+	output (margin--, &quot;&lt;/table&gt;&quot;);
+	output (margin--, &quot;&lt;/div&gt;&quot;);
+	return (margin);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='NetworkTraffic.c.html' title=' NetworkTraffic.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='OptionIdentity.c.html' title=' OptionIdentity.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

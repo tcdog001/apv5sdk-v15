@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			WriteCFG.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='WatchdogReport.c.html' title=' WatchdogReport.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='WriteMEM.c.html' title=' WriteMEM.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   signed WriteCFG (struct int6k * int6k);
+ *
+ *   int6k.h
+ *
+ *   This plugin for program int6k writes the contents of an SDRAM
+ *   confirmation file to a device using a VS_SET_SDRAM message; the
+ *   CFG file in struct int6k must be opened before this function is
+ *   called; the bootloader must be running for this to work; 
+ *   
+ *   the VS_SET_SDRAM message is recognized by the INT600 BootLoader
+ *   only; the INT6400 BootLoader recognizes it but does nothing with
+ *   it;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef WRITECFG_SOURCE
+#define WRITECFG_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;memory.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../ram/sdram.h&quot;
+
+int WriteCFG (struct int6k * int6k) 
+
+{
+
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_set_sdram_request 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		struct config_ram config_ram;
+		uint32_t CHECKSUM;
+	}
+	* request = (struct vs_set_sdram_request *) (message);
+	struct __packed vs_set_sdram_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+	}
+	* confirm = (struct vs_set_sdram_confirm *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	Request (int6k, &quot;Write Configuration to Device&quot;);
+	memset (message, 0, sizeof (struct message));
+	EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message-&gt;intellon, (VS_SET_SDRAM | MMTYPE_REQ));
+	int6k-&gt;packetsize = ETHER_MIN_LEN;
+	if (lseek (int6k-&gt;CFG.file, 0, SEEK_SET)) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;can't rewind %s&quot;, filepart (int6k-&gt;CFG.name));
+		return (-1);
+	}
+	if (read (int6k-&gt;CFG.file, &amp;request-&gt;config_ram, sizeof (struct config_ram)) &lt; sizeof (struct config_ram)) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;can't read %s&quot;, filepart (int6k-&gt;CFG.name));
+		return (-1);
+	}
+	if (read (int6k-&gt;CFG.file, &amp;request-&gt;CHECKSUM, sizeof (request-&gt;CHECKSUM)) &lt; sizeof (request-&gt;CHECKSUM)) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;can't read %s checksum&quot;, filepart (int6k-&gt;CFG.name));
+		return (-1);
+	}
+	if (SendMME (int6k) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+		return (-1);
+	}
+	if (ReadMME (int6k, (VS_SET_SDRAM | MMTYPE_CNF)) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+		return (-1);
+	}
+	if (confirm-&gt;MSTATUS) 
+	{
+		Failure (int6k, INT6K_WONTDOIT);
+		return (-1);
+	}
+	Confirm (int6k, &quot;Wrote %s&quot;, filepart (int6k-&gt;CFG.name));
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='WatchdogReport.c.html' title=' WatchdogReport.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='WriteMEM.c.html' title=' WriteMEM.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

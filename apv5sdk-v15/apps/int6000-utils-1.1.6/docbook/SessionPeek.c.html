@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			SessionPeek.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='SessionLoad.c.html' title=' SessionLoad.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SessionSave.c.html' title=' SessionSave.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void SessionPeek ();
+ *
+ *   session.h
+ *
+ *   send session variable information to HTML client for development
+ *   and debugging purposes; 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SESSIONPEEK_SOURCE
+#define SESSIONPEEk_SOURCE
+
+#include &quot;../cgi/page.h&quot;
+#include &quot;../cgi/session.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/format.h&quot;
+
+void SessionPeek () 
+
+{
+	extern struct session session;
+	char address [ETHER_ADDR_LEN * 3];
+	signed margin = 0;
+	unsigned bridge = 0;
+	output (margin++, &quot;&lt;div class ='%s' style='background:yellow;'&gt;&quot;, STYLE_PEEK);
+	output (margin++, &quot;&lt;table&gt;&quot;);
+	output (margin++, &quot;&lt;tr&gt;&quot;);
+	output (margin++, &quot;&lt;td&gt;&quot;);
+	printf (&quot;%s=%s&lt;br/&gt;&quot;, SUBMIT_OPTION, session.option);
+	printf (&quot;%s=%s&lt;br/&gt;&quot;, SUBMIT_ACTION, session.action);
+	printf (&quot;%s=%s&lt;br/&gt;&quot;, SUBMIT_SOURCE, session.source);
+	while (bridge &lt; session.bridges)
+	{
+		printf (&quot;bridge=%s&lt;br/&gt;&quot;, hexstring (address, sizeof (address), session.bridge[bridge++].MAC, ETHER_ADDR_LEN));
+	}
+	printf (&quot;device=%s&lt;br/&gt;&quot;, hexstring (address, sizeof (address), session.device.MAC, ETHER_ADDR_LEN));
+	printf (&quot;DAK=%s DPW='%s'&lt;br/&gt;&quot;, hexstring (address, sizeof (address), session.device.DAK, sizeof (session.device.DAK)), session.DPW);
+	printf (&quot;NMK=%s NPW='%s'&lt;br/&gt;&quot;, hexstring (address, sizeof (address), session.device.NMK, sizeof (session.device.NMK)), session.NPW);
+	printf (&quot;NID=%s&lt;br/&gt;&quot;, hexstring (address, sizeof (address), session.device.NID, sizeof (session.device.NID)));
+	printf (&quot;method=%d,%d&lt;br/&gt;&quot;, session.QoS.method [0], session.QoS.method [1]);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin--, &quot;&lt;/tr&gt;&quot;);
+	output (margin--, &quot;&lt;/table&gt;&quot;);
+	output (margin--, &quot;&lt;/div&gt;&quot;);
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='SessionLoad.c.html' title=' SessionLoad.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='SessionSave.c.html' title=' SessionSave.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

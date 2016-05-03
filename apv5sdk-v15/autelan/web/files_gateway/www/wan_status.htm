@@ -1,0 +1,92 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+
+pppd_status=`ps|awk '/pppd/'`
+if [ -z "$pppd_status" ]; then
+	pppd_status="Disconnected"
+else
+	pppd_status="Connected"
+fi
+
+xml_wan=`config_read /config/network/wan`
+xml_wan_select=`config_getoption "$xml_wan" wan_select`
+
+xml_wlwan=`config_read /config/network/wlwan`
+xml_wlwan_enable=`config_getoption "$xml_wlwan" enable`
+if [ "$xml_wlwan_enable" == "yes" ]; then
+	xml_80211wan_enable="Connected"
+else
+	xml_80211wan_enable="Disconnected"
+fi
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Network</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<script language="javascript">
+function myrefresh()
+{
+   document.form_refresh.action="action.cgi";
+	 document.form_refresh.submit(); 
+}
+setTimeout("myrefresh()",10000)
+</script>
+</head>
+
+<body bgcolor="#efefef">
+	<form name="form_refresh" method="post" action="<%= $action_cgi %>">
+	<input type="hidden" value="wanstatus refresh" name="SERVLET">
+	</form>
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1">Status</td>
+          <td class="top1"><a href="3g_wan_setting.htm" target="MainFrame">3G WAN Setting</a></td>
+		  <td class="top1"><a href="802.11_wan_setting.htm" target="MainFrame">802.11 WAN Setting</a></td>
+		  <td class="top1"><a href="wan_selection.htm" target="MainFrame">WAN selection</a></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">WAN Setting-->Status</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="WAN Information illustration">WAN Information</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+      <tr>
+          <td class="td_style" width="150">PPP Status </td>
+          <td class="td_style" width="350"><%= "$pppd_status" %></td>
+        </tr>
+      <tr>
+          <td class="td_style" >802.11 Status </td>
+          <td class="td_style" ><%= "$xml_80211wan_enable" %></td>
+        </tr>
+		<tr>
+          <td class="td_style">Current WAN Selection </td>
+          <td class="td_style"><%= "$xml_wan_select" %></td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><a class="imgLink" href="#" onclick="window.parent.frames.MainFrame.location.reload();">Refresh</a></td>
+  </tr>
+</table>
+</div>
+</body>
+</html>

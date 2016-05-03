@@ -1,0 +1,93 @@
+.NOTPARALLEL:
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR = src
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+ifeq ($(BOARD_TYPE),amcc)
+CROSS=powerpc-apm-linux-gnu-
+CC=${CROSS}gcc
+else
+ifeq ($(BOARD_TYPE),armada370)
+CROSS=arm-marvell-linux-gnueabi-
+CC=${CROSS}gcc
+else
+CROSS=mips64-octeon-linux-gnu
+CC=${CROSS}-gcc
+endif
+endif
+#TOOLCHAIN_ABI_64=y
+
+unexport LDFLAGS
+
+.PHONY: all
+all: build install
+.PHONY: build
+#wangyu add 2011-05-23
+ifeq ($(BOARD_TYPE),db12x)
+ifeq ($(AQ_TYPE),XH9344)
+build:
+	${MAKE} -C $(PKG_BUILD_DIR) \
+		CC=$(CC) CROSS_COMPILE=$(TARGET_CROSS) EXTRA_CFLAGS=$(TOOLCHAIN_ABI) \
+		ARCH=$(ARCH) IPKG_ARCH=$(ARCH) XH9344=1
+else
+ifeq ($(AQ_TYPE),XJ9344)
+build:
+	${MAKE} -C $(PKG_BUILD_DIR) \
+		CC=$(CC) CROSS_COMPILE=$(TARGET_CROSS) EXTRA_CFLAGS=$(TOOLCHAIN_ABI) \
+		ARCH=$(ARCH) IPKG_ARCH=$(ARCH) XJ9344=1
+else
+build:
+	${MAKE} -C $(PKG_BUILD_DIR) \
+		CC=$(CC) CROSS_COMPILE=$(TARGET_CROSS) EXTRA_CFLAGS=$(TOOLCHAIN_ABI) \
+		ARCH=$(ARCH) IPKG_ARCH=$(ARCH) PC018=1
+endif
+endif
+else ifeq ($(AQ_TYPE),AQ2000SNH)
+build:
+	${MAKE} -C $(PKG_BUILD_DIR) \
+		CC=$(CC) CROSS_COMPILE=$(TARGET_CROSS) EXTRA_CFLAGS=$(TOOLCHAIN_ABI) \
+		ARCH=$(ARCH) IPKG_ARCH=$(ARCH) WNAP550=1 AQ2000SNH=1
+else ifeq ($(AQ_TYPE), AP2400-IFM)
+build:
+	${MAKE} -C $(PKG_BUILD_DIR) \
+		CC=$(CC) CROSS_COMPILE=$(TARGET_CROSS) EXTRA_CFLAGS=$(TOOLCHAIN_ABI) \
+		ARCH=$(ARCH) IPKG_ARCH=$(ARCH) AP2400=1  
+else ifeq ($(AQ_TYPE), XHPB44)
+build:
+	${MAKE} -C $(PKG_BUILD_DIR) \
+		CC=$(CC) CROSS_COMPILE=$(TARGET_CROSS) EXTRA_CFLAGS=$(TOOLCHAIN_ABI) \
+		ARCH=$(ARCH) IPKG_ARCH=$(ARCH) AP2400=1 XHPB44=1
+else ifeq ($(BOARD_TYPE), amcc)
+build:
+	${MAKE} -C $(PKG_BUILD_DIR) \
+		CC=$(CC) CROSS_COMPILE=$(CROSS) \
+		ARCH=powerpc  IPKG_ARCH=powerpc APM82181=1
+else ifeq ($(BOARD_TYPE), armada370)
+build:
+	${MAKE} -C $(PKG_BUILD_DIR) \
+		CC=$(CC) CROSS_COMPILE=$(CROSS) \
+		ARCH=arm_marvell  IPKG_ARCH=arm_marvell ARMADA370=1
+else
+build:
+	${MAKE} -C $(PKG_BUILD_DIR) \
+		CC=$(CC) CROSS_COMPILE=$(TARGET_CROSS) EXTRA_CFLAGS=$(TOOLCHAIN_ABI) \
+		ARCH=$(ARCH) IPKG_ARCH=$(ARCH) $(AQ_TYPE)=1
+endif
+#wangyu add end
+
+
+.PHONY: clean
+
+clean:
+	${MAKE} -C ${PKG_BUILD_DIR}   clean
+
+#install dir /usr/bin
+.PHONY: install
+install: 
+			 cp -f ${PKG_BUILD_DIR}/pro_ctl_util ${ROOTFSDIR}/usr/bin
+			 cp -f ${PKG_BUILD_DIR}/crc ${ROOTFSDIR}/usr/bin

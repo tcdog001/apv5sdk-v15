@@ -1,0 +1,420 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			arpc.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='argv.c.html' title=' argv.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='assist.c.html' title=' assist.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   arpc.c - Intellon ARPC Logger;
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	C. Maier, charles.maier@intellon.com
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;limits.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/putoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../int6k/intellon.h&quot;
+#include &quot;../int6k/homeplug.h&quot;
+#include &quot;../int6k/message.h&quot;
+#include &quot;../int6k/problem.h&quot;
+#include &quot;../ether/channel.h&quot;
+#include &quot;../mme/mme.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/hexdump.c&quot;
+#include &quot;../tools/hexwrite.c&quot;
+#include &quot;../tools/uintspec.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/error.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ether/channel.c&quot;
+#include &quot;../ether/openchannel.c&quot;
+#include &quot;../ether/closechannel.c&quot;
+#include &quot;../ether/sendpacket.c&quot;
+#include &quot;../ether/readpacket.c&quot;
+#endif
+
+/*====================================================================*
+ *    program constants; 
+ *--------------------------------------------------------------------*/
+
+#define PLCDEVICE &quot;PLC&quot;
+#define ARPC_ASCII_EACH '2'
+#define ARPC_ASCII_SOME '1'
+#define ARPC_ASCII_EXIT '0'
+
+/*====================================================================*
+ *
+ *   unsigned ARPCLog (void const * memory, size_t extent, FILE *fp);
+ *
+ *   print formatted VS_ARPC payload on the specified output stream;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+unsigned ARPCLog (void const * memory, size_t extent, FILE *fp) 
+
+{
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_arpc_data 
+	{
+		uint32_t BYPASS;
+		uint16_t ARPCID;
+		uint16_t DATALENGTH;
+		uint8_t DATAOFFSET;
+		uint8_t RESERVED [3];
+		uint16_t ARGOFFSET;
+		uint16_t STROFFSET;
+		uint16_t ARGLENGTH;
+		uint16_t STRLENGTH;
+		uint8_t LIST [1];
+	}
+	* data = (struct vs_arpc_data *)(memory);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+#if 0
+
+	fprintf (fp, &quot;BYPASS=%d &quot;, data-&gt;BYPASS);
+	fprintf (fp, &quot;ARPCID=%d &quot;, data-&gt;ARPCID);
+	fprintf (fp, &quot;DATALENGTH=%d &quot;, LE16TOH (data-&gt;DATALENGTH));
+	fprintf (fp, &quot;DATAOFFSET=%d &quot;, data-&gt;DATAOFFSET);
+	fprintf (fp, &quot;ARGOFFSET=%d &quot;, LE16TOH (data-&gt;ARGOFFSET));
+	fprintf (fp, &quot;STROFFSET=%d &quot;, LE16TOH (data-&gt;STROFFSET));
+	fprintf (fp, &quot;ARGLENGTH=%d &quot;, LE16TOH (data-&gt;ARGLENGTH));
+	fprintf (fp, &quot;STRLENGTH=%d &quot;, LE16TOH (data-&gt;STRLENGTH));
+	fprintf (fp, &quot;FORMAT=[%s]\n&quot;, &amp;data-&gt;LIST [data-&gt;STROFFSET]);
+
+#endif
+
+	vfprintf (fp, (char *)(&amp;data-&gt;LIST [data-&gt;STROFFSET]), (void *)(&amp;data-&gt;LIST [data-&gt;ARGOFFSET]));
+	fprintf (fp, &quot;\n&quot;);
+	return (data-&gt;LIST [data-&gt;STROFFSET]);
+}
+
+/*====================================================================*
+ *   
+ *   void function (struct channel * channel, unsigned period, signed fo);
+ *   
+ *   capture and record VS_ARPC messages from any Intellon powerline 
+ *   device; devices must be programmed to send these messages;
+ *   the first payload character determines message disposition;
+ *
+ *   this function has no practical use under operation conditions;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static void function (struct channel * channel, unsigned period, signed fd1, signed fd2, signed fd3) 
+
+{
+	struct message message;
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_arpc_ind 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint16_t RDATALENGTH;
+		uint8_t RDATAOFFSET;
+		uint8_t RDATA [1];
+	}
+	* indicate = (struct vs_arpc_ind *)(&amp;message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	unsigned state = 0;
+	signed length;
+	while ((length = readpacket (channel, &amp;message, sizeof (message))) &gt;= 0) 
+	{
+		if (!length) 
+		{
+			continue;
+		}
+		if (message.ethernet.MTYPE != htons (HOMEPLUG_MTYPE)) 
+		{
+			if (fd1 &gt; 0) 
+			{
+				hexwrite (fd1, &amp;message, length);
+			}
+			continue;
+		}
+		if (message.intellon.MMV == HOMEPLUG_MMV) 
+		{
+			if (message.intellon.MMTYPE == HTOLE16 (VS_SNIFFER | MMTYPE_IND)) 
+			{
+				if (fd3 &gt; 0) 
+				{
+					hexwrite (fd3, &amp;message, length);
+				}
+				continue;
+			}
+			if (fd1 &gt; 0) 
+			{
+				hexwrite (fd1, &amp;message, length);
+			}
+			continue;
+		}
+		if (message.intellon.MMV != INTELLON_MMV) 
+		{
+			if (fd1 &gt; 0) 
+			{
+				hexwrite (fd1, &amp;message, length);
+			}
+			continue;
+		}
+		if (message.intellon.MMTYPE == HTOLE16 (VS_SNIFFER | MMTYPE_IND)) 
+		{
+			if (fd3 &gt; 0) 
+			{
+				hexwrite (fd3, &amp;message, length);
+			}
+			continue;
+		}
+		if (message.intellon.MMTYPE != HTOLE16 (VS_ARPC | MMTYPE_IND)) 
+		{
+			if (fd1 &gt; 0) 
+			{
+				hexwrite (fd1, &amp;message, length);
+			}
+			continue;
+		}
+		state = ARPCLog (&amp;indicate-&gt;RDATA [indicate-&gt;RDATAOFFSET], indicate-&gt;RDATALENGTH, stdout);
+		if (state == ARPC_ASCII_SOME) 
+		{
+			static unsigned count = 0;
+			if ((count++ % period)) 
+			{
+				continue;
+			}
+			ARPCLog (&amp;indicate-&gt;RDATA [indicate-&gt;RDATAOFFSET], indicate-&gt;RDATALENGTH, stderr);
+			continue;
+		}
+		if (state == ARPC_ASCII_EACH) 
+		{
+			ARPCLog (&amp;indicate-&gt;RDATA [indicate-&gt;RDATAOFFSET], indicate-&gt;RDATALENGTH, stderr);
+			continue;
+		}
+		if (state == ARPC_ASCII_EXIT) 
+		{
+			ARPCLog (&amp;indicate-&gt;RDATA [indicate-&gt;RDATAOFFSET], indicate-&gt;RDATALENGTH, stderr);
+			break;
+		}
+		ARPCLog (&amp;indicate-&gt;RDATA [indicate-&gt;RDATAOFFSET], indicate-&gt;RDATALENGTH, stderr);
+	}
+	return;
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, char * argv[]);
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	extern struct channel channel;
+	static const char *optv [] = 
+	{
+		&quot;a:b:c:i:qu:v&quot;,
+		PUTOPTV_S_DIVINE,
+		&quot;Intellon ARPC Logger&quot;,
+		&quot;a s\tlog intellon sniffer frames to file (s)&quot;,
+		&quot;b s\tlog homeplug channel estimation frames to file (s)&quot;,
+		&quot;c n\tprint every (n) messages [10]&quot;,
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		&quot;i s\tuse host interface s [&quot; CHANNEL_ETHDEVICE &quot;]&quot;,
+
+#else
+
+		&quot;i n\tuse host interface n [2]&quot;,
+
+#endif
+
+		&quot;q\tsuppress output on stderr&quot;,
+		&quot;t n\ttimeout is (n) milliseconds [50]&quot;,
+		&quot;u s\tlog unwanted frames to file (s)&quot;,
+		&quot;v\tverbose messages on stdout&quot;,
+		(const char *) (0) 
+	};
+	unsigned count = 10;
+	signed fd1 = -1;
+	signed fd2 = -1;
+	signed fd3 = -1;
+	signed c;
+	if (getenv (PLCDEVICE)) 
+	{
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		channel.id = atoi (getenv (PLCDEVICE));
+
+#else
+
+		channel.name = strdup (getenv (PLCDEVICE));
+
+#endif
+
+	}
+	optind = 1;
+	opterr = 1;
+	optmin = 0;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'a':
+			if ((fd3 = open (optarg, O_BINARY|O_CREAT|O_WRONLY|O_TRUNC, FILE_FILEMODE)) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, optarg);
+			}
+			break;
+		case 'b':
+			if ((fd2 = open (optarg, O_BINARY|O_CREAT|O_WRONLY|O_TRUNC, FILE_FILEMODE)) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, optarg);
+			}
+			break;
+		case 'c':
+			count = (unsigned)(uintspec (optarg, 1, 1024));
+			break;
+		case 't':
+			channel.timeout = (unsigned)(uintspec (optarg, 0, UINT_MAX));
+			break;
+		case 'u':
+			if ((fd1 = open (optarg, O_BINARY|O_CREAT|O_WRONLY|O_TRUNC, FILE_FILEMODE)) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, optarg);
+			}
+			break;
+		case 'i':
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+			channel.id = atoi (optarg);
+
+#else
+
+			channel.name = optarg;
+
+#endif
+
+			break;
+		case 'q':
+			_setbits (channel.flags, CHANNEL_SILENCE);
+			break;
+		case 'v':
+			_setbits (channel.flags, CHANNEL_VERBOSE);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+
+#ifndef WIN32
+
+/*
+ *      raw packets require root priviledges on linux; one does not have to be
+ *      root when this program is installed setuid using 'chown root:root' and 
+ *      'chmod 4555';
+ */
+
+	if (geteuid ()) 
+	{
+		error (1, EPERM, INT6K_NEEDROOT);
+	}
+
+#endif
+
+	openchannel (&amp;channel);
+	function (&amp;channel, count, fd1, fd2, fd3);
+	closechannel (&amp;channel);
+	return (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='argv.c.html' title=' argv.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='assist.c.html' title=' assist.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

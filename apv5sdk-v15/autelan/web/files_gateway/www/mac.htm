@@ -1,0 +1,235 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_mac=`config_read /config/firewall/macfilter`
+xml_mac_status=`config_getoption "$xml_mac" status`
+xml_mac_count=`config_getoption "$xml_mac" rule_count`
+
+xml_mac1=`config_getoption "$xml_mac" mac1`
+xml_mac2=`config_getoption "$xml_mac" mac2`
+xml_mac3=`config_getoption "$xml_mac" mac3`
+xml_mac4=`config_getoption "$xml_mac" mac4`
+xml_mac5=`config_getoption "$xml_mac" mac5`
+xml_mac6=`config_getoption "$xml_mac" mac6`
+xml_mac7=`config_getoption "$xml_mac" mac7`
+xml_mac8=`config_getoption "$xml_mac" mac8`
+xml_mac9=`config_getoption "$xml_mac" mac9`
+xml_mac10=`config_getoption "$xml_mac" mac10`
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>MAC</title>
+<style>
+#mac_table{
+	border:solid 1px #000000;
+}
+</style>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<script language="javascript" src="JAS.js">
+</script>
+<script language="javascript" >
+function addrulecount()
+{
+	if(mac_table.rows.length<12)
+	{
+		var count=parseInt(document.all.rule_num.value)+1;
+		document.all.rule_num.value = count;
+	}
+}
+function delrulecount()
+{
+	if(mac_table.rows.length>3)
+	{
+		var count=parseInt(document.all.rule_num.value)-1;
+		document.all.rule_num.value = count;
+	}
+}
+function initrulecount()
+{
+	if( document.all.rule_num.value == "0")
+		document.all.rule_num.value = "1";
+}
+
+
+/*********************************************/
+/*control of mac.htm                        */
+/*********************************************/
+var mac_count="<%= $xml_mac_count %>";
+var mac_status="<%= $xml_mac_status %>";
+var mac_arr=["<%= $xml_mac1 %>","<%= $xml_mac2 %>","<%= $xml_mac3 %>","<%= $xml_mac4 %>","<%= $xml_mac5 %>","<%= $xml_mac6 %>","<%= $xml_mac7 %>","<%= $xml_mac8 %>","<%= $xml_mac9 %>","<%= $xml_mac10 %>"];
+var num = 1;
+var i = 0;
+function mactable_insRow(obj)
+{
+	if( obj == "first entry")
+	{
+		for( i=0; i<mac_count; i++)
+		{
+			var td1 = "mac_address" + String(i+1);
+			var row_num = "mac_tr" + String(i+1);
+			
+			var newRow = document.getElementById('mac_table').insertRow(mac_table.rows.length-1);
+       	    		newRow.id = row_num;
+			var cell0 = newRow.insertCell(0);
+			cell0.className = "td_style";
+			cell0.innerHTML="&nbsp;";
+			var cell1 = newRow.insertCell(1);
+			cell1.className = "td_style";
+			cell1.innerHTML="<table width='350' border='0'><tr><td><input type='text' name='" + td1 +"' value='" + mac_arr[i] + "' style='height:12px; width:88px'/></td></tr></table>";
+		}
+
+		if (i==0)
+			num = 1;
+		else
+			num = i ;
+			
+		if( mac_status == "enable")
+		{
+			for(var i=1;i<mac_table.rows.length;i++)
+				document.getElementById("mac_table").rows[i].style.display="";
+		}
+		else
+		{
+			for(var i=1;i<mac_table.rows.length;i++)
+				document.getElementById("mac_table").rows[i].style.display="none";
+		}
+	}
+	else
+	{
+		num = num + 1;
+		if(mac_table.rows.length<12)
+		{
+			var td1 = "mac_address" + String(num);
+			var row_num = "mac_tr" + String(num);
+
+			var newRow = document.getElementById('mac_table').insertRow(mac_table.rows.length-1);
+       	    		newRow.id = row_num;
+			var cell0 = newRow.insertCell(0);
+			cell0.className = "td_style";
+			cell0.innerHTML="&nbsp;";
+			var cell1 = newRow.insertCell(1);
+			cell1.className = "td_style";
+			cell1.innerHTML="<table width='350' border='0'><tr><td><input type='text' name='" + td1 +"' style='height:12px; width:88px'/></td></tr></table>";
+		}
+		else
+		{
+			num = num - 1;
+	 		alert("Max number of fiter MAC is 10!");
+	 	}
+	}
+}
+
+function mactable_delRow(){
+
+	num = num - 1;
+	if(mac_table.rows.length>3)
+	 	document.getElementById('mac_table').deleteRow(mac_table.rows.length-2);
+	else
+	{
+		num = num + 1;
+		alert("There must be at least one mac-filter entry!");
+	}
+}
+
+function mac_radio_display(obj)
+{
+	if(parseInt(obj) == 1)
+	{
+		for(var i=1;i<mac_table.rows.length;i++)
+			document.getElementById("mac_table").rows[i].style.display="none";
+	}
+	else
+	{
+		for(var i=1;i<mac_table.rows.length;i++)
+			document.getElementById("mac_table").rows[i].style.display="";
+			
+		if( mac_table.rows.length<3 )
+		{
+			var row_num = "mac_tr1";
+	
+			var newRow = document.getElementById('mac_table').insertRow(mac_table.rows.length-1);
+        		newRow.id = row_num;
+			var cell0 = newRow.insertCell(0);
+			cell0.className = "td_style";
+			cell0.innerHTML="&nbsp;";
+			var cell1 = newRow.insertCell(1);
+			cell1.className = "td_style";
+			cell1.innerHTML="<table width='350' border='0'><tr><td><input type='text' name='mac_address1' style='height:12px; width:88px'/></td></tr></table>";
+		}
+	}
+}
+
+</script>
+</head>
+
+<body bgcolor="#efefef" onload='mactable_insRow("first entry")'>
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1"><a href="firewall.htm" target="MainFrame">IP</a></td>
+		  <td class="top1">MAC</td>
+		  <td class="top1"><a href="url.htm" target="MainFrame">URL</a></td>
+		  <td class="top1"><a href="dos.htm" target="MainFrame">DoS</a></td>
+		  <td class="top1"><a href="port_forwarding.htm" target="MainFrame">Virtual server</a></td>
+		  <td class="top1"><a href="ip_forwarding.htm" target="MainFrame">dmz</a></td>
+		  <td class="top1"><a href="upnp.htm" target="MainFrame">upnp</a></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">Firewall-->MAC Filter</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form method="post" action="<%= $firewall_action_cgi %>" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="MAC Filter illustration">MAC Filter</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table id="mac_table" width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">MAC Address filter </td>
+          <td class="td_style" width="350">
+		    <table width="350" border="0">
+              <tr>
+                <td width="60"><input type="radio" name="mac_address_filter" value="disable" <% webui_radiobutton_check "$xml_mac_status" "disable" %> onclick="mac_radio_display(1);"/>Disable</td>
+                <td width="290"><input type="radio" name="mac_address_filter" value="enable" <% webui_radiobutton_check "$xml_mac_status" "enable" %> onclick="mac_radio_display(2);initrulecount();"/>Enable</td>
+              </tr>
+            </table>
+		  </td>
+        </tr>
+		
+	<tr style="display:none">
+          <td class="td_style">&nbsp;</td>
+          <td class="td_style">
+		    <table width="130" border="0">
+              <tr>
+                <td><input id="but" type="button" name="insert_one_row" value="Add" onclick='addrulecount();mactable_insRow("click");'/></td>
+                <td><input id="but" type="button" name="delete_one_row" value="Delete" onclick='delrulecount();mactable_delRow();'/>
+              </tr>
+            </table>
+		  </td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><input id="but" type="submit" name="mac_filter_commit" value="Submit"/></td>
+  </tr>
+</table>
+<input type="hidden" value="MAC filter" name="SERVLET">
+<input type="hidden" value="<%= $xml_mac_count %>" name="rule_num">
+</form>
+</div>
+</body>
+</html>

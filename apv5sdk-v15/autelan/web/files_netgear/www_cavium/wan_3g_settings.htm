@@ -1,0 +1,434 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_3g_PPP_Connection=`config_read /config/network/ap_3g_wan/PPP_Connection_Mode`
+xml_connect_mode=`config_getoption "$xml_3g_PPP_Connection" connect_mode`
+xml_connect_status=`config_getoption "$xml_3g_PPP_Connection" connect_status`
+
+xml_3g_apn=`config_read /config/network/ap_3g_wan/APN`
+xml_apn_mode=`config_getoption "$xml_3g_apn" apn_mode`
+xml_apn_content=`config_getoption "$xml_3g_apn" apn_content`
+
+xml_3g_Dial_setting=`config_read /config/network/ap_3g_wan/Dial_setting`
+xml_Dial_NO=`config_getoption "$xml_3g_Dial_setting" Dial_NO`
+
+xml_3g_PDP=`config_read /config/network/ap_3g_wan/PDP`
+xml_PDP_type=`config_getoption "$xml_3g_PDP" PDP_type`
+xml_PDP_mode=`config_getoption "$xml_3g_PDP" PDP_mode`
+xml_PDP_address=`config_getoption "$xml_3g_PDP" PDP_address`
+
+xml_3g_PPP_Auth=`config_read /config/network/ap_3g_wan/PPP_Auth`
+xml_auth_mode=`config_getoption "$xml_3g_PPP_Auth" auth_mode`
+xml_user_name=`config_getoption "$xml_3g_PPP_Auth" user_name`
+xml_passwd=`config_getoption "$xml_3g_PPP_Auth" passwd`
+
+xml_3g_PPP_setting=`config_read /config/network/ap_3g_wan/PPP_setting`
+xml_idle_time_enable=`config_getoption "$xml_3g_PPP_setting" idle_time_enable`
+xml_max_idle_time=`config_getoption "$xml_3g_PPP_setting" max_idle_time`
+xml_MTU=`config_getoption "$xml_3g_PPP_setting" MTU`
+
+xml_3g_DNS=`config_read /config/network/ap_3g_wan/DNS`
+xml_dns_mode=`config_getoption "$xml_3g_DNS" dns_mode`
+xml_Primary_dns=`config_getoption "$xml_3g_DNS" Primary_dns`
+xml_second_dns=`config_getoption "$xml_3g_DNS" second_dns`
+
+pppd_status=`ps|awk '/pppd/'`
+if [ -z "$pppd_status" ]; then
+	pppd_status="disconnected"
+else
+	pppd_status="connected"
+fi
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js interface_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	var ppp_status="<%= $pppd_status %>";
+	init_mmenu(flag);
+	init_basemenu(flag);
+	init_lan(flag);
+function init_3g_wan()
+{
+	document.getElementById("manual_apn_tr").style.display = "none";
+	document.getElementById("ppp_click_show").style.display = "none";
+	document.getElementById("pri_dns").style.display = "none";
+	document.getElementById("second_dns").style.display = "none";
+	document.getElementById("manual_pdp_tr").style.display = "none";
+	if(ppp_status == "connected" )
+	{
+		document.all.connect_status.value = "Connected";
+		document.all.connect_ppp.value=ppp_disconnect;
+	}
+	else
+	{
+		document.all.connect_status.value = "Disconnected";
+		document.all.connect_ppp.value=ppp_connect;
+	}
+}
+function display_click()
+{
+	if(document.all.apn_setting[0].checked == true )
+		document.getElementById("manual_apn_tr").style.display = "none";
+	else if(document.all.apn_setting[1].checked == true )
+		document.getElementById("manual_apn_tr").style.display = "";
+		
+	if(document.all.idle_time_setting[0].checked == true )
+		document.getElementById("ppp_click_show").style.display = "";
+	else if(document.all.idle_time_setting[1].checked == true )
+		document.getElementById("ppp_click_show").style.display = "none";
+		
+	if(document.all.dns[0].checked == true )
+	{
+		document.getElementById("pri_dns").style.display = "none";
+		document.getElementById("second_dns").style.display = "none";
+	}
+	else if(document.all.dns[1].checked == true )
+	{
+		document.getElementById("pri_dns").style.display = "";
+		document.getElementById("second_dns").style.display = "";
+	}
+	
+	if(document.all.pdp_setting[0].checked == true )
+		document.getElementById("manual_pdp_tr").style.display = "none";
+	else if(document.all.pdp_setting[1].checked == true )
+		document.getElementById("manual_pdp_tr").style.display = "";
+}
+
+function pppconnect_display()
+{
+	if(document.all.connect_ppp.value == ppp_connect )
+	{
+		document.all.connect_status.value = "Connected";
+	}
+	else
+	{
+		document.all.connect_status.value = "Disconnected";
+	}
+	overlayer();
+}
+
+function get_mode()
+{
+	if(document.all.ppp_connct_mode[0].checked == true)
+	{
+		document.all.ppp_connect_mode.value="Auto_connect";
+	}
+	else if(document.all.ppp_connct_mode[1].checked == true)
+	{
+		document.all.ppp_connect_mode.value="Demand_connct";
+	}
+	else
+	{
+		document.all.ppp_connect_mode.value="Manual_connct";
+	}
+	
+}
+
+function myrefresh()
+{
+   document.form_refresh.action="action.cgi";
+	 document.form_refresh.submit(); 
+}
+setTimeout("myrefresh()",60000)
+ 
+</script>
+</head>
+<body onload="init_3g_wan();display_click()">
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_interface2.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<div align="center">
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">  
+	<tr>
+		<td bordercolor="#d9d9d9">	
+		<form name="form0" method="post" action="<%= $action_cgi %>" onsubmit="return pppconnect_display()">					
+    <table  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+		  <!///////////////////////////////////////////////CONNECT/////////////////////////////////////////////////////////////////-->  
+	  <tr>
+	    <td align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9" ><b><script language="javascript">replace(ppp_mode)</script></b></td>
+	  </tr>
+  
+  	<tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+  	
+		<tr>
+	          <td align="right" height="24" width="280" bordercolor="#ffffff" ><input type="radio" name="ppp_connct_mode" <% webui_radiobutton_check "$xml_connect_mode" "Auto_connect" %> value="Auto_connect" onclick="get_mode()"></td>
+	          <td  align="left"  width="370" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(ppp_auto_connect)</script></td>
+	        </tr>
+	        
+			<tr>
+	          <td align="right" height="24" bordercolor="#ffffff"><input type="radio" name="ppp_connct_mode" <% webui_radiobutton_check "$xml_connect_mode" "Demand_connct" %> value="Demand_connct" onclick="get_mode()"></td>
+	          <td align="left" height="24" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(ppp_connect_by_need)</script></td>
+	        </tr>
+	        
+			<tr>
+	          <td align="right" height="24" bordercolor="#ffffff"><input type="radio" name="ppp_connct_mode" <% webui_radiobutton_check "$xml_connect_mode" "Manual_connct" %> value="Manual_connct" onclick="get_mode()"></td>
+	          <td align="left" height="24" bordercolor="#ffffff">&nbsp;<script language="javascript">replace(ppp_manual_connect)</script></td>
+	        </tr>
+	    
+	    <tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+	        
+			<tr >
+	          <td align="right" height="24" bordercolor="#ffffff"><script language="javascript">replace(ppp_connect_status)</script>:</td>
+	          <td align="left" height="24" bordercolor="#ffffff">&nbsp;
+	          <font size="4" style="font-weight:bold">
+	          	<script language="javascript">
+	          	var ppp_status="<%= $pppd_status %>";
+							if(ppp_status == "connected" )
+							{
+								ppp_connectstatus=ppp_constatus;
+							}
+							else
+							{
+								ppp_connectstatus=ppp_disconstatus;
+							}
+							document.write(ppp_connectstatus);
+	          	</script></font> &nbsp;&nbsp;
+	          <input type="submit" name="connect_ppp" value="" >
+	          </td>
+	        </tr>
+	  
+	  	<tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+	  		
+	  </table>
+	  <input type="hidden" name="connect_status" value="">
+	  <input type="hidden" name="SERVLET" value="pppconnect">
+</form>	
+<form name="form_refresh" method="post" action="<%= $action_cgi %>">
+	<input type="hidden" value="wan3g refresh" name="SERVLET">
+	</form>  
+<form name="form1" method="post" action="<%= $action_cgi %>"  onsubmit="return overlayer()">  
+<!///////////////////////////////////////////////APN/////////////////////////////////////////////////////////////////-->  
+ <table  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650"> 
+        <tr>
+          <td align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(APN_set)</script></b></td>
+        </tr>
+        
+        <tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+        
+	      <tr>
+                <td  align="left" height="24" width="280" bordercolor="#ffffff" ><script language="javascript">replace(APN_get_mode)</script></td>
+                <td  align="left" height="24" width="370" bordercolor="#ffffff" >
+				  			<table width="370" border="0">
+                    <tr>
+                      <td width="100"><input type="radio" name="apn_setting" <% webui_radiobutton_check "$xml_apn_mode" "auto_apn" %> value="auto_apn" onClick="display_click()"/><script language="javascript">replace(auto_APN)</script></td>
+                      <td width="270"><input type="radio" name="apn_setting" <% webui_radiobutton_check "$xml_apn_mode" "manual_apn" %> value="manual_apn" onClick="display_click()"/><script language="javascript">replace(manual_APN)</script></td>
+                    </tr>
+                  </table>				  
+								</td>
+         </tr>
+          
+		     <tr id=manual_apn_tr>
+                <td align="left" height="24" bordercolor="#ffffff">APN</td>
+                <td align="left" height="24" bordercolor="#ffffff"><input type="text" name="apn" value="<%= $xml_apn_content  %>"  /></td>
+         </tr>
+              
+         <tr>
+                <td colspan=2><input type=hidden></td>
+         </tr>
+
+        <tr>
+          <td align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9" ><b><script language="javascript">replace(dial_set)</script></b></td>
+        </tr>
+
+	     <tr>
+                <td align="left" height="24" bordercolor="#ffffff" ><script language="javascript">replace(dial_number)</script></td>
+                <td align="left" height="24" bordercolor="#ffffff" ><input type="text" name="dial_num"   value="<%= $xml_Dial_NO  %>"/></td>
+       </tr>
+
+        <tr>
+          <td align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(PDP_set)</script></b></td>
+        </tr>
+        
+	      <tr>
+                <td align="left" height="24" bordercolor="#ffffff"  ><script language="javascript">replace(PDP_type)</script></td>
+                <td  align="left" height="24" bordercolor="#ffffff" >
+				  			<table width="370" border="0">
+                    <tr>
+                      <td width="100"><input type="radio" <% webui_radiobutton_check "$xml_PDP_type" "ip" %> name="pdp_type" value="ip"/>IP</td>
+                      <td width="270"><input type="radio" <% webui_radiobutton_check "$xml_PDP_type" "ppp" %> name="pdp_type" value="ppp"/>PPP</td>
+                    </tr>
+                  </table>
+						</td>
+        </tr>
+
+	     <tr>
+                <td align="left" height="24" bordercolor="#ffffff"  ><script language="javascript">replace(PDP_get_mode)</script></td>
+                <td  align="left" height="24" bordercolor="#ffffff"  >
+				  			<table width="370" border="0">
+                    <tr>
+                      <td width="100"><input type="radio" name="pdp_setting" <% webui_radiobutton_check "$xml_PDP_mode" "auto_pdp" %> value="auto_pdp" onClick="display_click()"/><script language="javascript">replace(auto_PDP)</script></td>
+                      <td width="270"><input type="radio" name="pdp_setting" <% webui_radiobutton_check "$xml_PDP_mode" "manual_pdp" %> value="manual_pdp" onClick="display_click()"/><script language="javascript">replace(manual_PDP)</script></td>
+                    </tr>
+                  </table>
+							</td>
+			 </tr>
+			 
+       <tr id=manual_pdp_tr>
+                <td align="left" height="24" bordercolor="#ffffff"  ><script language="javascript">replace(PDP_addr)</script></td>
+                <td align="left" height="24" bordercolor="#ffffff"  ><input type="text" name="pdp_address" value="<%= $xml_PDP_address %>"  /></td>
+        </tr>
+        
+        <tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+<!///////////////////////////////////////////////PPP/////////////////////////////////////////////////////////////////-->  
+  
+
+        <tr>
+          <td align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(PPP_auth)</script></b></td>
+        </tr>
+
+				<tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+				
+	      <tr>
+                <td align="left" height="24" bordercolor="#ffffff"  ><script language="javascript">replace(PPP_auth_type)</script></td>
+                <td  align="left" height="24" bordercolor="#ffffff"  >
+				  			<table width="370" border="0">
+                    <tr>
+                      <td width="100"><input type="radio" name="authentication" <% webui_radiobutton_check "$xml_auth_mode" "chap" %> value="chap"/>CHAP</td>
+                      <td width="270"><input type="radio" name="authentication" <% webui_radiobutton_check "$xml_auth_mode" "pap" %> value="pap"/>PAP</td>
+                    </tr>
+                </table>				  
+								</td>
+        </tr>
+        
+		     <tr>
+                <td align="left" height="24" bordercolor="#ffffff"  ><script language="javascript">replace(PPP_usr)</script></td>
+                <td align="left" height="24" bordercolor="#ffffff"  ><input type="text" name="user_name" value="<%= $xml_user_name %>" /></td>
+         </tr>
+			  
+			  <tr>
+                <td align="left" height="24" bordercolor="#ffffff"  ><script language="javascript">replace(PPP_passwd)</script></td>
+                <td align="left" height="24" bordercolor="#ffffff"  ><input type="text" name="password" value="<%= $xml_passwd %>" /></td>
+          </tr>
+
+        <tr>
+          <td align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(PPP_set)</script></b></td>
+        </tr>
+
+	      <tr>
+                <td  align="left" height="24" bordercolor="#ffffff"  ><script language="javascript">replace(idle_time_set)</script></td>
+                <td  align="left" height="24" bordercolor="#ffffff"  >
+				  			<table width="370" border="0">
+                    <tr>
+                      <td width="100"><input type="radio" name="idle_time_setting" <% webui_radiobutton_check "$xml_idle_time_enable" "enable" %> value="enable" onClick="display_click()"/><script language="javascript">replace(idle_enable)</script></td>
+                      <td width="270"><input type="radio" name="idle_time_setting" <% webui_radiobutton_check "$xml_idle_time_enable" "disable" %> value="disable" onClick="display_click()"/><script language="javascript">replace(idle_disable)</script></td>
+                    </tr>
+                  </table>	
+						</td>
+        </tr>
+        
+        <tr id=ppp_click_show>
+                <td  align="left" height="24" bordercolor="#ffffff"  ><script language="javascript">replace(idle_time_max)</script></td>
+                <td  align="left" height="24" bordercolor="#ffffff"  ><input type="text" name="max_idle_time" value="<%= $xml_max_idle_time%>" /></td>
+         </tr>
+         
+			   <tr>
+                <td  align="left" height="24" bordercolor="#ffffff"  ><script language="javascript">replace(MTU_set)</script></td>
+                <td  align="left" height="24" bordercolor="#ffffff"  ><input type="text" name="mtu" value="<%= $xml_MTU%>" /></td>
+         </tr>
+					
+					<tr>
+								<td colspan="2" height="10">
+								</td>
+					</tr>
+  
+<!///////////////////////////////////////////////DNS/////////////////////////////////////////////////////////////////-->  
+        <tr>
+          <td align="left" width="100%" align="center" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(DNS_set)</script></b></td>
+        </tr>
+	       
+	       <tr>
+								<td colspan="2" height="10">
+								</td>
+								</tr>
+	          
+	      <tr>
+                <td  align="left" height="24" bordercolor="#ffffff"  ><script language="javascript">replace(DNS_enable)</script></td>
+                <td  align="left" height="24" bordercolor="#ffffff"  >
+				  				<table width="370" border="0">
+                    <tr>
+                      <td width="100"><input type="radio" name="dns" <% webui_radiobutton_check "$xml_dns_mode" "auto_dns" %> value="auto_dns" onClick="display_click()"/><script language="javascript">replace(auto_get_DNS)</script></td>
+                      <td width="270"><input type="radio" name="dns" <% webui_radiobutton_check "$xml_dns_mode" "manual_dns" %> value="manual_dns" onClick="display_click()"/><script language="javascript">replace(manual_get_DNS)</script></td>
+                    </tr>
+                  </table>				  
+								</td>
+         </tr>
+         
+          <tr id=pri_dns>
+             <td  align="left" height="24" bordercolor="#ffffff"  ><script language="javascript">replace(first_DNS)</script></td>
+             <td  align="left" height="24" bordercolor="#ffffff"  ><input type="text" name="primary_dns"  value="<%= $xml_Primary_dns %>"/></td>
+          </tr>
+          
+          <tr id=second_dns>
+             <td  align="left" height="24" bordercolor="#ffffff"  ><script language="javascript">replace(second_DNS)</script></td>
+             <td  align="left" height="24" bordercolor="#ffffff"  ><input type="text" name="secondary_dns"  value="<%= $xml_second_dns %>"/></td>
+          </tr>
+          
+          <tr>
+          	<td colspan=2><input type=hidden></td>
+          </tr>
+		</table>
+	</td>
+	</tr> 
+</table>  
+		<table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+			<tr>
+			  <td align="center" height="40" valign="middle" colspan="2" ><script language="javascript" >replace(b_lansu)</script>&nbsp;</td>
+			</tr>
+			<tr>
+        <td align="right"   colspan="2"><script language="javascript">replace(w3g_help)</script></td>
+      </tr>
+		</table>
+</div>
+<input type="hidden" value="3G wan setting" name="SERVLET">
+  <input type="hidden" value="<%= $xml_connect_mode  %>" name="ppp_connect_mode">
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

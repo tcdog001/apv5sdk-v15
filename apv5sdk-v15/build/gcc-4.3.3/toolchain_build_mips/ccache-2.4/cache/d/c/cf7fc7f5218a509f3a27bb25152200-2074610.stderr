@@ -1,0 +1,2 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/if_lmac/if_ath.c: In function 'ath_node_get_packet_power':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/if_lmac/if_ath.c:3397: warning: unused variable 'hal_txchainmask'

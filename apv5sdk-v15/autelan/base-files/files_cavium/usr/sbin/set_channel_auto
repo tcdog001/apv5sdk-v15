@@ -1,0 +1,29 @@
+#!/bin/sh
+
+IWCONFIG=/usr/sbin/iwconfig
+IWLIST=/usr/sbin/iwlist
+IFCONFIG=/sbin/ifconfig
+
+flag=0
+vapname="ath0"
+
+if [ ! -z $2 ];then
+	flag=$2
+fi
+
+if [ ! -z $1 ];then
+	vapname="${1}"
+fi
+
+${IFCONFIG} ${vapname} down
+if [ 0${flag} -eq 0 ];then
+	${IWCONFIG} ${vapname} channel auto
+else
+	lineno=`${IWLIST} ${vapname} channel | wc -l`
+	cur_channel=`${IWLIST} ${vapname} channel | awk -F"[ ]+|\(|\)" 'NR==lineno {print $7}' lineno=$((${lineno}-1))`
+	${IWCONFIG} ${vapname} channel ${cur_channel}
+fi
+
+sleep 1
+${IFCONFIG} ${vapname} up
+

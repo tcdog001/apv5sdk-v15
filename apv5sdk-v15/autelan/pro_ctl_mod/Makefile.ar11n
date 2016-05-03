@@ -1,0 +1,117 @@
+PWD := ${shell pwd}
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR =src
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR = /tmp/changzhimin-rootfs
+endif
+
+ifndef KERNELDIR
+ #wangyu add 2011-05-23
+ifeq ($(BOARD_TYPE),db12x)
+KERNELDIR := $(PWD)/../../ap83sdk/linux/kernels/mips-linux-2.6.31
+else ifeq ($(BOARD_TYPE),amcc)
+KERNELDIR := $(PWD)/../../linux/kernels/powerpc-linux-2.6.36
+else ifeq ($(BOARD_TYPE),armada370)
+KERNELDIR := $(PWD)/../../linux/kernels/marvell-linux-2.6.35.9
+else
+KERNELDIR := $(PWD)/../../ap83sdk/linux/kernels/mips-linux-2.6.15
+endif
+endif
+ 
+ #wangyu add 2011-05-23
+ifeq ($(BOARD_TYPE),db12x)
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.31/net
+else ifeq ($(BOARD_TYPE),amcc)
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.36/net
+PKG_BUILD_DIR :=${shell pwd}/src_apv6
+else ifeq ($(BOARD_TYPE),armada370)
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/$(KERNELVER)/net
+PKG_BUILD_DIR :=${shell pwd}/src_apv7
+else
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.15/net
+endif
+ifeq ($(BOARD_TYPE),amcc)
+TARGET_CROSS := powerpc-apm-linux-gnu-
+else ifeq ($(BOARD_TYPE),armada370)
+TARGET_CROSS := arm-marvell-linux-gnueabi-
+else
+TARGET_CROSS := mips-linux-uclibc-
+endif
+MAKE_ARGS:= \
+	KERNELPATH="$(KERNELDIR)" \
+	CROSS_COMPILE="$(TARGET_CROSS)" \
+
+all:pro_ctl_mod install
+ifeq ($(BOARD_TYPE),db12x)
+ifeq ($(AQ_TYPE), XH9344)
+pro_ctl_mod:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.cavium && mv ${PKG_BUILD_DIR}/Makefile.cavium ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) XH9344=1 PC018=0	
+	echo "XH9344 finished"
+else
+ifeq ($(AQ_TYPE), XJ9344)
+pro_ctl_mod:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.cavium && mv ${PKG_BUILD_DIR}/Makefile.cavium ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) XJ9344=1
+	echo "XJ9344 finished"
+else
+pro_ctl_mod:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.cavium && mv ${PKG_BUILD_DIR}/Makefile.cavium ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) PC018=1	
+	echo "9350 finished"
+endif
+endif
+else
+ifeq ($(AQ_TYPE), AP2400-IFM)
+pro_ctl_mod:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.cavium && mv ${PKG_BUILD_DIR}/Makefile.cavium ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) AP2400=1
+	echo "AP2400 finished"
+else
+ifeq ($(AQ_TYPE), XHPB44)
+pro_ctl_mod:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.cavium && mv ${PKG_BUILD_DIR}/Makefile.cavium ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) AP2400=1 XHPB44=1
+	echo "XHPB44 finished"
+else
+ifeq ($(AQ_TYPE_EXT), 1)
+pro_ctl_mod:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.cavium && mv ${PKG_BUILD_DIR}/Makefile.cavium ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) WNAP550=1	
+	echo "ap83 finished"
+else ifeq ($(BOARD_TYPE),amcc)
+pro_ctl_mod:
+	$(MAKE) -C $(PKG_BUILD_DIR)  $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR)  $(MAKE_ARGS)	
+	echo "$(BOARD_TYPE) finished"
+else ifeq ($(BOARD_TYPE),armada370)
+pro_ctl_mod:
+	$(MAKE) -C $(PKG_BUILD_DIR)  $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR)  $(MAKE_ARGS) ARMADA370=1
+	echo "$(BOARD_TYPE) finished"
+else
+pro_ctl_mod:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.cavium && mv ${PKG_BUILD_DIR}/Makefile.cavium ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) $(AQ_TYPE)=1
+	echo "$(AQ_TYPE) finished"
+endif
+endif
+endif
+endif
+#wangyu add end
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean
+	
+install:pro_ctl_mod
+	mkdir -p $(INSTALLDIR)
+	cd $(PKG_BUILD_DIR) && \
+	cp -f pro_ctl_mod.ko $(INSTALLDIR)/pro_ctl_mod.ko

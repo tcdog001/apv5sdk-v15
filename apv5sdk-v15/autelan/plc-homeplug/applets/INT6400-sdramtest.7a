@@ -1,0 +1,44 @@
+.TH INT6400-sdramtest 7a "June 2012" "plc-utils-2.1.1" "Qualcomm Atheros Powerline Toolkit"
+.SH NAME
+INT6400-sdramtest.nvm - SDRAM Diagnostic Applet
+.SH SYNOPSIS
+.RB amptest
+.BR memctl.nvm 
+.BR INT6400-sdramtest.nvm
+.RI [ ... ]
+.SH PURPOSE
+Runs 10 industry standard SDRAM memory tests on Qualcomm Atheros \fBINT6400\fR and \fB AR7400\fR Powerline Devices.
+.SH PREREQUISITES
+Program \fBamptest\fR or \fBplctest\fR must be available. Applet \fBmemctl.nvm\fR must be available. Bootloader software must be running. 
+.SH DISCLAIMER
+Qualcomm Atheros image file structure and content is proprietary to Qualcomm Atheros, Ocala FL USA. Consequently, public information is not available. Qualcomm Atheros reserves the right to change file structure or content in future firmware releases without any obligation to notify or compensate users of this program. This applet is reserved for use by Qualcomm Atheros Engineers for internal use. Qualcomm Atheros makes no claims concerning the reliability of this applet or the suitability of this applet for any particular purpose.
+.SH EXAMPLES
+The following example uses program \fBamptest\fR to download and execute applet file \fBmemctl.nvm\fR then applet file \fBINT6400-sdramtest.nvm\fR. Applet \fBmemctl\fR needs to be downloaded and execute once to configure the onboard SDRAM controller after reboot. It is not necessary each time that applet \fBINT6400-sdramtest.nvm\fR is run.
+.PP
+   # amptest memctl.nvm INT6400-sdramtest.nvm
+   eth1 00:B0:52:00:00:01 Started BootLoader
+   eth1 00:B0:52:00:00:01 Writing memctl.nvm to memory (00000040:10188)
+   eth1 00:B0:52:00:00:01 Execute (000000C0)
+   eth1 00:B0:52:00:00:01 Writing AR6400.nvm to memory (00001000:3368)
+   eth1 00:B0:52:00:00:01 Execute (00001004)
+   Write/Read Ones: Pass
+   Write/Read Zeros: Pass
+   March2 Bg 0's Incrementing: Pass
+   March2 Bg 1's Decremention: Pass
+   March2 Bg 1's Incrementing: Pass
+   March2 Bg 0's Decremention: Pass
+   Shifting One: Pass
+   Shifting Zero: Pass
+   Ones Fill: Pass
+   Zeros Fill: Pass
+   Memory Testing Finished.
+.SH SEE ALSO
+.BR applets ( 7 ),
+.BR AR7420-flashtest ( 7 ),
+.BR amptest ( 7 ),
+.BR memctl ( 7 ),
+.BR plctest ( 7 )
+.SH CREDITS
+ John Byron <john.byron@qca.qualcomm.com>
+
+

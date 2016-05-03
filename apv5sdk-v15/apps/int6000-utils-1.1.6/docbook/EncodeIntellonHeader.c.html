@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			EncodeIntellonHeader.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='EncodeEthernetHeader.c.html' title=' EncodeEthernetHeader.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='EncodeSetSDRAMCfg.c.html' title=' EncodeSetSDRAMCfg.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   size_t EncodeIntellonHeader (uint8_t buffer [], signed length, uint16_t MMTYPE);
+ *
+ *   ihp.h
+ *
+ *   Encode buffer with an Intellon vendor specific message header 
+ *   having HomePlug message protocol version (INTELLON_MMV) and 
+ *   Intellon message type (MMTYPE);
+ *
+ *   return the number of bytes actually encoded or 0 on encode error; 
+ *   the error code is stored in errno;
+ *
+ *   this function is called by all Intellon vendor specific message
+ *   encoding functions; message content MUST BE SENT LITTLE ENDIAN;
+ *
+ *   see the INT6000 Firmware Technical Reference 
+ *   Manual for information about MME headers and message types; the
+ *   Intellon OUI is implicit in this function;
+ *
+ *   this function only encodes the header; see EncodeIntellonPacket
+ *   to encode the entire message packet;
+ *
+ *   MMV is the version number of the MME command set; currently, 
+ *   there is only one command set for Intellon MMEs; 
+ *
+ *   MMTYPE indicates the desired Intellon device operation taken
+ *   from the TRM; some operations are undocumented and should not
+ *   be used;
+ *
+ *   OUI is the Organizationally Unique Identifier resgistered with
+ *   the IEEE by the vendor and is a constant for Intellon Devices; 
+ *
+ *   There is no need to flush the header since this function writes
+ *   to all locations unless there is an error; the caller may elect
+ *   to flush the buffer before calling this function;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon HomePlug AV Application Programming Interface;
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration and evaluation only; Not for production use;
+ *
+ *   Contributor(s): 
+ *	Charles Maier, charles.maier@intellon.com
+ *	Alex Vasquez, alex.vasquez@intellon.com
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef ENCODEINTELLONHEADER_SOURCE
+#define ENCODEINTELLONHEADER_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;string.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../ihpapi/ihp.h&quot;
+#include &quot;../tools/types.h&quot;
+ 
+size_t EncodeIntellonHeader (uint8_t buffer [], signed length, uint16_t MMTYPE) 
+
+{
+	struct header_mme * header = (struct header_mme *)(buffer);
+
+#if INTELLON_SAFEMODE
+ 
+	if (buffer == (uint8_t *)(0)) 
+	{
+		errno = EFAULT;
+		return (0);
+	}
+
+#endif
+ 
+	if (length &lt; sizeof (struct header_mme)) 
+	{
+#if INTELLON_SAFEMODE
+ 
+		memset (buffer, 0, length);
+
+#endif
+ 
+		errno = ERANGE;
+		return (0);
+	}
+	header-&gt;MMV = INTELLON_MMV;
+	header-&gt;MMTYPE = ihtons(MMTYPE);
+	header-&gt;OUI [0] = 0x00;
+	header-&gt;OUI [1] = 0xB0;
+	header-&gt;OUI [2] = 0x52;
+	return (sizeof (struct header_mme));
+}
+
+#endif
+ 
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='EncodeEthernetHeader.c.html' title=' EncodeEthernetHeader.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='EncodeSetSDRAMCfg.c.html' title=' EncodeSetSDRAMCfg.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

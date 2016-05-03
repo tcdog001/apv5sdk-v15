@@ -1,0 +1,8 @@
+In file included from shell/mxml_file.c:12:
+shell/mxml.h:27: warning: function declaration isn't a prototype
+shell/mxml.h:32: warning: function declaration isn't a prototype
+shell/mxml.h:37: warning: function declaration isn't a prototype
+shell/mxml.h:64: warning: function declaration isn't a prototype
+shell/mxml.h:137: warning: function declaration isn't a prototype
+shell/mxml_file.c: In function 'mxml_read_file':
+shell/mxml_file.c:57: warning: implicit declaration of function 'mxml_refil_destroy'

@@ -1,0 +1,235 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_url=`config_read /config/firewall/urlfilter`
+xml_url_status=`config_getoption "$xml_url" status`
+xml_url_count=`config_getoption "$xml_url" rule_count`
+
+xml_url1=`config_getoption "$xml_url" url1`
+xml_url2=`config_getoption "$xml_url" url2`
+xml_url3=`config_getoption "$xml_url" url3`
+xml_url4=`config_getoption "$xml_url" url4`
+xml_url5=`config_getoption "$xml_url" url5`
+xml_url6=`config_getoption "$xml_url" url6`
+xml_url7=`config_getoption "$xml_url" url7`
+xml_url8=`config_getoption "$xml_url" url8`
+xml_url9=`config_getoption "$xml_url" url9`
+xml_url10=`config_getoption "$xml_url" url10`
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>URL</title>
+<style>
+#url_table{
+	border:solid 1px #000000;
+}
+</style>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<script language="javascript" src="JAS.js">
+</script>
+<script language="javascript" >
+function addrulecount()
+{
+	if(url_table.rows.length<12)
+	{
+		var count=parseInt(document.all.rule_num.value)+1;
+		document.all.rule_num.value = count;
+	}
+}
+function delrulecount()
+{
+	if(url_table.rows.length>3)
+	{
+		var count=parseInt(document.all.rule_num.value)-1;
+		document.all.rule_num.value = count;
+	}
+}
+function initrulecount()
+{
+	if( document.all.rule_num.value == "0")
+		document.all.rule_num.value = "1";
+}
+
+/*********************************************/
+/*control of url.htm                        */
+/*********************************************/
+var url_count="<%= $xml_url_count %>";
+var url_status="<%= $xml_url_status %>";
+var url_arr=["<%= $xml_url1 %>","<%= $xml_url2 %>","<%= $xml_url3 %>","<%= $xml_url4 %>","<%= $xml_url5 %>","<%= $xml_url6 %>","<%= $xml_url7 %>","<%= $xml_url8 %>","<%= $xml_url9 %>","<%= $xml_url10 %>"];
+var num = 1;
+var i = 0;
+function urltable_insRow(obj)
+{
+	if( obj == "first entry")
+	{
+		for( i=0; i<url_count; i++)
+		{
+			var td1 = "url_address" + String(i+1);
+			var row_num = "url_tr" + String(i+1);
+	
+			var newRow = document.getElementById('url_table').insertRow(url_table.rows.length-1);
+       	    		newRow.id = row_num;
+			var cell0 = newRow.insertCell(0);
+			cell0.className = "td_style";
+			cell0.innerHTML="&nbsp;";
+			var cell1 = newRow.insertCell(1);
+			cell1.className = "td_style";
+			cell1.innerHTML="<table width='350' border='0'><tr><td><input type='text' name='" + td1 +"' value='" + url_arr[i] + "' style='height:12px; width:88px'/></td></tr></table>";
+		}
+
+		if (i==0)
+			num = 1;
+		else
+			num = i ;
+			
+		if( url_status == "enable")
+		{
+			for(var i=1;i<url_table.rows.length;i++)
+				document.getElementById("url_table").rows[i].style.display="";
+		}
+		else
+		{
+			for(var i=1;i<url_table.rows.length;i++)
+				document.getElementById("url_table").rows[i].style.display="none";
+		}
+	}
+	else
+	{
+		num = num + 1;
+		if(url_table.rows.length<12)
+		{
+			var td1 = "url_address" + String(num);
+
+			var row_num = "url_tr" + String(num);
+	
+			var newRow = document.getElementById('url_table').insertRow(url_table.rows.length-1);
+        		newRow.id = row_num;
+			var cell0 = newRow.insertCell(0);
+			cell0.className = "td_style";
+			cell0.innerHTML="&nbsp;";
+			var cell1 = newRow.insertCell(1);
+			cell1.className = "td_style";
+			cell1.innerHTML="<table width='350' border='0'><tr><td><input type='text' name='" + td1 +"' style='height:12px; width:88px'/></td></tr></table>";
+		}
+		else
+		{
+			num = num - 1;
+	  		alert("Max number of fiter URL is 10!");
+	  	}
+	}
+
+}
+
+function urltable_delRow(){
+	num = num - 1;
+	if(url_table.rows.length>3)
+	 	document.getElementById('url_table').deleteRow(url_table.rows.length-2);
+	else
+	{
+		num = num + 1;	
+		alert("There must be at least one url-filter entry!");
+	}
+}
+
+function url_radio_display(obj)
+{
+	if(parseInt(obj) == 1)
+	{
+		for(var i=1;i<url_table.rows.length;i++)
+			document.getElementById("url_table").rows[i].style.display="none";
+	}
+	else
+	{
+		for(var i=1;i<url_table.rows.length;i++)
+			document.getElementById("url_table").rows[i].style.display="";
+			
+		if( url_table.rows.length<3 )
+		{
+			var row_num = "url_tr1";
+	
+			var newRow = document.getElementById('url_table').insertRow(url_table.rows.length-1);
+        		newRow.id = row_num;
+			var cell0 = newRow.insertCell(0);
+			cell0.className = "td_style";
+			cell0.innerHTML="&nbsp;";
+			var cell1 = newRow.insertCell(1);
+			cell1.className = "td_style";
+			cell1.innerHTML="<table width='350' border='0'><tr><td><input type='text' name='url_address1' style='height:12px; width:88px'/></td></tr></table>";
+		}
+	}
+}
+
+</script>
+</head>
+
+<body bgcolor="#efefef" onload='urltable_insRow("first entry")'>
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1"><a href="firewall.htm" target="MainFrame">IP</a></td>
+		  <td class="top1"><a href="mac.htm" target="MainFrame">MAC</a></td>
+		  <td class="top1">URL</td>
+		  <td class="top1"><a href="dos.htm" target="MainFrame">DoS</a></td>
+		  <td class="top1"><a href="port_forwarding.htm" target="MainFrame">Virtual server</a></td>
+		  <td class="top1"><a href="ip_forwarding.htm" target="MainFrame">DMZ</a></td>
+		  <td class="top1"><a href="upnp.htm" target="MainFrame">upnp</a></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">Firewall-->URL Filter</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form method="post" action="<%= $firewall_action_cgi %>" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="URL Filter illustration">URL Filter</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table id="url_table" width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">URL DOMAIN filter </td>
+          <td class="td_style" width="350">
+		    <table width="350" border="0">
+              <tr>
+                <td width="60"><input type="radio" name="url_filter" <% webui_radiobutton_check "$xml_url_status" "disable" %> value="disable" onclick="url_radio_display(1);"/>Disable</td>
+                <td width="290"><input type="radio" name="url_filter" <% webui_radiobutton_check "$xml_url_status" "enable" %> value="enable" onclick="url_radio_display(2);initrulecount();"/>Enable</td>
+              </tr>
+            </table>
+		  </td>
+        </tr>	
+		
+	<tr style="display:none">
+          <td class="td_style">&nbsp;</td>
+          <td class="td_style">
+		    <table width="130" border="0">
+              <tr>
+                <td><input id="but" type="button" name="insert_one_row" value="Add" onclick='addrulecount();urltable_insRow("click");'/></td>
+                <td><input id="but" type="button" name="delete_one_row" value="Delete" onclick="delrulecount();urltable_delRow();"/>
+              </tr>
+            </table>
+		  </td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><input id="but" type="submit" name="url_filter_commit" value="Submit"/></td>
+  </tr>
+</table>
+<input type="hidden" value="URL filter" name="SERVLET">
+<input type="hidden" value="<%= $xml_url_count %>" name="rule_num">
+</form>
+</div>
+</body>
+</html>

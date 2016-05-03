@@ -1,0 +1,1153 @@
+------------------------------------------------------------------------
+r1852 | yuanjinhu | 2011-03-28 18:28:58 +0800 (Mon, 28 Mar 2011) | 1 line
+
+add XJAP93V1 in Makefile.ar11n
+------------------------------------------------------------------------
+r1850 | yuanjinhu | 2011-03-28 17:38:30 +0800 (Mon, 28 Mar 2011) | 1 line
+
+add XJAP93V1 in Makefile.ar11n
+------------------------------------------------------------------------
+r1848 | yuanjinhu | 2011-03-28 17:34:51 +0800 (Mon, 28 Mar 2011) | 1 line
+
+add XJAP93V1 in Makefile.ar11n and add micor in WTPDriverInteraction.c
+------------------------------------------------------------------------
+r1822 | peiwenhui | 2011-03-28 14:45:45 +0800 (Mon, 28 Mar 2011) | 1 line
+
+LIPENG modified for the num of sta 
+------------------------------------------------------------------------
+r1812 | yuanjinhu | 2011-03-24 14:39:17 +0800 (Thu, 24 Mar 2011) | 1 line
+
+sundaolian add  for qos and dncpsnooping in wtpd
+------------------------------------------------------------------------
+r1800 | peiwenhui | 2011-03-22 12:03:34 +0800 (Tue, 22 Mar 2011) | 1 line
+
+LIPENG modified wtpd 
+------------------------------------------------------------------------
+r1798 | peiwenhui | 2011-03-22 11:49:47 +0800 (Tue, 22 Mar 2011) | 1 line
+
+LIPENG midified for the ac count is 0 ,wtpd will use the default ac 255.255.255.255 
+------------------------------------------------------------------------
+r1795 | yuanjinhu | 2011-03-21 19:14:15 +0800 (Mon, 21 Mar 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1794 | yuanjinhu | 2011-03-21 19:13:32 +0800 (Mon, 21 Mar 2011) | 1 line
+
+yuanjinhu modified delete set chainmask when into run
+------------------------------------------------------------------------
+r1783 | yuanjinhu | 2011-03-19 16:03:30 +0800 (Sat, 19 Mar 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1782 | yuanjinhu | 2011-03-19 16:02:21 +0800 (Sat, 19 Mar 2011) | 1 line
+
+yuanjinhu modified add license for XHPB44
+------------------------------------------------------------------------
+r1771 | yuanjinhu | 2011-03-15 17:45:13 +0800 (Tue, 15 Mar 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1770 | yuanjinhu | 2011-03-15 17:43:08 +0800 (Tue, 15 Mar 2011) | 1 line
+
+yuanjinhu modified get CODE for XHAP93 and XHPB44 
+------------------------------------------------------------------------
+r1769 | peiwenhui | 2011-03-15 14:25:53 +0800 (Tue, 15 Mar 2011) | 1 line
+
+peiwenhui fix bug for some unfree pointer, like CWProtocolRetrieveRawBytes() & CWProtocolRetrieveStr()
+------------------------------------------------------------------------
+r1753 | peiwenhui | 2011-03-09 11:33:42 +0800 (Wed, 09 Mar 2011) | 1 line
+
+peiwenhui add tx_ctrl to frame_all for station info
+------------------------------------------------------------------------
+r1743 | yuanjinhu | 2011-03-07 18:53:14 +0800 (Mon, 07 Mar 2011) | 1 line
+
+yuanjinhu modified for XHAP93
+------------------------------------------------------------------------
+r1738 | peiwenhui | 2011-03-07 11:22:02 +0800 (Mon, 07 Mar 2011) | 1 line
+
+ lipeng modified for rrm 
+------------------------------------------------------------------------
+r1732 | yuanjinhu | 2011-03-04 15:18:37 +0800 (Fri, 04 Mar 2011) | 1 line
+
+yuanjinhu modified for linkcheck,ipmode and no sleep(4) before create second wlan when wtpd -V 
+------------------------------------------------------------------------
+r1731 | peiwenhui | 2011-03-04 14:19:48 +0800 (Fri, 04 Mar 2011) | 1 line
+
+ LIPENG modified for the wlancount of the configfile
+------------------------------------------------------------------------
+r1730 | yuanjinhu | 2011-03-04 11:47:07 +0800 (Fri, 04 Mar 2011) | 1 line
+
+sundaolian add for warning for image update failed 
+------------------------------------------------------------------------
+r1711 | xiaruixin | 2011-03-03 11:45:28 +0800 (Thu, 03 Mar 2011) | 1 line
+
+xiaruixin add for xjap93V2
+------------------------------------------------------------------------
+r1707 | xiaruixin | 2011-03-02 20:15:23 +0800 (Wed, 02 Mar 2011) | 2 lines
+
+xiaruixin add for xjap93V2 
+
+------------------------------------------------------------------------
+r1693 | yuanjinhu | 2011-03-02 11:36:08 +0800 (Wed, 02 Mar 2011) | 1 line
+
+yuanjinhu modified add 2>&1 when killall iwlist_scan
+------------------------------------------------------------------------
+r1692 | yuanjinhu | 2011-03-02 11:25:59 +0800 (Wed, 02 Mar 2011) | 1 line
+
+yuanjinhu modified for iwlist_scan add 2>&1
+------------------------------------------------------------------------
+r1686 | yuanjinhu | 2011-02-28 20:38:04 +0800 (Mon, 28 Feb 2011) | 1 line
+
+yuanjinhu modified for get SN
+------------------------------------------------------------------------
+r1685 | yuanjinhu | 2011-02-28 18:24:34 +0800 (Mon, 28 Feb 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1684 | yuanjinhu | 2011-02-28 18:22:49 +0800 (Mon, 28 Feb 2011) | 1 line
+
+yuanjinhu modified for set the new channel when set channel 0
+------------------------------------------------------------------------
+r1682 | yuanjinhu | 2011-02-28 14:23:02 +0800 (Mon, 28 Feb 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1680 | yuanjinhu | 2011-02-28 14:08:06 +0800 (Mon, 28 Feb 2011) | 1 line
+
+yuanjinhu modified for 11n wmm in wtpd
+------------------------------------------------------------------------
+r1676 | yuanjinhu | 2011-02-25 11:14:26 +0800 (Fri, 25 Feb 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1675 | yuanjinhu | 2011-02-25 11:12:18 +0800 (Fri, 25 Feb 2011) | 1 line
+
+yuanjinhu modified for down athscanwifi0 when set cwmmode
+------------------------------------------------------------------------
+r1674 | peiwenhui | 2011-02-23 11:46:34 +0800 (Wed, 23 Feb 2011) | 1 line
+
+LIPENG modified for the interval of no message timeout 
+------------------------------------------------------------------------
+r1673 | yuanjinhu | 2011-02-23 10:48:27 +0800 (Wed, 23 Feb 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1672 | yuanjinhu | 2011-02-23 10:47:21 +0800 (Wed, 23 Feb 2011) | 1 line
+
+yuanjinhu modefied for delete sta_access_limit when receive ac_cmd
+------------------------------------------------------------------------
+r1671 | yuanjinhu | 2011-02-22 18:28:01 +0800 (Tue, 22 Feb 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1670 | yuanjinhu | 2011-02-22 18:24:12 +0800 (Tue, 22 Feb 2011) | 1 line
+
+yuanjinhu modified for don't choose channel when set channel_offset
+------------------------------------------------------------------------
+r1655 | peiwenhui | 2011-02-21 09:59:39 +0800 (Mon, 21 Feb 2011) | 1 line
+
+LIPENG modified for wmm setting 
+------------------------------------------------------------------------
+r1654 | peiwenhui | 2011-02-18 18:07:57 +0800 (Fri, 18 Feb 2011) | 1 line
+
+add code_boot record to wtpd.log
+------------------------------------------------------------------------
+r1653 | yuanjinhu | 2011-02-18 11:18:55 +0800 (Fri, 18 Feb 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1651 | peiwenhui | 2011-02-18 10:40:49 +0800 (Fri, 18 Feb 2011) | 1 line
+
+LIPENG modified for get the value of mem_total
+------------------------------------------------------------------------
+r1648 | peiwenhui | 2011-02-17 10:09:35 +0800 (Thu, 17 Feb 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1647 | peiwenhui | 2011-02-17 10:01:54 +0800 (Thu, 17 Feb 2011) | 1 line
+
+LIPENG modified for popen
+------------------------------------------------------------------------
+r1643 | yuanjinhu | 2011-02-16 12:55:42 +0800 (Wed, 16 Feb 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1642 | yuanjinhu | 2011-02-16 12:54:15 +0800 (Wed, 16 Feb 2011) | 1 line
+
+yuanjinhu modified about wlan_list to behind insert
+------------------------------------------------------------------------
+r1639 | peiwenhui | 2011-02-15 16:20:48 +0800 (Tue, 15 Feb 2011) | 1 line
+
+modified u_int64_t back to u_int64_c
+------------------------------------------------------------------------
+r1638 | peiwenhui | 2011-01-27 17:21:47 +0800 (Thu, 27 Jan 2011) | 1 line
+
+diaowenqin modify,save wlan_count
+------------------------------------------------------------------------
+r1637 | yuanjinhu | 2011-01-27 14:19:31 +0800 (Thu, 27 Jan 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1636 | yuanjinhu | 2011-01-27 14:18:17 +0800 (Thu, 27 Jan 2011) | 1 line
+
+yuanjinhu modified for iwlist_scan after athscanwifi0 up
+------------------------------------------------------------------------
+r1634 | yuanjinhu | 2011-01-26 13:00:10 +0800 (Wed, 26 Jan 2011) | 1 line
+
+yuanjinhu modified for sta_access_limit
+------------------------------------------------------------------------
+r1631 | peiwenhui | 2011-01-25 10:55:25 +0800 (Tue, 25 Jan 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1630 | peiwenhui | 2011-01-25 10:54:27 +0800 (Tue, 25 Jan 2011) | 1 line
+
+delete packet drop by simulate for cmcc test
+------------------------------------------------------------------------
+r1629 | yuanjinhu | 2011-01-25 09:42:37 +0800 (Tue, 25 Jan 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1628 | yuanjinhu | 2011-01-25 09:36:34 +0800 (Tue, 25 Jan 2011) | 1 line
+
+yuanjinhu modified setting cwmmode and extoffset for every ath if
+------------------------------------------------------------------------
+r1626 | peiwenhui | 2011-01-23 18:15:14 +0800 (Sun, 23 Jan 2011) | 1 line
+
+modified for mgmtbytes support for ar11n
+------------------------------------------------------------------------
+r1624 | peiwenhui | 2011-01-23 17:49:25 +0800 (Sun, 23 Jan 2011) | 1 line
+
+update log.txt
+------------------------------------------------------------------------
+r1623 | peiwenhui | 2011-01-23 17:48:30 +0800 (Sun, 23 Jan 2011) | 1 line
+
+modified for mgmtbytes support, closedir, u_int64_t
+------------------------------------------------------------------------
+r1615 | yuanjinhu | 2011-01-22 18:10:15 +0800 (Sat, 22 Jan 2011) | 1 line
+
+yuanjinhu modified a bug :did not close sock
+------------------------------------------------------------------------
+r1603 | yuanjinhu | 2011-01-21 15:52:34 +0800 (Fri, 21 Jan 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1602 | yuanjinhu | 2011-01-21 15:44:03 +0800 (Fri, 21 Jan 2011) | 1 line
+
+yuanjinhu modified for interface athscanwifi0 in wtpd
+------------------------------------------------------------------------
+r1599 | peiwenhui | 2011-01-20 10:34:51 +0800 (Thu, 20 Jan 2011) | 1 line
+
+update log.txt
+------------------------------------------------------------------------
+r1598 | peiwenhui | 2011-01-20 10:34:03 +0800 (Thu, 20 Jan 2011) | 1 line
+
+pei modified using close(sock) instead of close (sock)
+------------------------------------------------------------------------
+r1597 | peiwenhui | 2011-01-19 21:01:00 +0800 (Wed, 19 Jan 2011) | 1 line
+
+update log.txt
+------------------------------------------------------------------------
+r1596 | peiwenhui | 2011-01-19 21:00:08 +0800 (Wed, 19 Jan 2011) | 1 line
+
+diaowenqin modified for wtpd hot restart config save and init
+------------------------------------------------------------------------
+r1594 | peiwenhui | 2011-01-14 18:35:41 +0800 (Fri, 14 Jan 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1593 | peiwenhui | 2011-01-14 18:34:48 +0800 (Fri, 14 Jan 2011) | 1 line
+
+peiwenhui modified, gettxpower after up all wlan
+------------------------------------------------------------------------
+r1591 | peiwenhui | 2011-01-13 15:39:55 +0800 (Thu, 13 Jan 2011) | 1 line
+
+update log.txt
+------------------------------------------------------------------------
+r1590 | peiwenhui | 2011-01-13 15:37:11 +0800 (Thu, 13 Jan 2011) | 1 line
+
+peiwenhui modified, free some pointer when config sta or wlan in runstate
+------------------------------------------------------------------------
+r1589 | yuanjinhu | 2011-01-13 15:31:20 +0800 (Thu, 13 Jan 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1588 | yuanjinhu | 2011-01-13 15:14:25 +0800 (Thu, 13 Jan 2011) | 1 line
+
+yuanjinhu modified for unicast_bytes type to 'llu' when get date from /proc/net/dev
+------------------------------------------------------------------------
+r1585 | peiwenhui | 2011-01-12 10:00:50 +0800 (Wed, 12 Jan 2011) | 1 line
+
+lipeng modified for unicastbytes
+------------------------------------------------------------------------
+r1582 | yuanjinhu | 2011-01-11 10:04:51 +0800 (Tue, 11 Jan 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1581 | yuanjinhu | 2011-01-11 10:00:30 +0800 (Tue, 11 Jan 2011) | 1 line
+
+yuanjinhu modified a mistake using struct addwlanvalues when deletewlan and updatewlan
+------------------------------------------------------------------------
+r1568 | yuanjinhu | 2011-01-07 18:01:40 +0800 (Fri, 07 Jan 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1567 | yuanjinhu | 2011-01-07 18:00:39 +0800 (Fri, 07 Jan 2011) | 1 line
+
+yuanjinhu modified delete mcs-setting and add rx_chainmask to 3 into runstats
+------------------------------------------------------------------------
+r1566 | yuanjinhu | 2011-01-07 17:45:57 +0800 (Fri, 07 Jan 2011) | 1 line
+
+
+------------------------------------------------------------------------
+r1565 | yuanjinhu | 2011-01-07 17:42:51 +0800 (Fri, 07 Jan 2011) | 1 line
+
+yuanjinhu modified for set channel in createwlan everytime
+------------------------------------------------------------------------
+r1555 | yuanjinhu | 2011-01-06 14:34:05 +0800 (Thu, 06 Jan 2011) | 1 line
+
+yuanjinhu modified for 11n cwmmode base value to 0 in wtpd.
+------------------------------------------------------------------------
+r1554 | yuanjinhu | 2011-01-06 10:27:08 +0800 (Thu, 06 Jan 2011) | 1 line
+
+modified log.txt
+------------------------------------------------------------------------
+r1553 | yuanjinhu | 2011-01-06 10:02:23 +0800 (Thu, 06 Jan 2011) | 1 line
+
+yuanjinhu modified for upgrade using sysupgrade all.
+------------------------------------------------------------------------
+r1550 | peiwenhui | 2011-01-05 13:50:24 +0800 (Wed, 05 Jan 2011) | 1 line
+
+add log.txt
+------------------------------------------------------------------------
+r1547 | yuanjinhu | 2011-01-04 10:59:47 +0800 (Tue, 04 Jan 2011) | 1 line
+
+yuanjinhu modified for xjap93 upgrade
+------------------------------------------------------------------------
+r1533 | yuanjinhu | 2010-12-28 17:20:27 +0800 (Tue, 28 Dec 2010) | 1 line
+
+yuanjinhu modified to reboot when set ap_ip(static and dhcp) by ac
+------------------------------------------------------------------------
+r1522 | yuanjinhu | 2010-12-24 14:39:27 +0800 (Fri, 24 Dec 2010) | 1 line
+
+yuanjinhu modified to use_iwlist_scan
+------------------------------------------------------------------------
+r1515 | yuanjinhu | 2010-12-16 17:06:55 +0800 (Thu, 16 Dec 2010) | 1 line
+
+yuanjinhu add sta_access_limit when into runstate
+------------------------------------------------------------------------
+r1512 | yuanjinhu | 2010-12-16 16:35:18 +0800 (Thu, 16 Dec 2010) | 1 line
+
+yuanjinhu modified the using ath when set wifi parameter
+------------------------------------------------------------------------
+r1499 | yuanjinhu | 2010-12-08 22:41:41 +0800 (Wed, 08 Dec 2010) | 1 line
+
+yuanjinhu modified using wlanname when set channel,add setting cwmmode and extoffset when set radio_type
+------------------------------------------------------------------------
+r1478 | yuanjinhu | 2010-12-06 10:59:27 +0800 (Mon, 06 Dec 2010) | 1 line
+
+yuanjinhu modify parameters in create wlan
+------------------------------------------------------------------------
+r1387 | yuanjinhu | 2010-11-09 15:21:24 +0800 (Tue, 09 Nov 2010) | 1 line
+
+yuanjinhu change for wrong:free()
+------------------------------------------------------------------------
+r1381 | peiwenhui | 2010-11-05 16:15:42 +0800 (Fri, 05 Nov 2010) | 1 line
+
+modified for fix bug get wlan count error when wtpd hot restart
+------------------------------------------------------------------------
+r1376 | peiwenhui | 2010-10-29 18:32:51 +0800 (Fri, 29 Oct 2010) | 1 line
+
+modified thinap_state when neighbordead
+------------------------------------------------------------------------
+r1366 | peiwenhui | 2010-10-27 12:05:15 +0800 (Wed, 27 Oct 2010) | 1 line
+
+modified for 2wlan channel 0 no up, fixed completely
+------------------------------------------------------------------------
+r1365 | peiwenhui | 2010-10-26 21:10:49 +0800 (Tue, 26 Oct 2010) | 1 line
+
+modified for 2wlan channel 0 no up
+------------------------------------------------------------------------
+r1364 | yuanjinhu | 2010-10-26 19:45:45 +0800 (Tue, 26 Oct 2010) | 1 line
+
+yuanjinhu delete CWWTPDebugLog when up/down interface
+------------------------------------------------------------------------
+r1360 | yuanjinhu | 2010-10-22 18:22:42 +0800 (Fri, 22 Oct 2010) | 1 line
+
+yuanjinhu add CWWTPDebugLog when set radio_type and up/down interface ...
+------------------------------------------------------------------------
+r1355 | lijiyong | 2010-10-22 11:37:40 +0800 (Fri, 22 Oct 2010) | 2 lines
+
+lijiyong delete Makefile.woc of wtpd in public package
+
+------------------------------------------------------------------------
+r1349 | peiwenhui | 2010-10-20 16:41:45 +0800 (Wed, 20 Oct 2010) | 1 line
+
+set thinap_state when wtpd first start up
+------------------------------------------------------------------------
+r1347 | peiwenhui | 2010-10-20 15:33:16 +0800 (Wed, 20 Oct 2010) | 1 line
+
+no saveconfiginfo when retransmit
+------------------------------------------------------------------------
+r1346 | lijiyong | 2010-10-20 10:09:58 +0800 (Wed, 20 Oct 2010) | 2 lines
+
+lijiyong modify the makefile of wtpd for woc
+
+------------------------------------------------------------------------
+r1343 | lijiyong | 2010-10-19 17:47:55 +0800 (Tue, 19 Oct 2010) | 2 lines
+
+lijiyong add Makefile for woc
+
+------------------------------------------------------------------------
+r1305 | yuanjinhu | 2010-10-13 21:34:35 +0800 (Wed, 13 Oct 2010) | 1 line
+
+yuanjinhu change for ampdu,amsdu,tx_chainmask,rx_chainmask
+------------------------------------------------------------------------
+r1298 | peiwenhui | 2010-10-12 00:39:46 +0800 (Tue, 12 Oct 2010) | 1 line
+
+for sta wpi errors
+------------------------------------------------------------------------
+r1295 | peiwenhui | 2010-10-11 23:12:38 +0800 (Mon, 11 Oct 2010) | 1 line
+
+modified for simulate no rate, ntp seg
+------------------------------------------------------------------------
+r1291 | peiwenhui | 2010-10-11 15:43:08 +0800 (Mon, 11 Oct 2010) | 1 line
+
+add for badcrypt pkt simulate
+------------------------------------------------------------------------
+r1280 | yuanjinhu | 2010-10-09 22:33:04 +0800 (Sat, 09 Oct 2010) | 1 line
+
+yuanjinhu add geting channel in set_radio_type
+------------------------------------------------------------------------
+r1278 | peiwenhui | 2010-10-09 21:19:08 +0800 (Sat, 09 Oct 2010) | 1 line
+
+add some pkt for simulate
+------------------------------------------------------------------------
+r1276 | peiwenhui | 2010-10-08 19:46:13 +0800 (Fri, 08 Oct 2010) | 1 line
+
+pei add terminal disturb for cmcc test
+------------------------------------------------------------------------
+r1275 | yuanjinhu | 2010-10-08 18:35:35 +0800 (Fri, 08 Oct 2010) | 1 line
+
+yuanjinhu amend a mistake in set channel and channel_offset, 11b to 11g
+------------------------------------------------------------------------
+r1274 | yuanjinhu | 2010-10-08 15:10:06 +0800 (Fri, 08 Oct 2010) | 1 line
+
+yuanjinhu add for channel when set channel 0,set channel_offset,set radio_type,set cwmmode
+------------------------------------------------------------------------
+r1269 | peiwenhui | 2010-09-27 17:39:09 +0800 (Mon, 27 Sep 2010) | 1 line
+
+add mgmtbytes
+------------------------------------------------------------------------
+r1268 | yuanjinhu | 2010-09-27 16:38:28 +0800 (Mon, 27 Sep 2010) | 1 line
+
+yaunjinhu add error_packets and frames for 11n
+------------------------------------------------------------------------
+r1267 | yuanjinhu | 2010-09-27 15:56:11 +0800 (Mon, 27 Sep 2010) | 1 line
+
+yuanjinhu add rx_error_frames in ifinformation
+------------------------------------------------------------------------
+r1266 | peiwenhui | 2010-09-27 15:32:24 +0800 (Mon, 27 Sep 2010) | 1 line
+
+add eth rate and change rate operate by using sum_bytes
+------------------------------------------------------------------------
+r1265 | peiwenhui | 2010-09-25 18:42:15 +0800 (Sat, 25 Sep 2010) | 1 line
+
+modified for adding wapi challenge replay trap
+------------------------------------------------------------------------
+r1264 | peiwenhui | 2010-09-25 16:06:10 +0800 (Sat, 25 Sep 2010) | 1 line
+
+modified for 2radio rrm, using wlan to scan if it exist
+------------------------------------------------------------------------
+r1257 | wangjianru | 2010-09-25 14:51:02 +0800 (Sat, 25 Sep 2010) | 1 line
+
+update vlan for XHPB44
+------------------------------------------------------------------------
+r1242 | yuanjinhu | 2010-09-21 18:49:36 +0800 (Tue, 21 Sep 2010) | 1 line
+
+yuanjinhu add mgmtbytes,rx_errors and rx_error_frames to struct ieee80211_stats of bg
+------------------------------------------------------------------------
+r1220 | peiwenhui | 2010-09-19 11:12:20 +0800 (Sun, 19 Sep 2010) | 1 line
+
+modified using bytes_recv&send when they are 0
+------------------------------------------------------------------------
+r1215 | peiwenhui | 2010-09-16 11:39:22 +0800 (Thu, 16 Sep 2010) | 1 line
+
+modified for 2radio rrm
+------------------------------------------------------------------------
+r1209 | peiwenhui | 2010-09-14 11:52:52 +0800 (Tue, 14 Sep 2010) | 1 line
+
+add for 64bit eth bytes from capwap split fast
+------------------------------------------------------------------------
+r1208 | peiwenhui | 2010-09-14 11:34:42 +0800 (Tue, 14 Sep 2010) | 1 line
+
+add for attack addr redirection
+------------------------------------------------------------------------
+r1206 | peiwenhui | 2010-09-10 21:54:17 +0800 (Fri, 10 Sep 2010) | 1 line
+
+add tx_ctrl for bg
+------------------------------------------------------------------------
+r1201 | peiwenhui | 2010-09-10 16:25:01 +0800 (Fri, 10 Sep 2010) | 1 line
+
+wait for dhcpflag before get ac addr by dns, and get dhcp ac count checking ipv4/6
+------------------------------------------------------------------------
+r1199 | peiwenhui | 2010-09-10 11:32:05 +0800 (Fri, 10 Sep 2010) | 1 line
+
+add dtls
+------------------------------------------------------------------------
+r1189 | peiwenhui | 2010-09-08 10:58:47 +0800 (Wed, 08 Sep 2010) | 1 line
+
+lipeng add tx＆rx ctrl frames
+------------------------------------------------------------------------
+r1177 | wangjianru | 2010-09-06 17:19:46 +0800 (Mon, 06 Sep 2010) | 1 line
+
+update for parameter of /proc/net/dev
+------------------------------------------------------------------------
+r1172 | peiwenhui | 2010-09-02 17:55:27 +0800 (Thu, 02 Sep 2010) | 1 line
+
+add unicast 64bit
+------------------------------------------------------------------------
+r1171 | peiwenhui | 2010-09-02 17:29:07 +0800 (Thu, 02 Sep 2010) | 1 line
+
+modified for ipv6 ntp
+------------------------------------------------------------------------
+r1167 | peiwenhui | 2010-08-31 21:24:29 +0800 (Tue, 31 Aug 2010) | 1 line
+
+modified for wtpd hot restart
+------------------------------------------------------------------------
+r1166 | wangjianru | 2010-08-31 18:09:54 +0800 (Tue, 31 Aug 2010) | 1 line
+
+update for dhcpsnooping flow
+------------------------------------------------------------------------
+r1159 | peiwenhui | 2010-08-30 14:04:13 +0800 (Mon, 30 Aug 2010) | 1 line
+
+set led when wtpd start
+------------------------------------------------------------------------
+r1154 | peiwenhui | 2010-08-30 10:02:37 +0800 (Mon, 30 Aug 2010) | 1 line
+
+close sock for using iwlist_scan
+------------------------------------------------------------------------
+r1152 | yuanjinhu | 2010-08-28 23:44:22 +0800 (Sat, 28 Aug 2010) | 1 line
+
+yuanjinhu  change for mode
+------------------------------------------------------------------------
+r1151 | yuanjinhu | 2010-08-28 23:22:54 +0800 (Sat, 28 Aug 2010) | 1 line
+
+yuanjinhu  add sta mode printf
+------------------------------------------------------------------------
+r1149 | yuanjinhu | 2010-08-28 23:02:54 +0800 (Sat, 28 Aug 2010) | 1 line
+
+yuanjinhu add sum bytes for if info, packets and mode,rate for sta info
+------------------------------------------------------------------------
+r1143 | qbuilder | 2010-08-28 21:07:56 +0800 (Sat, 28 Aug 2010) | 1 line
+
+
+------------------------------------------------------------------------
+r1142 | peiwenhui | 2010-08-28 21:05:11 +0800 (Sat, 28 Aug 2010) | 1 line
+
+modified some thing for scanning
+------------------------------------------------------------------------
+r1138 | peiwenhui | 2010-08-28 19:04:51 +0800 (Sat, 28 Aug 2010) | 1 line
+
+modified for support file(/jffs/use_iwlist_scan) control using wtpd or iwlist_scan to get rrm info
+------------------------------------------------------------------------
+r1134 | peiwenhui | 2010-08-28 16:11:36 +0800 (Sat, 28 Aug 2010) | 1 line
+
+add for IPV6
+------------------------------------------------------------------------
+r1132 | peiwenhui | 2010-08-28 16:06:05 +0800 (Sat, 28 Aug 2010) | 1 line
+
+add define IPV6 and IPv6
+------------------------------------------------------------------------
+r1129 | peiwenhui | 2010-08-28 15:55:01 +0800 (Sat, 28 Aug 2010) | 1 line
+
+modified for  MODE11N and AR11N
+------------------------------------------------------------------------
+r1109 | wangjianru | 2010-08-27 11:38:13 +0800 (Fri, 27 Aug 2010) | 1 line
+
+update for /proc/net/dev
+------------------------------------------------------------------------
+r1108 | peiwenhui | 2010-08-26 22:04:57 +0800 (Thu, 26 Aug 2010) | 1 line
+
+
+------------------------------------------------------------------------
+r1107 | peiwenhui | 2010-08-26 21:56:08 +0800 (Thu, 26 Aug 2010) | 1 line
+
+add some packet count for ar11n
+------------------------------------------------------------------------
+r1106 | peiwenhui | 2010-08-26 21:36:36 +0800 (Thu, 26 Aug 2010) | 1 line
+
+modified according to OMC
+------------------------------------------------------------------------
+r1062 | wangjianru | 2010-08-12 09:37:26 +0800 (Thu, 12 Aug 2010) | 1 line
+
+add for support IPV6
+------------------------------------------------------------------------
+r1052 | peiwenhui | 2010-08-10 17:31:14 +0800 (Tue, 10 Aug 2010) | 1 line
+
+pei modified ipv6 ip parse getted by nslookup6
+------------------------------------------------------------------------
+r1010 | wangjianru | 2010-07-28 15:28:46 +0800 (Wed, 28 Jul 2010) | 1 line
+
+add CFLAG for XH
+------------------------------------------------------------------------
+r1009 | wangjianru | 2010-07-28 15:27:14 +0800 (Wed, 28 Jul 2010) | 1 line
+
+update for XH product type
+------------------------------------------------------------------------
+r1005 | guoziming | 2010-07-27 18:14:37 +0800 (Tue, 27 Jul 2010) | 1 line
+
+change setapscanning bacause of  wlan disable/enable
+------------------------------------------------------------------------
+r1003 | guoziming | 2010-07-27 16:36:01 +0800 (Tue, 27 Jul 2010) | 1 line
+
+gzm modified for compliant old driver
+------------------------------------------------------------------------
+r995 | guoziming | 2010-07-27 15:00:19 +0800 (Tue, 27 Jul 2010) | 1 line
+
+gzm modified up interface order for set  extoffset 
+------------------------------------------------------------------------
+r991 | guohongyuan | 2010-07-27 10:22:36 +0800 (Tue, 27 Jul 2010) | 1 line
+
+ghy add hxpb44
+------------------------------------------------------------------------
+r987 | peiwenhui | 2010-07-26 18:54:23 +0800 (Mon, 26 Jul 2010) | 1 line
+
+sort
+------------------------------------------------------------------------
+r978 | guoziming | 2010-07-22 10:59:11 +0800 (Thu, 22 Jul 2010) | 1 line
+
+gzm
+------------------------------------------------------------------------
+r977 | guoziming | 2010-07-22 10:56:50 +0800 (Thu, 22 Jul 2010) | 1 line
+
+gzm modifed for set extoffset no up down interface
+------------------------------------------------------------------------
+r972 | peiwenhui | 2010-07-20 09:59:48 +0800 (Tue, 20 Jul 2010) | 1 line
+
+add for eth rx & tx bytes
+------------------------------------------------------------------------
+r960 | guoziming | 2010-07-16 16:22:22 +0800 (Fri, 16 Jul 2010) | 1 line
+
+gzm modified txchainmask for AQ2000-SNH
+------------------------------------------------------------------------
+r946 | guoziming | 2010-07-15 22:19:49 +0800 (Thu, 15 Jul 2010) | 1 line
+
+gzm modified for XJ H-txpower license and NEW MODEL is default H-txpower license 
+------------------------------------------------------------------------
+r910 | liuyanbo | 2010-06-28 14:41:02 +0800 (Mon, 28 Jun 2010) | 1 line
+
+gzm modified WNAP550
+------------------------------------------------------------------------
+r909 | guoziming | 2010-06-28 13:16:33 +0800 (Mon, 28 Jun 2010) | 1 line
+
+gzm modified set channel when interface is up and set cwmmode interface updown 2 times
+------------------------------------------------------------------------
+r885 | guoziming | 2010-06-21 20:18:02 +0800 (Mon, 21 Jun 2010) | 1 line
+
+gzm modified for default  cwmmode 0 extoffset 0
+------------------------------------------------------------------------
+r883 | peiwenhui | 2010-06-18 15:12:42 +0800 (Fri, 18 Jun 2010) | 1 line
+
+modified for get wifi count from device_info.xml instead of 2 when get interface state
+------------------------------------------------------------------------
+r882 | peiwenhui | 2010-06-17 18:24:39 +0800 (Thu, 17 Jun 2010) | 1 line
+
+pei modified for filter nameserver when get dns from resolv.conf
+------------------------------------------------------------------------
+r881 | yuanjinhu | 2010-06-17 17:52:47 +0800 (Thu, 17 Jun 2010) | 1 line
+
+add Bcast into aclist when there is 255.255.255.255 in aclist
+------------------------------------------------------------------------
+r877 | yuanjinhu | 2010-06-12 20:26:16 +0800 (Sat, 12 Jun 2010) | 1 line
+
+add 11n parameter
+------------------------------------------------------------------------
+r870 | peiwenhui | 2010-06-12 12:09:05 +0800 (Sat, 12 Jun 2010) | 1 line
+
+add AQ2000-M license
+------------------------------------------------------------------------
+r862 | yuanjinhu | 2010-06-11 14:59:45 +0800 (Fri, 11 Jun 2010) | 1 line
+
+nslookup jiexi xiugai
+------------------------------------------------------------------------
+r860 | peiwenhui | 2010-06-10 17:26:09 +0800 (Thu, 10 Jun 2010) | 1 line
+
+pei modified no refree delsta.mac when sta aging
+------------------------------------------------------------------------
+r858 | peiwenhui | 2010-06-10 16:07:47 +0800 (Thu, 10 Jun 2010) | 1 line
+
+del some useless printf
+------------------------------------------------------------------------
+r854 | yuanjinhu | 2010-06-08 21:33:10 +0800 (Tue, 08 Jun 2010) | 1 line
+
+modified for ipv6 dns found AC addr
+------------------------------------------------------------------------
+r848 | liuyanbo | 2010-06-04 17:56:42 +0800 (Fri, 04 Jun 2010) | 1 line
+
+modified error
+------------------------------------------------------------------------
+r847 | peiwenhui | 2010-06-04 17:17:32 +0800 (Fri, 04 Jun 2010) | 1 line
+
+pei modified no reboot for the first time check no msg from AC and write wtpd.log
+------------------------------------------------------------------------
+r817 | peiwenhui | 2010-06-01 19:13:57 +0800 (Tue, 01 Jun 2010) | 1 line
+
+pei modified for ar11n thinap wapi
+------------------------------------------------------------------------
+r801 | peiwenhui | 2010-05-27 21:31:19 +0800 (Thu, 27 May 2010) | 1 line
+
+modified for return
+------------------------------------------------------------------------
+r800 | peiwenhui | 2010-05-27 19:38:04 +0800 (Thu, 27 May 2010) | 1 line
+
+add some snmp info
+------------------------------------------------------------------------
+r798 | peiwenhui | 2010-05-27 17:22:12 +0800 (Thu, 27 May 2010) | 1 line
+
+modified for socket no close in delete sta no in sta_list
+------------------------------------------------------------------------
+r796 | peiwenhui | 2010-05-27 11:04:25 +0800 (Thu, 27 May 2010) | 1 line
+
+del mutex for wtp_list
+------------------------------------------------------------------------
+r790 | peiwenhui | 2010-05-26 17:31:45 +0800 (Wed, 26 May 2010) | 1 line
+
+pei modified for set channel auto no re iwlist
+------------------------------------------------------------------------
+r789 | peiwenhui | 2010-05-25 18:54:51 +0800 (Tue, 25 May 2010) | 1 line
+
+add new model WNAP550
+------------------------------------------------------------------------
+r788 | peiwenhui | 2010-05-25 17:32:39 +0800 (Tue, 25 May 2010) | 1 line
+
+reback to r781 for no dtls
+------------------------------------------------------------------------
+r787 | peiwenhui | 2010-05-25 11:37:41 +0800 (Tue, 25 May 2010) | 1 line
+
+modified for dtls
+------------------------------------------------------------------------
+r786 | peiwenhui | 2010-05-25 11:36:26 +0800 (Tue, 25 May 2010) | 1 line
+
+add lib and .h for dtls
+------------------------------------------------------------------------
+r781 | peiwenhui | 2010-05-24 20:48:43 +0800 (Mon, 24 May 2010) | 1 line
+
+pei modified saveconfig when get config update msg
+------------------------------------------------------------------------
+r749 | guoziming | 2010-05-20 19:44:48 +0800 (Thu, 20 May 2010) | 1 line
+
+gzm modified for XJ double radio
+------------------------------------------------------------------------
+r740 | peiwenhui | 2010-05-18 18:37:40 +0800 (Tue, 18 May 2010) | 1 line
+
+pei modified for free gCWACList[i].address in discovery response
+------------------------------------------------------------------------
+r733 | guoziming | 2010-05-18 17:15:22 +0800 (Tue, 18 May 2010) | 1 line
+
+gzm modified Makefile.ar11n because files is not exist
+------------------------------------------------------------------------
+r724 | peiwenhui | 2010-05-17 17:36:50 +0800 (Mon, 17 May 2010) | 1 line
+
+modified WTP.c for IPv6 dhcp option52, and delete files
+------------------------------------------------------------------------
+r721 | guoziming | 2010-05-17 09:31:08 +0800 (Mon, 17 May 2010) | 1 line
+
+gzm modified for neighborApCount
+------------------------------------------------------------------------
+r720 | guoziming | 2010-05-17 09:22:28 +0800 (Mon, 17 May 2010) | 1 line
+
+gzm modified neighborApCount type for unsigned int,because it is not enough to record essid count
+------------------------------------------------------------------------
+r717 | peiwenhui | 2010-05-13 16:14:40 +0800 (Thu, 13 May 2010) | 1 line
+
+pei modified CWSaveConfigInfo() to received echo for wpa-psk-tkip
+------------------------------------------------------------------------
+r713 | liuyanbo | 2010-05-11 16:38:55 +0800 (Tue, 11 May 2010) | 1 line
+
+peiwh modify for wnap350 antenna
+------------------------------------------------------------------------
+r706 | peiwenhui | 2010-05-07 15:58:57 +0800 (Fri, 07 May 2010) | 1 line
+
+devide manufacture option type by power high or normal, for XJ license
+------------------------------------------------------------------------
+r700 | peiwenhui | 2010-05-05 14:58:25 +0800 (Wed, 05 May 2010) | 1 line
+
+modified sock using unconnect instead of connect in discovery state for ipv6
+------------------------------------------------------------------------
+r685 | peiwenhui | 2010-04-29 15:12:06 +0800 (Thu, 29 Apr 2010) | 1 line
+
+add define of CW_WTP_MANUFACTURE_OPTION
+------------------------------------------------------------------------
+r683 | guoziming | 2010-04-28 18:31:29 +0800 (Wed, 28 Apr 2010) | 1 line
+
+gzm init WTPStaticIPV2 and WTPModeNPara
+------------------------------------------------------------------------
+r681 | guoziming | 2010-04-28 17:13:39 +0800 (Wed, 28 Apr 2010) | 1 line
+
+gzm add run state set mtu and IP dhcp
+------------------------------------------------------------------------
+r679 | peiwenhui | 2010-04-28 15:54:37 +0800 (Wed, 28 Apr 2010) | 1 line
+
+add report license num for XJ AP
+------------------------------------------------------------------------
+r668 | guoziming | 2010-04-27 14:40:30 +0800 (Tue, 27 Apr 2010) | 1 line
+
+gzm add stats.is_rx_mgmt and stats.is_tx_mgmt of sta ,multicast_bytesunicast_bytes rx_mgmt tx_mgmt in echo package
+------------------------------------------------------------------------
+r665 | guoziming | 2010-04-23 17:56:49 +0800 (Fri, 23 Apr 2010) | 1 line
+
+gzm modified run state receive same message to do nothing
+------------------------------------------------------------------------
+r663 | guoziming | 2010-04-22 20:27:42 +0800 (Thu, 22 Apr 2010) | 1 line
+
+gzm modified for extoffset and puren bug make by lasttime
+------------------------------------------------------------------------
+r662 | peiwenhui | 2010-04-21 13:01:12 +0800 (Wed, 21 Apr 2010) | 1 line
+
+mv setting txchainmask and cwmmode in the end of create wlan for NG WNAP
+------------------------------------------------------------------------
+r661 | guoziming | 2010-04-20 15:23:49 +0800 (Tue, 20 Apr 2010) | 1 line
+
+gzm modified
+------------------------------------------------------------------------
+r660 | guoziming | 2010-04-20 15:03:01 +0800 (Tue, 20 Apr 2010) | 1 line
+
+gzm modified dhcpsnooping and and malloc array instead of static array
+------------------------------------------------------------------------
+r653 | peiwenhui | 2010-04-19 11:11:35 +0800 (Mon, 19 Apr 2010) | 1 line
+
+modified rate to 300M default for NG 210&350
+------------------------------------------------------------------------
+r648 | peiwenhui | 2010-04-15 09:55:44 +0800 (Thu, 15 Apr 2010) | 1 line
+
+modified for thinap_check_threshold and tx_buf refer to v12
+------------------------------------------------------------------------
+r647 | peiwenhui | 2010-04-14 16:25:13 +0800 (Wed, 14 Apr 2010) | 1 line
+
+fix bug: no free valuesPtr when assemble echo request while ap statistics enable
+------------------------------------------------------------------------
+r644 | guoziming | 2010-04-13 11:42:20 +0800 (Tue, 13 Apr 2010) | 1 line
+
+gzm modified mode set for other wireless driver
+------------------------------------------------------------------------
+r643 | guoziming | 2010-04-13 11:07:13 +0800 (Tue, 13 Apr 2010) | 1 line
+
+gzm modified set rate,rts,fragment to all ath interface 
+------------------------------------------------------------------------
+r641 | peiwenhui | 2010-04-12 10:55:05 +0800 (Mon, 12 Apr 2010) | 1 line
+
+set wifi txchainmask to 3 default
+------------------------------------------------------------------------
+r640 | peiwenhui | 2010-04-10 18:53:40 +0800 (Sat, 10 Apr 2010) | 1 line
+
+modified setting txchainmask from ath to wifi
+------------------------------------------------------------------------
+r637 | guoziming | 2010-04-09 11:46:50 +0800 (Fri, 09 Apr 2010) | 1 line
+
+gzm delete sleep 1s before set txpower 
+------------------------------------------------------------------------
+r629 | guoziming | 2010-04-08 19:41:02 +0800 (Thu, 08 Apr 2010) | 1 line
+
+gzm modified
+------------------------------------------------------------------------
+r623 | guoziming | 2010-04-08 16:44:36 +0800 (Thu, 08 Apr 2010) | 1 line
+
+gzm modified Makefile.ar11n
+------------------------------------------------------------------------
+r621 | guoziming | 2010-04-08 16:05:12 +0800 (Thu, 08 Apr 2010) | 1 line
+
+gzm modified XJ ap read eth_speed from ethreg
+------------------------------------------------------------------------
+r617 | guoziming | 2010-04-08 09:42:42 +0800 (Thu, 08 Apr 2010) | 1 line
+
+gzm modified for snmp get wifi info
+------------------------------------------------------------------------
+r603 | guoziming | 2010-04-06 18:14:48 +0800 (Tue, 06 Apr 2010) | 1 line
+
+gzm add for snmp get PowerSave flag
+------------------------------------------------------------------------
+r602 | guoziming | 2010-04-06 17:07:16 +0800 (Tue, 06 Apr 2010) | 1 line
+
+gzm modified for sta info get
+------------------------------------------------------------------------
+r599 | peiwenhui | 2010-04-06 14:35:37 +0800 (Tue, 06 Apr 2010) | 1 line
+
+modified for 11n parameter setting, tx_chainmask,setting when no down
+------------------------------------------------------------------------
+r597 | guoziming | 2010-04-01 20:04:19 +0800 (Thu, 01 Apr 2010) | 1 line
+
+gzm modified
+------------------------------------------------------------------------
+r596 | guoziming | 2010-04-01 20:01:05 +0800 (Thu, 01 Apr 2010) | 1 line
+
+gzm modified
+------------------------------------------------------------------------
+r593 | guoziming | 2010-04-01 10:18:52 +0800 (Thu, 01 Apr 2010) | 1 line
+
+gzm modified for ar11n set
+------------------------------------------------------------------------
+r590 | guoziming | 2010-03-31 22:07:36 +0800 (Wed, 31 Mar 2010) | 1 line
+
+gzm add for 11n mode set 
+------------------------------------------------------------------------
+r578 | guoziming | 2010-03-29 20:11:20 +0800 (Mon, 29 Mar 2010) | 1 line
+
+gzm add for get eth_speed
+------------------------------------------------------------------------
+r573 | guoziming | 2010-03-26 11:14:30 +0800 (Fri, 26 Mar 2010) | 1 line
+
+gzm modified flash_size and AP93 SN
+------------------------------------------------------------------------
+r572 | peiwenhui | 2010-03-25 11:42:29 +0800 (Thu, 25 Mar 2010) | 1 line
+
+pei modified for guangdong mib test
+------------------------------------------------------------------------
+r571 | guoziming | 2010-03-24 14:53:45 +0800 (Wed, 24 Mar 2010) | 1 line
+
+gzm add txpower_auto
+------------------------------------------------------------------------
+r570 | peiwenhui | 2010-03-24 11:10:02 +0800 (Wed, 24 Mar 2010) | 1 line
+
+pei modified for wtpd hot backup
+------------------------------------------------------------------------
+r566 | guoziming | 2010-03-19 10:13:52 +0800 (Fri, 19 Mar 2010) | 1 line
+
+gzm modified for ap93 cause eth1src/wcpss/src/app/wtpd/WTPDriverInteraction.c
+------------------------------------------------------------------------
+r546 | peiwenhui | 2010-03-16 17:03:32 +0800 (Tue, 16 Mar 2010) | 1 line
+
+modified for format style
+------------------------------------------------------------------------
+r545 | guoziming | 2010-03-16 15:56:23 +0800 (Tue, 16 Mar 2010) | 1 line
+
+gzm add for 11n arguments set
+------------------------------------------------------------------------
+r521 | guoziming | 2010-03-13 17:33:32 +0800 (Sat, 13 Mar 2010) | 1 line
+
+gzm modified debug in imagedata
+------------------------------------------------------------------------
+r518 | guohongyuan | 2010-03-12 20:25:20 +0800 (Fri, 12 Mar 2010) | 1 line
+
+modified for country code
+------------------------------------------------------------------------
+r517 | guohongyuan | 2010-03-12 20:25:06 +0800 (Fri, 12 Mar 2010) | 1 line
+
+modified for country code
+------------------------------------------------------------------------
+r510 | guoziming | 2010-03-12 18:11:53 +0800 (Fri, 12 Mar 2010) | 1 line
+
+gzm add
+------------------------------------------------------------------------
+r467 | guoziming | 2010-03-11 09:47:47 +0800 (Thu, 11 Mar 2010) | 1 line
+
+gzm modified
+------------------------------------------------------------------------
+r458 | peiwenhui | 2010-03-10 17:23:58 +0800 (Wed, 10 Mar 2010) | 1 line
+
+modified for setting last-connect-gateway in /jffs/last_connect_gw when get in runstate
+------------------------------------------------------------------------
+r439 | peiwenhui | 2010-03-08 15:02:09 +0800 (Mon, 08 Mar 2010) | 1 line
+
+del WTPDriverInteraction_openwrt.h
+------------------------------------------------------------------------
+r426 | guoziming | 2010-03-04 21:23:39 +0800 (Thu, 04 Mar 2010) | 1 line
+
+gzm
+------------------------------------------------------------------------
+r423 | guoziming | 2010-03-04 21:09:33 +0800 (Thu, 04 Mar 2010) | 1 line
+
+gzm modified set txpower and get hardinfo
+------------------------------------------------------------------------
+r412 | peiwenhui | 2010-03-04 15:45:55 +0800 (Thu, 04 Mar 2010) | 1 line
+
+modified 11n parameter setting: mcs
+------------------------------------------------------------------------
+r402 | guoziming | 2010-03-04 11:17:55 +0800 (Thu, 04 Mar 2010) | 1 line
+
+gzm modified ap code for XJ
+------------------------------------------------------------------------
+r397 | guoziming | 2010-03-04 10:28:31 +0800 (Thu, 04 Mar 2010) | 1 line
+
+gzm modified for AR11N
+------------------------------------------------------------------------
+r385 | guoziming | 2010-03-03 18:54:47 +0800 (Wed, 03 Mar 2010) | 1 line
+
+gzm modified for snmp report
+------------------------------------------------------------------------
+r362 | guoziming | 2010-03-02 10:18:38 +0800 (Tue, 02 Mar 2010) | 1 line
+
+gzm modified
+------------------------------------------------------------------------
+r358 | guoziming | 2010-03-01 21:08:56 +0800 (Mon, 01 Mar 2010) | 1 line
+
+gzm add flashtype,memtype and cputype report
+------------------------------------------------------------------------
+r352 | guoziming | 2010-02-26 16:19:31 +0800 (Fri, 26 Feb 2010) | 1 line
+
+gzm modified for set radio type
+------------------------------------------------------------------------
+r349 | liuyanbo | 2010-02-26 09:37:00 +0800 (Fri, 26 Feb 2010) | 1 line
+
+lyb submit for ap83 wtpd
+------------------------------------------------------------------------
+r348 | guoziming | 2010-02-24 20:45:47 +0800 (Wed, 24 Feb 2010) | 1 line
+
+gzm modified ap code
+------------------------------------------------------------------------
+r345 | guoziming | 2010-02-24 18:06:37 +0800 (Wed, 24 Feb 2010) | 1 line
+
+gzm modified for  rate unable set
+------------------------------------------------------------------------
+r343 | guoziming | 2010-02-24 14:58:36 +0800 (Wed, 24 Feb 2010) | 1 line
+
+gzm modefied for led
+------------------------------------------------------------------------
+r330 | guoziming | 2010-02-22 18:10:46 +0800 (Mon, 22 Feb 2010) | 1 line
+
+gzm modified for rebind socket and for snmp
+------------------------------------------------------------------------
+r319 | guoziming | 2010-02-08 20:56:43 +0800 (Mon, 08 Feb 2010) | 1 line
+
+gzm modified
+------------------------------------------------------------------------
+r314 | guoziming | 2010-02-08 18:14:33 +0800 (Mon, 08 Feb 2010) | 1 line
+
+gzm delete
+------------------------------------------------------------------------
+r295 | guoziming | 2010-02-08 16:24:41 +0800 (Mon, 08 Feb 2010) | 1 line
+
+gzm modified
+------------------------------------------------------------------------
+r281 | guoziming | 2010-02-08 13:25:05 +0800 (Mon, 08 Feb 2010) | 1 line
+
+gzm modified
+------------------------------------------------------------------------
+r280 | guoziming | 2010-02-08 13:20:13 +0800 (Mon, 08 Feb 2010) | 1 line
+
+gzm modified discovery request binging port 32768
+------------------------------------------------------------------------
+r245 | guoziming | 2010-02-02 21:02:01 +0800 (Tue, 02 Feb 2010) | 1 line
+
+gzm modified for AP2400-IFM
+------------------------------------------------------------------------
+r241 | guoziming | 2010-02-01 15:32:31 +0800 (Mon, 01 Feb 2010) | 1 line
+
+gzm modified for wtpd pthread unlock mutex compete
+------------------------------------------------------------------------
+r237 | guoziming | 2010-01-27 16:23:01 +0800 (Wed, 27 Jan 2010) | 1 line
+
+gzm modified Channelget
+------------------------------------------------------------------------
+r234 | guoziming | 2010-01-27 11:32:23 +0800 (Wed, 27 Jan 2010) | 1 line
+
+gzm init Bingvalue for neighborDeadInterval value uncertain problem
+------------------------------------------------------------------------
+r227 | guoziming | 2010-01-18 19:51:12 +0800 (Mon, 18 Jan 2010) | 1 line
+
+gzm modified 
+------------------------------------------------------------------------
+r224 | guoziming | 2010-01-13 17:12:36 +0800 (Wed, 13 Jan 2010) | 1 line
+
+gzm modefied
+------------------------------------------------------------------------
+r201 | peiwenhui | 2010-01-11 20:45:45 +0800 (Mon, 11 Jan 2010) | 1 line
+
+del some comments unuseful
+------------------------------------------------------------------------
+r196 | peiwenhui | 2010-01-11 16:59:48 +0800 (Mon, 11 Jan 2010) | 1 line
+
+add ng102-500 support
+------------------------------------------------------------------------
+r188 | peiwenhui | 2010-01-08 18:19:16 +0800 (Fri, 08 Jan 2010) | 1 line
+
+modified for 11n parameter setting on new driver
+------------------------------------------------------------------------
+r185 | peiwenhui | 2010-01-08 17:22:49 +0800 (Fri, 08 Jan 2010) | 1 line
+
+modified for 11n parameter setting default because of new 11n driver
+------------------------------------------------------------------------
+r182 | peiwenhui | 2010-01-08 10:54:05 +0800 (Fri, 08 Jan 2010) | 1 line
+
+modified for new 11n driver
+------------------------------------------------------------------------
+r174 | guoziming | 2010-01-06 18:59:53 +0800 (Wed, 06 Jan 2010) | 1 line
+
+gzm modify for channel auto
+------------------------------------------------------------------------
+r173 | peiwenhui | 2010-01-06 11:53:40 +0800 (Wed, 06 Jan 2010) | 1 line
+
+modified for 11n parameter setting
+------------------------------------------------------------------------
+r172 | guoziming | 2010-01-06 11:28:45 +0800 (Wed, 06 Jan 2010) | 1 line
+
+gzm delete 
+------------------------------------------------------------------------
+r170 | peiwenhui | 2010-01-06 11:10:56 +0800 (Wed, 06 Jan 2010) | 1 line
+
+modified for wtpd IPV6
+------------------------------------------------------------------------
+r169 | guoziming | 2010-01-06 10:27:18 +0800 (Wed, 06 Jan 2010) | 1 line
+
+gzm for cavium 
+------------------------------------------------------------------------
+r168 | guoziming | 2010-01-06 10:14:09 +0800 (Wed, 06 Jan 2010) | 1 line
+
+gzm add WNAP350 Makefiles
+------------------------------------------------------------------------
+r167 | guoziming | 2010-01-06 10:06:08 +0800 (Wed, 06 Jan 2010) | 1 line
+
+gzm add for Makefiles and WNAP350
+------------------------------------------------------------------------
+r149 | peiwenhui | 2009-12-30 11:31:19 +0800 (Wed, 30 Dec 2009) | 1 line
+
+modified ifname from ath0 to athscan0 when ap scanning and modified getting option43 AC IP count instead of 4
+------------------------------------------------------------------------
+r142 | peiwenhui | 2009-12-29 16:44:41 +0800 (Tue, 29 Dec 2009) | 1 line
+
+modified for parsing unrecognized element error in config state and run state(configration update)
+------------------------------------------------------------------------
+r122 | guoziming | 2009-12-25 17:01:35 +0800 (Fri, 25 Dec 2009) | 1 line
+
+gzm add for AP83 SN=MAC
+------------------------------------------------------------------------
+r105 | guoziming | 2009-12-24 11:30:48 +0800 (Thu, 24 Dec 2009) | 1 line
+
+gzm modify for WNAP210 settxpower in up
+------------------------------------------------------------------------
+r104 | peiwenhui | 2009-12-23 18:43:51 +0800 (Wed, 23 Dec 2009) | 1 line
+
+changed control channel unconnect and binding host IP, modified reboot monitor
+------------------------------------------------------------------------
+r73 | guoziming | 2009-12-18 15:52:41 +0800 (Fri, 18 Dec 2009) | 1 line
+
+gzm add for WNAP210N APcode and wlan mode
+------------------------------------------------------------------------
+r62 | guoziming | 2009-12-11 18:49:06 +0800 (Fri, 11 Dec 2009) | 1 line
+
+gzm add for ap83
+------------------------------------------------------------------------
+r61 | guoziming | 2009-12-11 18:09:56 +0800 (Fri, 11 Dec 2009) | 1 line
+
+gzm add for ap83
+------------------------------------------------------------------------
+r33 | liuyanbo | 2009-12-09 12:08:37 +0800 (Wed, 09 Dec 2009) | 1 line
+
+default aprebootflag is 1
+------------------------------------------------------------------------
+r23 | peiwenhui | 2009-12-07 18:14:51 +0800 (Mon, 07 Dec 2009) | 1 line
+
+modified for no reboot if AC set
+------------------------------------------------------------------------
+r11 | peiwenhui | 2009-12-03 16:00:57 +0800 (Thu, 03 Dec 2009) | 1 line
+
+add gather drop packet info in statics
+------------------------------------------------------------------------
+r10 | peiwenhui | 2009-12-03 15:56:13 +0800 (Thu, 03 Dec 2009) | 1 line
+
+modified for set&get IP,netmask,dns
+------------------------------------------------------------------------
+r1 | changzhimin | 2009-11-26 19:49:45 +0800 (Thu, 26 Nov 2009) | 1 line
+
+init ver13
+------------------------------------------------------------------------

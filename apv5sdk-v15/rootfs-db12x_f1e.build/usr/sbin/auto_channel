@@ -1,0 +1,101 @@
+#!/bin/sh  
+
+MAX_VAP_NUM=16
+
+if [ $# -le 0 ];then
+	echo "error:need wifi name"
+	exit 0
+fi
+
+IFCONFIG="/sbin/ifconfig"
+IWLIST="/usr/sbin/iwlist"
+IWCONFIG="/usr/sbin/iwconfig"
+CONFIG_XML="/jffs/config.xml"
+. /usr/lib/web/xmlconf.sh
+XPATH_VAP=/config/network/vap
+
+#set_vap(wifi,action)
+#wifi   : wifi[n]  n=0,1,2...
+#action : default | down | up
+set_vap()
+{
+	for num in `seq $MAX_VAP_NUM`
+	do
+		local action="$2"
+		local vap_str=`config_read ${XPATH_VAP}${num} 2>/dev/null`
+		
+		local if_name=`config_getoption "$vap_str" if 2>/dev/null`
+		if [ -n "$if_name"  ];then
+			local wifi_name=`config_getoption "$vap_str" wifi 2>/dev/null`
+			if [ $wifi_name = "$1" ];then
+				if [ $action = "default"  ];then
+					local vap_enable=`config_getoption "$vap_str" enable`
+					if [ "$vap_enable" = "yes" ];then
+						action="up"
+					else
+						action="down"
+					fi
+				fi
+				${IFCONFIG} $if_name $action 1>/dev/null 2>&1
+			fi
+
+		fi
+	done
+}
+
+#get_vap_name(wifi_name)
+#wifi_name : wifi[n] n=0,1,2...
+get_vap_name()
+{
+	local wifi_name="notset"
+	local if_name=""
+	local vap_str=""
+	local num=0
+	while [ ! "$wifi_name" = $1 ] && [ $num -lt $MAX_VAP_NUM ] 
+	do
+		num=$(($num+1))
+		vap_str=`config_read ${XPATH_VAP}${num} 2>/dev/null`
+		wifi_name=`config_getoption "$vap_str" wifi 2>/dev/null`
+	done
+	if [ "$wifi_name" = $1 ];then
+		echo `config_getoption "$vap_str" if 2>/dev/null`
+	fi
+}
+
+#channel_detect(dev_name)
+#dev_name : wifi[n] n=0,1,2...
+channel_detect()
+{
+    vap_name_in_wifi=`get_vap_name $1`
+    if [ ! -n "$vap_name_in_wifi" ];then
+	    exit 1
+    fi
+    outside_frequencies=`$IWLIST ${vap_name_in_wifi} scanning 2>/dev/null | awk -F ":|[ ]+" '/Frequency/{print $3}'`
+    if [ ! -n "$outside_frequencies" ];then
+	    exit 1 
+    fi
+    inside_frequency=`$IWCONFIG $vap_name_in_wifi 2>/dev/null | awk '/Frequency/{print $2}'| awk -F ":|=" '{print $2}'`
+    echo $outside_frequencies | grep -q $inside_frequency 2>/dev/null
+    if [ ! $? -eq 0 ];then
+	    return 1 
+    fi
+    return 0
+}
+
+if [ ! -f /tmp/auto_channel_count_${1} ];then
+	echo 0 > /tmp/auto_channel_count_${1}
+fi
+if [ $# -eq 1  ];then
+    echo "choose channel for ${1} automaticly..."
+    if channel_detect $1 ;then
+        set_vap $1 down
+        set_vap $1 default
+        count=`cat /tmp/auto_channel_count_${1}`   
+        echo $(($count+1)) > /tmp/auto_channel_count_${1}
+    fi
+fi
+
+
+
+
+

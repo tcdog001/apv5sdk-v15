@@ -1,0 +1,55 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>AV-ator™ Widget Installation on Windows</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><meta name="keywords" content="
+				int6k 
+				, 
+				powerline 
+				"><link rel="start" href="index.html" title="Intellon INT6000 Linux Toolkit"><link rel="up" href="ch01.html" title="Chapter 1.  Toolkit Overview"><link rel="prev" href="ch01s06.html" title="Toolkit Installation on Windows XP™"><link rel="next" href="ch01s08.html" title="Toolkit Programs"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">
+			<span class="productname">AV-ator</span>™ Widget Installation on Windows
+			</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch01s06.html">Prev</a> </td><th width="60%" align="center">Chapter 1. 
+		Toolkit Overview 
+		</th><td width="20%" align="right"> <a accesskey="n" href="ch01s08.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="overview-install-widgets"></a>
+			<span class="productname">AV-ator</span>™ Widget Installation on Windows
+			</h2></div></div></div><p>
+			Intellon provides an example Yahoo! widget for demonstration purposes. The Intellon <span class="productname">AV-ator</span>™widget runs on <span class="productname">Windows</span>™ and displays either the transmit or receive PHY rate of a given powerline adaptor using Intellon Toolkit programs. It needs the <span class="productname">Yahoo! Widgets SDK</span>™,  available from <a class="ulink" href="http://download.yimg.com/ycs/widgets/us/4.5.2x10a50/widgetsus.exe" target="_top">Yahoo!</a>, this is a development version that can be skinned with a custom meter face.
+			</p><div class="figure"><a name="id2541090"></a><p class="title"><b>Figure 1.4. 
+				The AV-ator Widget
+				</b></p><div class="figure-contents"><div class="mediaobject" align="center"><img src="AV-ator.png" align="middle" alt="The AV-ator Widget"><div class="caption"><p>
+					The AV-ator Widget
+						</p></div></div></div></div><br class="figure-break"><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2541120"></a>
+				Widget Installation on Windows
+				</h3></div></div></div><p>
+				Widget installation on Windows is essentially the same as <a class="link" href="ch01s06.html" title="Toolkit Installation on Windows XP™">Toolkit Installation on Windows</a> with the addition of the <span class="productname">Yahoo! Widgets</span>™ <span class="application">Deskbar</span> and the Intellon <span class="productname">AV-ator</span>™ widget,  itself.
+				</p><p>
+				The <span class="productname">AV-ator</span>™ widget is distributed as a <span class="productname">WinZip</span>™ archive,  named <code class="filename">AV-ator-xxx-xx-xx.zip</code>. The file contains all widget source code and images,  a Yahoo! <span class="productname">Widgets 4.5</span>™ installation program, a <span class="productname">DotNet 1.1</span>™ installation program  and a <span class="productname">WinPcap 4.0.2</span>™ installation program.
+				</p><div class="orderedlist"><ol type="1"><li><p>
+						Extract the <span class="application">AV-ator</span> archive file into a temporary folder on your Windows host. It will create a folder named <code class="filename">AV-ator.widget</code>.
+						</p></li><li><p>
+						Using <span class="application">Windows Explorer</span>, double-click on file <code class="filename">AV-ator.widget/Contents/Installation/AV-ator-install.bat</code> to start installation. The batch file will invoke <span class="application">Control Panel</span> applets and installation files in proper sequence. If problems occur during installation,  merely restart the installation at this step and skip the steps that have been successfully completed. Most of the steps only need to be done once.
+						</p></li><li><p>
+						The <span class="productname">DotNet 1.1 </span>™ installation file, <code class="filename">dotnetfx.exe</code>,  will execute. If you do not have this specified version installed then install it, even if you have a later version. Old and new version can coexist. Otherwise,  close the installation dialogue and continue. 
+						</p></li><li><p>
+						The <span class="productname">WinPcap 4.5</span>™ installation file, <code class="filename">WinPcap_4_0_2.exe</code>, will execute. It you do not have this version,  or a later version, installed then install it. Otherwise,  close the installation dialogue and continue. 
+						</p></li><li><p>
+						The <span class="application">Control Panel</span> <span class="command"><strong>Add/Remove Software</strong></span> applet will open to show installed applications. If you have a previous version of the Intellon Toolkit installed then remove it. Otherwise,  close the dialogue and continue.
+						</p></li><li><p>
+						The Intellon Toolkit installation file, <code class="filename">int6000-utils-x.x.x.msi</code>, will execute. If you do not have this version of the toolkit installed then install it. Otherwise, close the dialogue and continue.
+						</p></li><li><p>
+						The <span class="application">Control Panel</span> <span class="command"><strong>System</strong></span> applet will open. Select the <span class="command"><strong>Advanced</strong></span> tab then press the <span class="command"><strong>Environment Variables</strong></span> pushbutton. 
+						</p></li><li><p>
+						If folder <code class="filename">C:\Program Files\Intellon\Toolkit</code> is not in your current <code class="constant">Path</code> string then add it. If you have Administrator permissions then edit the <span class="command"><strong>System Variable</strong></span> list. Otherwise, edit the <span class="command"><strong>User Variable</strong></span> list. If you do not know how to do this then ask someone. Close the dialogue to continue.
+						</p></li><li><p>
+						<span class="application">Internet Explorer</span> will open. If you do not have Yahoo! <span class="productname">Widgets 4.5</span>™ installed then download and install it. Otherwise,  close the download dialogue and continue. 
+						</p></li><li><p>
+						The Yahoo! Widgets <span class="application">Deskbar</span> will appear from the right or left side of you screen as the cursor approaches the edge. Click on the <span class="command"><strong>gear</strong></span> icon in the upper left of the <span class="application">Deskbar</span> and select <span class="command"><strong>Open Widget ...</strong></span> from the menu that appears. Select file <code class="filename">AV-ator.kon</code> to load and execute the <span class="productname">AV-ator</span>™ widget. If asked to copy the widget, respond in the affirmative.
+						</p></li><li><p>
+						The first time the widget executes, you will be prompted with a confirmation dialogue. After that,  the widget will appear as a pushbutton on the <span class="application">Deskbar</span>.
+						</p></li><li><p>
+						Once the <span class="productname">AV-ator</span>™ appears, right-click on the meter face to open the preferences menu. Select an Ethernet interface from the dropdown <span class="command"><strong>Host Interface</strong></span> list and powerline device from the <span class="command"><strong>Powerline Link</strong></span> list. Press the <span class="command"><strong>Save pushbutton</strong></span> to save your preferences. If there are any powerline devices connected to the selected interfaces then the meter needle will indicate the PHY rate.
+						</p></li></ol></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id2541526"></a>
+				Widget Removal on Windows
+				</h3></div></div></div><p>
+				After successful installation,  you may delete the original archive file and the temporary folders that it created. The installed <span class="productname">AV-ator</span>™ widget will be located in your <code class="filename">My Documents\My Widgets\AV-ator.widget</code> folder. It can be removed from there using the <span class="productname">Yahoo! Widgets</span>™ <span class="application">Deskbar</span>.
+				</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch01s06.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch01.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch01s08.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">
+			Toolkit Installation on <span class="productname">Windows XP</span>™
+			 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 
+			Toolkit Programs 
+			</td></tr></table></div></body></html>

@@ -1,0 +1,286 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+
+xml_vap=`config_read /config/network`
+vapnum=`config_getoption "$xml_vap" vapnum `
+
+xml_config_wmm=`config_read /config/network/vap$vapnum/wmm`
+xml_wlan_wmm_enable=`config_getoption "$xml_config_wmm" enable`
+xml_wlan_wmm_noack=`config_getoption "$xml_config_wmm" noack`
+xml_wmm_bgmint=`config_getoption "$xml_config_wmm" bgmint`
+xml_wmm_bgmaxt=`config_getoption "$xml_config_wmm" bgmaxt`
+xml_wmm_bgaift=`config_getoption "$xml_config_wmm" bgaift`
+xml_wmm_bgopbt=`config_getoption "$xml_config_wmm" bgopbt`
+xml_wmm_bgopgt=`config_getoption "$xml_config_wmm" bgopgt`
+xml_wmm_bgafdt=`config_getoption "$xml_config_wmm" bgafdt"`
+xml_wmm_bemint=`config_getoption "$xml_config_wmm" bemint`
+xml_wmm_bemaxt=`config_getoption "$xml_config_wmm" bemaxt`
+xml_wmm_beaift=`config_getoption "$xml_config_wmm" beaift`
+xml_wmm_beopbt=`config_getoption "$xml_config_wmm" beopbt`
+xml_wmm_beopgt=`config_getoption "$xml_config_wmm" beopgt`
+xml_wmm_beafdt=`config_getoption "$xml_config_wmm" beafdt`
+xml_wmm_vdmint=`config_getoption "$xml_config_wmm" vdmint`
+xml_wmm_vdmaxt=`config_getoption "$xml_config_wmm" vdmaxt`
+xml_wmm_vdaift=`config_getoption "$xml_config_wmm" vdaift`
+xml_wmm_vdopbt=`config_getoption "$xml_config_wmm" vdopbt`
+xml_wmm_vdopgt=`config_getoption "$xml_config_wmm" vdopgt`
+xml_wmm_vdafdt=`config_getoption "$xml_config_wmm" vdafdt`
+xml_wmm_vcmint=`config_getoption "$xml_config_wmm" vcmint`
+xml_wmm_vcmaxt=`config_getoption "$xml_config_wmm" vcmaxt`
+xml_wmm_vcaift=`config_getoption "$xml_config_wmm" vcaift`
+xml_wmm_vcopbt=`config_getoption "$xml_config_wmm" vcopbt`
+xml_wmm_vcopgt=`config_getoption "$xml_config_wmm" vcopgt`
+xml_wmm_vcafdt=`config_getoption "$xml_config_wmm" vcafdt` 
+xml_wmm_bgminf=`config_getoption "$xml_config_wmm" bgminf`
+xml_wmm_bgmaxf=`config_getoption "$xml_config_wmm" bgmaxf`
+xml_wmm_bgaiff=`config_getoption "$xml_config_wmm" bgaiff`
+xml_wmm_bgopbf=`config_getoption "$xml_config_wmm" bgopbf`
+xml_wmm_bgopgf=`config_getoption "$xml_config_wmm" bgopgf`
+xml_wmm_bgafdf=`config_getoption "$xml_config_wmm" bgafdf`
+xml_wmm_beminf=`config_getoption "$xml_config_wmm" beminf`
+xml_wmm_bemaxf=`config_getoption "$xml_config_wmm" bemaxf`
+xml_wmm_beaiff=`config_getoption "$xml_config_wmm" beaiff`
+xml_wmm_beopbf=`config_getoption "$xml_config_wmm" beopbf`
+xml_wmm_beopgf=`config_getoption "$xml_config_wmm" beopgf`
+xml_wmm_beafdf=`config_getoption "$xml_config_wmm" beafdf`
+xml_wmm_vdminf=`config_getoption "$xml_config_wmm" vdminf`
+xml_wmm_vdmaxf=`config_getoption "$xml_config_wmm" vdmaxf`
+xml_wmm_vdaiff=`config_getoption "$xml_config_wmm" vdaiff`
+xml_wmm_vdopbf=`config_getoption "$xml_config_wmm" vdopbf`
+xml_wmm_vdopgf=`config_getoption "$xml_config_wmm" vdopgf`
+xml_wmm_vdafdf=`config_getoption "$xml_config_wmm" vdafdf`
+xml_wmm_vcminf=`config_getoption "$xml_config_wmm" vcminf`
+xml_wmm_vcmaxf=`config_getoption "$xml_config_wmm" vcmaxf`
+xml_wmm_vcaiff=`config_getoption "$xml_config_wmm" vcaiff`
+xml_wmm_vcopbf=`config_getoption "$xml_config_wmm" vcopbf`
+xml_wmm_vcopgf=`config_getoption "$xml_config_wmm" vcopgf`
+xml_wmm_vcafdf=`config_getoption "$xml_config_wmm" vcafdf`
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script type="text/javascript">
+var flag="<%= $xml_session_lang %>";
+var mode="<%= $xml_mode %>";
+	init_mmenu(flag);
+	init_wiremenu(flag);
+	init_adv(flag);
+function valvalidate() 
+{
+	   	overlayer();
+}       
+
+</script>
+</head>
+<body >
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_wireless6.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form action="action.cgi" method="post" name="form1" id="form1" onsubmit="return valvalidate()">
+  <div align="center">
+    <table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+    	<tr>
+					<td bordercolor="#d9d9d9">						
+											 <table  id="a3" bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+										    
+										     <tr>
+										        <td align="left"  width="100%" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9" colspan="3"><b><script language="javascript">replace(adv_wmm)</script></b> </td>
+										      </tr>
+										     
+										     <tr>
+													<td colspan="3" height="10">
+													</td>
+													</tr>
+											  
+											  <tr>
+										        <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_wmmsupp)</script> </td>
+										        <td align="left" bordercolor="#ffffff">
+										         <input type="radio" <% webui_radiobutton_check "$xml_wlan_wmm_enable" "1" %>  name="wmmenable" value="1" >
+										        <script language="javascript">replace(adv_enable)</script>
+										         <input type="radio" <% webui_radiobutton_check "$xml_wlan_wmm_enable" "0" %>  name="wmmenable" value="0" >
+										        <script language="javascript">replace(adv_disable)</script></td>
+											      <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_disables)</script> </td>
+										      </tr>
+										     
+										      <tr>
+										        <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_ack)</script></td>
+										        <td align="left" bordercolor="#ffffff">
+										         <input type="radio" <% webui_radiobutton_check "$xml_wlan_wmm_noack" "1" %> name="wmmnoack" value="1" >
+										          <script language="javascript">replace(adv_enable)</script>
+										         <input type="radio" <% webui_radiobutton_check "$xml_wlan_wmm_noack" "0" %> name="wmmnoack" value="0" >
+										        <script language="javascript">replace(adv_disable)</script></td>
+											      <td align="left" bordercolor="#ffffff"><script language="javascript">replace(adv_disables)</script>  </td>
+										      </tr>
+			                 </table>
+											 <table  id="a3" bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="630">
+			                    <tr>
+													<td colspan="7" height="10">
+													</td>
+													</tr>
+			                   
+			                   <tr>
+										        <td align="left"  width="100%" height="18" bgcolor="#888888" bordercolor="#d9d9d9" colspan="7"><b>EDCA AP Parameters (AP to Client)</b> </td>
+										      </tr>
+			                   
+			                   <tr>
+													<td  height="20" align="center" bordercolor="#ffffff" width="90"></td>
+													<td  height="20" align="center" bordercolor="#ffffff" width="90">CWmin</td>
+													<td  height="20" align="center" bordercolor="#ffffff" width="90">CWmax</td>
+													<td  height="20" align="center" bordercolor="#ffffff" width="90">AIFSN</td>
+													<td  height="20" align="center" bordercolor="#ffffff" width="90">TXOP(b)</td>
+													<td  height="20" align="center" bordercolor="#ffffff" width="90">TXOP(a/g)</td>
+													<td  height="20" align="center" bordercolor="#ffffff" width="90">Admin Forced</td>
+												 </tr>
+												 
+												 <tr>
+													<td  height="20" align="left" bordercolor="#ffffff" >Background</td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="bgmint" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_bgmint" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="bgmaxt" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_bgmaxt" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="bgaift" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_bgaift" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="bgopbt" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_bgopbt" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="bgopgt" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_bgopgt" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input type="checkbox" <% webui_checkbox_check "$xml_wmm_bgafdt" "1" %> name="bgafdt" value="1"></td>
+												 </tr>
+												 
+												 <tr>
+													<td  height="20" align="left" bordercolor="#ffffff" >Best Effort</td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="bemint" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_bemint" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="bemaxt" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_bemaxt" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="beaift" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_beaift" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="beopbt" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_beopbt" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="beopgt" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_beopgt" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input type="checkbox" <% webui_checkbox_check "$xml_wmm_beafdt" "1" %> name="beafdt" value="1"></td>
+												 </tr>
+												 
+												 <tr>
+													<td  height="20" align="left" bordercolor="#ffffff" >Video</td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vdmint" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vdmint" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vdmaxt" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vdmaxt" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vdaift" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vdaift" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vdopbt" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vdopbt" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vdopgt" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vdopgt" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input type="checkbox" <% webui_checkbox_check "$xml_wmm_vdafdt" "1" %> name="vdafdt" value="1"></td>
+												 </tr>
+												 
+												 <tr>
+													<td  height="20" align="left" bordercolor="#ffffff" >Voice</td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vcmint" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vcmint" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vcmaxt" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vcmaxt" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vcaift" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vcaift" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vcopbt" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vcopbt" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vcopgt" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vcopgt" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input type="checkbox" <% webui_checkbox_check "$xml_wmm_vcafdt" "1" %> name="vcafdt" value="1"></td>
+												 </tr>
+												 
+												 <tr>
+													<td colspan="7" height="10">
+													</td>
+													</tr>
+			                   
+			                   <tr>
+										        <td align="left"  width="100%" height="18" bgcolor="#888888" bordercolor="#d9d9d9" colspan="7"><b>EDCA STA Parameters (Client to AP)</b> </td>
+										      </tr>
+			                   
+			                   <tr>
+													<td  height="20" align="center" bordercolor="#ffffff" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" >CWmin</td>
+													<td  height="20" align="center" bordercolor="#ffffff" >CWmax</td>
+													<td  height="20" align="center" bordercolor="#ffffff" >AIFSN</td>
+													<td  height="20" align="center" bordercolor="#ffffff" >TXOP(b)</td>
+													<td  height="20" align="center" bordercolor="#ffffff" >TXOP(a/g)</td>
+													<td  height="20" align="center" bordercolor="#ffffff" >Admin Forced</td>
+												 </tr>
+												 
+												 <tr>
+													<td  height="20" align="left" bordercolor="#ffffff" >Background</td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="bgminf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_bgminf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="bgmaxf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_bgmaxf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="bgaiff" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_bgaiff" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="bgopbf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_bgopbf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="bgopgf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_bgopgf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input type="checkbox" <% webui_checkbox_check "$xml_wmm_bgafdf" "1" %> name="bgafdf" value="1"></td>
+												 </tr>
+												 
+												  <tr>
+													<td  height="20" align="left" bordercolor="#ffffff" >Best Effort</td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="beminf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_beminf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="bemaxf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_bemaxf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="beaiff" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_beaiff" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="beopbf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_beopbf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="beopgf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_beopgf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input type="checkbox" <% webui_checkbox_check "$xml_wmm_beafdf" "1" %> name="beafdf" value="1"></td>
+												 </tr>
+												 
+												 <tr>
+													<td  height="20" align="left" bordercolor="#ffffff" >Video</td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vdminf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vdminf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vdmaxf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vdmaxf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vdaiff" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vdaiff" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vdopbf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vdopbf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vdopgf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vdopgf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input type="checkbox" <% webui_checkbox_check "$xml_wmm_vdafdf" "1" %> name="vdafdf" value="1"></td>
+												 </tr>
+												 
+												 <tr>
+													<td  height="20" align="left" bordercolor="#ffffff" >Voice</td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vcminf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vcminf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vcmaxf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vcmaxf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vcaiff" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vcaiff" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vcopbf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vcopbf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input name="vcopgf" type="text" size="7" maxlength="4" value="<%= "$xml_wmm_vcopgf" %>" ></td>
+													<td  height="20" align="center" bordercolor="#ffffff" ><input type="checkbox" <% webui_checkbox_check "$xml_wmm_vcafdf" "1" %> name="vcafdf" value="1"></td>
+												 </tr>
+												 
+												 <tr>
+													<td colspan="3" height="10">
+													</td>
+													</tr>
+			                 </table> 
+							 </td>
+       </tr>
+     </table>
+		                      <table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+											    <tr>
+											     <td align="center" height="40px" valign="middle" >
+											       <script language="javascript">replace(adv_apply)</script>
+											      </td>
+											     </tr>
+											     <tr>
+										        <td align="right"   colspan="2"><script language="javascript">replace(adv_help)</script></td>
+										      </tr>
+    </table>
+  </div>
+  <input type="hidden" name="SERVLET" value="QoS Apply">
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

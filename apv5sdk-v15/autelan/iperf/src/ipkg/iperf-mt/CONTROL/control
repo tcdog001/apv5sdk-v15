@@ -1,0 +1,13 @@
+Package: iperf-mt
+Version: 2.0.4-2
+Depends: uclibcxx, libpthread
+Provides: 
+Source: package/iperf
+Section: net
+Priority: optional
+Maintainer: OpenWrt Developers Team <openwrt-devel@openwrt.org>
+Architecture: mips
+Description:  Iperf is a modern alternative for measuring TCP and UDP bandwidth
+ performance, allowing the tuning of various parameters and
+ characteristics.
+ This package is built with multithread support.

@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			psgraph.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='pibsize.c.html' title=' pibsize.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='psin.c.html' title=' psin.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   psgraph.c - print PIB prescalar graph;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;unistd.h&gt;
+#include &lt;limits.h&gt;
+#include &lt;errno.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/putoptv.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/files.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/uintspec.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/error.c&quot;
+#endif
+
+/*====================================================================*
+ *   program constants;
+ *--------------------------------------------------------------------*/
+
+#define TM_VERBOSE (1 &lt;&lt; 0)
+#define TM_SILENCE (1 &lt;&lt; 1)
+
+#define OFFSET 0x0A10
+#define LENGTH 0x0483
+
+#define INDEX_TO_FREQ(index) ((float)(index + 74)/40.96) 
+#define FREQ_TO_INDEX(freq)  ((unsigned)(40.96 * freq)-74)
+
+/*====================================================================*
+ *
+ *   int main (int argc, const char * argv []);
+ *
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char *argv []) 
+
+{
+	static const char *optv [] = 
+	{
+		&quot;s:&quot;,
+		&quot;file [file] [...] [&gt; stdout]&quot;,
+		&quot;print PIB prescalar graph&quot; &quot;amplitude map display&quot;,
+		&quot;s n\tscale&quot;,
+		(const char *) (0) 
+	};
+	signed index = 0;
+	signed scale = 5;
+	uint32_t table [LENGTH];
+	file_t fd;
+	signed c;
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch (c) 
+		{
+		case 's':
+			scale = (unsigned)(uintspec (optarg, 1, UCHAR_MAX));
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		if ((fd = open (*argv, O_BINARY|O_RDONLY)) == -1) 
+		{
+			error (0, errno, &quot;Can't open %s&quot;, *argv);
+		}
+		else if (lseek (fd, OFFSET, SEEK_SET) != OFFSET) 
+		{
+			error (0, errno, &quot;Can't seek %s&quot;, *argv);
+			close (fd);
+		}
+		else if (read (fd, table, sizeof (table)) &lt; sizeof (table)) 
+		{
+			error (0, errno, &quot;Can't read %s&quot;, *argv);
+			close (fd);
+		}
+		else 
+		{
+			for (index = 0; index &lt; LENGTH; index++) 
+			{
+				int32_t value = table [index];
+				printf (&quot; %04d %6d %6.3f &quot;, index, value, INDEX_TO_FREQ (index));
+				while (value &gt; (scale &gt;&gt; 1)) 
+				{
+					printf (&quot;#&quot;);
+					value -= scale;
+				}
+				printf (&quot;\n&quot;);
+			}
+			close (fd);
+		}
+		argc--;
+		argv++;
+	}
+	return (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='pibsize.c.html' title=' pibsize.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='psin.c.html' title=' psin.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

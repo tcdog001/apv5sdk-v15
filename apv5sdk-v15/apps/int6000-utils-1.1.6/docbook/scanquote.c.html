@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			scanquote.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='scanprint.c.html' title=' scanprint.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='scanquotematch.c.html' title=' scanquotematch.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void scanquote (const char *charset, SCAN * content);
+ *
+ *   scan.h
+ * 
+ *   append input buffer characters to the current token substring until
+ *   some member of the specified character set is found; do not append
+ *   that character;t marks the start of another scan operation;
+ *
+ *   if the escape meta character (backslash) occurs then append it and
+ *   any subsequent character to the current token substringi and advance
+ *   without checking for charactr set membership; this allows character
+ *   set members to be ignored as scan terminators;
+ *
+ *   if the escape meta character (backslash) is a member of the character
+ *   set then it termnates the scan, like any other member of the set;
+ *
+ *   this function is similar to scanuntil() except that scanuntil() does
+ *   not recognize escaped character sequences;
+ *
+ *.  released 2005 by charles maier associates ltd. for public use;
+ *:  compiled on debian gnu/linux with gcc 2.95 compiler;
+ *;  licensed under the gnu public license version two;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SCANQUOTE_SOURCE
+#define SCANQUOTE_SOURCE
+
+#include &quot;../scan/scan.h&quot;
+
+void scanquote (SCAN * content, const char *charset) 
+
+{
+	while ((content-&gt;final &lt; content-&gt;limit) &amp;&amp; !isbreak (content, charset)) 
+	{
+		if (isbreak (content, &quot;\\&quot;)) 
+		{
+			nextbreak (content);
+		}
+		nextbreak (content);
+	}
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='scanprint.c.html' title=' scanprint.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='scanquotematch.c.html' title=' scanquotematch.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

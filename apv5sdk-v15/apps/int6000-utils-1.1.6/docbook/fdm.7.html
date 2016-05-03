@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			fdm.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='efsu.7.html' title=' efsu.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='getpib.7.html' title=' getpib.7 '>NEXT</a>]
+			</div>
+<pre>
+fdm(7)                                Intellon Linux Toolkit                               fdm(7)
+
+NAME
+       fdm - PIB Notching Script
+
+SYNOPSIS
+       fdm.sh [mode]
+
+DESCRIPTION
+       A script to program an Intellon HomePlug AV Powerline Device with a known set of prescalar
+       values. Prescalar values tell runtime firware to attenuate or  ignore  specific  powerline
+       frequencies. Prescalar sets are provided by Intellon as files that may be selected by num‐
+       ber from a menu printed by this script. This number is called the notching mode.
+
+       The script will read a device PIB into a temporary file, replace the  prescalars  in  that
+       file, write that file back to the device and commit it to NVRAM. The script and associated
+       prescalar files are all needed for proper operation. Users may edit  script  variables  or
+       modify script logic to suit their requirements.
+
+       This  program  is part of the Intellon Linux Toolkit. See the ilt man page for an overview
+       and installation instructions.
+
+OPTIONS
+       None.
+
+ARGUMENTS
+       mode   The notching mode. Mode values are listed in the script menu. Each mode corresponds
+              to  a prescalar file that will be used to modify the device PIB using program psin.
+              If omitted, a mode menu will be displayed an no action will occur.
+
+FILES
+       fdm.sh A Linux bash version of fdm.bat. Users should edit script paramters  ETH,  DIR  and
+              DEV,  as  explained  below,  before running this script. The Intellon Linux Toolkit
+              must be installed for proper script execution.
+
+       fdm.bat
+              A Microsoft DOS version of fdm.sh.  Users should edit script paramters ETH, DIR and
+              DEV,  as  explained  below,  before running this script. The Intellon Linux Toolkit
+              must be installed for proper script execution.
+
+       scripts/prescaler
+              A folder containing prescalar files. There is one prescalar file for each  notching
+              mode.  All  files  must  reside in folder DIR as defined in the script file. If you
+              change file names then you must also edit both script files to relfect that change.
+
+VARIABLES
+       There  are four variables defined at the start of the script. These variables permit relo‐
+       cation of the script and/or the prescalar files.
+
+       ETH    The name or the number of the host network interface used to communicate  with  the
+              powerline  device.   On  Linux, the name will typicall be &quot;eth0&quot; or &quot;eth1&quot;. On Win‐
+              dows, the number will typically be 2 or 3. This variable is expanded and passed  to
+              toolkit programs using option -i.
+
+       DIR    The  absolute  or  relative  path  of  the  folder  containing the prescalar files.
+              Prescalar files are located in toolkit folder scripts/prescalers. You may move them
+              to  another folder but must edit this variable so that they can be located when the
+              script is executed.
+
+       PIB    The temporary PIB filename. This file holds the PIB read from a device while it  is
+              being  modified. Make sure that this filename does not conflict with other files by
+              the same name.
+
+       DEV    The hardware address of the powerline device to be modified. You  can  use  keyword
+              local  which  translates  to  the  Local  Management Address (00:B0:52:00:00:01) or
+              specify the actual MAC address of a remote powerline device.
+
+EXAMPLES
+       To display available modes, type the script filename but omit the mode argument. Available
+       modes are listed along with the corresponding range of frequencies to be notched.
+
+          # fdm.sh
+
+          Intellon fdm mode utility
+
+          usage: fdm mode
+
+          mode = &quot;1&quot; 2.01MHz to 27.90Mhz w/HAM bands notched
+          mode = &quot;2&quot; 2.01Mhz to 7.08MHz w/no notches
+          mode = &quot;3&quot; 2.01Mhz to 7.54MHz w/HAM and Aero notches
+          mode = &quot;4&quot; 2.01Mhz to 11.91Mhz w/no notches
+          mode = &quot;5&quot; 2.01MHz to 11.91MHz w/ HAM and Aero notches
+          mode = &quot;6a&quot; 2.0Mhz to 13.0Mhz w/HAM bands notched
+          mode = &quot;6b&quot; 17.0Mhz to 28.0Mhz w/HAM bands notched
+          mode = &quot;7a&quot; 2.0MHz to 10.1MHz w/HAM bands notched
+          mode = &quot;7b&quot; 14.3MHz to 28.0MHz w/HAM bands notched
+          mode = &quot;8a&quot; 2.0MHz to 16.0MHz w/HAM bands notched
+          mode = &quot;8b&quot; 21.0MHz to 28.0MHz w/HAM bands notched
+          mode = &quot;9a&quot; 2.0MHz to 9.0MHz w/HAM bands notched
+          mode = &quot;9b&quot; 11.0MHz to 17.0MHz w/HAM bands notched
+          mode = &quot;9c&quot; 22.0MHz to 28.0MHz w/HAM bands notched
+
+       This  example  will notch a device from 2.0Mhz to 10.0Mhz because we specified mode as 6a.
+       The affected device is determined by variable DEV. The assiciated prescaler file from  the
+       folder defined by variable DIR will be used. A brief confirmation message will appear.
+
+          # fdm.sh 6a
+
+          Setting modem to 2.0Mhz to 13.0Mhz w/HAM bands notched
+
+REFERENCES
+       See the Intellon HomePlug AV Firmware Technical Reference Manual for more information.
+
+DISCLAIMER
+       Intellon  HomePlug  AV Vendor Specific Management Message structure and content is propri‐
+       etary to Intellon Corporation, Ocala FL  USA.  Consequently,  public  information  is  not
+       available.  Intellon Corporation reserves the right to modify message structure or content
+       in future firmware releases without any obligation to notify or compensate users  of  this
+       program.
+
+SEE ALSO
+       int6k(7), psin(7), setpib(7)
+
+CREDITS
+        Bill Wike &lt;bill.wike@intellon.com&gt;
+        Charles Maier &lt;charles.maier@intellon.com&gt;
+
+int6000-utils-linux                    Intellon Corporation                                fdm(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='efsu.7.html' title=' efsu.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='getpib.7.html' title=' getpib.7 '>NEXT</a>]
+			</div>
+		</body>
+	</html>

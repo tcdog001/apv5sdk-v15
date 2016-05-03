@@ -1,0 +1,42 @@
+ac配置文件修改说明
+
+1：配置文件的读取顺序
+  1)/mnt/wtp/wtpcompatible.xml 成功转到5)，否则到2)
+  2)etc/version/wtpcompatible.xml 成功转到5)，否则到3)
+  3)/mnt/wtp/wtpcompatible 成功转到5)，否则到4)
+  4)/etc/version/wtpcompatible 
+  5)解析文件
+  强烈建议使用wtpcompatible.xml配置，这样方便存储，察看，修改。特别是OEM修改Model。
+
+2：如何增加wtpcompatible.xml一个新Model类型
+   增加新Model格式如下：
+  <body>
+  <ap_sw_model>AQ3120</ap_sw_model> 
+  <ap_sw_version_name>1.1.9</ap_sw_version_name> 
+  <ap_sw_version_image_path>AW1.1.9.1.Q1.img</ap_sw_version_image_path> 
+  <ap_radio_num>2</ap_radio_num> 
+  <ap_radio_type>5</ap_radio_type> 
+  <ap_bss_num>8</ap_bss_num> 
+  <ap_radio_type>7</ap_radio_type> 
+  <ap_bss_num>8</ap_bss_num> 
+  <ap_sw_code>3120</ap_sw_code> 
+  </body>
+  增加的model信息必须放到<body></body>中,否则不会解析
+  <ap_sw_model>是model类型信息,任意的字符串,用于创建wtp时的匹配，不允许有重复的。
+  <ap_sw_version_name>是版本号,用于接入时版本匹配
+  <ap_sw_version_image_path>版本镜像文件名称,版本不匹配时,会下载这个镜像文件升级
+  <ap_radio_num>这个型号的ap radio个数,一般是1或者2,一定不要乱填写
+  <ap_radio_type>radio的类型 11b是1 11a是2 11g是4 11n是8
+  <ap_bss_num>这个radio最大支持bss格式，一般是8。
+  注意：ap_radio_type ap_bss_num 是成对出现的，radio个数是1出现1对，radio格式为2出现两次
+        分别代码radio 0和radio1
+  <ap_sw_code>内部研发代码，不允许有重复的
+
+3：OEM是如何修改Model信息
+   原则上OEM是只允许修改<ap_sw_model> <ap_sw_version_name> <ap_sw_version_image_path>这
+   三项，不允许修改radio信息和内部研发码。
+
+   修改时，直接修改配置文件。然后从新启动AC就可以了。
+
+4：有任何问题，请及时联系：weiay@autelan.com
+

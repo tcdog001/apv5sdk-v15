@@ -1,0 +1,657 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			int6ktest.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='int6kstat.c.html' title=' int6kstat.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6ktone.c.html' title=' int6ktone.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   int6ktest.c - Intellon Test Applet Loader;
+ *
+ *   this program sends and receives raw ethernet frames and so needs
+ *   root priviledges; if you install it using &quot;chmod 555&quot; and &quot;chown 
+ *   root:root&quot; then you must login as root to run it; otherwise, you 
+ *   can install it using &quot;chmod 4555&quot; and &quot;chown root:root&quot; so that 
+ *   anyone can run it; the program will refuse to run until you get
+ *   things right;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*&quot;
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;limits.h&gt;
+#include &lt;errno.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/putoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../ether/channel.h&quot;
+#include &quot;../ram/nvram.h&quot;
+#include &quot;../ram/sdram.h&quot;
+#include &quot;../nvm/nvm.h&quot;
+#include &quot;../pib/pib.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../int6k/Confirm.c&quot;
+#include &quot;../int6k/Display.c&quot;
+#include &quot;../int6k/Failure.c&quot;
+#include &quot;../int6k/Request.c&quot;
+#include &quot;../int6k/SendMME.c&quot;
+#include &quot;../int6k/WriteMEM.c&quot;
+#include &quot;../int6k/EthernetHeader.c&quot;
+#include &quot;../int6k/IntellonHeader.c&quot;
+#include &quot;../int6k/FirmwarePacket.c&quot;
+#include &quot;../int6k/UnwantedPacket.c&quot;
+#include &quot;../int6k/WaitForReset.c&quot;
+#include &quot;../int6k/WaitForStart.c&quot;
+#include &quot;../int6k/WaitForStop.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/uintspec.c&quot;
+#include &quot;../tools/checkfilename.c&quot;
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/hexdump.c&quot;
+#include &quot;../tools/checksum_32.c&quot;
+#include &quot;../tools/fdchecksum_32.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/alert.c&quot;
+#include &quot;../tools/strfbits.c&quot;
+#include &quot;../tools/filepart.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ether/openchannel.c&quot;
+#include &quot;../ether/closechannel.c&quot;
+#include &quot;../ether/readpacket.c&quot;
+#include &quot;../ether/sendpacket.c&quot;
+#include &quot;../ether/channel.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../nvm/nvmfile.c&quot;
+#include &quot;../nvm/nvmpeek.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../mme/MMECode.c&quot;
+#endif
+
+/*====================================================================*
+ *
+ *   signed ReadMME (struct int6k * int6k, uint16_t MMTYPE);
+ *
+ *   int6k.h        
+ *
+ *   this is a custom version of ReadMME() that intercepts VS_ARPC messages for int6ktest;
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+signed ReadMME (struct int6k * int6k, uint16_t MMTYPE) 
+
+{
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+	while ((int6k-&gt;packetsize = readpacket (channel, message, sizeof (struct message))) &gt; 0) 
+	{
+		if (FirmwarePacket (int6k)) 
+		{
+			continue;
+		}
+		if (UnwantedPacket (message, MMTYPE)) 
+		{
+			continue;
+		}
+		break;
+	}
+	return (int6k-&gt;packetsize);
+}
+
+/*====================================================================*
+ *
+ *   signed ConfigureMemory (struct int6k * int6k, struct config_ram * config_ram);
+ *
+ *   download SDRAM configuration parameters using a VS_SET_SDRAM 
+ *   message; this function is deprecated in favor of the memctl.nvm 
+ *   applet but may still be needed on INT6000 devices;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#if 0
+
+static signed ConfigureMemory (struct int6k * int6k, struct config_ram * config_ram) 
+
+{
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_set_sdram_request 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		struct config_ram config_ram;
+		uint32_t CHECKSUM;
+	}
+	* request = (struct vs_set_sdram_request *) (message);
+	struct __packed vs_set_sdram_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+	}
+	* confirm = (struct vs_set_sdram_confirm *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	memset (message, 0, sizeof (struct message));
+	EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message-&gt;intellon, (VS_SET_SDRAM | MMTYPE_REQ));
+	int6k-&gt;packetsize = ETHER_MIN_LEN;
+	memcpy (&amp;request-&gt;config_ram, config_ram, sizeof (struct config_ram));
+	request-&gt;CHECKSUM = checksum_32 (&amp;request-&gt;config_ram, sizeof (struct config_ram), 0);
+	if (SendMME (int6k) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+		return (-1);
+	}
+	if (ReadMME (int6k, (VS_SET_SDRAM | MMTYPE_CNF)) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+		return (-1);
+	}
+	if (confirm-&gt;MSTATUS) 
+	{
+		Failure (int6k, &quot;Memory will not Configure.&quot;);
+		return (-1);
+	}
+	return (0);
+}
+
+#endif
+
+/*====================================================================*
+ *
+ *   signed ExecuteApplet (struct int6k * int6k, struct header_nvm * header_nvm, unsigned image) 
+ *
+ *   int6k.h
+ *
+ *   start applet execution using VS_ST_MAC and wait for execution
+ *   to complete;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+signed ExecuteApplet (struct int6k * int6k, struct header_nvm * header_nvm, unsigned image) 
+
+{
+
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_st_mac_request 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MODULEID;
+		uint8_t RESERVED [3];
+		uint32_t IMAGELOAD;
+		uint32_t IMAGELENGTH;
+		uint32_t IMAGECHECKSUM;
+		uint32_t IMAGESTART;
+	}
+	* request = (struct vs_st_mac_request *) (message);
+	struct __packed vs_st_mac_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint8_t MODULEID;
+	}
+	* confirm = (struct vs_st_mac_confirm *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	if (_anyset (LE32TOH (header_nvm-&gt;IGNOREMASK), (1 &lt;&lt; (int6k-&gt;hardwareID - 1)))) 
+	{
+		return (0);
+	}
+	if (WriteMEM (int6k, &amp;int6k-&gt;NVM, LE32TOH (header_nvm-&gt;IMAGEADDR), LE32TOH (header_nvm-&gt;IMAGELENGTH))) 
+	{
+		return (-1);
+	}
+	Request (int6k, &quot;Start %s (%d)&quot;, filepart (int6k-&gt;NVM.name), image);
+	memset (message, 0, sizeof (struct message));
+	EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message-&gt;intellon, (VS_ST_MAC | MMTYPE_REQ));
+	int6k-&gt;packetsize = ETHER_MIN_LEN;
+	request-&gt;MODULEID = VS_MODULE_MAC;
+	request-&gt;IMAGELOAD = header_nvm-&gt;IMAGEADDR;
+	request-&gt;IMAGELENGTH = header_nvm-&gt;IMAGELENGTH;
+	request-&gt;IMAGECHECKSUM = header_nvm-&gt;IMAGECHECKSUM;
+	request-&gt;IMAGESTART = header_nvm-&gt;ENTRYPOINT;
+	if (SendMME (int6k) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+		return (-1);
+	}
+	if (ReadMME (int6k, (VS_ST_MAC | MMTYPE_CNF)) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+		return (-1);
+	}
+	if (confirm-&gt;MSTATUS) 
+	{
+		Failure (int6k, &quot;Applet did not Start.&quot;);
+		return (-1);
+	}
+	if (WaitForStop (int6k)) 
+	{
+		return (-1);
+	}
+	if (int6k-&gt;state) 
+	{
+		Failure (int6k, &quot;Test Failed: %s (%d)&quot;, filepart (int6k-&gt;NVM.name), image);
+	}
+	return (0);
+}
+
+/*====================================================================*
+ *  
+ *   signed ExecuteApplets (struct int6k * int6k);
+ *
+ *   int6k.h
+ *  
+ *   download and execute all image file applets in turn regardless 
+ *   of image type; users should make sure that image files contain
+ *   nothing but executable image or results may be unpredictable;
+ *
+ *   DO NOT USE THIS FUNCTION TO DOWNLOAD AND EXECUTE RUNTIME FIRMWARE;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed ExecuteApplets (struct int6k * int6k) 
+
+{
+	struct header_nvm header_nvm;
+	signed image = 0;
+	memset (&amp;header_nvm, 0, sizeof (header_nvm));
+	if (lseek (int6k-&gt;NVM.file, 0, SEEK_SET)) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;Can't home %s&quot;, filepart (int6k-&gt;NVM.name));
+		return (-1);
+	}
+	do 
+	{
+		if (lseek (int6k-&gt;NVM.file, 0, SEEK_CUR) != LE32TOH (header_nvm.NEXTHEADER)) 
+		{
+			if (_allclr (int6k-&gt;flags, INT6K_SILENCE)) 
+			{
+				error (0, 0, &quot;Bad file position: %s (%d)&quot;, filepart (int6k-&gt;NVM.name), image);
+			}
+			return (-1);
+		}
+		if (read (int6k-&gt;NVM.file, &amp;header_nvm, sizeof (struct header_nvm)) &lt; sizeof (struct header_nvm)) 
+		{
+			if (_allclr (int6k-&gt;flags, INT6K_SILENCE)) 
+			{
+				error (0, errno, &quot;Can't read image header: %s (%d)&quot;, filepart (int6k-&gt;NVM.name), image);
+			}
+			return (-1);
+		}
+		if (LE32TOH (header_nvm.HEADERVERSION) != NVM_HEADER_VERSION) 
+		{
+			if (_allclr (int6k-&gt;flags, INT6K_SILENCE)) 
+			{
+				error (0, 0, &quot;Bad header version: %s (%d)&quot;, filepart (int6k-&gt;NVM.name), image);
+			}
+			return (-1);
+		}
+		if (checksum_32 (&amp;header_nvm, sizeof (struct header_nvm), 0)) 
+		{
+			if (_allclr (int6k-&gt;flags, INT6K_SILENCE)) 
+			{
+				error (0, 0, &quot;Bad header checksum: %s (%d)&quot;, filepart (int6k-&gt;NVM.name), image);
+			}
+			return (-1);
+		}
+		if (ExecuteApplet (int6k, &amp;header_nvm, image)) 
+		{
+			return (-1);
+		}
+		image++;
+	}
+	while (header_nvm.NEXTHEADER);
+	if (lseek (int6k-&gt;NVM.file, 0, SEEK_CUR) != lseek (int6k-&gt;NVM.file, 0, SEEK_END)) 
+	{
+		if (_allclr (int6k-&gt;flags, INT6K_SILENCE)) 
+		{
+			error (0, errno, &quot;Bad header chain: %s (%d)&quot;, filepart (int6k-&gt;NVM.name), image);
+		}
+		return (-1);
+	}
+	return (0);
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char * argv[]);
+ *   
+ *   parse command line, populate int6k structure and perform selected 
+ *   operations; show help summary when asked; see getoptv and putoptv
+ *   to understand command line parsing and help summary display; see
+ *   int6k.h for the definition of struct int6k; 
+ *
+ *   the default interface is eth1 because most people use eth0 as 
+ *   their principle network connection; you can specify another 
+ *   interface with -i or define environment string PLC to make
+ *   that the default interface and save typing;
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	extern struct channel channel;
+	char hardware [INT6K_VERSTRING];
+	static const char *optv [] = 
+	{
+		&quot;c:ei:p:qt:vx&quot;,
+		&quot;file [file] [...]&quot;,
+		&quot;Intellon Test Applet Loader&quot;,
+		&quot;c n\tretry count until failure&quot;,
+		&quot;e\tredirect stderr messages to stdout&quot;,
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		&quot;i n\thost interface number [2]&quot;,
+
+#else
+
+		&quot;i s\thost interface name [&quot; CHANNEL_ETHDEVICE &quot;]&quot;,
+
+#endif
+
+		&quot;p n\tpolls per second second&quot;,
+		&quot;q\tquiet mode&quot;,
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		&quot;t n\tread capture time is (n) milliseconds [50]&quot;,
+
+#else
+
+		&quot;t n\tread timeout is (n) milliseconds [50]&quot;,
+
+#endif
+
+		&quot;v\tverbose mode&quot;,
+		&quot;x\texit on error&quot;,
+		(const char *) (0) 
+	};
+
+#include &quot;../int6k/int6k-struct.c&quot;
+
+	signed c;
+	if (getenv (PLCDEVICE)) 
+	{
+#if defined (WINPCAP) || defined (LIBPCAP)
+		channel.id = atoi (getenv (PLCDEVICE));
+#else
+		channel.name = strdup (getenv (PLCDEVICE));
+#endif
+	}
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'c':
+			int6k.retry = (unsigned)(uintspec (optarg, 1, INT_MAX));
+			break;
+		case 'e':
+			dup2 (STDOUT_FILENO, STDERR_FILENO);
+			break;
+		case 'i':
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+			channel.id = atoi (optarg);
+
+#else
+
+			channel.name = optarg;
+
+#endif
+
+			break;
+		case 'p':
+			int6k.timer = _TIMER/(unsigned)(uintspec (optarg, 1, 10));
+			break;
+		case 'q':
+			_setbits (channel.flags, CHANNEL_SILENCE);
+			_setbits (int6k.flags, INT6K_SILENCE);
+			break;
+		case 't':
+			channel.timeout = (unsigned)(uintspec (optarg, 0, UINT_MAX));
+			break;
+		case 'v':
+			_setbits (channel.flags, CHANNEL_VERBOSE);
+			_setbits (int6k.flags, INT6K_VERBOSE);
+			break;
+		case 'x':
+			_setbits (int6k.flags, INT6K_BAILOUT);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+
+#ifndef WIN32
+
+/*
+ *      raw packets require root priviledges on linux; one does not have to be
+ *      root when this program is installed; setuid using 'chown root:root' and 
+ *      'chmod 4555';
+ */
+
+	if (geteuid ()) 
+	{
+		error (1, EPERM, INT6K_NEEDROOT);
+	}
+
+#endif
+
+	openchannel (&amp;channel);
+	if (!(int6k.message = malloc (sizeof (struct message)))) 
+	{
+		error (1, errno, INT6K_ERR_MEMORY);
+	}
+	if (WaitForStart (&amp;int6k, hardware, sizeof (hardware))) 
+	{
+		error (1, ECANCELED, &quot;Device must be connected&quot;);
+	}
+	if (strcmp (hardware, INT6K_BOOTLOADER)) 
+	{
+		error (1, ECANCELED, &quot;BootLoader must be running&quot;);
+	}
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		int6k.NVM.name = *argv;
+		if ((int6k.NVM.file = open (int6k.NVM.name, O_BINARY|O_RDONLY)) == -1) 
+		{
+			error (0, errno, &quot;%s&quot;, int6k.NVM.name);
+		}
+		else if (nvmfile (&amp;int6k.NVM)) 
+		{
+			error (0, errno, &quot;Won't load %s&quot;, int6k.NVM.name);
+		}
+		else 
+		{
+			ExecuteApplets (&amp;int6k);
+		}
+		close (int6k.NVM.file);
+		argc--;
+		argv++;
+	}
+	free (int6k.message);
+	closechannel (&amp;channel);
+	return (int6k.state);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='int6kstat.c.html' title=' int6kstat.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6ktone.c.html' title=' int6ktone.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

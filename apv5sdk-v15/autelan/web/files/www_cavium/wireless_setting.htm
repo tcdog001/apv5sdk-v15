@@ -1,0 +1,1054 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+
+xml_vap=`config_read /config/network`
+vapnum=`config_getoption "$xml_vap" vapnum`
+vapname="vap$vapnum"
+
+xml_config=`config_read /config/network/vap$vapnum`
+xml_wlan_workmode=`config_getoption "$xml_config" wlanmode`
+xml_wlan_if=`config_getoption "$xml_config" if`
+
+xml_wlan_enable=`config_getoption "$xml_config" enable`
+xml_wlan_ssid=`config_getoption "$xml_config" ssid`
+xml_wlan_assocchan=`config_getoption "$xml_config" assocchan`
+xml_wlan_assocweight=`config_getoption "$xml_config" assocweight`
+xml_wlan_assocrssi=`config_getoption "$xml_config" assocrssi`
+
+xml_wlan_broadcast=`config_getoption "$xml_config" broadcast`
+xml_wlan_beacon=`config_getoption "$xml_config" beacon`
+xml_wlan_rate=`config_getoption "$xml_config" rate`
+xml_wlan_rateb=`config_getoption "$xml_config" rateb`
+xml_wlan_ratea=`config_getoption "$xml_config" ratea`
+xml_wlan_ratenaht20ds=`config_getoption "$xml_config" rate_n_ht20ds`
+xml_wlan_ratenaht40ds=`config_getoption "$xml_config" rate_n_ht40ds`
+
+
+
+xml_wlan_wifi=`config_getoption "$xml_config" wifi`
+xml_wifi=`config_read /config/network/$xml_wlan_wifi`
+xml_wifi_channel=`config_getoption "$xml_wifi" channel`
+xml_wifi_channel1=`config_getoption "$xml_wifi" channel1`
+xml_wifi_channela=`config_getoption "$xml_wifi" channela`
+xml_wifi_cwwmode=`config_getoption "$xml_wifi" cwwmode`
+xml_wlan_shortgi=`config_getoption "$xml_wifi" shortgi`
+
+config_country_code=`config_read /config/network/country`
+xml_wlan_region=`config_getoption "$config_country_code" region`
+xml_wlan_mode=`config_getoption "$xml_wifi" mode`
+xml_wlan_modea=`config_getoption "$xml_wifi" modea`
+xml_wlan_moden=`config_getoption "$xml_wifi" moden`
+
+eval wifi_devmode="$"DEVMODE_$xml_wlan_wifi
+
+#########################
+#sta_config
+#########################
+xml_wlwan=`config_read /config/network/vap$vapnum`
+xml_wlwan_enable=`config_getoption "$xml_wlwan" enable`
+xml_wlwan_ssid=`config_getoption "$xml_wlwan" ssid`
+xml_wlan_security=`config_getoption "$xml_wlwan" sectype`
+
+xml_wep=`config_read /config/network/vap$vapnum/wep`
+xml_wlan_authmode=`config_getoption "$xml_wep" wepmode`
+xml_wlan_wepkeytype=`config_getoption "$xml_wep" wepkeytype`
+xml_wlan_wepkey=`config_getoption "$xml_wep" cwepkey`
+xml_wlan_passkey1=`config_getoption "$xml_wep" wepkey1`
+xml_wlan_passkey2=`config_getoption "$xml_wep" wepkey2`
+xml_wlan_passkey3=`config_getoption "$xml_wep" wepkey3`
+xml_wlan_passkey4=`config_getoption "$xml_wep" wepkey4`
+
+xml_wpa=`config_read /config/network/vap$vapnum/wpa`
+xml_wlan_passphrase=`config_getoption "$xml_wpa" wpapass`
+#########################
+
+for vap_allnum in `seq $NUM_ap`
+do
+	eval "xml_wlan_config_vap${vap_allnum}=\`config_read /config/network/vap${vap_allnum}\`"
+	eval "xml_wlan_vap${vap_allnum}_enable=\`config_getoption \"\$xml_wlan_config_vap${vap_allnum}\" create\`"
+done
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js wireless_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+ <script type="text/javascript">
+var flag="<%= $xml_session_lang %>";
+var array_vapcreate=["<%= $xml_wlan_vap1_enable %>","<%= $xml_wlan_vap2_enable %>","<%= $xml_wlan_vap3_enable %>","<%= $xml_wlan_vap4_enable %>","<%= $xml_wlan_vap5_enable %>","<%= $xml_wlan_vap6_enable %>","<%= $xml_wlan_vap7_enable %>","<%= $xml_wlan_vap8_enable %>","<%= $xml_wlan_vap9_enable %>","<%= $xml_wlan_vap10_enable %>","<%= $xml_wlan_vap11_enable %>","<%= $xml_wlan_vap12_enable %>",];
+var vapname="<%= $vapname %>";
+var allvap_num="<%= $NUM_ap %>";
+var wifi_devmode="<%= $wifi_devmode %>";
+var wifi_curmode="<%= $xml_wlan_mode %>";
+var work_mode="<%= $xml_wlan_workmode %>";
+var country_code="<%= $xml_wlan_region %>";
+var shortgi="<%= $xml_wlan_shortgi %>";
+	init_mmenu(flag);
+	init_wiremenu(flag);
+	init_wset(flag);
+
+
+function channeladd()
+{
+	if(document.all.region.value == "Asia" || document.all.region.value == "Europe" )
+	 var str1="\<option value=\"12\" \>12 - 2.467GHz\</option\>";
+	 var str2="\<option value=\"13\" \>13 - 2.472GHz\</option\>";
+   document.write(str1);
+   document.write(str2);
+}
+
+function channel_to_123()
+{
+	if(document.getElementById("chan1").value == 14 || document.getElementById("chan1").value == 15)
+	{
+		alert(wset_alert_channel);
+	}
+}
+
+function valvalidate()
+{
+    var x = document.all.ssid;   
+	  if (x.value.length > 31 || x.value.length <1)
+	  {
+        alert(wset_alert_ssid);
+				x.focus();
+				return false;
+    }
+    
+    var y=document.all.beacon;
+		var value2=parseInt(y.value);
+		var reg1 = /^[0-9]{1,4}$/;        
+	  if (!reg1.test(y.value)){
+	     alert(y.name + wset_alert_illchar);
+				y.focus();
+				return false;
+	  }
+	  else if (value2 < 25 || value2 > 1000){
+				alert(y.name + wset_alert_range);
+				y.focus();
+				return false;
+	  }	 
+    
+    document.all.vap_name.value=document.all.vapname.value;
+    var z =document.getElementById("region");
+    var w =document.getElementById("chan1");
+    if ((country_code == "America" || country_code == "None") && (z.value == "Asia" || z.value == "Europe") && (w.value == "12" || w.value == "13")){     
+    	 alert(wset_alert_c1213);
+    }
+    	overlayer();
+}
+
+function vap_specific()
+{
+	 document.form0.onsubmit();
+	 document.form0.action="action.cgi";
+	 document.form0.submit(); 
+}
+
+function vapname_display()
+{
+	for(var i = 1;i <= allvap_num;i++)
+	{
+		if(array_vapcreate[i-1] == "yes")
+		{
+			var tmp_vapname="vap"+i;
+			if(vapname == tmp_vapname)
+			{
+			 		document.write("<option value='"+tmp_vapname+"' selected='selected' >"+tmp_vapname+"</option>");
+			}
+			else
+			{
+				  document.write("<option value='"+tmp_vapname+"' >"+tmp_vapname+"</option>");
+			}
+	  }
+	}
+}
+
+function shielding()
+{
+	if( work_mode != "sta" && work_mode != "client")
+	{
+	 if(wifi_devmode == "bg")
+	 {
+	 	  document.getElementById("mode").style.display="";
+		  document.getElementById("modea").style.display="none";
+		  document.getElementById("moden").style.display="none";
+		  document.getElementById("modeng").style.display="none";
+	 	  
+	 	  if(document.all.region.value == "Asia" || document.all.region.value == "Europe"){
+	   	 document.getElementById("c1").style.display="";
+		   document.getElementById("chan").style.display="none";
+		   document.getElementById("chan1").style.display="";
+		  }
+		  else if(document.all.region.value == "America"){
+		  	document.getElementById("c1").style.display="";
+		   document.getElementById("chan").style.display="";
+		   document.getElementById("chan1").style.display="none";
+		  }
+	    else if(document.all.region.value == "None"){
+		   document.getElementById("c1").style.display="none";
+		  }
+		  
+		  if(document.all.mode.value == "11b" ){
+		   document.getElementById("rate").style.display="none";
+		   document.getElementById("rateb").style.display="";
+		  }
+		  else if(document.all.mode.value == "11g" || document.all.mode.value == "bg"){
+		   document.getElementById("rate").style.display="";
+		   document.getElementById("rateb").style.display="none";
+		  }
+		  
+		  document.getElementById("chana").style.display="none";
+		  
+		  document.getElementById("ratea").style.display="none";
+		  document.getElementById("rate_n_ht20ds").style.display="none";
+		  document.getElementById("rate_n_ht40ds").style.display="none";
+		  document.getElementById("rate_n_ht40ds_s").style.display="none";
+		  
+	 }
+	 else if(wifi_devmode == "abg")
+	 {
+	 		document.getElementById("mode").style.display="none";
+		  document.getElementById("modea").style.display="";
+		  document.getElementById("moden").style.display="none";
+		  document.getElementById("modeng").style.display="none";
+	 		
+	 	  if(document.all.modea.value != "11a")
+	 	  {
+			 		if(document.all.region.value == "Asia" || document.all.region.value == "Europe")
+			 		{
+			   	 document.getElementById("c1").style.display="";
+				   document.getElementById("chan").style.display="none";
+				   document.getElementById("chan1").style.display="";
+				   document.getElementById("chana").style.display="none";
+				  }
+				  else if(document.all.region.value == "America")
+				  {
+				  	document.getElementById("c1").style.display="";
+				   document.getElementById("chan").style.display="";
+				   document.getElementById("chan1").style.display="none";
+				   document.getElementById("chana").style.display="none";
+				  }
+			    else if(document.all.region.value == "None")
+			    {
+				   document.getElementById("c1").style.display="none";
+				  }
+			}
+			else
+			{
+			 	 document.getElementById("c1").style.display="";
+			   document.getElementById("chan").style.display="none";
+			   document.getElementById("chan1").style.display="none";
+			   document.getElementById("chana").style.display="";
+			}
+		  
+		  if(document.all.modea.value == "11b" ){
+		   document.getElementById("rate").style.display="none";
+		   document.getElementById("rateb").style.display="";
+		   document.getElementById("ratea").style.display="none";
+		  }
+		  else if(document.all.modea.value == "11g" || document.all.modea.value == "bg"){
+		   document.getElementById("rate").style.display="";
+		   document.getElementById("rateb").style.display="none";
+		   document.getElementById("ratea").style.display="none";
+		  }
+		  else
+		  {
+		   document.getElementById("rate").style.display="none";
+		   document.getElementById("rateb").style.display="none";
+		   document.getElementById("ratea").style.display="";
+		  }
+		  
+		  document.getElementById("rate_n_ht20ds").style.display="none";
+		  document.getElementById("rate_n_ht40ds").style.display="none";
+		  document.getElementById("rate_n_ht40ds_s").style.display="none";
+	 		
+	 }
+	 else if(wifi_devmode == "an")
+	 {
+	    document.getElementById("mode").style.display="none";
+		  document.getElementById("modea").style.display="none";
+		  document.getElementById("moden").style.display="";
+	    	  document.getElementById("modeng").style.display="none";
+	 	  
+	   	if(document.all.moden.value == "11na" || document.all.moden.value == "11a")
+	 	  {
+			   if(document.all.region.value == "Asia" || document.all.region.value == "Europe")
+			 		{
+			   	 document.getElementById("c1").style.display="";
+				   document.getElementById("chan").style.display="none";
+				   document.getElementById("chan1").style.display="none";
+				   document.getElementById("chana").style.display="";
+				  }
+				  else if(document.all.region.value == "America")
+				  {
+	 	  	 document.getElementById("c1").style.display="";
+			   document.getElementById("chan").style.display="none";
+			   document.getElementById("chan1").style.display="none";
+			   document.getElementById("chana").style.display="";
+				  }
+			    else if(document.all.region.value == "None")
+			    {
+				   document.getElementById("c1").style.display="none";
+				  }
+			 		
+			}
+			else
+			{
+			 	 if(document.all.region.value == "Asia" || document.all.region.value == "Europe")
+			 		{
+			   	 document.getElementById("c1").style.display="";
+				   document.getElementById("chan").style.display="none";
+				   document.getElementById("chan1").style.display="";
+				   document.getElementById("chana").style.display="none";
+				  }
+				  else if(document.all.region.value == "America")
+				  {
+				  	document.getElementById("c1").style.display="";
+				   document.getElementById("chan").style.display="";
+				   document.getElementById("chan1").style.display="none";
+				   document.getElementById("chana").style.display="none";
+				  }
+			    else if(document.all.region.value == "None")
+			    {
+				   document.getElementById("c1").style.display="none";
+				  }
+			}
+      
+		  if((document.all.moden.value == "11ng" || document.all.moden.value == "11na") && "<%= $xml_wifi_cwwmode %>" == "0" ){
+		  	document.getElementById("rate").style.display="none";
+			  document.getElementById("rateb").style.display="none";
+			  document.getElementById("ratea").style.display="none";
+			  document.getElementById("rate_n_ht20ds").style.display="";
+			  document.getElementById("rate_n_ht40ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds_s").style.display="none";
+		  }
+		  else if((document.all.moden.value == "11ng" || document.all.moden.value == "11na") && ("<%= $xml_wifi_cwwmode %>" == "1" || "<%= $xml_wifi_cwwmode %>" == "2")){
+		    document.getElementById("rate").style.display="none";
+			  document.getElementById("rateb").style.display="none";
+			  document.getElementById("ratea").style.display="none";
+			  document.getElementById("rate_n_ht20ds").style.display="none";
+			  if (shortgi == "0"){
+			  document.getElementById("rate_n_ht40ds").style.display="";
+			      document.getElementById("rate_n_ht40ds_s").style.display="none";
+			  }
+			  if (shortgi == "1"){
+			      document.getElementById("rate_n_ht40ds").style.display="none";
+			      document.getElementById("rate_n_ht40ds_s").style.display="";
+			  }
+		  }
+		  else if(document.all.moden.value == "11g" || document.all.moden.value == "bg"){
+		    document.getElementById("rate").style.display="";
+			  document.getElementById("rateb").style.display="none";
+			  document.getElementById("ratea").style.display="none";
+			  document.getElementById("rate_n_ht20ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds_s").style.display="none";
+		  }
+		  else if(document.all.moden.value == "11b"){
+		    document.getElementById("rate").style.display="none";
+			  document.getElementById("rateb").style.display="";
+			  document.getElementById("ratea").style.display="none";
+			  document.getElementById("rate_n_ht20ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds_s").style.display="none";
+		  }
+		  else 
+		  {
+		    document.getElementById("rate").style.display="none";
+			  document.getElementById("rateb").style.display="none";
+			  document.getElementById("ratea").style.display="";
+			  document.getElementById("rate_n_ht20ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds_s").style.display="none";
+		  }
+	 }
+	 else if(wifi_devmode == "n")
+	 	{
+      document.getElementById("mode").style.display="none";
+      document.getElementById("modea").style.display="none";
+      document.getElementById("moden").style.display="none";
+      document.getElementById("modeng").style.display="";
+			 	 if(document.all.region.value == "Asia" || document.all.region.value == "Europe")
+			 		{
+			   	 document.getElementById("c1").style.display="";
+				   document.getElementById("chan").style.display="none";
+				   document.getElementById("chan1").style.display="";
+				   document.getElementById("chana").style.display="none";
+				  }
+				  else if(document.all.region.value == "America")
+				  {
+				  	document.getElementById("c1").style.display="";
+				   document.getElementById("chan").style.display="";
+				   document.getElementById("chan1").style.display="none";
+				   document.getElementById("chana").style.display="none";
+				  }
+			    else if(document.all.region.value == "None")
+			    {
+				   document.getElementById("c1").style.display="none";
+				  }
+		  if(document.all.modeng.value == "11ng" && "<%= $xml_wifi_cwwmode %>" == "0" ){
+		  	document.getElementById("rate").style.display="none";
+			  document.getElementById("rateb").style.display="none";
+			  document.getElementById("ratea").style.display="none";
+			  document.getElementById("rate_n_ht20ds").style.display="";
+			  document.getElementById("rate_n_ht40ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds_s").style.display="none";
+		  }
+		  else if(document.all.modeng.value == "11ng" && ("<%= $xml_wifi_cwwmode %>" == "1" || "<%= $xml_wifi_cwwmode %>" == "2")){
+		    document.getElementById("rate").style.display="none";
+			  document.getElementById("rateb").style.display="none";
+			  document.getElementById("ratea").style.display="none";
+			  document.getElementById("rate_n_ht20ds").style.display="none";
+			  if (shortgi == "0"){
+			  document.getElementById("rate_n_ht40ds").style.display="";
+			      document.getElementById("rate_n_ht40ds_s").style.display="none";
+			  }
+			  if (shortgi == "1"){
+			      document.getElementById("rate_n_ht40ds").style.display="none";
+			      document.getElementById("rate_n_ht40ds_s").style.display="";
+			  }
+		  }
+		  else if(document.all.modeng.value == "11g" || document.all.modeng.value == "bg"){
+		    document.getElementById("rate").style.display="";
+			  document.getElementById("rateb").style.display="none";
+			  document.getElementById("ratea").style.display="none";
+			  document.getElementById("rate_n_ht20ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds_s").style.display="none";
+		  }
+		  else if(document.all.modeng.value == "11b"){
+		    document.getElementById("rate").style.display="none";
+			  document.getElementById("rateb").style.display="";
+			  document.getElementById("ratea").style.display="none";
+			  document.getElementById("rate_n_ht20ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds_s").style.display="none";
+		  }
+		  else 
+		  {
+		    document.getElementById("rate").style.display="none";
+			  document.getElementById("rateb").style.display="none";
+			  document.getElementById("ratea").style.display="";
+			  document.getElementById("rate_n_ht20ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds").style.display="none";
+			  document.getElementById("rate_n_ht40ds_s").style.display="none";
+		  }
+
+	 }
+	 
+	  document.getElementById("tab5").style.display="";
+	  document.getElementById("tab_sta").style.display="none";
+	  document.getElementById("tab6").style.display="none";
+	}
+	else
+	{
+	 	document.getElementById("tab0").style.display="none";
+	 	document.getElementById("tab5").style.display="none";
+	 	document.getElementById("tab_sta").style.display="";
+	 	document.getElementById("tab6").style.display="";
+	}
+	
+}
+
+function shielding_sta(){
+   if(document.all.security[0].checked == true){
+	  document.getElementById("weps1").style.display="none";
+	  document.getElementById("wept1").style.display="none";
+	  document.getElementById("wepk1").style.display="none";
+	  document.getElementById("wepk2").style.display="none";
+	  document.getElementById("wepk3").style.display="none";
+	  document.getElementById("wepk4").style.display="none";
+	  document.getElementById("wpas1").style.display="none";
+	  document.getElementById("wpak1").style.display="none";
+	  
+	  }
+	else if(document.all.security[1].checked == true){
+		document.getElementById("weps1").style.display="";
+		document.getElementById("wept1").style.display="";
+		document.getElementById("wepk1").style.display="";
+		document.getElementById("wepk2").style.display="";
+		document.getElementById("wepk3").style.display="";
+		document.getElementById("wepk4").style.display="";
+	  document.getElementById("wpas1").style.display="none";
+	  document.getElementById("wpak1").style.display="none";
+	}
+  else if(document.all.security[2].checked == true||document.all.security[3].checked == true){
+	  document.getElementById("weps1").style.display="none";
+	  document.getElementById("wept1").style.display="none";
+	  document.getElementById("wepk1").style.display="none";
+	  document.getElementById("wepk2").style.display="none";
+	  document.getElementById("wepk3").style.display="none";
+	  document.getElementById("wepk4").style.display="none";
+	  document.getElementById("wpas1").style.display="";
+	  document.getElementById("wpak1").style.display="";
+	}
+	
+}
+
+function g_OpenWindow(pageURL, innerWidth, innerHeight)
+{
+	var ScreenWidth = screen.availWidth
+	var ScreenHeight = screen.availHeight
+	var StartX = (ScreenWidth - innerWidth) / 2
+	var StartY = (ScreenHeight - innerHeight) / 2
+	var wins = window.open(pageURL, 'OpenWin', 'left='+ StartX + ', top='+ StartY + ', Width=' + innerWidth +', height=' + innerHeight + ', resizable=no, scrollbars=yes, status=no, toolbar=no, menubar=no, location=no')
+	wins.focus();
+}	
+
+function submit_sta()
+{
+	 document.form_sta.action="action.cgi";
+	 document.form_sta.submit(); 
+	
+}
+ </script>
+</head>
+<body onLoad="shielding_sta();shielding()">
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_wireless1.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+
+<div align="center">
+	<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0">
+	<tr>
+		<td bordercolor="#456f95">	
+	                     <form name="form0" method="post" action="<%= $action_cgi %>" onsubmit="return overlayer()">
+                        <table  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+												<tr>
+												<td width="100%"  colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(wset_selectap)</script></b></td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+												
+												<tr>
+													<td align="right" height="24" bordercolor="#ffffff" width="280"><script language="javascript">replace(wset_currentap)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" width="370">
+													<select name="vapname" onChange="vap_specific()">
+														<script language="JavaScript" type="text/javascript">vapname_display()</script>
+													</select>	
+													</td>
+												</tr>
+										    
+										    
+										    
+												</table>
+												<input type="hidden" value="VAPSpec WS" name="SERVLET">
+											</form>
+											
+											
+											<form name="form_sta" method="post" action="<%= $action_cgi %>" >
+												<table id="tab_sta"  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+													<tr>
+												<td width="100%"  colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(wset_staset)</script></b></td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+												
+												<tr>
+												<td height="24" align="right" bordercolor="#ffffff" width="280"><script language="javascript">replace(wset_stastate)</script></td>
+												<td bordercolor="#ffffff" width="370"><input type="checkbox" <% webui_checkbox_check "$xml_wlwan_enable" "yes" %> name="wanenable" value="yes" >&nbsp;</td>
+											</tr>   
+									        
+											<tr>
+													<td height="24" align="right" bordercolor="#ffffff"><script language="javascript">replace(wset_associated_ssid)</script></td>
+													<td bordercolor="#ffffff"><input type="text" name="ssidname" value="<%= "$xml_wlwan_ssid" %>">&nbsp;<script language="javascript">replace(wset_find_button)</script></td>
+											</tr>
+											
+									    <tr >
+											<td align="right" height="24" bordercolor="#ffffff"><script language="javascript">replace(wset_selectchan)</script>
+											</td>
+											<td align="left" bordercolor="#ffffff">
+												<select name="assocchan" id="assocchan">
+												<option value="0" <% webui_listbox_select "$xml_wlan_assocchan" "0" %>>Any</option>
+												<option value="1" <% webui_listbox_select "$xml_wlan_assocchan" "1" %>>1 - 2.412GHz</option>
+												<option value="2" <% webui_listbox_select "$xml_wlan_assocchan" "2" %>>2 - 2.417GHz</option>
+												<option value="3" <% webui_listbox_select "$xml_wlan_assocchan" "3" %>>3 - 2.422GHz</option>
+												<option value="4" <% webui_listbox_select "$xml_wlan_assocchan" "4" %>>4 - 2.427GHz</option>
+												<option value="5" <% webui_listbox_select "$xml_wlan_assocchan" "5" %>>5 - 2.432GHz</option>
+												<option value="6" <% webui_listbox_select "$xml_wlan_assocchan" "6" %>>6 - 2.437GHz</option>
+												<option value="7" <% webui_listbox_select "$xml_wlan_assocchan" "7" %>>7 - 2.442GHz</option>
+												<option value="8" <% webui_listbox_select "$xml_wlan_assocchan" "8" %>>8 - 2.447GHz</option>
+												<option value="9" <% webui_listbox_select "$xml_wlan_assocchan" "9" %>>9 - 2.452GHz</option>
+												<option value="10" <% webui_listbox_select "$xml_wlan_assocchan" "10" %>>10 - 2.457GHz</option>
+												<option value="11" <% webui_listbox_select "$xml_wlan_assocchan" "11" %>>11 - 2.462GHz</option>
+												<option value="34" <% webui_listbox_select "$xml_wlan_assocchan" "34" %>>34 - 5.170GHz</option>
+												<option value="36" <% webui_listbox_select "$xml_wlan_assocchan" "36" %>>36 - 5.180GHz</option>
+												<option value="38" <% webui_listbox_select "$xml_wlan_assocchan" "38" %>>38 - 5.190GHz</option>
+												<option value="40" <% webui_listbox_select "$xml_wlan_assocchan" "40" %>>40 - 5.200GHz</option>
+												<option value="42" <% webui_listbox_select "$xml_wlan_assocchan" "42" %>>42 - 5.210GHz</option>
+												<option value="44" <% webui_listbox_select "$xml_wlan_assocchan" "44" %>>44 - 5.220GHz</option>
+												<option value="46" <% webui_listbox_select "$xml_wlan_assocchan" "46" %>>46 - 5.230GHz</option>
+												<option value="48" <% webui_listbox_select "$xml_wlan_assocchan" "48" %>>48 - 5.240GHz</option>
+												<option value="52" <% webui_listbox_select "$xml_wlan_assocchan" "52" %>>52 - 5.260GHz</option>
+												<option value="56" <% webui_listbox_select "$xml_wlan_assocchan" "56" %>>56 - 5.280GHz</option>
+												<option value="60" <% webui_listbox_select "$xml_wlan_assocchan" "60" %>>60 - 5.300GHz</option>
+												<option value="64" <% webui_listbox_select "$xml_wlan_assocchan" "64" %>>64 - 5.320GHz</option>
+												<option value="100" <% webui_listbox_select "$xml_wlan_assocchan" "100" %>>100 - 5.500GHz</option>
+												<option value="104" <% webui_listbox_select "$xml_wlan_assocchan" "104" %>>104 - 5.520GHz</option>
+												<option value="108" <% webui_listbox_select "$xml_wlan_assocchan" "108" %>>108 - 5.540GHz</option>
+												<option value="112" <% webui_listbox_select "$xml_wlan_assocchan" "112" %>>112 - 5.560GHz</option>
+												<option value="116" <% webui_listbox_select "$xml_wlan_assocchan" "116" %>>116 - 5.580GHz</option>
+												<option value="120" <% webui_listbox_select "$xml_wlan_assocchan" "120" %>>120 - 5.600GHz</option>
+												<option value="124" <% webui_listbox_select "$xml_wlan_assocchan" "124" %>>124 - 5.620GHz</option>
+												<option value="128" <% webui_listbox_select "$xml_wlan_assocchan" "128" %>>128 - 5.640GHz</option>
+												<option value="132" <% webui_listbox_select "$xml_wlan_assocchan" "132" %>>132 - 5.660GHz</option>
+												<option value="136" <% webui_listbox_select "$xml_wlan_assocchan" "136" %>>136 - 5.680GHz</option>
+												<option value="140" <% webui_listbox_select "$xml_wlan_assocchan" "140" %>>140 - 5.700GHz</option>
+												<option value="149" <% webui_listbox_select "$xml_wlan_assocchan" "149" %>>149 - 5.745GHz</option>
+												<option value="153" <% webui_listbox_select "$xml_wlan_assocchan" "153" %>>153 - 5.765GHz</option>
+												<option value="157" <% webui_listbox_select "$xml_wlan_assocchan" "157" %>>157 - 5.785GHz</option>
+												<option value="161" <% webui_listbox_select "$xml_wlan_assocchan" "161" %>>161 - 5.805GHz</option>
+												</select>
+												</td>
+											</tr>
+									        
+											<tr>
+												<td height="24" align="right" bordercolor="#ffffff" width="280"><script language="javascript">replace(wset_assocfail)</script></td>
+												<td bordercolor="#ffffff" width="370"><input type="checkbox" <% webui_checkbox_check "$xml_wlan_assocweight" "1" %> name="assocweight" value="1" >&nbsp;</td>
+											</tr>
+											
+											<tr>
+												<td height="24" align="right" bordercolor="#ffffff" width="280"><script language="javascript">replace(wset_assocrssi)</script></td>
+												<td bordercolor="#ffffff" width="370"><input type="checkbox" <% webui_checkbox_check "$xml_wlan_assocrssi" "1" %> name="assocrssi" value="1" >&nbsp;</td>
+											</tr>
+											
+											<tr>
+													<td height="24" align="right" bordercolor="#ffffff"><script language="javascript">replace(wset_security)</script></td>
+													<td bordercolor="#ffffff">
+														<input type="radio" <% webui_radiobutton_check "$xml_wlan_security" "none" %> name="security" value="none" onClick="shielding_sta()">None &nbsp;
+														<input type="radio" <% webui_radiobutton_check "$xml_wlan_security" "wep" %> name="security" value="wep" onClick="shielding_sta()">WEP &nbsp;
+														<input type="radio" <% webui_radiobutton_check "$xml_wlan_security" "wpa" %> name="security" value="wpa" onClick="shielding_sta()"> WPA &nbsp;
+														<input type="radio" <% webui_radiobutton_check "$xml_wlan_security" "wpa2" %> name="security" value="wpa2" onClick="shielding_sta()"> WPA2 &nbsp; 
+													</td>
+											</tr>
+											
+											<tr id="weps1">
+													<td height="24" align="right" bordercolor="#ffffff"><script language="javascript">replace(wset_wep_mode)</script></td>
+													<td bordercolor="#ffffff">
+														<select name="authmode" onChange="shielding_sta()">
+														<option value="1" <% webui_listbox_select "$xml_wlan_authmode" "1" %>>Open System</option>
+													  <option value="2" <% webui_listbox_select "$xml_wlan_authmode" "2" %>>Shared Key</option>
+														</select>
+													</td>
+												</tr>
+												
+												<tr id="wept1">
+													<td height="24" align="right" bordercolor="#ffffff" ><script language="javascript">replace(wset_encrypt_type)</script></td>
+													<td bordercolor="#ffffff" >
+														<select name="etype">
+														<option value="hex" <% webui_listbox_select "$xml_wlan_wepkeytype" "hex" %>>Hexadecimal</option>
+														<option value="ascii" <% webui_listbox_select "$xml_wlan_wepkeytype" "ascii" %>>Ascii</option>
+														</select>
+													</td>
+												</tr>
+																											
+												<tr id="wepk1">
+													<td height="24" align="right" bordercolor="#ffffff"><script language="javascript">replace(wset_wep_key1)</script></td>
+													<td bordercolor="#ffffff"><input type="radio" <% webui_radiobutton_check "$xml_wlan_wepkey" "0" %>  name="wepkey" value="0">&nbsp;
+													<input type="text" name="passkey1" value="<%= "$xml_wlan_passkey1" %>"></td>
+												</tr>
+																					
+												<tr id="wepk2">
+														<td height="24" align="right" bordercolor="#ffffff"><script language="javascript">replace(wset_wep_key2)</script></td>
+														<td bordercolor="#ffffff"><input type="radio" <% webui_radiobutton_check "$xml_wlan_wepkey" "1" %>  name="wepkey" value="1">&nbsp;
+														<input type="text" name="passkey2" value="<%= "$xml_wlan_passkey2" %>"></td>
+												</tr>
+																					
+												<tr id="wepk3">
+														<td height="24" align="right" bordercolor="#ffffff" ><script language="javascript">replace(wset_wep_key3)</script></td>
+														<td v><input type="radio" <% webui_radiobutton_check "$xml_wlan_wepkey" "2" %>  name="wepkey" value="2" >&nbsp;
+														<input type="text" name="passkey3" value="<%= "$xml_wlan_passkey3" %>"></td>
+												</tr>
+																					
+												<tr id="wepk4">
+														<td height="24" align="right" bordercolor="#ffffff"><script language="javascript">replace(wset_wep_key4)</script></td>
+														<td  bordercolor="#ffffff"><input type="radio" <% webui_radiobutton_check "$xml_wlan_wepkey" "3" %>  name="wepkey" value="3" >&nbsp;
+														<input type="text" name="passkey4" value="<%= "$xml_wlan_passkey4" %>"></td>
+												</tr>						
+											
+												<tr id="wpas1">
+														<td height="24" align="right" bordercolor="#ffffff"><script language="javascript">replace(wset_wpa_with)</script></td>
+														<td  bordercolor="#ffffff">
+														PSK
+														</select>
+														</td>
+												</tr>
+											
+												<tr id="wpak1">
+														<td height="24" align="right" bordercolor="#ffffff"><script language="javascript">replace(wset_wpa_key)</script></td>
+														<td  bordercolor="#ffffff"><input type="text" name="passphrase"  value="<%= "$xml_wlan_passphrase" %>"></td>
+												</tr>
+			
+													
+												</table>
+												<input type="hidden" value="Wlwan Apply" name="SERVLET">
+											</form>
+											
+											
+												<form name="form1" method="post" action="<%= $action_cgi %>" onsubmit="return valvalidate()">
+												<table id="tab0"  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+												<tr>
+												<td width="100%"  colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(wset_wifi_set)</script></b></td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+
+												<tr id="regiontr">
+												<td height="24" align="right" bordercolor="#ffffff"><script language="javascript">replace(wset_region)</script>&nbsp;</td>
+												<td bordercolor="#ffffff">
+												<select name="region" id="region" onChange="shielding()">
+												<option <% webui_listbox_select "$xml_wlan_region" "None" %> value="None" >None</option>
+												<option <% webui_listbox_select "$xml_wlan_region" "Asia" %> value="Asia" >China</option>
+												<option <% webui_listbox_select "$xml_wlan_region" "Europe" %> value="Europe">Europe</option>
+												<option <% webui_listbox_select "$xml_wlan_region" "America" %> value="America">America</option>
+												</select>
+												</td>
+												</tr>
+												
+												<tr>
+												<td height="24" align="right" bordercolor="#ffffff"><script language="javascript">replace(wset_mode)</script>&nbsp;</td>
+												<td bordercolor="#ffffff">
+												<select name="mode" onChange="shielding()">
+												<option <% webui_listbox_select "$xml_wlan_mode" "11b" %> value="11b">11b</option>
+												<option <% webui_listbox_select "$xml_wlan_mode" "11g" %> value="11g">11g</option>
+												<option <% webui_listbox_select "$xml_wlan_mode" "bg" %> value="bg" >11b and 11g</option>
+												</select>
+												<select name="modea" onChange="shielding()">
+												<option <% webui_listbox_select "$xml_wlan_modea" "11a" %> value="11a" >11a</option>
+												<option <% webui_listbox_select "$xml_wlan_modea" "11b" %> value="11b">11b</option>
+												<option <% webui_listbox_select "$xml_wlan_modea" "11g" %> value="11g">11g</option>
+												<option <% webui_listbox_select "$xml_wlan_modea" "bg" %> value="bg" >11b and 11g</option>
+												</select>
+												<select name="moden" onChange="shielding()">
+												<option <% webui_listbox_select "$xml_wlan_moden" "11ng" %> value="11ng" >11ng</option>
+												<option <% webui_listbox_select "$xml_wlan_moden" "11na" %> value="11na" >11na</option>
+												<option <% webui_listbox_select "$xml_wlan_moden" "11a" %> value="11a" >11a</option>
+												<option <% webui_listbox_select "$xml_wlan_moden" "11b" %> value="11b">11b</option>
+												<option <% webui_listbox_select "$xml_wlan_moden" "11g" %> value="11g">11g</option>
+												<option <% webui_listbox_select "$xml_wlan_moden" "bg" %> value="bg" >11b and 11g</option>
+												</select>
+												<select name="modeng" onChange="shielding()">
+												<option <% webui_listbox_select "$xml_wlan_moden" "11ng" %> value="11ng" >11ng</option>
+												<option <% webui_listbox_select "$xml_wlan_moden" "11b" %> value="11b">11b</option>
+												<option <% webui_listbox_select "$xml_wlan_moden" "11g" %> value="11g">11g</option>
+												<option <% webui_listbox_select "$xml_wlan_moden" "bg" %> value="bg" >11b and 11g</option>
+												</select>
+												</td>
+												</tr>
+												
+												<tr id="c1">
+												<td  height="24" align="right" bordercolor="#ffffff"><script language="javascript">replace(wset_chan)</script>&nbsp;</td>
+												<td bordercolor="#ffffff">
+												<select name="channel" id="chan">
+												<option value="0" <% webui_listbox_select "$xml_wifi_channel" "0" %>>Auto</option>
+												<option value="1" <% webui_listbox_select "$xml_wifi_channel" "1" %>>1 - 2.412GHz</option>
+												<option value="2" <% webui_listbox_select "$xml_wifi_channel" "2" %>>2 - 2.417GHz</option>
+												<option value="3" <% webui_listbox_select "$xml_wifi_channel" "3" %>>3 - 2.422GHz</option>
+												<option value="4" <% webui_listbox_select "$xml_wifi_channel" "4" %>>4 - 2.427GHz</option>
+												<option value="5" <% webui_listbox_select "$xml_wifi_channel" "5" %>>5 - 2.432GHz</option>
+												<option value="6" <% webui_listbox_select "$xml_wifi_channel" "6" %>>6 - 2.437GHz</option>
+												<option value="7" <% webui_listbox_select "$xml_wifi_channel" "7" %>>7 - 2.442GHz</option>
+												<option value="8" <% webui_listbox_select "$xml_wifi_channel" "8" %>>8 - 2.447GHz</option>
+												<option value="9" <% webui_listbox_select "$xml_wifi_channel" "9" %>>9 - 2.452GHz</option>
+												<option value="10" <% webui_listbox_select "$xml_wifi_channel" "10" %>>10 - 2.457GHz</option>
+												<option value="11" <% webui_listbox_select "$xml_wifi_channel" "11" %>>11 - 2.462GHz</option>
+												</select>
+												<select name="channel1" id="chan1" onChange="channel_to_123()">
+												<option value="0" <% webui_listbox_select "$xml_wifi_channel1" "0" %>>Auto</option>
+												<option value="1" <% webui_listbox_select "$xml_wifi_channel1" "1" %>>1 - 2.412GHz</option>
+												<option value="2" <% webui_listbox_select "$xml_wifi_channel1" "2" %>>2 - 2.417GHz</option>
+												<option value="3" <% webui_listbox_select "$xml_wifi_channel1" "3" %>>3 - 2.422GHz</option>
+												<option value="4" <% webui_listbox_select "$xml_wifi_channel1" "4" %>>4 - 2.427GHz</option>
+												<option value="5" <% webui_listbox_select "$xml_wifi_channel1" "5" %>>5 - 2.432GHz</option>
+												<option value="6" <% webui_listbox_select "$xml_wifi_channel1" "6" %>>6 - 2.437GHz</option>
+												<option value="7" <% webui_listbox_select "$xml_wifi_channel1" "7" %>>7 - 2.442GHz</option>
+												<option value="8" <% webui_listbox_select "$xml_wifi_channel1" "8" %>>8 - 2.447GHz</option>
+												<option value="9" <% webui_listbox_select "$xml_wifi_channel1" "9" %>>9 - 2.452GHz</option>
+												<option value="10" <% webui_listbox_select "$xml_wifi_channel1" "10" %>>10 - 2.457GHz</option>
+												<option value="11" <% webui_listbox_select "$xml_wifi_channel1" "11" %>>11 - 2.462GHz</option>
+												<option value="12" <% webui_listbox_select "$xml_wifi_channel1" "12" %>>12 - 2.467GHz</option>
+												<option value="13" <% webui_listbox_select "$xml_wifi_channel1" "13" %>>13 - 2.472GHz</option>
+												</select>
+												<select name="channela" id="chana">
+												<option value="0" <% webui_listbox_select "$xml_wifi_channela" "0" %>>Auto</option>
+												<option value="34" <% webui_listbox_select "$xml_wifi_channela" "34" %>>34 - 5.170GHz</option>
+												<option value="36" <% webui_listbox_select "$xml_wifi_channela" "36" %>>36 - 5.180GHz</option>
+												<option value="38" <% webui_listbox_select "$xml_wifi_channela" "38" %>>38 - 5.190GHz</option>
+												<option value="40" <% webui_listbox_select "$xml_wifi_channela" "40" %>>40 - 5.200GHz</option>
+												<option value="42" <% webui_listbox_select "$xml_wifi_channela" "42" %>>42 - 5.210GHz</option>
+												<option value="44" <% webui_listbox_select "$xml_wifi_channela" "44" %>>44 - 5.220GHz</option>
+												<option value="46" <% webui_listbox_select "$xml_wifi_channela" "46" %>>46 - 5.230GHz</option>
+												<option value="48" <% webui_listbox_select "$xml_wifi_channela" "48" %>>48 - 5.240GHz</option>
+												<option value="52" <% webui_listbox_select "$xml_wifi_channela" "52" %>>52 - 5.260GHz</option>
+												<option value="56" <% webui_listbox_select "$xml_wifi_channela" "56" %>>56 - 5.280GHz</option>
+												<option value="60" <% webui_listbox_select "$xml_wifi_channela" "60" %>>60 - 5.300GHz</option>
+												<option value="64" <% webui_listbox_select "$xml_wifi_channela" "64" %>>64 - 5.320GHz</option>
+												<option value="100" <% webui_listbox_select "$xml_wifi_channela" "100" %>>100 - 5.500GHz</option>
+												<option value="104" <% webui_listbox_select "$xml_wifi_channela" "104" %>>104 - 5.520GHz</option>
+												<option value="108" <% webui_listbox_select "$xml_wifi_channela" "108" %>>108 - 5.540GHz</option>
+												<option value="112" <% webui_listbox_select "$xml_wifi_channela" "112" %>>112 - 5.560GHz</option>
+												<option value="116" <% webui_listbox_select "$xml_wifi_channela" "116" %>>116 - 5.580GHz</option>
+												<option value="120" <% webui_listbox_select "$xml_wifi_channela" "120" %>>120 - 5.600GHz</option>
+												<option value="124" <% webui_listbox_select "$xml_wifi_channela" "124" %>>124 - 5.620GHz</option>
+												<option value="128" <% webui_listbox_select "$xml_wifi_channela" "128" %>>128 - 5.640GHz</option>
+												<option value="132" <% webui_listbox_select "$xml_wifi_channela" "132" %>>132 - 5.660GHz</option>
+												<option value="136" <% webui_listbox_select "$xml_wifi_channela" "136" %>>136 - 5.680GHz</option>
+												<option value="140" <% webui_listbox_select "$xml_wifi_channela" "140" %>>140 - 5.700GHz</option>
+												<option value="149" <% webui_listbox_select "$xml_wifi_channela" "149" %>>149 - 5.745GHz</option>
+												<option value="153" <% webui_listbox_select "$xml_wifi_channela" "153" %>>153 - 5.765GHz</option>
+												<option value="157" <% webui_listbox_select "$xml_wifi_channela" "157" %>>157 - 5.785GHz</option>
+												<option value="161" <% webui_listbox_select "$xml_wifi_channela" "161" %>>161 - 5.805GHz</option>
+												</select>
+												</td>
+												</tr>
+												
+
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+												
+												
+												<tr>
+												<td width="100%"  colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(wset_basic_set)</script></b></td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+												
+												<tr>
+												<td align="right" height="24" width="280" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_wlan_enable" "yes" %> name="enable" value="yes" >&nbsp;</td>
+												<td width="370" bordercolor="#ffffff"><script language="javascript">replace(wset_enable)</script></td>
+												</tr>
+												
+												<tr>
+												<td align="right" height="24" bordercolor="#ffffff"><input type="checkbox" <% webui_checkbox_check "$xml_wlan_broadcast" "yes" %> name="broadcast" value="yes">&nbsp;</td>
+												<td bordercolor="#ffffff"><script language="javascript">replace(wset_broad)</script></td>
+												</tr>
+	
+												<tr>
+												<td align="right" height="24" bordercolor="#ffffff"><script language="javascript">replace(wset_name)</script></td>
+												<td bordercolor="#ffffff"><input type="text" name="ssid" maxlength="31" value="<%= "$xml_wlan_ssid" %>"></td>
+												</tr>
+                        
+                        <tr>
+										        <td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(wset_rate)</script></td>
+										        <td align="left" bordercolor="#ffffff"><select name="rate" size="1" id="rate">
+										          <option value="auto" <% webui_listbox_select "$xml_wlan_rate" "auto" %>>Auto</option>
+														  <option value="1M" <% webui_listbox_select "$xml_wlan_rate" "1M" %>>1Mbps</option>
+														  <option value="2M" <% webui_listbox_select "$xml_wlan_rate" "2M" %>>2Mbps</option>
+														  <option value="5.5M" <% webui_listbox_select "$xml_wlan_rate" "5.5M" %>>5.5Mbps</option>
+														  <option value="6M" <% webui_listbox_select "$xml_wlan_rate" "6M" %>>6Mbps</option>
+														  <option value="9M" <% webui_listbox_select "$xml_wlan_rate" "9M" %>>9Mbps</option>
+														  <option value="11M" <% webui_listbox_select "$xml_wlan_rate" "11M" %>>11Mbps</option>
+														  <option value="12M" <% webui_listbox_select "$xml_wlan_rate" "12M" %>>12Mbps</option>
+														  <option value="18M" <% webui_listbox_select "$xml_wlan_rate" "18M" %>>18Mbps</option>
+														  <option value="24M" <% webui_listbox_select "$xml_wlan_rate" "24M" %>>24Mbps</option>
+														  <option value="36M" <% webui_listbox_select "$xml_wlan_rate" "36M" %>>36Mbps</option>
+														  <option value="48M" <% webui_listbox_select "$xml_wlan_rate" "48M" %>>48Mbps</option>
+														  <option value="54M" <% webui_listbox_select "$xml_wlan_rate" "54M" %>>54Mbps</option>
+										         </select>
+										         <select name="rateb" size="1" id="rateb">
+										          <option value="auto" <% webui_listbox_select "$xml_wlan_rateb" "auto" %>>Auto</option>
+														  <option value="1M" <% webui_listbox_select "$xml_wlan_rateb" "1M" %>>1Mbps</option>
+														  <option value="2M" <% webui_listbox_select "$xml_wlan_rateb" "2M" %>>2Mbps</option>
+														  <option value="5.5M" <% webui_listbox_select "$xml_wlan_rateb" "5.5M" %>>5.5Mbps</option>
+														  <option value="11M" <% webui_listbox_select "$xml_wlan_rateb" "11M" %>>11Mbps</option>
+														  </select>
+														  <select name="ratea" size="1" id="ratea">
+										          <option value="auto" <% webui_listbox_select "$xml_wlan_ratea" "auto" %>>Auto</option>
+														  <option value="6M" <% webui_listbox_select "$xml_wlan_ratea" "6M" %>>6Mbps</option>
+														  <option value="9M" <% webui_listbox_select "$xml_wlan_ratea" "9M" %>>9Mbps</option>
+														  <option value="12M" <% webui_listbox_select "$xml_wlan_ratea" "12M" %>>12Mbps</option>
+														  <option value="18M" <% webui_listbox_select "$xml_wlan_ratea" "18M" %>>18Mbps</option>
+														  <option value="24M" <% webui_listbox_select "$xml_wlan_ratea" "24M" %>>24Mbps</option>
+														  <option value="36M" <% webui_listbox_select "$xml_wlan_ratea" "36M" %>>36Mbps</option>
+														  <option value="48M" <% webui_listbox_select "$xml_wlan_ratea" "48M" %>>48Mbps</option>
+														  <option value="54M" <% webui_listbox_select "$xml_wlan_ratea" "54M" %>>54Mbps</option>
+														  </select>
+														  <select name="rate_n_ht20ds" size="1" id="rate_n_ht20ds">
+										          <option value="auto" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "auto" %>>Auto</option>
+														  <option value="1M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "1M" %>>1Mbps</option>
+														  <option value="2M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "2M" %>>2Mbps</option>
+														  <option value="5.5M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "5.5M" %>>.5Mbps</option>
+														  <option value="11M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "11M" %>>11Mbps</option>
+														  <option value="6M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "6M" %>>6Mbps</option>
+														  <option value="9M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "9M" %>>9Mbps</option>
+														  <option value="12M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "12M" %>>12Mbps</option>
+														  <option value="18M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "18M" %>>18Mbps</option>
+														  <option value="24M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "24M" %>>24Mbps</option>
+														  <option value="36M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "36M" %>>36Mbps</option>
+														  <option value="48M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "48M" %>>48Mbps</option>
+														  <option value="54M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "54M" %>>54Mbps</option>
+														  <option value="6.5M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "6.5M" %>>6.5Mbps</option>
+														  <option value="13M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "13M" %>>13Mbps</option>
+														  <option value="19.5M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "19.5M" %>>19.5Mbps</option>
+														  <option value="26M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "26M" %>>26Mbps</option>
+														  <option value="39M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "39M" %>>39Mbps</option>
+														  <option value="52M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "52M" %>>52Mbps</option>
+														  <option value="58M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "58M" %>>58Mbps</option>
+														  <option value="65M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "65M" %>>65Mbps</option>
+														  <option value="13M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "13M" %>>13Mbps</option>
+														  <option value="26M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "26M" %>>26Mbps</option>
+														  <option value="39M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "39M" %>>39Mbps</option>
+														  <option value="52M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "52M" %>>52Mbps</option>
+														  <option value="78M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "78M" %>>78Mbps</option>
+														  <option value="104M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "104M" %>>104Mbps</option>
+														  <option value="117M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "117M" %>>117Mbps</option>
+														  <option value="130M" <% webui_listbox_select "$xml_wlan_ratenaht20ds" "130M" %>>130Mbps</option>
+														  </select>
+														  <select name="rate_n_ht40ds_s" size="1" id="rate_n_ht40ds_s">
+										          <option value="auto" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "auto" %>>Auto</option>
+										          <option value="1M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "1M" %>>1Mbps</option>
+										          <option value="2M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "2M" %>>2Mbps</option>
+										          <option value="5.5M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "5.5M" %>>5.5Mbps</option>
+										          <option value="11M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "11M" %>>11Mbps</option>
+										          <option value="6M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "6M" %>>6Mbps</option>
+														  <option value="9M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "9M" %>>9Mbps</option>
+														  <option value="12M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "12M" %>>12Mbps</option>
+														  <option value="18M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "18M" %>>18Mbps</option>
+														  <option value="24M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "24M" %>>24Mbps</option>
+														  <option value="36M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "36M" %>>36Mbps</option>
+														  <option value="48M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "48M" %>>48Mbps</option>
+														  <option value="54M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "54M" %>>54Mbps</option>
+														  <option value="13.5M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "13.5M" %>>13.5Mbps</option>
+														  <option value="27M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "27M" %>>27Mbps</option>
+														  <option value="40.5M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "40.5M" %>>40.5Mbps</option>
+														  <option value="54M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "54M" %>>54Mbps</option>
+														  <option value="81M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "81M" %>>81Mbps</option>
+														  <option value="108M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "108M" %>>108Mbps</option>
+														  <option value="121.5M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "121.5M" %>>121.5Mbps</option>
+														  <option value="135M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "135M" %>>135Mbps</option>
+														  <option value="150M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "150M" %>>150Mbps</option>
+										          <option value="27M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "27M" %>>27Mbps</option>
+										          <option value="54M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "54M" %>>54Mbps</option>
+										          <option value="81M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "81M" %>>81Mbps</option>
+										          <option value="108M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "108M" %>>108Mbps</option>
+										          <option value="162M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "162M" %>>162Mbps</option>
+														  <option value="216M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "216M" %>>216Mbps</option>
+														  <option value="243M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "243M" %>>243Mbps</option>
+														  <option value="270M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "270M" %>>270Mbps</option>
+														  <option value="300M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "300M" %>>300Mbps</option>
+														  </select>
+														  <select name="rate_n_ht40ds" size="1" id="rate_n_ht40ds">
+										          <option value="auto" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "auto" %>>Auto</option>
+										          <option value="1M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "1M" %>>1Mbps</option>
+										          <option value="2M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "2M" %>>2Mbps</option>
+										          <option value="5.5M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "5.5M" %>>5.5Mbps</option>
+										          <option value="11M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "11M" %>>11Mbps</option>
+										          <option value="6M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "6M" %>>6Mbps</option>
+														  <option value="9M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "9M" %>>9Mbps</option>
+														  <option value="12M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "12M" %>>12Mbps</option>
+														  <option value="18M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "18M" %>>18Mbps</option>
+														  <option value="24M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "24M" %>>24Mbps</option>
+														  <option value="36M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "36M" %>>36Mbps</option>
+														  <option value="48M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "48M" %>>48Mbps</option>
+														  <option value="54M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "54M" %>>54Mbps</option>
+														  <option value="13.5M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "13.5M" %>>13.5Mbps</option>
+														  <option value="27M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "27M" %>>27Mbps</option>
+														  <option value="40.5M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "40.5M" %>>40.5Mbps</option>
+														  <option value="54M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "54M" %>>54Mbps</option>
+														  <option value="81M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "81M" %>>81Mbps</option>
+														  <option value="108M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "108M" %>>108Mbps</option>
+														  <option value="121.5M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "121.5M" %>>121Mbps</option>
+														  <option value="135M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "135M" %>>135Mbps</option>
+														  <option value="27M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "27M" %>>27Mbps</option>
+														  <option value="54M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "54M" %>>54Mbps</option>
+														  <option value="81M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "81M" %>>81Mbps</option>
+														  <option value="108M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "108M" %>>108Mbps</option>
+														  <option value="162M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "162M" %>>162Mbps</option>
+														  <option value="216M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "216M" %>>216Mbps</option>
+														  <option value="243M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "243M" %>>243Mbps</option>
+														  <option value="270M" <% webui_listbox_select "$xml_wlan_ratenaht40ds" "270M" %>>270Mbps</option>
+														  </select>
+										         </td>
+											       
+										      </tr>
+										      
+										      <tr>
+										        <td align="right" bordercolor="#ffffff"><script language="javascript">replace(wset_beacon_interval)</script></td>
+										        <td align="left" bordercolor="#ffffff">
+										         <label>
+										          <input name="beacon" type="text" size="7" maxlength="4" value="<%= "$xml_wlan_beacon" %>"  > &nbsp;&nbsp;<script language="javascript">replace(wset_label_range)</script>
+										         </label></td>
+											      
+										      </tr>
+                        
+												<tr>
+												<td height="10" colspan="2" ></td>
+												</tr>
+								        </table>
+					</td>
+   </tr>
+</table> 
+												<table id="tab5" align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+												<tr>
+												<td  align="center" height="40" valign="middle" colspan="2">
+												<script language="javascript">replace(wset_apply)</script></td>
+												</tr>
+												<tr>
+										        <td align="right"   colspan="2"><script language="javascript">replace(wset_help)</script></td>
+										      </tr>
+                        </table>
+                        <table id="tab6" align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+												<tr>
+												<td  align="center" height="40" valign="middle" colspan="2">
+												<script language="javascript">replace(wset_sta_apply)</script></td>
+												</tr>
+												<tr>
+										        <td align="right"   colspan="2"><script language="javascript">replace(wset_help)</script></td>
+										      </tr>
+                        </table>
+                        <input type="hidden" value="VAP Apply" name="SERVLET">
+                        <input type="hidden" name="vap_name" value="">
+                        </form>
+
+</div>
+
+
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+
+<%in page_footer.htm %>
+</body>
+</html>
+

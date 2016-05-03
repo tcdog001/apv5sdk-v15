@@ -1,0 +1,27 @@
+#!/bin/sh
+#set_mac_vlan vapname mac vlanID
+
+AUTELAN=/usr/sbin/autelan
+#
+#usage()
+#
+usage()
+{
+	echo "set_mac_vlan vapname mac vlanID"
+	exit 1
+}
+
+if [ ! $# -eq 3 ];then
+	usage
+fi
+
+VAPNAME=$1
+MAC=$2
+VLANID=$3
+
+if [ ${VLANID} -lt 0 ] || [ ${VLANID} -gt 4096 ];then
+	echo "wrong parameter, vlanID should be in 0~4096"
+	exit 1
+fi
+
+${AUTELAN} mac_binding ${VAPNAME} set_vlan ${MAC} ${VLANID}

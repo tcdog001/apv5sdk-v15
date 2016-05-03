@@ -1,0 +1,144 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+xml_dhcp=`config_read /config/network/dhcp/dhcpserver`
+xml_dhcp_enable=`config_getoption "$xml_dhcp" enable`
+xml_dhcp_interface=`config_getoption "$xml_dhcp" interface`
+xml_dhcp_leasetime=`config_getoption "$xml_dhcp" leasetime`
+xml_dhcp_ipstart=`config_getoption "$xml_dhcp" ipstart`
+xml_dhcp_ipend=`config_getoption "$xml_dhcp" ipend`
+xml_dhcp_subnet=`config_getoption "$xml_dhcp" subnet`
+xml_dhcp_route=`config_getoption "$xml_dhcp" route`
+
+xml_dhcpsnoop=`config_read /config/network/dhcp/dhcpsnooping`
+xml_dhcpsnoop_enable=`config_getoption "$xml_dhcpsnoop" enable`
+xml_dhcpsnoop_interface=`config_getoption "$xml_dhcpsnoop" interface`
+xml_dhcpsnoop_info=`config_getoption "$xml_dhcpsnoop" info`
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js network_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	init_mmenu(flag);
+	init_basemenu(flag);
+	init_lan(flag);
+function Ip() 
+{
+	  overlayer(); 
+}
+
+ 
+</script>
+</head>
+<body  >
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_network3.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return Ip()">
+<div align="center">
+		<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+		  <tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(dhcp_server)</script></b></td>
+			</tr>
+		  
+		  <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+
+			<tr>
+			<td align="left" height="24" width="280" bordercolor="#ffffff"><script language="javascript">replace(dhcp_enablestate)</script>&nbsp;</td>
+			<td align="left" width="370" bordercolor="#ffffff">
+			<input type="radio" <% webui_radiobutton_check "$xml_dhcp_enable" "yes" %> name="dhcpenable" value="yes"  /><script language="javascript">replace(dhcp_enable)</script>
+			&nbsp;&nbsp; <input type="radio" <% webui_radiobutton_check "$xml_dhcp_enable" "no" %> name="dhcpenable" value="no" /><script language="javascript">replace(dhcp_disable)</script>
+			</td> 
+			</tr>
+			
+			<tr >
+			<td align="left" height="20" bordercolor="#ffffff"><script language="javascript">replace(dhcp_rentperiod)</script>;
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="leasetime"  value="<%= "$xml_dhcp_leasetime" %>" ><script language="javascript">replace(dhcp_time)</script></td>
+			</tr>
+			
+			<tr >
+			<td align="left" height="20" bordercolor="#ffffff"><script language="javascript">replace(dhcp_subnetmask)</script>&nbsp;
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="subnet"  value="<%= "$xml_dhcp_subnet" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td align="left" height="20" bordercolor="#ffffff"><script language="javascript">replace(dhcp_gateway)</script>&nbsp;
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="route"  value="<%= "$xml_dhcp_route" %>" ></td>
+			</tr>
+			
+			<tr >
+			<td align="left" height="20" bordercolor="#ffffff"><script language="javascript">replace(dhcp_ipaddrange)</script>&nbsp;
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="ipstart"  value="<%= "$xml_dhcp_ipstart" %>" >-<input type="text" name="ipend"  value="<%= "$xml_dhcp_ipend" %>" ></td>
+			</tr>
+
+			<tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+			
+			<tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(dhcpsnooping_usersleaseinfo)</script></b></td>
+			</tr>
+		  
+		  <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" bordercolor="#ffffff"><label>
+				<textarea name="messages" cols="100" rows="10"><%
+					if [ -f "/var/lib/misc/dnsmasq.leases" ]; then
+						cat /var/lib/misc/dnsmasq.leases
+					fi
+			%></textarea></label>
+			</td>
+			</tr>
+			
+		</table>
+		<table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+			<tr>
+			  <td align="center" height="40" valign="middle" colspan="2" ><script language="javascript" >replace(b_lansu)</script>&nbsp;</td>
+			</tr>
+			<tr>
+        <td align="right"   colspan="2"><script language="javascript">replace(dhcp_settings_help)</script></td>
+      </tr>
+		</table>
+</div>
+<input type="hidden" value="DHCP Setup" name="SERVLET">
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

@@ -1,0 +1,1 @@
+cmd_util-linux/lib.a := rm -f util-linux/lib.a; mips-linux-uclibc-ar  rcs util-linux/lib.a util-linux/dmesg.o util-linux/fdisk.o util-linux/hexdump.o util-linux/mdev.o util-linux/mkfs_minix.o util-linux/more.o util-linux/mount.o util-linux/pivot_root.o util-linux/switch_root.o util-linux/umount.o

@@ -1,0 +1,3 @@
+make
+/opt/dev_env/XSCALE/usr/local/bin/arm-linux-strip agent/snmpd
+cp agent/snmpd /home/wlan/piyp

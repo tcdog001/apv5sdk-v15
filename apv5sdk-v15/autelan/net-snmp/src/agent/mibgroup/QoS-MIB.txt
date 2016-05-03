@@ -1,0 +1,304 @@
+--********************************************************************************
+--* Autelan-Ac-QoS-Capable-Parameter
+--********************************************************************************
+AUTELAN-QoS-MIB DEFINITIONS ::= BEGIN
+IMPORTS	
+	autelan-wireless
+			FROM AUTELAN-GROUP-SMI
+--   	PhysAddress, 
+--	TEXTUAL-CONVENTION, 
+--	TruthValue,
+--   	NOTIFICATION-GROUP, 
+--	OBJECT-GROUP, 
+--	MODULE-COMPLIANCE
+--       			FROM SNMPv2-CONF
+	DisplayString
+				FROM SNMPv2-TC
+   	MODULE-IDENTITY, 
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+   	Integer32, 
+--	Unsigned32, 
+--	Counter32,
+--	TimeTicks,
+	enterprises
+       			FROM SNMPv2-SMI;
+       			
+autelanQosGroup MODULE-IDENTITY
+    LAST-UPDATED "200903120000Z"        -- Feb 12th, 2009
+    ORGANIZATION " AuteLan Network Management Working Group
+                  http://www.autelan.com"
+    CONTACT-INFO
+        "General Discussion: support@autelan.com
+         To Subscribe: http://www.autelan.com
+         Liu Tao
+         Autelan Technology Ltd.,NO.1 Agricultural University Sourth Street,
+        Haidian
+         District,Beijing,China(100084)
+         Email:  liutao@autelan.com."
+
+    DESCRIPTION
+        "Copyright (C) 2009 The Internet Society.  This version of
+         the MIB module is part of RFC xxx; see the RFC itself
+         for full legal notices.
+
+         This MIB module contains managed object definitions for
+         the AuteLan Protocol."
+    REVISION    "200903120000Z"
+    DESCRIPTION
+        "Initial version published as RFC xxx"
+         ::= {autelan-wireless  3 }
+
+
+         
+
+dot11QosBasicConfig             OBJECT IDENTIFIER 	::= { autelanQosGroup  1 }
+
+--********************************************************************************
+--*   Qos  基本配置 变量
+--********************************************************************************
+		dot11QosTotalBW OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        ACCESS  read-write
+		        STATUS  current
+		        DESCRIPTION
+		        "保障QoS业务分配的总带宽"
+		        ::= {dot11QosBasicConfig   1}
+		        
+		dot11QosResScale OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        ACCESS  read-write
+		        STATUS  current
+		        DESCRIPTION
+		        "保障QoS业务占用资源的百分比"
+		        ::= {dot11QosBasicConfig   2}
+		        
+		dot11QosShareBW OBJECT-TYPE
+			 SYNTAX  INTEGER 
+		        ACCESS  read-write
+		        STATUS  current
+		        DESCRIPTION
+		        "QoS类业务的共享带宽"
+		        ::= {dot11QosBasicConfig   3}
+		        
+		dot11QosResShareScale OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        ACCESS  read-write
+		        STATUS  current
+		        DESCRIPTION
+		        "QoS类业务的共享带宽占总资源的百分比"
+		        ::= {dot11QosBasicConfig   4}
+		        
+		dot11OperAtpArithmetic OBJECT-TYPE
+		        SYNTAX OCTET STRING
+		        ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		        "不同类业务间的调度算法名称"
+		        ::= {dot11QosBasicConfig   5}
+		        
+		dot11UseResGrabPolicy OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        ACCESS  read-write
+		        STATUS  current
+		        DESCRIPTION
+		        "是否使用资源抢占策略"
+		        ::= {dot11QosBasicConfig   6}
+		        
+		dot11ResPolicyName OBJECT-TYPE
+		        SYNTAX OCTET STRING
+		        ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		        "资源抢占策略的名称"
+		        ::= {dot11QosBasicConfig   7}
+		        
+		dot11UseResShovePolicy OBJECT-TYPE
+		        SYNTAX OCTET STRING
+		        ACCESS read-write
+		        STATUS current
+		        DESCRIPTION
+		        "是否使用资源挤占策略"
+		        ::= {dot11QosBasicConfig   8}
+		        
+		dot11ResShoveName OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        ACCESS  read-write
+		        STATUS  current
+		        DESCRIPTION
+		        "资源挤占策略的名称"
+		        ::= {dot11QosBasicConfig   9}
+
+
+--********************************************************************************
+--*   Qos  Table
+--********************************************************************************
+
+              dot11AcQosTable OBJECT-TYPE
+				SYNTAX SEQUENCE OF dot11AcQosEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION 
+        	       		"AC设备配置管理功能QoS性能配置参数"
+				::= {autelanQosGroup     2}
+		
+		 dot11AcQosEntry OBJECT-TYPE
+				SYNTAX  Dot11AcQosEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+				"表格autelanAcQoSEntry中的一个条目。"
+				INDEX { dot11QosTrafficClass }
+			::= { dot11AcQosTable  1 }
+
+		Dot11AcQosEntry ::=
+			SEQUENCE {
+		    		dot11QosTrafficClass  				INTEGER,
+		    		dot11AvgRate						INTEGER,
+				dot11MaxDegree					INTEGER,
+				dot11PolicyPRI						INTEGER,
+		    		dot11ResShovePRI					INTEGER,
+		    		dot11ResGrabPRI					INTEGER,
+				dot11MaxPallel 					INTEGER,
+				dot11Bandwidth					INTEGER,
+				dot11BandwidthScale				INTEGER,
+				dot11UseFlowEqtQueue				INTEGER,
+				dot11SingleFlowMaxQueue			INTEGER,
+				dot11FlowAvgRate					INTEGER,
+				dot11FlowMaxDegree				INTEGER,
+				dot11UseWREDPolicy				INTEGER,
+				dot11UseTrafficShaping				INTEGER,
+				dot11lRowStatus					RowStatus}
+			
+
+            dot11QosTrafficClass OBJECT-TYPE
+			SYNTAX INTEGER { background(1), bestEffort(2), video(3), voice(4)}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"提供QoS机制的业务类型"
+	    	  ::= { dot11AcQosEntry 1 }
+
+	    dot11AvgRate  OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-create
+		        STATUS current
+		        DESCRIPTION  
+		        	"业务的平均速率"
+	    	   ::= { dot11AcQosEntry 2 }
+
+	    dot11MaxDegree  OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-create
+		        STATUS current
+		        DESCRIPTION  
+		       	 	"业务的最大突发度"
+	   	   ::= { dot11AcQosEntry 3 }
+	        
+	   dot11PolicyPRI    OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-create
+		        STATUS current
+		        DESCRIPTION  
+		        	"业务的调度优先级"
+		    ::= { dot11AcQosEntry 4}
+	    
+	dot11ResShovePRI  OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-create
+		        STATUS current
+		        DESCRIPTION  
+		        	"业务的资源挤占优先级"
+		    ::= { dot11AcQosEntry  5}
+	    
+	dot11ResGrabPRI    OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-create
+		        STATUS current
+		        DESCRIPTION  
+		       	 	"业务的资源抢占优先级"
+		    ::= { dot11AcQosEntry  6}
+	    
+	dot11MaxPallel OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-create
+		        STATUS current
+		        DESCRIPTION  
+		        	"业务最大并发数"
+		    ::= { dot11AcQosEntry   7 }
+	    
+      dot11Bandwidth OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-create
+		        STATUS current
+		        DESCRIPTION
+		        	"业务分配的带宽"
+		    ::= { dot11AcQosEntry   8}
+    
+	dot11BandwidthScale OBJECT-TYPE
+		        SYNTAX INTEGER
+		        ACCESS read-create
+		        STATUS current
+		        DESCRIPTION
+		        	"业务分配的带宽占用总带宽的百分比"
+		    ::= { dot11AcQosEntry   9}
+    
+	dot11UseFlowEqtQueue OBJECT-TYPE
+	        SYNTAX INTEGER
+	        ACCESS read-create
+	        STATUS current
+	        DESCRIPTION
+	        	"是否使用基于流的公平排队"
+	    ::= { dot11AcQosEntry   10}
+    
+	dot11SingleFlowMaxQueue OBJECT-TYPE
+	        SYNTAX INTEGER
+	        ACCESS read-create
+	        STATUS current
+	        DESCRIPTION
+	        	"单个流的最大排队长度"
+	    ::= { dot11AcQosEntry   11}
+    
+	dot11FlowAvgRate OBJECT-TYPE
+	        SYNTAX INTEGER
+	        ACCESS read-create
+	        STATUS current
+	        DESCRIPTION
+	        	"流的平均速率"
+	    ::= { dot11AcQosEntry  12 }
+    
+	dot11FlowMaxDegree OBJECT-TYPE
+	        SYNTAX INTEGER
+	        ACCESS read-create
+	        STATUS current
+	        DESCRIPTION
+	        	"流的最大突发度"
+	    ::= { dot11AcQosEntry   13}
+    
+	dot11UseWREDPolicy OBJECT-TYPE
+	        SYNTAX INTEGER
+	        ACCESS read-create
+	        STATUS current
+	        DESCRIPTION
+	       	 	"是否使用WRED算法"
+	    ::= { dot11AcQosEntry   14 }
+    
+	dot11UseTrafficShaping OBJECT-TYPE
+	        SYNTAX INTEGER
+	        ACCESS read-create
+	        STATUS current
+	        DESCRIPTION
+	        	"是否使用流量整形(Traffic Shaping）"
+	    ::= { dot11AcQosEntry    15 }
+
+       dot11lRowStatus OBJECT-TYPE    
+	        SYNTAX      RowStatus   
+	        MAX-ACCESS  read-create   
+	        STATUS      current   
+	        DESCRIPTION       
+	        "This variable is used to create, modify, and/or delete a row   in this table."    
+	      ::= { dot11AcQosEntry  16 }
+
+    
+END
+

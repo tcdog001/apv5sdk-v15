@@ -1,0 +1,41 @@
+-- INTELLON-MIB
+-- $Id: INTELLON-MIB.txt,v 1.3 2009-05-14 15:38:03 nhoughton Exp $
+--
+-- Contributors(s):
+--    Rishi Panjwani <rishi.panjwani@intellon.com>
+--
+
+INTELLON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	enterprises
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC;
+
+intellon MODULE-IDENTITY
+	LAST-UPDATED "200905141000Z"
+	ORGANIZATION "Intellon Corporation"
+	CONTACT-INFO
+		"Intellon Corporation
+		
+		5955 T.G. Lee Blvd., Suite 600
+		Orlando, FL 32822
+		Tel: +1-407-428-2800
+		Fax: +1-407-428-2850 (fax)
+
+		http://www.intellon.com/support/contactsupport.php"
+
+	DESCRIPTION
+		"Management Information Base (MIB) for Intellon Corporation"
+
+	REVISION "200905141000Z"
+	DESCRIPTION
+		"version 0.0.0.1"
+
+	::= { enterprises 32019 }
+
+END
+

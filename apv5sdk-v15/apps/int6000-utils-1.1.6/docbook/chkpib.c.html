@@ -1,0 +1,288 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			chkpib.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='chknvm2.c.html' title=' chknvm2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='closechannel.c.html' title=' closechannel.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   chkpib.c - validate pib files using internal checksums;
+ *
+ *   validate one or more PIB files using header checksum and length;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *		Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;errno.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../crypt/HPAVKey.h&quot;
+#include &quot;../pib/pib.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/checksum_32.c&quot;
+#include &quot;../tools/fdchecksum_32.c&quot;
+#include &quot;../tools/hexstring.c&quot;
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/alert.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../pib/pibpeek.c&quot;
+#include &quot;../pib/pibcodes.c&quot;
+#endif 
+
+#ifndef MAKEFILE
+#include &quot;../crypt/SHA256Reset.c&quot;
+#include &quot;../crypt/SHA256Block.c&quot;
+#include &quot;../crypt/SHA256Write.c&quot;
+#include &quot;../crypt/SHA256Fetch.c&quot;
+#include &quot;../crypt/HPAVKeyNID.c&quot;
+#include &quot;../crypt/keys.c&quot;
+#endif
+
+/*====================================================================*
+ *
+ *   signed chkpib (struct _file_ * file, flag_t flags);
+ *
+ *   pib.h
+ *
+ *   open an PIB file and validate it by checking the version number,
+ *   filesize and file checksum; return 0 on success or -1 on error;
+ *
+ *   the computed checksum of the file should be 0 because the file
+ *   includes the original checksum;
+ *
+ *   there are three types of error: bad version, bad checksum and
+ *   I/O error and they all return -1; errno will be EINVAL if the
+ *   pib version is bad, 0 if the checksum is bad or the I/O error
+ *   code;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+signed chkpib (struct _file_ * file, flag_t flags) 
+
+{
+	uint8_t NID [HPAVKEY_NID_LEN];
+	struct simple_pib header_pib = 
+	{
+		0 
+	};
+	if (lseek (file-&gt;file, 0, SEEK_SET)) 
+	{
+		if (_allclr (flags, PIB_SILENCE)) 
+		{
+			error (0, errno, &quot;Can't rewind %s&quot;, file-&gt;name);
+		}
+		return (-1);
+	}
+	if (read (file-&gt;file, &amp;header_pib, sizeof (struct simple_pib)) &lt; sizeof (struct simple_pib)) 
+	{
+		if (_allclr (flags, PIB_SILENCE)) 
+		{
+			alert (&quot;Can't read %s&quot;, file-&gt;name);
+		}
+		return (-1);
+	}
+	if (_anyset (flags, PIB_VERBOSE)) 
+	{
+		printf (&quot;------- %s -------\n&quot;, file-&gt;name);
+		if (pibpeek ((byte *)(&amp;header_pib))) 
+		{
+			if (_allclr (flags, PIB_SILENCE)) 
+			{
+				error (0, 0, &quot;Bad version: %s&quot;, file-&gt;name);
+			}
+			return (-1);
+		}
+	}
+	if (lseek (file-&gt;file, 0, SEEK_END) != LE16TOH (header_pib.PIBLENGTH)) 
+	{
+		if (_allclr (flags, PIB_SILENCE)) 
+		{
+			error (0, errno, &quot;Bad length: %s&quot;, file-&gt;name);
+		}
+		return (-1);
+	}
+	if (lseek (file-&gt;file, 0, SEEK_SET)) 
+	{
+		if (_allclr (flags, PIB_SILENCE)) 
+		{
+			error (0, errno, &quot;Can't rewind %s&quot;, file-&gt;name);
+		}
+		return (-1);
+	}
+	if (fdchecksum_32 (file-&gt;file, LE16TOH (header_pib.PIBLENGTH), 0)) 
+	{
+		if (_allclr (flags, PIB_SILENCE)) 
+		{
+			alert (&quot;Bad checksum: %s&quot;, file-&gt;name);
+		}
+		return (-1);
+	}
+	HPAVKeyNID (NID, header_pib.NMK, header_pib.PreferredNID [HPAVKEY_NID_LEN-1]&gt;&gt;4);
+	if (memcmp (NID, header_pib.PreferredNID, sizeof (NID))) 
+	{
+		if (_allclr (flags, PIB_SILENCE)) 
+		{
+			alert (&quot;Bad network identifier: %s&quot;, file-&gt;name);
+		}
+		return (-1);
+	}
+	if (lseek (file-&gt;file, 0, SEEK_SET)) 
+	{
+		if (_allclr (flags, PIB_SILENCE)) 
+		{
+			error (0, errno, &quot;Can't rewind %s&quot;, file-&gt;name);
+		}
+		return (-1);
+	}
+	if (_allclr (flags, PIB_SILENCE)) 
+	{
+		alert (&quot;%s looks good&quot;, file-&gt;name);
+	}
+	return (0);
+}
+
+/*====================================================================*
+ *   
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	static const char *optv [] = 
+	{
+		&quot;qv&quot;,
+		&quot;file [file] [...]&quot;,
+		&quot;validate PIB files based on internal checksums&quot;,
+		&quot;q\tquiet&quot;,
+		&quot;v\tverbose messages&quot;,
+		(const char *) (0) 
+	};
+	signed state = 0;
+	struct _file_ pib;
+	flag_t flags = (flag_t)(0);
+	signed c;
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'q':
+			_setbits (flags, PIB_SILENCE);
+			break;
+		case 'v':
+			_setbits (flags, PIB_VERBOSE);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		pib.name = *argv;
+		if ((pib.file = open (pib.name, O_BINARY|O_RDONLY)) == -1) 
+		{
+			error (0, errno, &quot;can't open %s&quot;, pib.name);
+			state = 1;
+			errno = 0;
+		}
+		else if (chkpib (&amp;pib, flags)) 
+		{
+			state = 1;
+		}
+		close (pib.file);
+		argc--;
+		argv++;
+	}
+	return (state);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='chknvm2.c.html' title=' chknvm2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='closechannel.c.html' title=' closechannel.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

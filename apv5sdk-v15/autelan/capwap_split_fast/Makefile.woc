@@ -1,0 +1,40 @@
+PWD := ${shell pwd}
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR =src
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR = /tmp/changzhimin-rootfs
+endif
+
+ifndef KERNELDIR
+KERNELDIR := $(PWD)/../../ap83sdk/linux/kernels/mips-linux-2.6.15
+endif 
+
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.15/net
+
+TARGET_CROSS := mips-linux-uclibc-
+
+
+
+MAKE_ARGS:= \
+	KERNELPATH="$(KERNELDIR)" \
+	CROSS_COMPILE="$(TARGET_CROSS)" \
+
+all:capwap_split_fast install
+
+capwap_split_fast:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.ap83 && mv ${PKG_BUILD_DIR}/Makefile.ap83 ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) 
+	echo "finished"
+
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean
+	
+install:capwap_split_fast
+	mkdir -p $(INSTALLDIR)
+	cd $(PKG_BUILD_DIR) && \
+	cp -f capwap_split_fast.ko $(INSTALLDIR)
+
+

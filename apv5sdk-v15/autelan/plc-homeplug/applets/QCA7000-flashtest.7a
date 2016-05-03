@@ -1,0 +1,56 @@
+.TH QCA7000-flashtest 7a "June 2012" "plc-utils-2.1.1" "Qualcomm Atheros Powerline Toolkit"
+.SH NAME
+QCA7000-flashtest - Flash Memory Diagnostic Applet
+.SH SYNOPSIS
+.BR plctest
+.BR QCA6410-flashtest.nvm
+.RI [ ... ]
+.SH PURPOSE
+This diagnostic applet runs in AR7420 and QCA6410 TCM and performs a connectivity and data integrity test of onboard flash memory. The test consists of the four sub-tests described below. Each sub-test depends on successful completion of the previous one. Progress and status messages appear on the local host console. Control returns to the Bootloader and flash memory is left in an erased state on successful completion. The test takes about 25 seconds to complete.
+.PP
+This applets ignores the JDEC ID manufacturer but checks type and size. 
+Only these JDEC IDs are supported: 0x2010, 0x2011, 0x2014, 0x2015, 0x2016, 0x2017, 0x2541, 0x258E, 0x4600, 0x4601, 0x0214, 0x3015, W25Q80BV, W25Q16BV.
+.PP
+This applet was introduced with the AR7420 chipset. It does not work on earlier chipsets but it may work on some later chipsets. The file format may not be compatible with programs \fBint6ktest\fR or \fBamptest\fR.
+.SH PREREQUISITES
+Program \fBplctest\fR must be available. Bootloader software must be running. 
+.SH SUBTESTS
+.TP 
+.B 1 - JDEC ID Test
+The flash is sent a RDID command to request the three byte JEDEC ID. The least significant two bytes of the JEDEC ID are compared against a list of approved JEDEC IDs of flash devices. If the JEDEC ID is found in the list the test passes otherwise the three byte JEDEC ID is displayed by plctest and control is returned to the boot ROM.
+.TP 
+.B 2 - Write/Read Data Test
+The first 256 bytes of each sector in the first one megabyte of flash are written with unique data. The most significant nibble contains the sector number and the least significant nibble contains an incrementing pattern. The first 256 bytes of each sector in the first one megabyte of flash are then read and compared with the expected data. If a mismatch is detected the test fails.
+.sP 
+.B 3 - Sector Erase Test
+The flash is sent a command to erase sector zero and then sent commands to erase every other sector for the first sixteen (16) sectors. The first 256 bytes of each sector in the first one megabyte of flash are read and the data compared with the expected data. If a mismatch is detected the test fails.
+.TP
+.B 4 - Bulk Erase
+The flash is sent a bulk erase command. The entire flash is read 1024 bytes at a time and the data is checked to be all ones. If there is a mismatch the test fails.
+.SH DISCLAIMER
+Qualcomm Atheros image file structure and content is proprietary to Qualcomm Atheros, Ocala FL USA. Consequently, public information is not available. Qualcomm Atheros reserves the right to change file structure or content in future firmware releases without any obligation to notify or compensate users of this program. 
+ This applet is reserved for use by Qualcomm Atheros Engineers for internal use. Qualcomm Atheros makes no claims concerning the reliability of this applet or the suitability of this applet for any particular purpose.
+.SH EXAMPLES
+The following example uses program \fBplctest\fR to download and execute applet applet \fBAR7420-flashtest.nvm\fR. 
+.PP
+   # plctest QCA6410-flashtest.nvm
+   eth1 00:B0:52:00:00:01 Write QCA6410-flashtest.nvm (0) (00202200:10280)
+   eth1 00:B0:52:00:00:01 Start QCA6410-flashtest.nvm (0) (00202204)
+   JEDEC ID Test: Pass
+   JEDEC ID Read: 0xC22015
+   Running Write/Read Data Test... 
+   Write/Read Data Test: Pass
+   Running Sector Erase Test... 
+   Erase Sector Test: Pass
+   Running Bulk Erase Test... 
+   Bulk Erase Test: Pass
+.SH SEE ALSO
+.BR amptest ( 7 ),
+.BR int6ktest ( 7 ),
+.BR plctest ( 7 ),
+.BR AR6410-flashtest (7)
+.BR AR7420-flashtest (7)
+.SH CREDITS
+ John Byron <john.byron@qca.qualcomm.com>
+
+

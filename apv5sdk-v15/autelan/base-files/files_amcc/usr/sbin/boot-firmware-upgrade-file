@@ -1,0 +1,121 @@
+#!/bin/sh
+
+if [ -z $1 ] || [ ! -f $1 ]; then
+	logger -s "$0 <firmware-file> [skip_error_check]"
+	exit 1
+fi
+
+cd /tmp
+
+#
+# Give enough time for PHP/WEB GUI to redirect the client
+sleep 5
+
+#
+# Kill all the processes
+#
+# Sync everything from cache before killing.
+sync
+
+killall configd syslogd snmpd hostapd wpa_supplicant dropbear telnetd udhcpc dnsmasq reset_detect nmbd lighttpd php ntpclient klogd sleep wtpd wtpd_check ap_monitor
+ps | grep ntpclient-wrapper | awk '{print $1}' | xargs kill -9
+sleep 1
+
+BOOT_TYPE="flashboot"
+#if mount |grep '\/dev\/root on \/ type jffs2 (rw,noatime)' ; then
+#	
+#	echo "+++++++++++++++++"
+#else
+#	BOOT_TYPE="netboot"
+#	echo "==================="
+#	touch 11
+#/usr/bin/ap83-firmware-upgrade-stage2 $BOOT_TYPE
+#fi
+
+#
+# Keep essential binaries and libraries in memory as we are going to erase the flash
+#
+mkdir  -p bin
+mkdir  -p lib
+mkdir  -p dev
+mkdir  -p tmp
+mkdir  -p etc
+mkdir  -p sbin
+mkdir  -p proc
+mkdir  -p oldroot
+mkdir  -p newroot
+mkdir  -p usr
+mkdir  -p usr/bin
+mkdir  -p usr/sbin
+mkdir  -p usr/lib
+touch 8
+# binaries
+#cp -f /usr/bin/flashcp bin
+cp -a /usr/sbin/boot-firmware-upgrade-stage2 bin
+cp -f /bin/busybox bin
+
+cp -a /bin/echo bin
+cp -a /bin/cp bin
+cp -a /bin/sleep bin
+cp -a /bin/sync bin
+cp -a /bin/kill bin
+cp -a /bin/tar bin
+cp -a /bin/dd bin
+cp -a /bin/rm bin
+cp -a /bin/mount bin
+cp -a /bin/umount bin
+cp -a /bin/sh bin
+cp -a /bin/ash bin
+cp -a /bin/sed bin
+cp -a /usr/bin/logger bin
+
+cp -a /sbin/pivot_root sbin
+cp -a /sbin/reboot sbin
+cp -a /sbin/init sbin
+cp -a /sbin/getty sbin
+
+cp -a /usr/bin/killall usr/bin
+#cp -a /usr/bin/led-op usr/bin
+cp -a /usr/bin/[ usr/bin
+cp -a /usr/sbin/chroot usr/sbin
+cp -a /usr/bin/pro_ctl_util usr/bin
+
+# libraries
+#cp -a /lib/ld-uClibc-0.9.28.so lib
+#cp -a /lib/ld-uClibc.so.0 lib
+#cp -a /lib/libc.so.0 lib
+#cp -a /lib/libcrypt-0.9.28.so lib
+#cp -a /lib/libcrypt.so.0 lib
+#cp -a /lib/libm-0.9.28.so lib
+#cp -a /lib/libm.so.0 lib
+#cp -a /lib/libm.so lib
+#cp -a /lib/libuClibc-0.9.28.so lib
+cp -a /lib/* lib
+cp -a /dev/* dev
+cp -a /usr/lib/* usr/lib
+
+sleep 2
+touch 9
+# 
+# Generate a new /etc/inittab
+#
+echo '::sysinit:/bin/boot-firmware-upgrade-stage2 '$BOOT_TYPE > etc/inittab
+echo '::restart:/sbin/init'>> etc/inittab
+touch 10
+# 
+# Change the root of FS to /tmp
+#
+./sbin/pivot_root . oldroot
+cd /
+mount -t proc proc /proc
+mount -t tmpfs tmpfs /dev #rbk test
+cp /oldroot/dev . -rf #rbk test
+touch 11
+#
+# Restart the init daemon
+#
+
+#echo 'Before sending HUP & SIGQUIT to init' >> /messages
+
+exec /usr/sbin/chroot . /bin/sh -c '/bin/kill -HUP 1; /bin/sleep 3; /bin/kill -SIGQUIT 1' <dev/console >dev/console 2>&1
+touch 12

@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			modpib.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='mac2pwd.7.html' title=' mac2pwd.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='mrgpib.7.html' title=' mrgpib.7 '>NEXT</a>]
+			</div>
+<pre>
+modpib(7)                             Intellon Linux Toolkit                            modpib(7)
+
+NAME
+       modpib - Intellon PIB File Editor
+
+SYNOPSIS
+       modpib [options] filename
+
+DESCRIPTION
+       Change  device identity parameters in a PIB file and updated the checksum. Device identity
+       parameters are the MAC, DAK, NMK and the Manufacturer,  Network  and  User  HFID.  Collec‐
+       tively, they establish the device network identity.
+
+       This program is the safe way to edit identity parameters since only valid PIB files can be
+       edited and only selected values changed. In addition, critical cross-parameter updates are
+       automatically applied.
+
+       This  program  is part of the Intellon Linux Toolkit. See the ilt man page for an overview
+       and installation instructions.
+
+OPTIONS
+       -C mode
+              Set Central Coordinator Selection mode.  Permitted  values  for  mode  are  0=Auto,
+              1=Never, 2=Always and 3=UserAssigned.
+
+       -D xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx
+              The  new  Device Access Key (DAK). This key will replace the original DAK. Keys are
+              16 hex octet strings. Octets may be seperated by optional colons. The symbol  none,
+              key1  or  key2  may be specified in place of a hexadecimal string, for convenience.
+              Use program hpavkey to compute the DAK for a specific password, if required.
+
+       -L level
+              Set security level. The security level is written into the  PreferredNID.  Level  0
+              enables pusbutton pairing. Level 1 disables it. The default secutity level is 0.
+
+       -M xx:xx:xx:xx:xx:xx
+              The  new Media Access Control (MAC) address. This address will replace the original
+              address, if specified. Addresses are 6 hex octet strings. Octets may  be  seperated
+              by optional colons.
+
+              Intellon  powerline devices derive their MAC address from their PIB and each device
+              on a network must have a unique address. To facilitate the  assignement  of  unique
+              addresses,  substituting  the  word  auto, next or plus will cause the original MAC
+              address to be incremented before a new checksum is calculated. Successive  uses  of
+              this  option  will  continue  to  increment the stored address. You can inspect the
+              stored MAC address with &quot;chkpib -v pibfile&quot;.
+
+       -N xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx
+              The new Network Membership Key (NMK). This key will replace the original NMK,  cre‐
+              ate  a  new  PreferredNID and clear the AVLNMembership bit. Keys are 16 hex octets.
+              Optionally, octets may be seperated colons. The symbol key1 or key2 can  be  speci‐
+              fied in place of a hexadecimal string, for convenience. Use program hpavkey to com‐
+              pute the NMK from a specific password, if required.
+
+       -P filename
+              The specified file is loaded from disk and written into the  prescaler  section  of
+              the  PIB.  This file must be in the format used by the Intellon Windows Device Man‐
+              ager, which is a two column file, each column consisting of 8  ASCII  alpha-numeric
+              characters. The first column corresponds to the array index value (00000000 through
+              00001155, decimal), and the second column is the value stored at that  position  in
+              the  prescaler  array (00000000 through 000000ff, hexadecimal). The two columns may
+              be separated by any whitespace characters when using this tool. However,  for  full
+              compatibility  with  the Windows Device Manager it is advised to use a single space
+              between the columns. The ’#’ character may also be used at the start of a  line  to
+              denote a comment.
+
+       -S string
+              The new manufacturing string. The maximum length is 63 characters.
+
+       -T string
+              The new network name string. The maximum length is 63 character.
+
+       -U string
+              The new username string. The maximum length is 63 characters.
+
+       -q     Enable quiet mode. This opation has no effect at present.
+
+       -v     Print edited PIB identity information on stdout.
+
+       -?,--help
+              Print  program  help  summary  on  stdout.  This option takes precedence over other
+              options on the command line.
+
+       -!,--version
+              Print program version information on stdout.  This  option  takes  precedence  over
+              other  options  on  the  command  line. Usethis option when sending screen dumps to
+              Intellon Technical Support so that they know exactly which  version  of  the  Linux
+              Toolkit you are using.
+
+ARGUMENTS
+       filename
+              The  name of the PIB file to be modified. No assumptions are made based on filename
+              and no filename conventions are enforced.
+
+KEYS
+       Encryption keys are long, tedious to type and prone to error. For  convenience,  the  sym‐
+       bolic  names  may  be  used to specify the key for options -D and -K. Symbolic name &quot;none&quot;
+       translates to zeros. Symbolic name &quot;key1&quot; translates to the HomePlug AV compliant key  for
+       pass phrase &quot;HomePlugAV&quot;. Symbolic name &quot;key2&quot; translates to the HomePlug AV compliant key
+       for pass phrase &quot;HomePlugAV0123&quot;.
+
+EXAMPLES
+       The following example replaces the MAC address in pib file  abc.pib  and  computes  a  new
+       checksum. The input file is over-written. A command like this one can be used to establish
+       the start MAC address when downloading a series of PIBs.
+
+          # modpib -M 00:b0:52:DA:DA:FF abc.pib
+
+       The following example increments the MAC address in pib file abc.pib and  computes  a  new
+       checksum.  The  word auto, next or plus, in place of a MAC address, will increment the old
+       address each time the command is executed. This command can be used to ensure that  unique
+       and consequtive MAC addresses are used each time a PIB is downloaded.
+
+          # modpib -M auto abc.pib
+
+       The  following  command updates pib file abc.pib with the DAK and NMK read from the device
+       connected to eth0. In similar fashion, program rkey can be used to compute random key val‐
+       ues from a keyfile.
+
+          # modpib -D $(int6kid -Di eth0) -N $(rkey secret.key -M) abc.pib
+
+       The  following  example  displays the current value of keys and strings stored in pib file
+       v3.3.1.pib because option -v is present. This can be used to inspect PIB identity settings
+       prior to download.
+
+          # chkpib -v v3.3.1.pib
+          ------- v3.3.1.pib -------
+                PIB 3-5 8072 bytes
+                MAC 00:B0:52:00:00:01
+                DAK 50:D3:E4:93:3F:85:5B:70:40:78:4D:F8:15:AA:8D:B7
+                NMK 50:D3:E4:93:3F:85:5B:70:40:78:4D:F8:15:AA:8D:B7 (HomePlugAV)
+                NID B0:F2:E6:95:66:6B:03
+                NET Intellon Enabled Network
+                MFG Intellon HomePlug AV Device
+                USR Intellon Enabled Product
+                CCo Auto
+
+DISCLAIMER
+       PIB  file structure and content is proprietary to Intellon Corporation, Ocala FL USA. Con‐
+       sequently, public information is not available. Intellon Corporation reserves the right to
+       modify PIB file structure or content in future firmware releases without any obligation to
+       notify or compensate users of this program.
+
+SEE ALSO
+       chkpib(7), mrgpib(7), pxe(7), setpib(7)
+
+CREDITS
+        Nathan Houghton &lt;nathan.houghton@intellon.com&gt;
+        Charles Maier &lt;charles.maier@intellon.com&gt;
+
+int6000-utils-linux                    Intellon Corporation                             modpib(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='mac2pwd.7.html' title=' mac2pwd.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='mrgpib.7.html' title=' mrgpib.7 '>NEXT</a>]
+			</div>
+		</body>
+	</html>

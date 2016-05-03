@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			xmltree.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='xmlschema.c.html' title=' xmlschema.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='xmlvalue.c.html' title=' xmlvalue.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void xmltree (NODE * node);
+ *
+ *   nodes.h
+ *
+ *   print node structure on stdout;
+ *
+ *.  Motley Tools by Charles Maier &lt;cmaier@cmassoc.net&gt;;
+ *:  Published 2006 by Charles Maier Associates Limited;
+ *;  Released under the GNU General Public Licence v2 and later;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef XMLTREE_SOURCE
+#define XMLTREE_SOURCE
+
+#include &lt;stdio.h&gt;
+
+#include &quot;../nodes/nodes.h&quot;
+#include &quot;../tools/format.h&quot;
+
+void xmltree (NODE * node) 
+
+{
+	static signed level = 0;
+	if (node) 
+	{
+		node = node-&gt;below;
+	}
+	while (node) 
+	{
+
+#if NODE_LIST
+
+		printf (&quot;%03d &quot;, node-&gt;index);
+		printf (&quot;%02d &quot;, node-&gt;level);
+		printf (&quot;%03d &quot;, node-&gt;count);
+
+#endif
+
+		printf (&quot;%03d &quot;, node-&gt;line);
+		printf (&quot;[%c] &quot;, node-&gt;type);
+		output (level, &quot;[%s]&quot;, node-&gt;text);
+		level++;
+		xmltree (node);
+		level--;
+		node = node-&gt;after;
+	}
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='xmlschema.c.html' title=' xmlschema.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='xmlvalue.c.html' title=' xmlvalue.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

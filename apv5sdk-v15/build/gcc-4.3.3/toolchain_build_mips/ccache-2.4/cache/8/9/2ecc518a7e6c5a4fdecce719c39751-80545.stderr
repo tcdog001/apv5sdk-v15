@@ -1,0 +1,52 @@
+In file included from shell/mxml_node.c:15:
+shell/mxml.h:27: warning: function declaration isn't a prototype
+shell/mxml.h:32: warning: function declaration isn't a prototype
+shell/mxml.h:37: warning: function declaration isn't a prototype
+shell/mxml.h:64: warning: function declaration isn't a prototype
+shell/mxml.h:137: warning: function declaration isn't a prototype
+shell/mxml_node.c:23: warning: function declaration isn't a prototype
+shell/mxml_node.c: In function 'mxml_node_new':
+shell/mxml_node.c:24: warning: implicit declaration of function 'malloc'
+shell/mxml_node.c:24: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_node.c: In function 'mxml_node_clone':
+shell/mxml_node.c:148: warning: declaration of 'clone' shadows a global declaration
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/include/bits/sched.h:74: warning: shadowed declaration is here
+shell/mxml_node.c:152: warning: implicit declaration of function 'strlen'
+shell/mxml_node.c:153: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_node.c:154: warning: implicit declaration of function 'memcpy'
+shell/mxml_node.c:154: warning: incompatible implicit declaration of built-in function 'memcpy'
+shell/mxml_node.c:159: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_node.c:160: warning: incompatible implicit declaration of built-in function 'memcpy'
+shell/mxml_node.c: In function 'mxml_node_clone_tree':
+shell/mxml_node.c:177: warning: declaration of 'clone' shadows a global declaration
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/build_mips/staging_dir/usr/include/bits/sched.h:74: warning: shadowed declaration is here
+shell/mxml_node.c: In function 'mxml_node_destroy':
+shell/mxml_node.c:207: warning: implicit declaration of function 'free'
+shell/mxml_node.c:207: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_node.c:210: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_node.c:221: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_node.c: In function 'mxml_node_value_of':
+shell/mxml_node.c:233: warning: implicit declaration of function 'strcmp'
+shell/mxml_node.c: In function 'mxml_node_read_data':
+shell/mxml_node.c:270: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_node.c:312: warning: implicit declaration of function 'strncmp'
+shell/mxml_node.c:326: warning: implicit declaration of function 'realloc'
+shell/mxml_node.c:326: warning: incompatible implicit declaration of built-in function 'realloc'
+shell/mxml_node.c:355: warning: suggest parentheses around && within ||
+shell/mxml_node.c:271: warning: unused variable 'bufc'
+shell/mxml_node.c: In function 'mxml_node_read_name':
+shell/mxml_node.c:417: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_node.c:418: warning: incompatible implicit declaration of built-in function 'memcpy'
+shell/mxml_node.c: In function 'mxml_node_read_directive':
+shell/mxml_node.c:450: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_node.c:464: warning: incompatible implicit declaration of built-in function 'realloc'
+shell/mxml_node.c: In function 'mxml_node_read_pi':
+shell/mxml_node.c:500: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_node.c:537: warning: incompatible implicit declaration of built-in function 'realloc'
+shell/mxml_node.c: In function 'mxml_node_read_comment':
+shell/mxml_node.c:590: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_node.c:635: warning: incompatible implicit declaration of built-in function 'realloc'
+shell/mxml_node.c: In function 'mxml_node_read_closing':
+shell/mxml_node.c:656: warning: unused variable 'iStatus'
+shell/mxml_node.c: In function 'mxml_node_read':
+shell/mxml_node.c:687: warning: unused variable 'nLen'

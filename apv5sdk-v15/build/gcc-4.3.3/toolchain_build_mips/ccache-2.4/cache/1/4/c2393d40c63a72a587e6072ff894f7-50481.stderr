@@ -1,0 +1,5 @@
+../src/mxml_refil.c: In function 'mxml_refil_new':
+../src/mxml_refil.c:26: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_refil.c:34: warning: incompatible implicit declaration of built-in function 'free'
+../src/mxml_refil.c: In function 'mxml_refil_destroy':
+../src/mxml_refil.c:88: warning: incompatible implicit declaration of built-in function 'free'

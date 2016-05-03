@@ -1,0 +1,3 @@
+networking/udhcp/options.c:58: warning: missing braces around initializer
+networking/udhcp/options.c:58: warning: (near initialization for 'dhcp_option43[1].name')
+networking/udhcp/options.c:58: warning: initialization makes integer from pointer without a cast

@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			session.h
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='sdram.h.html' title=' sdram.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='sizes.h.html' title=' sizes.h '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   session.h - session variable definitions and declarations;
+ *
+ *   the session structure stores all information needed to conduct
+ *   an HTTP session; the structure is read from a file at the start
+ *   of each session and written back at the end; because it is read
+ *   and written so frequently, it is essentially self initializing;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SESSION_HEADER
+#define SESSION_HEADER
+ 
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+ 
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../ether/ether.h&quot;
+#include &quot;../crypt/HPAVKey.h&quot;
+ 
+/*====================================================================*
+ *   constant definitions;
+ *--------------------------------------------------------------------*/
+
+#define CGI_DATA_LENGTH 4096
+#define CGI_DATANAME_LENGTH 36
+#define CGI_FILENAME_LENGTH 256
+ 
+#define SESSION_NIC &quot;eth3&quot;
+#define SESSION_DAT &quot;/var/state/intellon.dat&quot;
+#define SESSION_LOG &quot;/var/state/intellon.log&quot;
+#define SESSION_DBG &quot;/var/state/intellon.dbg&quot;
+#define SESSION_DPW &quot;HomePlugAV&quot;
+#define SESSION_NPW &quot;HomePlugAV&quot;
+
+#define TABS 5
+#define CAPS 4
+#define TTLS 4
+#define TAGS 8
+#define BITS 8
+ 
+/*====================================================================*
+ *   program variables;
+ *--------------------------------------------------------------------*/
+ 
+typedef struct __packed QoS 
+
+{
+	uint32_t TTL [TTLS];
+	uint8_t method [2];
+	uint8_t VLAN [TAGS];
+	uint8_t ToS [BITS];
+}
+
+QOS;
+
+/*====================================================================*
+ *
+ *--------------------------------------------------------------------*/
+ 
+typedef struct __packed fileinfo 
+
+{
+	char name [FILENAME_MAX];
+	const void * data;
+	signed size;
+}
+
+fileinfo;
+
+/*====================================================================*
+ *   session variable declaration;
+ *--------------------------------------------------------------------*/
+ 
+typedef struct __packed session 
+
+{
+	char option [IF_NAMESIZE];
+	char action [16];
+	char source [16];
+	struct bridge
+	{
+		byte MAC [ETHER_ADDR_LEN];
+	} bridge [255];
+	unsigned bridges;
+	struct 
+	{
+		byte PLATFORM;
+		byte FIRMWARE [INT6K_VERSTRING];
+		byte MAC [ETHER_ADDR_LEN];
+		byte DAK [HPAVKEY_DAK_LEN];
+		byte NMK [HPAVKEY_NMK_LEN];
+		byte NID [HPAVKEY_NID_LEN];
+	}
+	device;
+	char DPW [HPAVKEY_PHRASE_MAX];
+	char NPW [HPAVKEY_PHRASE_MAX];
+	struct QoS QoS;
+}
+
+SESSION;
+
+/*====================================================================*
+ *   session management functions;
+ *--------------------------------------------------------------------*/
+ 
+void SessionLoad (const char * filename);
+void SessionSave (const char * filename);
+void SessionEdit ();
+void SessionTask ();
+void SessionPeek ();
+void CGIWriteMOD (uint8_t module, const void * memory, signed extent);
+void CGIFlashMOD (uint8_t module);
+void CGILocalPLD ();
+void CGISetKey ();
+void CGIRestore ();
+
+/*====================================================================*
+ *
+ *--------------------------------------------------------------------*/
+
+#endif
+ 
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='sdram.h.html' title=' sdram.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='sizes.h.html' title=' sizes.h '>NEXT</a>]
+			</div>
+		</body>
+	</html>

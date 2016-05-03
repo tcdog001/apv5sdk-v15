@@ -1,0 +1,2 @@
+eth.c: In function 'eth_initialize':
+eth.c:238: warning: implicit declaration of function 'ag7240_enet_initialize'

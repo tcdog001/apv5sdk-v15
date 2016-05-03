@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			applets.7a
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='toolkit.html' title=' Index Page '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='burstadrinadrtestloop.7a.html' title=' burstadrinadrtestloop.7a '>NEXT</a>]
+			</div>
+<pre>
+applets(7a)                           Intellon Linux Toolkit                          applets(7a)
+
+NAME
+       Intellon Applets
+
+SYNOPSIS
+       int6ktest applet [applet] [...]
+
+APPLETS
+       Applets  are small programs written for Intellon powerline devices and distributed as sin‐
+       gle-image .nvm files. The toolkit applets folder contains some useful applets having vari‐
+       ous purposes. See section CONFIGURATION, DIAGNOSTICS and SCOPE-LOOPS for brief inforamtion
+       about some applets.
+
+       Program int6ktest is used to download and execute applets from the command  line.  Program
+       nvmmerge can be used to combine applets into applet chains for convenience or distribution
+       to third parties. Program nvmsplit can be used to disassemble applet chains.
+
+CONFIGURATION
+       Configuration applets place a powerline device in a known state. They run once and  return
+       to  the  bootloader  in a matter of seconds without indication. Some configuration applets
+       are:
+
+       memctl Runs in TCM and initializes the SDRAM controller on INT6300  and  INT6400  devices.
+              This  applet  should be executed before applets that execute in SDRAM. If in doubt,
+              run it.
+
+DIAGNOSTICS
+       Diagnostic applets explore a powerline device looking for abnormal  conditions.  They  run
+       once  and  return  to  the  bootloader after giving some indication of success or failure.
+       Older diagnostic applets flash device LEDs to indicate progress or  outcomes.  Newer  ones
+       print console messages on the local host, instead. Some diagnostic applets are:
+
+       connection
+              Runs  in  TCM  and  checks  physical  onboard connections. This should be the first
+              applet executed on a new device.
+
+       flashtest
+              Runs in TCM and checks NVRAM and associated onboard connections. Returns  to  boot‐
+              loader and Leaves NVRAM in an erased state on successful completion.
+
+       linesynctest
+              Runs  in  SDRAM  and  checks onboard zero-cross detection circuitry and reports the
+              powerline frequecy. Progress and status messages appear on the local host  console.
+
+       marchloop
+              Runs  in  TCM  and checks SDRAM address lines, data lines and memory cells using an
+              industry standard March2 memory test sequence. Progress and error message appear on
+              the local host console.
+
+       sdramtest
+              Runs  in  TC and performs basic, slow-speed (160ns) SDRAM tests. If this diagnostic
+              fails then most others will probably fail, as well.
+
+SCOPE-LOOPS
+       Scope-loop applets continuously exercise the device so that  engineers  can  study  device
+       behavior  using  external  test equipment. Once started, scope-loops do not stop until the
+       device is reset. Some scope-loop applets are:
+
+       burstadrinadrtestloop
+              Writes the address of each memory location into that location then reads each loca‐
+              tion looking for errors.
+
+       burstreadtest6400
+              Reads all of SDRAM in burst mode.
+
+       burstwrite6400
+              Writes all of SDRAM in burst mode.
+
+       burstwritereadtest6400
+              Writes then reads all of SDRAM in burst mode.
+
+DISCLAIMER
+       Intellon image file structure and content is proprietary to Intellon Corporation, Ocala FL
+       USA. Consequently, public information is not available. Intellon Corporation reserves  the
+       right  to change file structure or content in future firmware releases without any obliga‐
+       tion to notify or compensate users of this program. This applet is  reserved  for  use  by
+       Intellon  Field Application Engineers. Intellon makes no claims concerning the reliability
+       of this applet or the suitability of this applet for any particular purpose.
+
+EXAMPLES
+       None.
+
+SEE ALSO
+       burstadrinadrtestloop(7),   burstreadtest6400(7),    burstwrite6400(7),    burstwriteread�‐
+       test6400(7),   connection(7),   flashtest(7),  int6ktest(7),  linesynctest(7),  memctl(7),
+       marchloop(7), memburst(7)
+
+CREDITS
+        John Byron &lt;john.byron@intellon.com&gt;
+
+int6400-utils-linux                    Intellon Corporation                           applets(7a)
+</pre>
+		<div class='footerlink'>
+			[<a href='toolkit.html' title=' Index Page '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='burstadrinadrtestloop.7a.html' title=' burstadrinadrtestloop.7a '>NEXT</a>]
+			</div>
+		</body>
+	</html>

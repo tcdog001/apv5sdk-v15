@@ -1,0 +1,60 @@
+#!/bin/sh
+TFTP=/usr/bin/tftp
+CLEARMEMORY=/usr/sbin/clearmemory
+DD=/bin/dd
+REBOOT=/sbin/reboot
+
+########################################
+#parameter numbers check and usage
+if [ $# -ne 2 ] ;then
+	echo "Usage: upgrade [HOST-IP-ADDRESS] [FILENAME]"
+	exit 1
+fi
+
+############################################
+#delete exist file
+if [ -e $2 ]; then
+	echo "file exist in `pwd`"
+	rm $2
+	echo "file $2 was cleared!"
+fi
+
+############################################
+#clear memory
+if [ -x $CLEARMEMORY ]; then
+	. $CLEARMEMORY || (echo "clear memory failed.";exit 4)
+else
+	echo "there is no clear memory tool:$CLEARMEMORY."
+	exit 3
+fi
+echo "clear memory successfully."
+
+############################################
+#get file by tftp
+#tftp -g -r filename host-pc-ip
+TFTPRESULT=`$TFTP -g -r $2 $1`
+echo $TFTPRESULT
+echo "tftp get file processed!"
+
+#check the file
+if [ ! -e $2 ]; then
+	echo "Download failed by tftp, please check the connection to the server or the filename on the server"
+	exit 2
+else
+	echo "tftp download successfully."
+fi
+
+
+
+############################################
+#write to block
+#dd if=vmlinux1.bin.l7 of=/dev/mtdblock1
+echo "write to flash starting, please wait for several minutes..."
+$DD if=$2 of=/dev/mtdblock1 bs=10 || ( echo "write to flash failed" && exit 5 )
+echo "write to flash successfully."
+
+############################################
+#reboot system
+echo "system is rebooting now."
+$REBOOT
+

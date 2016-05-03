@@ -1,0 +1,49 @@
+.NOTPARALLEL:
+
+ifndef ROOTFSDIR
+ROOTFSDIR := /home/shark/builddir/rootfs
+endif
+
+PKG := busybox
+VERSION := 1.4.2
+DIR := src
+BUSYBOX_LINKS := `xargs < ${DIR}/busybox.links`
+CC := "mips64-octeon-linux-gnu-gcc"
+TARGET_CROSS ?= "mips64-octeon-linux-gnu-"
+TOOLCHAIN_ABI ?= "-mabi=64"
+ARCH ?= "mips"
+CP := cp -fpR
+INSTALL_DIR := $(DIR)/_install
+
+
+.PHONY: all
+all: build install 
+
+.PHONY: build
+build:
+	${MAKE} -C $(DIR) \
+		CC=$(CC) \
+		CROSS_COMPILE=$(TARGET_CROSS) \
+		EXTRA_CFLAGS=$(TOOLCHAIN_ABI) \
+		ARCH=$(ARCH) \
+		IPKG_ARCH=$(ARCH) \
+		all
+
+.PHONY: install
+install:
+	$(MAKE) -C $(DIR) \
+		CC=$(CC) \
+	 	CROSS_COMPILE=$(TARGET_CROSS) \
+		EXTRA_CFLAGS=$(TOOLCHAIN_ABI) \
+		ARCH=$(ARCH) \
+		IPKG_ARCH=$(ARCH) \
+		install 
+	sudo $(CP) $(INSTALL_DIR)/bin/*  $(ROOTFSDIR)/bin/
+	sudo $(CP) $(INSTALL_DIR)/sbin/*  $(ROOTFSDIR)/sbin/
+	sudo $(CP) $(INSTALL_DIR)/usr/bin/*  $(ROOTFSDIR)/usr/bin/
+	sudo $(CP) $(INSTALL_DIR)/usr/sbin/*  $(ROOTFSDIR)/usr/sbin/
+	
+.PHONY: clean
+clean:	
+	${MAKE} -C $(DIR) clean
+

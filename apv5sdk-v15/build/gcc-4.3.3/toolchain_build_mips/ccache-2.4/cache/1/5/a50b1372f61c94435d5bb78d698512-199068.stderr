@@ -1,0 +1,2 @@
+libiptc/libiptc.c:1569: warning: 'iptc_num_rules' defined but not used
+libiptc/libiptc.c:1585: warning: 'iptc_get_rule' defined but not used

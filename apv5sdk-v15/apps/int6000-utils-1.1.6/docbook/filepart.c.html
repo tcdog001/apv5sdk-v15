@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			filepart.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='fdchecksum_32.c.html' title=' fdchecksum_32.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='gethwaddr.c.html' title=' gethwaddr.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   const char *filepart (const char *pathname);
+ *
+ *   files.h
+ *
+ *   return address of the filename portion of a pathname string;
+ *
+ *   this function is an alternative to the POSIX basename function
+ *   for systems that do not have it;
+ *
+ *.  published 2005 by charles maier associates limited for internal use;
+ *:  compiled for debian gnu/linux environment using gcc 2.95 compiler;
+ *;  licensed according to the GNU Public License version two;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef FILEPART_SOURCE
+#define FILEPART_SOURCE
+
+#include &quot;../tools/files.h&quot;
+
+const char *filepart (const char *pathname) 
+
+{
+	const char * filename = pathname;
+	while (*pathname) 
+	{
+
+#if 0
+
+		if (*pathname++ == PATH_C_EXTENDER) 
+		{
+			filename = pathname;
+		}
+
+#else
+
+		if ((*pathname == '/') || (*pathname == '\\')) 
+		{
+			filename = pathname + 1;
+		}
+		pathname++;
+
+#endif
+
+	}
+	return (filename);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='fdchecksum_32.c.html' title=' fdchecksum_32.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='gethwaddr.c.html' title=' gethwaddr.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

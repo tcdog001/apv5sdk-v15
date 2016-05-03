@@ -1,0 +1,276 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			Traffic.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='ToneMaps.c.html' title=' ToneMaps.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='TxFrame.c.html' title=' TxFrame.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed Traffic (struct channel * channel, unsigned period, unsigned repeat);
+ *   
+ *   int6k.h
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef TRAFFIC_SOURCE
+#define TRAFFIC_SOURCE
+
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../int6k/message.h&quot;
+#include &quot;../int6k/intellon.h&quot;
+#include &quot;../int6k/homeplug.h&quot;
+#include &quot;../int6k/problem.h&quot;
+#include &quot;../ether/channel.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/flags.h&quot;
+
+/*====================================================================*
+ *
+ *   signed Traffic1 (struct channel * channel, const byte remote [], unsigned count);
+ *
+ *   send send a given number of empty TCP frames to some powerline 
+ *   device; 
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed Traffic1 (struct channel * channel, const byte remote [], unsigned count) 
+
+{
+	struct message message;
+	memset (&amp;message, 0, sizeof (message));
+	memcpy (&amp;message.ethernet.ODA, remote, sizeof (message.ethernet.ODA));
+	memcpy (&amp;message.ethernet.OSA, channel-&gt;host, sizeof (message.ethernet.OSA));
+	message.ethernet.MTYPE = htons (ETHERTYPE_IP);
+	while (count--) 
+	{
+		if (sendpacket (channel, &amp;message, sizeof (message)) &lt;= 0) 
+		{
+			error (1, ECANCELED, INT6K_CANTSEND);
+		}
+	}
+	return (0);
+}
+
+/*====================================================================*
+ *
+ *   signed Traffic2 (struct channel * channel, const byte remote [], unsigned period);
+ *
+ *   instruct a remote powerline device to echo empty TCP frames to
+ *   the local device for a given period of time in seconds;
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed Traffic2 (struct channel * channel, const byte remote [], unsigned period) 
+
+{
+	struct message message;
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_fr_lbk_request 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t DURATION;
+		uint8_t RESERVED;
+		uint16_t LENGTH;
+		uint8_t PACKET [1038];
+	}
+	* request = (struct vs_fr_lbk_request *) (&amp;message);
+	struct header_eth * header_eth = (struct header_eth *)(&amp;request-&gt;PACKET);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	memset (&amp;message, 0, sizeof (message));
+	EthernetHeader (&amp;message.ethernet, remote, channel-&gt;host);
+	IntellonHeader (&amp;message.intellon, (VS_FR_LBK | MMTYPE_REQ));
+	request-&gt;DURATION = period;
+	request-&gt;LENGTH = HTOLE16 (sizeof (request-&gt;PACKET));
+	memcpy (&amp;header_eth-&gt;ODA, channel-&gt;peer, sizeof (header_eth-&gt;ODA));
+	memcpy (&amp;header_eth-&gt;OSA, remote, sizeof (header_eth-&gt;OSA));
+	header_eth-&gt;MTYPE = htons (ETHERTYPE_IP);
+	if (sendpacket (channel, &amp;message, sizeof (message)) &lt;= 0) 
+	{
+		error (1, ECANCELED, INT6K_CANTSEND);
+	}
+	while (readpacket (channel, &amp;message, sizeof (message)) &gt; 0) 
+	{
+		if (UnwantedPacket (&amp;message, (VS_FR_LBK | MMTYPE_REQ))) 
+		{
+			continue;
+		}
+		break;
+	}
+	return (0);
+}
+
+/*====================================================================*
+ *
+ *   signed Traffic (struct channel * channel, unsigned period, unsigned repeat);
+ *   
+ *   generate bi-directional traffic between a local device and all
+ *   remote devices on a powerline network; remote devices need not
+ *   be connected; no traffic is generated between remote devices;
+ *
+ *   this function is similar to NetworkTraffic but takes less time
+ *   since not all powerline paths are exercised and those that are
+ *   can be exercised in parallel; 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+signed Traffic (struct channel * channel, unsigned period, unsigned repeat) 
+
+{
+	extern const byte localcast [ETHER_ADDR_LEN];
+	struct message message;
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed station 
+	{
+		uint8_t LDA [ETHER_ADDR_LEN];
+		uint8_t TEI;
+		uint8_t BDA [ETHER_ADDR_LEN];
+		uint8_t AVGTX;
+		uint8_t AVGRX;
+	}
+	* station;
+	struct __packed network 
+	{
+		uint8_t NID [7];
+		uint8_t SNID;
+		uint8_t TEI;
+		uint8_t ROLE;
+		uint8_t CCO_MAC [ETHER_ADDR_LEN];
+		uint8_t CCO_TEI;
+		uint8_t NUMSTAS;
+		struct station stations [1];
+	}
+	* network;
+	struct __packed networks 
+	{
+		uint8_t NUMAVLNS;
+		struct network network [1];
+	}
+	* networks = (struct networks *) (&amp;message.content);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	byte bridges [255] [ETHER_ADDR_LEN];
+	unsigned bridge = 0;
+	memset (&amp;message, 0, sizeof (message));
+	memcpy (channel-&gt;peer, localcast, sizeof (channel-&gt;peer));
+	EthernetHeader (&amp;message.ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message.intellon, (VS_SW_VER | MMTYPE_REQ));
+	if (sendpacket (channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+	{
+		error (1, errno, INT6K_CANTSEND);
+	}
+	while (readpacket (channel, &amp;message, sizeof (message)) &gt; 0) 
+	{
+		if (!UnwantedPacket (&amp;message, (VS_SW_VER | MMTYPE_CNF))) 
+		{
+			memcpy (bridges [bridge++], message.ethernet.OSA, ETHER_ADDR_LEN);
+		}
+	}
+	while (bridge--) 
+	{
+		memset (&amp;message, 0, sizeof (message));
+		memcpy (channel-&gt;peer, bridges [bridge], sizeof (channel-&gt;peer));
+		EthernetHeader (&amp;message.ethernet, channel-&gt;peer, channel-&gt;host);
+		IntellonHeader (&amp;message.intellon, (VS_NW_INFO | MMTYPE_REQ));
+		if (sendpacket (channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+		{
+			error (1, errno, INT6K_CANTSEND);
+		}
+		while (readpacket (channel, &amp;message, sizeof (message)) &gt; 0) 
+		{
+			if (UnwantedPacket (&amp;message, (VS_NW_INFO | MMTYPE_CNF))) 
+			{
+				continue;
+			}
+			network = (struct network *)(&amp;networks-&gt;network);
+			while (networks-&gt;NUMAVLNS-- &gt; 0) 
+			{
+				station = (struct station *)(&amp;network-&gt;stations);
+				while (network-&gt;NUMSTAS-- &gt; 0) 
+				{
+					Traffic1 (channel, station-&gt;LDA, repeat);
+					Traffic2 (channel, station-&gt;LDA, period);
+					station++;
+				}
+				network = (struct network *)(station);
+			}
+		}
+		sleep (period + 1);
+	}
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='ToneMaps.c.html' title=' ToneMaps.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='TxFrame.c.html' title=' TxFrame.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

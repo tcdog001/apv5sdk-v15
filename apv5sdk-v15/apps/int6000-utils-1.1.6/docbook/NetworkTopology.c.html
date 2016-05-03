@@ -1,0 +1,244 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			NetworkTopology.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='NetworkInformation.c.html' title=' NetworkInformation.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='NetworkTraffic.c.html' title=' NetworkTraffic.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed NetworkTopology (struct channel * channel);
+ *   
+ *   int6k.h
+ *
+ *   display network topology on stdout; the topology shows devices
+ *   associated with each local device along with the tx/rx bit rates
+ *   between the target device and each device and the hardware and
+ *   firmware revison of each device; the target device is always 
+ *   the first one listed;
+ *
+ *   this function is a variation on function NetworkInfo but shows
+ *   more information; 
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef NETWORKTOPOLOGY_SOURCE
+#define NETWORKTOPOLOGY_SOURCE
+
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../ether/channel.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/flags.h&quot;
+
+static signed Platform (struct channel * channel, const uint8_t device []) 
+
+{
+	extern const char * chipset [CHIPSETS+1];
+	struct message message;
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_sw_ver_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint8_t MDEVICEID;
+		uint8_t MVERLENGTH;
+		char MVERSION [INT6K_VERSTRING];
+	}
+	* confirm = (struct vs_sw_ver_confirm *) (&amp;message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	memset (&amp;message, 0, sizeof (message));
+	EthernetHeader (&amp;message.ethernet, device, channel-&gt;host);
+	IntellonHeader (&amp;message.intellon, (VS_SW_VER | MMTYPE_REQ));
+	if (sendpacket (channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+	{
+//		error (1, errno, INT6K_CANTSEND);
+		return (0);
+	}
+	if (readpacket (channel, &amp;message, sizeof (message)) &lt;= 0) 
+	{
+//		error (1, errno, INT6K_CANTREAD);
+		return (0);
+	}
+	if (confirm-&gt;MDEVICEID &gt; CHIPSETS) 
+	{
+		confirm-&gt;MDEVICEID = 0;
+	}
+	printf (&quot; %s&quot;, chipset [confirm-&gt;MDEVICEID]);
+	printf (&quot; %s&quot;, confirm-&gt;MVERSION);
+	return (0);
+}
+
+signed NetworkTopology (struct channel * channel) 
+
+{
+	extern const byte localcast [ETHER_ADDR_LEN];
+	struct message message;
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed station 
+	{
+		uint8_t LDA [ETHER_ADDR_LEN];
+		uint8_t TEI;
+		uint8_t BDA [ETHER_ADDR_LEN];
+		uint8_t AVGTX;
+		uint8_t AVGRX;
+	}
+	* station;
+	struct __packed network 
+	{
+		uint8_t NID [7];
+		uint8_t SNID;
+		uint8_t TEI;
+		uint8_t ROLE;
+		uint8_t CCO_MAC [ETHER_ADDR_LEN];
+		uint8_t CCO_TEI;
+		uint8_t NUMSTAS;
+		struct station stations [1];
+	}
+	* network;
+	struct __packed networks 
+	{
+		uint8_t NUMAVLNS;
+		struct network network [1];
+	}
+	* networks = (struct networks *) (&amp;message.content);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	char address [ETHER_ADDR_LEN * 3];
+	byte bridges [255] [ETHER_ADDR_LEN];
+	unsigned bridge = 0;
+	const char * role;
+	const char * link;
+	memset (&amp;message, 0, sizeof (message));
+	memcpy (channel-&gt;peer, localcast, sizeof (channel-&gt;peer));
+	EthernetHeader (&amp;message.ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message.intellon, (VS_SW_VER | MMTYPE_REQ));
+	if (sendpacket (channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+	{
+		error (1, errno, INT6K_CANTSEND);
+	}
+	while (readpacket (channel, &amp;message, sizeof (message)) &gt; 0) 
+	{
+		if (UnwantedPacket (&amp;message, (VS_SW_VER | MMTYPE_CNF))) 
+		{
+			continue;
+		}
+		memcpy (bridges [bridge++], message.ethernet.OSA, ETHER_ADDR_LEN);
+	}
+	while (bridge--) 
+	{
+		memset (&amp;message, 0, sizeof (message));
+		memcpy (channel-&gt;peer, bridges [bridge], sizeof (channel-&gt;peer));
+		EthernetHeader (&amp;message.ethernet, channel-&gt;peer, channel-&gt;host);
+		IntellonHeader (&amp;message.intellon, (VS_NW_INFO | MMTYPE_REQ));
+		if (sendpacket (channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+		{
+			error (1, errno, INT6K_CANTSEND);
+		}
+		while (readpacket (channel, &amp;message, sizeof (message)) &gt; 0) 
+		{
+			if (UnwantedPacket (&amp;message, (VS_NW_INFO | MMTYPE_CNF))) 
+			{
+				continue;
+			}
+			if (_allclr (channel-&gt;flags, INT6K_SILENCE)) 
+			{
+				printf (&quot; P/L NET TEI ------ MAC ------ ------ BDA ------  TX  RX CHIPSET FIRMWARE\n&quot;);
+			}
+			network = (struct network *)(&amp;networks-&gt;network);
+			link = memcmp (message.ethernet.OSA, bridges [bridge], ETHER_ADDR_LEN)? &quot;REM&quot;: &quot;LOC&quot;;
+			role = memcmp (message.ethernet.OSA, network-&gt;CCO_MAC, ETHER_ADDR_LEN)? &quot;STA&quot;: &quot;CCO&quot;;
+			printf (&quot; %s %s&quot;, link, role);
+			printf (&quot; %03d&quot;, network-&gt;TEI);
+			printf (&quot; %s&quot;, hexstring (address, sizeof (address), message.ethernet.OSA, ETHER_ADDR_LEN));
+			printf (&quot; %s&quot;, hexstring (address, sizeof (address), message.ethernet.ODA, ETHER_ADDR_LEN));
+			printf (&quot; n/a&quot;);
+			printf (&quot; n/a&quot;);
+			Platform (channel, message.ethernet.OSA);
+			printf (&quot;\n&quot;);
+			while (networks-&gt;NUMAVLNS-- &gt; 0) 
+			{
+				station = (struct station *)(&amp;network-&gt;stations);
+				while (network-&gt;NUMSTAS-- &gt; 0) 
+				{
+					link = memcmp (station-&gt;BDA, bridges [bridge], ETHER_ADDR_LEN)? &quot;REM&quot;: &quot;LOC&quot;;
+					role = memcmp (station-&gt;LDA, network-&gt;CCO_MAC, ETHER_ADDR_LEN)? &quot;STA&quot;: &quot;CCO&quot;;
+					printf (&quot; %s %s&quot;, link, role);
+					printf (&quot; %03d&quot;, station-&gt;TEI);
+					printf (&quot; %s&quot;, hexstring (address, sizeof (address), station-&gt;LDA, ETHER_ADDR_LEN));
+					printf (&quot; %s&quot;, hexstring (address, sizeof (address), station-&gt;BDA, ETHER_ADDR_LEN));
+					printf (&quot; %03d&quot;, station-&gt;AVGTX);
+					printf (&quot; %03d&quot;, station-&gt;AVGRX);
+					Platform (channel, station-&gt;LDA);
+					printf (&quot;\n&quot;);
+					station++;
+				}
+				network = (struct network *)(station);
+			}
+		}
+	}
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='NetworkInformation.c.html' title=' NetworkInformation.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='NetworkTraffic.c.html' title=' NetworkTraffic.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,15 @@
+100-uclibc-conf.patch
+104-gnuhurd-uclibc-conf.patch
+301-missing-execinfo_h.patch
+302-c99-snprintf.patch
+303-profile-correction-feature.patch
+304-predict-zero-divide.patch
+305-libmudflap-susv3-legacy.patch
+810-arm-softfloat-libgcc.patch
+900-backport-fix-for-bug-39076.patch
+901-backport-fix-for-bug-32044.patch
+993-arm_insn-opinit-RTX_CODE-fixup.patch
+998-gcc-4.3.0-fix-header.00.patch
+999-4.3.2-armeabi-aapcs-linux.patch
+999-4.3.3-arm-fix-for-bug-37436.patch
+999-gcc-4.3.0-cris-pragma-pack-warning-remove.patch

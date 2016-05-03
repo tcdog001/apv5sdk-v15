@@ -1,0 +1,421 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<title></title>
+<base target="_self">
+<link rel="stylesheet" type="text/css" href="/CSS.CSS">
+<style>
+<!-- //
+.txt_m       { border: 1px solid #316AC5; background-color: #FFFFFF }
+.tbhead      { font-size: 12px }
+.s1          { font-size: 12px }
+.txt         { background-color: #DDDDD0 }
+
+.mypop       { border: 2px outset #FFFFFF; background-color: #ECE9D8 }
+.ptxt_center  { border: 0px solid #ECE9D8; background-color: #ECE9D8;}       
+.ptxt        { border: 0px solid #ECE9D8; background-color: #ECE9D8; float: left }
+.mytxt       { border: 1px ridge #E8E4D0; ; background-color:#FCFBF8 }
+.mysubmit	 {width:78;height:24;font-size:12px;margin:1px;border:0px solid #FFFFFF;cursor:hand;background-color:#FFFFFF}
+.tbhead1 {font-size: 12pt }
+// -->
+</style>
+</head>
+<SCRIPT src="/network.js"></SCRIPT>
+<SCRIPT src="/51w.js"></SCRIPT>
+<SCRIPT language=JavaScript> 
+<!--
+var page_max_cert_num = ${CERT_LIST_NUM};
+var isIE = (document.all)? true:false;
+var num_click = 0;
+var query_id = ${QUREY_ID};
+var max_cert_period = ${MAX_CERT_PERIOD};
+
+function mysubmit()
+{
+	if(num_click == 1)
+	{
+		return false;
+	}
+	num_click = 1;
+	document.fm1.action ="/cgi-bin/as_query.cgi";
+	document.fm1.submit();
+}
+function pageup()
+{
+	var query_idx = document.fm1.SELECT1.value;
+	var query_val;
+
+	if (query_idx == "2") 
+	{
+			
+			query_val = document.fm1.CERT_INFO.value;
+			if (query_val.length == 0)
+			{
+				alert("尚未输入序列号，请输入序列号！");
+				document.fm1.CERT_INFO.focus();
+				return false;
+			}
+
+			if (query_val.length != 8)
+                        {
+                                alert("序列号长度不对，请输入8位的序列号！");
+                                document.fm1.CERT_INFO.focus();
+                                return false;
+                        }
+	}
+
+	document.fm1.UP_DOWN.value="UP";
+	mysubmit();
+	return true;
+}
+function pagedown()
+{
+	var query_idx = document.fm1.SELECT1.value;
+	var query_val;
+
+	if (query_idx == "2") 
+	{
+			
+			query_val = document.fm1.CERT_INFO.value;
+			if (query_val.length == 0)
+			{
+				alert("尚未输入序列号，请输入序列号！");
+				document.fm1.CERT_INFO.focus();
+				return false;
+			}
+
+			if (query_val.length != 8)
+                        {
+                                alert("序列号长度不对，请输入8位的序列号！");
+                                document.fm1.CERT_INFO.focus();
+                                return false;
+                        }
+	}
+
+	document.fm1.UP_DOWN.value="DOWN";
+	mysubmit();
+	return true;
+}
+
+//////////////////////////////////////////////////
+// a : 1---revoke  2----unrevoke 3----del  4---active
+function cert_mng(a, sn)
+{
+	if (a==1)
+	{
+		question = confirm("按确定键系统将吊销选定的证书，是否继续?");
+		if(!question)
+		{
+			return;
+		}		
+	}
+	document.fm1.CERT_MNG.value = a;
+	document.fm1.CERT_SN.value = sn;
+	mysubmit();
+}
+
+// n: 总共的证书列表数目
+function cert_revoke(n)
+{
+	var i;
+	var num = 0;
+	var sn = "";
+	var revoke_n = 0;
+
+	if (n < 1)
+	{
+		alert("对不起，没有可吊销的证书列表，不能吊销！");
+		return;
+	
+	}
+	
+	if (n == 1)
+	{
+		if (document.fm1.CHECKBOX.checked)
+		{
+			sn = document.fm1.CHECKBOX.value+":";
+			revoke_n++;
+		}
+	}
+	else
+	{	
+		for (i=0; i<n; i++)
+		if (document.fm1.CHECKBOX[i].checked)
+		{
+			sn = sn+document.fm1.CHECKBOX[i].value+":";
+			revoke_n++;
+		}
+	}
+	if (revoke_n == 0)
+	{
+		alert("对不起，尚未选定要吊销的证书，请选定证书后再吊销!");
+                return;
+	}
+
+	question = confirm("按确定键系统将吊销选定的证书，是否继续?");
+	if(!question)
+	{
+		return;
+	}
+
+	document.fm1.CERT_MNG.value = 1;
+	document.fm1.CERT_SN.value = sn;
+	mysubmit();
+}
+
+function select_all()
+{
+        var i;
+        var n = page_max_cert_num;
+	 var select_n = 0;
+
+        if (n < 1)
+        {
+                alert("对不起，没有可选择的证书！");
+                return;
+
+        }
+	 
+	if (n == 1)
+	{
+		if (!document.fm1.CHECKBOX.disabled)
+		{
+			document.fm1.CHECKBOX.checked = true;
+            select_n++;
+		}
+
+	}
+	else
+       for (i=0; i<n; i++)
+       {
+		if (!document.fm1.CHECKBOX[i].disabled)
+		{
+     		   	document.fm1.CHECKBOX[i].checked = true;
+                 	select_n++;
+		}
+       }
+       
+	if (select_n == 0)
+       {
+                alert("对不起，没有可选择的证书!");
+                return;
+       }
+}
+
+function wopen()
+{
+	open("/cgi-bin/app_cert.cgi?max_cert_period="+max_cert_period, "证书申请","toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,copyhistory=no,width=449,height=290,left=320,top= 240");
+	return false;
+}
+function regInput(obj, reg, inputStr)
+{
+	var docSel;
+	if (isIE)
+	{
+		docSel	= document.selection.createRange();
+		if (docSel.parentElement().tagName != "INPUT")	return false;
+		oSel = docSel.duplicate();
+		oSel.text = "";
+		var srcRange	= obj.createTextRange();
+		oSel.setEndPoint("StartToStart", srcRange);
+		var str = oSel.text + inputStr + srcRange.text.substr(oSel.text.length);
+		return reg.test(str);
+	}
+}
+
+function IsNum(num)
+{
+	var number="0123456789";
+	for(i=0;i<num.length;i++)
+	{
+		for(j=0;j<10;j++)
+			if (num.charAt(i)==number.charAt(j)) break;
+		if (j>=10) return (false);
+	 }
+	return (true);
+}
+
+
+
+function go_submit()
+{
+	var query_idx = document.fm1.SELECT1.value;
+	var query_val;
+
+	if (query_idx == "2") 
+	{
+			
+			query_val = document.fm1.CERT_INFO.value;
+			if (query_val.length == 0)
+			{
+				alert("尚未输入序列号，请输入序列号！");
+				document.fm1.CERT_INFO.focus();
+				return ;
+			}
+
+			if (query_val.length != 8)
+                        {
+                                alert("序列号长度不对，请输入8位的序列号！");
+                                document.fm1.CERT_INFO.focus();
+                                return ;
+                        }
+	}
+
+	if ((query_idx != query_id) || (query_param != -1))
+	{
+		document.fm1.QPAGE_FROM.value = 0;	
+	}
+
+	mysubmit();
+	return ;
+}
+
+function oncancle()
+{
+	document.getElementById("win_pop").style.display ='none';
+	return;
+}
+
+
+// -->
+</SCRIPT>
+<body topMargin="0"> 
+ <tr height="30">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tr>  
+<div align="center"> 
+  <form method="POST" name="fm1" action="/cgi-bin/as_query.cgi"> 
+    <TABLE WIDTH="644" CELLSPACING=1 CELLPADDING=4 BORDER=1 height="145"> 
+      <TR> 
+        <TD BGCOLOR="#ddddd0"  width="633"  height="134" > <center> 
+            <table border="1" width="98%"  cellspacing="0" cellpadding="0" height="55"> 
+              <caption> 
+              <p align="center"><font face="MS Serif" size="4" color="#808000">${QUERY_INFO}</font></p> 
+              </caption> 
+              <thead bgcolor="#999999"> 
+                <tr> 
+				 <td width="7%" height="52" align="center" class="tbhead" rowspan="2" alt='del'>选择</td>
+			         <td width="38%" height="52" align="center" class="tbhead" rowspan="2">证书持有者</td>
+				 <td width="15%" height="52" align="center" class="tbhead" rowspan="2">序列号</td>
+				 <td width="24%" height="26" align="center" class="tbhead" colspan="2">有效期</td>
+				 <td width="7%" height="52" align="center" class="tbhead" rowspan="2">类型</td>
+				 <td width="9%" height="52" align="center" class="tbhead" rowspan="2">状态</td>
+
+                </tr>
+                <tr> 
+			      	<td width="12%" height="26" align="center" class="tbhead">总共天数</td>
+				<td width="12%" height="26" align="center" class="tbhead">剩余天数</td>
+
+                </tr> 
+              </thead> 
+              <tbody>  
+              ${PRINT_TABLE0}
+              ${PRINT_TABLE1}
+              ${PRINT_TABLE2}
+              ${PRINT_TABLE3}
+              ${PRINT_TABLE4}
+              ${PRINT_TABLE5}
+              ${PRINT_TABLE6}
+              ${PRINT_TABLE7}
+              ${PRINT_TABLE8}
+              ${PRINT_TABLE9}
+              </tbody> 
+               </table> 
+          </center> 
+          <center> 
+            <table border="1" width="98%" cellspacing="0" cellpadding="0" height="31"> 
+              <tr> 
+                <td width="40%" height="31" valign="middle" align="center">&nbsp;共 ${Q_SUMS1} 条,显示 ${QPAGE_FROM1}-${QPAGE_TO1} 条</td> 
+		<td width="20%" height="31"> <p align="center">&nbsp;<image onclick="javascript:select_all()"  src="/image/select_all.gif" align="top"></p></td>
+                <td width="20%" height="31"> <p align="center">&nbsp;${BTN_UP}</p></td> 
+                <td width="20%" height="31"> <p align="center"> ${BTN_DOWN}</p></td> 
+              </tr> 
+            </table> 
+          </center> 
+          <script language="javascript">
+function sel_handle(sel)
+{
+		var selIndex = sel.selectedIndex;
+		var type = 0;
+		var cert_info = 0;
+		var status = 0;
+		switch (selIndex)
+		{
+   			case 1:
+				var str1 = "<input name=\"CERT_INFO\" size=\"16\"  maxlength=\"8\" ";
+				var str2 = " onkeypress = \"return regInput(this,/^([0-9 a-f A-F])*$/, String.fromCharCode(event.keyCode))\" ";
+				var str3 = " onpaste	= \"return regInput(this,/^([0-9 a-f A-F])*$/, window.clipboardData.getData('Text'))\" ";
+				var str4 = " ondrop	    = \"return regInput(this,/^([0-9 a-f A-F])*$/,	event.dataTransfer.getData('Text'))\"";
+				var str5 = " style=\"ime-mode:Disabled\"";
+				//alert(str1+str2+str3+str4+">");
+				document.getElementById("query_span_info").innerHTML = str1+str2+str3+str4+str5+">";
+				query_param = 1;
+				break;
+			case 2:
+				//document.getElementById("query_span_info").innerHTML ="<input name=\"CERT_INFO\" size=\"16\"  maxlength=\"32\" value=\"${USER_NAME}\" style=\"ime-mode:Disabled\">";
+				document.getElementById("query_span_info").innerHTML ="<input name=\"CERT_INFO\" size=\"16\"  maxlength=\"32\" style=\"ime-mode:Disabled\">";
+				query_param = 1;
+				break;
+		case 3:		
+				 document.getElementById("query_span_info").innerHTML ="<select size=\"1\" name=\"CERT_INFO\"><option value=\"1\"  ${SEL_STAT1}>X.509</option><option value=\"2\"  ${SEL_STAT2}>GBW</option></select>";
+				query_param = 1;
+				break;
+		case 4:
+                                document.getElementById("query_span_info").innerHTML ="<select size=\"1\" name=\"CERT_INFO\"><option value=\"1\"  ${SEL_STAT3}>已激活</option><option value=\"2\"  ${SEL_STAT4}>已吊销</option></select>";
+				query_param = 1;
+                                break;
+			default:
+				document.getElementById("query_span_info").innerHTML ="";
+				query_param = -1;
+				break;
+		}
+}
+
+        </script> 
+          <center> 
+            <table border="1" width="98%" cellspacing="0" cellpadding="0" height="31"> 
+              <tr> 
+		  <td height=31 class=s1 align=center> <a href='javascript:cert_revoke(page_max_cert_num)'><img src=/image/revoke.gif border=0 width="78" height="24"></a></td> 
+                <td height=31 class=s1 align=center>
+<INPUT type="image" onclick="return wopen()" src="/image/askcer.gif" align="center" width="78" height="24">
+</td> 
+			
+
+                <td width="60%" height="31" class=s1 align=right> 证书查询
+                  <select name="SELECT1"  style="font-size: 12px" onChange="sel_handle(this)"> 
+                    <option value="1" ${SE1}>所有证书</option> 
+                    <option value="2" ${SE2}>序列号</option> 
+                    <option value="3" ${SE3}>证书持有者</option> 
+                    <option value="4" ${SE4}>类型</option> 
+		    <option value="5" ${SE5}>状态</option>
+                  </select> 
+                  <span id=query_span_info></span> 
+                  <input type="button" name="Submit" value="查询" onClick="go_submit()"> 
+&nbsp; </td> 
+              </tr> 
+            </table> 
+          </center> 
+          <input type="hidden" name="AUTOREFRESH" value="0"> </TD> 
+      </TR> 
+     <TR>
+	<TD  height=31 class=s1 align=center bgcolor="#ddddd0">
+	<a target="_blank" href="/as.cer"><font color="#FF0000">请点击此处下载AS的X.509证书</font></a>
+	</TD>
+     </TR>
+    </TABLE> 
+
+    <input type="hidden" name="QCERT_INFO"  value=""> 
+    <input type="hidden" name="UP_DOWN" value=""> 
+    <input type="hidden" name="CERT_MNG"  value=""> 
+    <input type="hidden" name="CERT_SN"  value=""> 
+    <input type="hidden"  name="QPAGE_FROM" value="${QPAGE_FROM}">
+    <input type="hidden" name="QPAGE_TO" value="${QPAGE_TO}">
+    <input type="hidden" name="MAX_CERT_PERIOD" value="">
+  </form> 
+</div> 
+<!--<div style="position: absolute; top: 207; left: 6; width: 550; height: 31">--> 
+　
+${AS_MNG_INFO} 
+<SCRIPT language=JavaScript>
+sel_handle(document.fm1.SELECT1)
+</SCRIPT>
+</body>
+</html>

@@ -1,0 +1,6 @@
+#!/bin/sh
+#sysreboot command in AQ2010
+/sbin/wrcpuutil -o > /dev/null 2>&1 
+touch /jffs/sysrebootflag  > /dev/null 2>&1
+/sbin/reboot -f
+echo 1 > /proc/sys/dev/wifi0/sysreboot_flag 

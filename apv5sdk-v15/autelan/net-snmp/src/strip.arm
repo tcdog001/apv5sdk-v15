@@ -1,0 +1,3 @@
+#!/bin/bash
+/opt/kendin/arm-uclibc/bin/arm-uclibc-strip agent/snmpd
+cp agent/snmpd ~/

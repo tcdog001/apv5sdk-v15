@@ -1,0 +1,15 @@
+#!/bin/sh
+. /usr/lib/web/xmlconf.sh
+
+CONFIG_XML=/etc/config/config.xml
+lan=`config_read "/config/network/lan"`
+lan=`config_setoption "$lan" proto "$1"`
+lan=`config_setoption "$lan" ipaddr "$2"`
+lan=`config_setoption "$lan" netmask "$3"`
+lan=`config_setoption "$lan" gateway "$4"`
+config_write "/config/network/lan" "$lan"
+
+xml_sroute=`config_read /config/network/sroute`
+xml_sroute=`config_setoption "$xml_sroute" route1 "$4"`
+config_write "/config/network/sroute" "$xml_sroute"
+

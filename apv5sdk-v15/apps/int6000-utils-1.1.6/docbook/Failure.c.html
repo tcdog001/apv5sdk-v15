@@ -1,0 +1,147 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			Failure.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='FactoryDefaults2.c.html' title=' FactoryDefaults2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='FindFWHeader.c.html' title=' FindFWHeader.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void Failure (struct int6k * int6k, const char *format, ...) 
+ *
+ *   error.h
+ *
+ *   Inform the user that an operation failed; print the channel name, 
+ *   packet source device, error message and user defined message on 
+ *   stderr unless the INT6K_SILENCE flags is set;
+ *
+ *   This function is identical to Confirm () excep that the message
+ *   status code and description is output if the status is non-zero;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s);
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef FAILURE_SOURCE
+#define FAILURE_SOURCE
+
+#include &lt;stdio.h&gt;
+#include &lt;stdarg.h&gt;
+#include &lt;stdlib.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../mme/mme.h&quot;
+
+#ifdef __GNUC__
+
+__attribute__ ((format (printf, 2, 3))) 
+
+#endif
+
+void Failure (struct int6k * int6k, const char *format, ...) 
+
+{
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+	if (_allclr (int6k-&gt;flags, INT6K_SILENCE)) 
+	{
+		char address [ETHER_ADDR_LEN * 3];
+		struct header_confirm 
+		{
+			header_eth ethernet;
+			header_int intellon;
+			uint8_t MSTATUS;
+		}
+		* header = (struct header_confirm *)(message);
+		struct __packed header_confirm_request 
+		{
+			struct header_eth ethernet;
+			struct header_int intellon;
+			uint32_t REQ_ID;
+			uint8_t MSTATUS;
+		}
+		* header_confirm_request = (struct header_confirm_request *)(message);
+		hexdecode (header-&gt;ethernet.OSA, sizeof (header-&gt;ethernet.OSA), address, sizeof (address));
+		fprintf (stderr, &quot;%s %s &quot;, channel-&gt;name, address);
+		switch (header-&gt;intellon.MMTYPE) 
+		{
+		case VS_ADD_CONN | MMTYPE_CNF:
+		case VS_MOD_CONN | MMTYPE_CNF:
+		case VS_REL_CONN | MMTYPE_CNF:
+		case VS_CON_INFO | MMTYPE_CNF:
+			if (header_confirm_request-&gt;MSTATUS) 
+			{
+				fprintf (stderr, &quot;%s (0x%02X): &quot;, MMECode (header_confirm_request-&gt;intellon.MMTYPE, header_confirm_request-&gt;MSTATUS), header_confirm_request-&gt;MSTATUS);
+			}
+			break;
+		default:
+			if (header-&gt;MSTATUS) 
+			{
+				fprintf (stderr, &quot;%s (0x%02X): &quot;, MMECode (header-&gt;intellon.MMTYPE, header-&gt;MSTATUS), header-&gt;MSTATUS);
+			}
+			break;
+		}
+		if ((format) &amp;&amp; (*format)) 
+		{
+			va_list arglist;
+			va_start (arglist, format);
+			vfprintf (stderr, format, arglist);
+			va_end (arglist);
+		}
+		fprintf (stderr, &quot;\n&quot;);
+	}
+	if (_anyset (int6k-&gt;flags, INT6K_BAILOUT)) 
+	{
+		if (_allclr (int6k-&gt;flags, INT6K_SILENCE)) 
+		{
+			error (1, 0, &quot;Bailing Out!&quot;);
+		}
+		exit (1);
+	}
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='FactoryDefaults2.c.html' title=' FactoryDefaults2.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='FindFWHeader.c.html' title=' FindFWHeader.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

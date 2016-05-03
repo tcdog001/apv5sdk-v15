@@ -1,0 +1,7 @@
+portmap-01-5beta.patch
+portmap-02-4.0-malloc.patch
+portmap-4.0-cleanup.patch
+portmap-4.0-rpc_user.patch
+portmap-4.0-sigpipe.patch
+portmap-5b-include-errno_h.patch
+portmap-5b-optional-tcpd.patch

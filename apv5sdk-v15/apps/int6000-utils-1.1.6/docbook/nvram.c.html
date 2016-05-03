@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			nvram.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='nvmsplit.c.html' title=' nvmsplit.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='nvrampeek.c.html' title=' nvrampeek.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   nvram.c - NVRAM type information;
+ * 
+ *   nvram.h
+ *
+ *   nvram codes for display purposes;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef NVRAM_SOURCE
+#define NVRAM_SOURCE
+
+#include &quot;../tools/types.h&quot;
+#include &quot;../ram/nvram.h&quot;
+
+const struct _type_ nvramtype [NVRAMTYPES] = 
+
+{
+	{
+		0x00000005,
+		&quot;500KB&quot; 
+	},
+	{
+		0x00000010,
+		&quot;1MB&quot; 
+	},
+	{
+		0x00000011,
+		&quot;M25P20&quot; 
+	},
+	{
+		0x00000012,
+		&quot;M25P40&quot; 
+	},
+	{
+		0x00000013,
+		&quot;M25P80&quot; 
+	},
+	{
+		0x00000014,
+		&quot;M25P16_ES&quot; 
+	},
+	{
+		0x00000015,
+		&quot;M25P32_ES&quot; 
+	},
+	{
+		0x00000016,
+		&quot;M25P64_ES&quot; 
+	},
+	{
+		0x00001020,
+		&quot;M25P05A&quot; 
+	},
+	{
+		0x00000046,
+		&quot;AT26DF161&quot; 
+	},
+	{
+		0x00000146,
+		&quot;AT26DF161A&quot; 
+	},
+	{
+		0x00001120,
+		&quot;M25P10A&quot; 
+	},
+	{
+		0x00001520,
+		&quot;M25P16&quot; 
+	},
+	{
+		0x00001620,
+		&quot;M25P32&quot; 
+	},
+	{
+		0x00001720,
+		&quot;M25P64&quot; 
+	},
+	{
+		0x00004125,
+		&quot;SST25VF016B&quot; 
+	}
+};
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='nvmsplit.c.html' title=' nvmsplit.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='nvrampeek.c.html' title=' nvrampeek.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

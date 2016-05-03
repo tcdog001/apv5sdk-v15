@@ -1,0 +1,37 @@
+#!/bin/sh
+
+get_value()
+{
+	#local switch=`cat /proc/sys/dev/wifi0/monitor_process`
+	#echo ${switch}
+	#if [ ${switch} == '0' ];then
+		:
+	#else	
+		/sbin/sysfactoryreset
+		echo f > /proc/kes_debug_flag
+		/sbin/sysreboot	
+	#fi	
+}
+get_value_reset()
+{
+	#local switch_reset=`cat /proc/sys/dev/wifi0/monitor_process`
+	#if [ ${switch_reset} == '0' ];then
+		:	
+	#else
+		echo f > /proc/kes_debug_flag
+		/sbin/sysreboot
+	#fi	
+}
+
+while :
+do
+sleep 5
+factory_reset_flag="`pro_ctl_util -L | awk -F " " '/factory reset/ {print $4}'`" 
+if [ $factory_reset_flag == 3 ]; then
+	get_value
+else
+	if [ $factory_reset_flag == 1 ];then
+		get_value_reset
+	fi
+fi	
+done

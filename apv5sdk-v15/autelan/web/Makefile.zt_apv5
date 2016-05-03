@@ -1,0 +1,40 @@
+.NOTPARALLEL:
+ifeq ($(AQ_TYPE),WNAP210)
+PKG_BUILD_DIR = files_ap83_netgear
+else ifeq ($(AQ_TYPE),WNAP350)
+PKG_BUILD_DIR = files_ap83_netgear
+else ifeq ($(AQ_TYPE),WNAP550)
+PKG_BUILD_DIR = files_ap83_netgear
+else
+PKG_BUILD_DIR = files
+endif
+ZT_DIR = files_zt_apv5
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+unexport LDFLAGS
+
+.PHONY: all
+all: install 
+
+
+.PHONY: install
+install:
+	cp -rf ${ZT_DIR}/* ${PKG_BUILD_DIR}/
+	cp -rf ${PKG_BUILD_DIR}/* ${ROOTFSDIR}/ 
+	cp -rf ${PKG_BUILD_DIR}/www_cavium/* ${ROOTFSDIR}/www
+	cp -rf ${PKG_BUILD_DIR}/www_cavium_apv5/* ${ROOTFSDIR}/www
+	rm -rf ${ROOTFSDIR}/www_cavium
+	rm -rf ${ROOTFSDIR}/www_cavium_ar11n
+	mv ${ROOTFSDIR}/usr/lib/web/sysinit.sh_cavium ${ROOTFSDIR}/usr/lib/web/sysinit.sh
+	mv ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium_ar11n ${ROOTFSDIR}/usr/lib/web/constant.sh
+	mv ${ROOTFSDIR}/usr/lib/web/function.sh_apv5 ${ROOTFSDIR}/usr/lib/web/function.sh
+	rm -rf ${ROOTFSDIR}/usr/lib/web/constant.sh_cavium
+#	mkdir -p ${ROOTFSDIR}/etc/files.conf/
+#	cp -rf ${ROOTFSDIR}/www/image/logo.jpg ${ROOTFSDIR}/etc/files.conf/
+#	mkdir -p /tmp/logo/
+#	rm -rf /tmp/logo/logo.jpg
+#	mv ${ROOTFSDIR}/www/image/logo.jpg /tmp/logo/
+#	ln -sf /tmp/logo/logo.jpg ${ROOTFSDIR}/www/image/logo.jpg
+

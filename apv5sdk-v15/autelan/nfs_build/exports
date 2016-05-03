@@ -1,0 +1,1 @@
+/tmp/udisk   *(rw,insecure,no_subtree_check,no_root_squash,sync)

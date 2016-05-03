@@ -1,0 +1,3 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/base/ieee80211_node.c:2296: warning: data definition has no type or storage class
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/base/ieee80211_node.c:2296: warning: type defaults to 'int' in declaration of 'EXPORT_SYMBOL_C'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/base/ieee80211_node.c:2296: warning: parameter names (without types) in function declaration

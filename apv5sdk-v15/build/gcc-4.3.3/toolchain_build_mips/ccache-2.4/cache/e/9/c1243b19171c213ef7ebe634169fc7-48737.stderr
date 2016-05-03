@@ -1,0 +1,4 @@
+../src/mxml_index.c: In function 'mxml_index_new':
+../src/mxml_index.c:16: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_index.c: In function 'mxml_index_destroy':
+../src/mxml_index.c:38: warning: incompatible implicit declaration of built-in function 'free'

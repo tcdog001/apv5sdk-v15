@@ -1,0 +1,35 @@
+#!/bin/sh
+. /usr/lib/web/xmlconf.sh
+
+#
+#usage()
+#
+usage()
+{
+	echo "set_countrycode [countrycode]"
+	exit 1
+}
+
+if [ ! $# -eq 1 ];then
+	usage
+fi
+
+COUNTRY_CODE=$1
+
+echo "countrycode:$COUNTRY_CODE"
+if [ ${COUNTRY_CODE} == "CN" ];then
+	REGION=Asia	
+fi
+if [ ${COUNTRY_CODE} == "US" ];then
+	REGION=none
+fi
+echo "region:${REGION}"
+
+CONFIG_XML=/etc/config/config.xml
+country=`config_read "/config/network/country"`
+echo ${country} | grep ${REGION} > /dev/null 2>&1
+if [ $? -ne 0 ];then
+	country=`config_setoption "$country" region "${REGION}"`
+	config_write "/config/network/country" "$country"
+fi
+

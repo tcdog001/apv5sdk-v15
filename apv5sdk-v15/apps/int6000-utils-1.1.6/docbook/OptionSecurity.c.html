@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			OptionSecurity.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='OptionPriority.c.html' title=' OptionPriority.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='OptionTopology.c.html' title=' OptionTopology.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed OptionSecurity (signed margin, const char * style);
+ * 
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef OPTIONSECURITY_SOURCE
+#define OPTIONSECURITY_SOURCE
+
+#include &quot;../cgi/page.h&quot;
+#include &quot;../cgi/session.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../crypt/HPAVKey.h&quot;
+#include &quot;../tools/format.h&quot;
+
+#define PASSWORD &quot;HomePlugAV&quot;
+#define DISABLED &quot;disabled value='not required'&quot;
+
+static signed passwords (signed margin, const char * style) 
+
+{
+	extern struct session session;
+
+#ifdef STYLE_KEY
+
+	char string [HPAVKEY_DAK_LEN * 3];
+
+#endif
+
+	unsigned bridge;
+	for (bridge = 0; bridge &lt; session.bridges; bridge++) 
+	{
+		if (!memcmp (session.device.MAC, session.bridge [bridge].MAC, ETHER_ADDR_LEN)) 
+		{
+			break;
+		}
+	}
+	output (margin++, &quot;&lt;fieldset class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;legend class='%s'&gt;&quot;, style);
+	output (margin, &quot;%s&quot;, &quot;Passwords&quot;);
+	output (margin--, &quot;&lt;/legend&gt;&quot;);
+	output (margin++, &quot;&lt;table class='%s'&gt;&quot;, style);
+	if (bridge == session.bridges) 
+	{
+		output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+		output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+		output (margin, &quot;%s&quot;, &quot;Station&quot;);
+		output (margin--, &quot;&lt;/th&gt;&quot;);
+		output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+		output (margin, &quot;&lt;input type='text' maxlength='64' class='%s' name='%s'&gt;&quot;, STYLE_PWD, FIELD_DPW);
+		output (margin--, &quot;&lt;/td&gt;&quot;);
+
+#ifdef STYLE_KEY
+
+		output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+		output (margin, &quot;&lt;input type='text' class='%s' name='%s' value='%s' readonly&gt;&quot;, STYLE_KEY, FIELD_DAK, hexstring (string, sizeof (string), session.device.DAK, sizeof (session.device.DAK)));
+		output (margin--, &quot;&lt;/td&gt;&quot;);
+
+#endif
+
+		output (margin--, &quot;&lt;/tr&gt;&quot;);
+	}
+	output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;th class='%s'&gt;&quot;, style);
+	output (margin, &quot;%s&quot;, &quot;Network&quot;);
+	output (margin--, &quot;&lt;/th&gt;&quot;);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin, &quot;&lt;input type='text' maxlength='64' class='%s' name='%s'&gt;&quot;, STYLE_PWD, FIELD_NPW);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+
+#ifdef STYLE_KEY
+
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin, &quot;&lt;input type='text' class='%s' name='%s' value='%s' readonly&gt;&quot;, STYLE_KEY, FIELD_NMK, hexstring (string, sizeof (string), session.device.NMK, sizeof (session.device.NMK)));
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+
+#endif
+
+	output (margin--, &quot;&lt;/tr&gt;&quot;);
+	output (margin--, &quot;&lt;/table&gt;&quot;);
+	output (margin--, &quot;&lt;/fieldset&gt;&quot;);
+	return (margin);
+}
+
+/*====================================================================*
+ *   
+ *   signed OptionSecurity (signed margin, const char * style);
+ *   
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+signed OptionSecurity (signed margin, const char * style) 
+
+{
+	output (margin++, &quot;&lt;div class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;table class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	margin = passwords (margin, FIELD_KEY);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin--, &quot;&lt;/tr&gt;&quot;);
+	output (margin++, &quot;&lt;tr class='%s'&gt;&quot;, style);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin, &quot;&lt;input type='submit' class='%s' name='%s' value='%s' title=' Change Network Membership '&gt;&quot;, style, SUBMIT_ACTION, ACTION_NETWORK);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin++, &quot;&lt;td class='%s'&gt;&quot;, style);
+	output (margin, &quot;%s&quot;, &quot;&amp;nbsp;&quot;);
+	output (margin--, &quot;&lt;/td&gt;&quot;);
+	output (margin--, &quot;&lt;/tr&gt;&quot;);
+	output (margin--, &quot;&lt;/table&gt;&quot;);
+	output (margin--, &quot;&lt;/div&gt;&quot;);
+	return (margin);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='OptionPriority.c.html' title=' OptionPriority.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='OptionTopology.c.html' title=' OptionTopology.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

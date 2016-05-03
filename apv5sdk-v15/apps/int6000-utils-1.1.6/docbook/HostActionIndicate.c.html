@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			HostActionIndicate.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='HPAVKeySpec.c.html' title=' HPAVKeySpec.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='HostActionResponse.c.html' title=' HostActionResponse.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   signed HostActionIndicate (struct int6k * int6k);
+ *   
+ *   int6k.h
+ * 
+ *   This test plugin requests come action from a local host using a 
+ *   VS_HST_ACTION indication message; the message must be sent to a 
+ *   host, not a device; it can be used to verify that your host 
+ *   application correctly responds to device requests;
+ *
+ *   this function is provided so that you can emulate a device boot
+ *   sequence by prompting a listening host to download firmware; it
+ *   has no practical purpose other than development and test;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef HOSTACTIONINDICATE_SOURCE
+#define HOSTACTIONINDICATE_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;memory.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/memory.h&quot;
+
+signed HostActionIndicate (struct int6k * int6k) 
+
+{
+
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_hst_action_ind 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t HST_ACTION_REQ;
+	}
+	* indicate = (struct vs_hst_action_ind *) (message);
+	struct __packed vs_hst_action_rsp 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+	}
+	* response = (struct vs_hst_action_rsp *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	Request (int6k, &quot;Start Host Action&quot;);
+	memset (message, 0, sizeof (struct message));
+	EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message-&gt;intellon, (VS_HST_ACTION | MMTYPE_IND));
+	int6k-&gt;packetsize = ETHER_MIN_LEN;
+	indicate-&gt;HST_ACTION_REQ = int6k-&gt;hostaction;
+	if (SendMME (int6k) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+		return (-1);
+	}
+	while (ReadMME (int6k, (VS_HST_ACTION | MMTYPE_RSP)) &gt; 0) 
+	{
+		if (response-&gt;MSTATUS) 
+		{
+			Failure (int6k, INT6K_WONTDOIT);
+			continue;
+		}
+		Confirm (int6k, &quot;Start.&quot;);
+	}
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='HPAVKeySpec.c.html' title=' HPAVKeySpec.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='HostActionResponse.c.html' title=' HostActionResponse.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

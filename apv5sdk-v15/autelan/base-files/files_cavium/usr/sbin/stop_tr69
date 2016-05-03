@@ -1,0 +1,7 @@
+#!/bin/sh
+KILLALL=/usr/bin/killall
+
+rm -rf /tmp/start-tr69
+$KILLALL datamodel >/dev/null 2>&1
+$KILLALL LocalManager >/dev/null 2>&1
+$KILLALL cwmp >/dev/null 2>&1

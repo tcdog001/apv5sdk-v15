@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			ReadPIB2.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='ReadPIB.c.html' title=' ReadPIB.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='Request.c.html' title=' Request.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   signed ReadPIB2 (struct int6k *int6k); 
+ *
+ *   int6k2.h
+ *
+ *   Read PIB from a device using ihpapi_UpdateDevice
+ *   api function call, and as many ihpapi_TxFrame and ihpapi_RxFrame
+ *   as needed;
+ *
+ *   See the HomePlugAV Firmware Technical Reference 
+ *   Manual for more information; 
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *  Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *      Nathan Houghton &lt;nathan.houghton@intellon.com&gt;
+ *      Alex Vasquez &lt;alex.vasquez@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef READPIB2_SOURCE
+#define READPIB2_SOURCE
+
+#include &lt;unistd.h&gt;
+#include &lt;memory.h&gt;
+
+#include &quot;../ihpapi/ihp.h&quot;
+#include &quot;../ihpapi/ihpapi.h&quot;
+#include &quot;../int6k/int6k.h&quot; 
+#include &quot;../tools/error.h&quot;
+#include &quot;../pib/pib.h&quot; 
+
+signed ReadPIB2 (struct int6k *int6k) 
+
+{
+	Request (int6k, &quot;Reading PIB from Device&quot;);
+	if (ihpapi_UpdateDevice (int6k-&gt;channel-&gt;host, int6k-&gt;channel-&gt;peer, IHPAPI_HAR_UPLOAD_PB) == -1) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, &quot;initialization error&quot;);
+		return (-1);
+	}
+	do 
+	{
+		int6k-&gt;packetsize = (int)(ihpapi_TxFrame (sizeof (struct message), (uint8_t *)(int6k-&gt;message)));
+		if (int6k-&gt;packetsize == 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;no more data&quot;);
+			break;
+		}
+		if (SendMME (int6k) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+			return (-1);
+		}
+		if (ReadMME2 (int6k) == -1) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+			return (-1);
+		}
+		if (int6k-&gt;result-&gt;opStatus.status) 
+		{
+			Failure (int6k, INT6K_WONTDOIT);
+			return (-1);
+		}
+		if (write (int6k-&gt;PIB.file, int6k-&gt;result-&gt;data.updateDev.buffer, (unsigned)(int6k-&gt;result-&gt;data.updateDev.bufferLen)) != int6k-&gt;result-&gt;data.updateDev.bufferLen) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, &quot;can't store buffer\n&quot;);
+			return (-1);
+		}
+	}
+	while (int6k-&gt;result-&gt;data.updateDev.eof == false);
+	Confirm (int6k, &quot;Read.&quot;);
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='ReadPIB.c.html' title=' ReadPIB.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='Request.c.html' title=' Request.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

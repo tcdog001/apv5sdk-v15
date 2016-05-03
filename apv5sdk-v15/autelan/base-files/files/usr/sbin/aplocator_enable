@@ -1,0 +1,29 @@
+#!/bin/sh
+start()
+{	
+	rm /tmp/aplocator.run -rf
+	/usr/sbin/wlanconfig aplocator_if0 create wlandev wifi0 wlanmode monitor
+	/sbin/ifconfig aplocator_if0 up
+	echo 802 > /proc/sys/net/aplocator_if0/dev_type
+	/usr/sbin/iwconfig aplocator_if0 channel 11
+	/usr/bin/killall aplocator
+	/usr/bin/aplocator -D 
+}
+
+stop()
+{
+	/usr/sbin/wlanconfig aplocator_if0 destroy
+	/usr/bin/killall aplocator
+ 	rm /tmp/aplocator.run -rf       
+}
+
+case $1 in
+start)
+	start
+	;;
+	
+stop)
+	stop
+	;;
+esac
+

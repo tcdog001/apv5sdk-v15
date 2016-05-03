@@ -1,0 +1,97 @@
+PKG := wtpd 
+PKG_BUILD_DIR:=src/wcpss/src/app/wtpd
+
+#command replace
+CPDIR := cp -r 
+CP := cp -fpR
+MKDIR := mkdir -p
+MV := mv
+
+##############################################################################
+
+#EXTRA_CFLAGS= -DAR11N  #when use dtls, use it
+EXTRA_CFLAGS= -DAR11N -DCW_NO_DTLS
+ifeq ($(WTPD_DEBUG),y)
+EXTRA_CFLAGS+=-DCW_DEBUGGING
+endif
+
+ifeq ($(AQ_TYPE),WNDAP350)
+EXTRA_CFLAGS += -DWNAP350 -DIPV6 -DIPv6
+else ifeq ($(AQ_TYPE), WNAP210)
+EXTRA_CFLAGS += -DWNAP210
+else ifeq ($(AQ_TYPE), WNAP550)
+EXTRA_CFLAGS += -DWNAP550 -DIPV6 -DIPv6
+else ifeq ($(AQ_TYPE),XHPB44)
+EXTRA_CFLAGS += -DXHPB44 -DIPV6 -DIPv6
+else ifeq ($(AQ_TYPE),AP2400-IFM)
+EXTRA_CFLAGS += -DAP2400_IFM -DIPV6 -DIPv6
+else ifeq ($(AQ_TYPE),AQ2000N)
+EXTRA_CFLAGS += -DAQ2000N
+else ifeq ($(AQ_TYPE),XJAP93)
+EXTRA_CFLAGS += -DAPXJ -DXJAP93V1
+else ifeq ($(AQ_TYPE),XJAP93_02)
+EXTRA_CFLAGS += -DAPXJ
+else ifeq ($(AQ_TYPE),XHAP93)
+EXTRA_CFLAGS += -DXHAP93
+else ifeq ($(AQ_TYPE),TDPB44_02)
+EXTRA_CFLAGS += -DTDPB44_02
+else ifeq ($(AQ_TYPE),XJPB44_02)
+EXTRA_CFLAGS += -DXJPB44_02
+endif
+
+#add for apv6 and apv7
+ifeq ($(BOARD_TYPE),amcc)
+EXTRA_CFLAGS += -DAPV6
+else ifeq ($(BOARD_TYPE),armada370)
+EXTRA_CFLAGS += -DMARVELL_PLATFORM
+endif
+#add for 9350
+EXTRA_CFLAGS += -DPC018
+ifeq ($(AQ_TYPE_PB44),1)
+EXTRA_CFLAGS += -DAPXH #-DIPV6 -DIPv6
+#else ($(AQ_TYPE_PB44),2)
+#EXTRA_CFLAGS += -DAPXH #-DIPV6 -DIPv6
+endif
+
+################################### for dtls ########
+SSL_DIR := $(ROOTFSDIR)/../openssl/src
+EXTRA_CPPFLAGS = -I$(SSL_DIR)/include
+EXTRA_LDFLAGS = -L$(SSL_DIR) -lcrypto -lssl
+MAKE_DTLS = \
+	DTLSCFLAGS="$(EXTRA_CPPFLAGS)" \
+	DTLSLDFLAGS="$(EXTRA_LDFLAGS)"
+#####################################################
+
+.PHONY: all
+all: compile install 
+
+.PHONY: compile
+compile:
+#	$(CP) ./files/* src/
+	$(MAKE) -C $(PKG_BUILD_DIR)  \
+	EXTRA_CFLAGS="$(EXTRA_CFLAGS)"  
+#	$(MAKE_DTLS)  #when use dtls, use it
+
+	
+.PHNOY: install
+install:
+	$(CP) $(PKG_BUILD_DIR)/wtpd ./
+	$(CP) $(PKG_BUILD_DIR)/wtpd $(ROOTFSDIR)/sbin/
+	
+#	if  test -d $(ROOTFSDIR)/etc/wlan ; then	\
+	echo "OK";	\
+	else	\
+	rm -r $(ROOTFSDIR)/etc/wlan;	 \
+	mkdir $(ROOTFSDIR)/etc/wlan;	 \
+fi;
+#	$(CP) $(PKG_BUILD_DIR)/../../res/config.wtp $(ROOTFSDIR)/etc/wlan 
+	$(CP) $(PKG_BUILD_DIR)/../../res/root.pem $(ROOTFSDIR)/etc/wlan/	
+	$(CP) $(PKG_BUILD_DIR)/../../res/client.pem $(ROOTFSDIR)/etc/wlan/
+#	$(CP) $(PKG_BUILD_DIR)/wcpss/src/res/wtp.log.txt $(ROOTFSDIR)/etc/wlan
+#	$(CP) /home/shark/ap83-work/app_autelan/source/wtpd/src/wcpss/src/app/wtpd/wtpd /home/shark/ap83-work/
+
+
+.PHONY: clean
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) clean
+	$(MAKE) -C $(PKG_BUILD_DIR)/../pub clean

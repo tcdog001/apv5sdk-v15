@@ -1,0 +1,4 @@
+cmd_bootm.c: In function 'do_bootm':
+cmd_bootm.c:325: warning: implicit declaration of function 'mips_cache_flush'
+cmd_bootm.c:326: warning: implicit declaration of function 'mips_icache_flush_ix'
+cmd_bootm.c:390: warning: pointer targets in passing argument 4 of 'lzma_inflate' differ in signedness

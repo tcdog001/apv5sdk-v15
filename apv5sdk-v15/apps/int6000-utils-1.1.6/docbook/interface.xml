@@ -1,0 +1,752 @@
+<chapter id='chapter-ihpapi'>
+	<title>
+		Embedded API Reference
+		</title>
+	<section id="interface-intro" >
+		<title>
+			Introduction
+			</title>
+		<para>
+			This chapter is a function reference for the Intellon Embedded API. It assumes that the reader has a copy of the  <citetitle>Intellon HomePlug AV Application Programming Interface User's Guide</citetitle> and the <citetitle>Intellon HomePlug AV Firmware Technical Reference Manual</citetitle>. Obtain copies from Intellon Corporation, Ocala FL USA, if you do not have them.
+			</para>
+		<para>
+			Intellon supports three levels of Application Programming Interface (API), described below. Intellon device operations are ultimately performed by sending and receiving Intellon vendor-specific management messages using ISO Layer 2 Ethernet frames. The <application>HomePlug AV API</application> assists application developers with common Intellon powerline device operations with the encoding and decoding of Ethernet frames and the automation of transaction sequences. Application developers must still select appropriate raw packet <function>send</function> and <function>receive</function> function and implement process decision logic.  
+			</para>
+		<para>
+			 
+			</para>
+		<variablelist>
+			<varlistentry>
+				<term>
+					Management Messages
+					</term>
+				<listitem>
+					<para>
+						Management messages are the lowest level interface to Intellon powerline devices. They consist of  Ethernet frames exchanged between a host processor and Intellon powerline devices connected to the host via an ethernet connection. Some messages can be forwared from one powerline device to another overpowerline. Others cannot. An application must allocate memory for the Ethernet frame, encode it with the correct information and then transmit it using a raw Ethernet socket. 
+						</para>
+					<para>
+						Application developers must understand each and every managment message transmitted or received and write program logic to encode and decode each type of Ethernet frame. They must also understand how to send and receive ISO Layer 2 Ethernet frames from their host processor. Management message function and format are explained in <citetitle>HomePlug AV Firmware Technical Reference Manual</citetitle>. Management messages are often added with new firmware revisions.
+						</para>
+					<para>
+						Application developers must take into account the endian-ness of their host processor when encoding and decoding managment messages.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry>
+				<term>
+					Internal API Functions
+					</term>
+				<listitem>
+					<para>
+						Ethernet frame encoding is not difficult but it can be tedious and repetitive to implement. The Embedded API includes a number of core functions that can assist programmers in encoding and decoding Ethernet frames containing Intellon vendor-specific management messages. Intellon has defined a series of data structures that correspond to common powerline device operations and function that process them.
+						</para>
+				<para>
+					Applications populate structures and pass to frame encoders to create well-formed management messages for transmission. They all oass them to frame decoders to populate them from management messages received from powerline devices. This approach isolates application software from implementation or platform details such as data offsets, data interpretation and processor byte order.
+						</para>
+				<para>
+					Many powerline device operations require a sequence of transactions to complete. For example, downloading firmware to a powerline device requires multiple transactions because the firmware exceeds the data capacity of an Ethernet frame. Other operations, like device initiialization, also require multiple management message types. In addition, transmission errors can occur and must ve handled before proceeding.
+					</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry>
+				<term>
+					External API Functions
+					</term>
+				<listitem>
+					<para>
+						The Intellon Embedded API is designed to listen for Intellon powerline device requests and respond to them. It also supports an number of device and network interrogation operations that return critical or, in some cases, complex information. Applications routinely execute a basic loop to detect powerline device requests and decode them. The application determines what sort of response is required, encodes it and transmits it and awaits acknowledgement from the powerline device. 
+						</para>
+					<para>
+						A key feature of the Embedded API is that application programmers need not deal with Intellon vendor-specific management messages directly. Management messages are handled by the Core API Functions mentioned above. Also, processor byte-order issues are handled internally.
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		<example>
+			<title>
+				Message Handling Loop
+				</title>
+<programlisting><![CDATA[
+#include <stdint.h>
+#include <errno.h>    
+#include <transport.h>
+#include "ihpapi.h"
+
+int8_t packet [ETHER_MAX_LEN]
+size_t length;
+ihpapi_result_t result;
+ihpapi_status_t status;
+
+read(&amp;length, packet);                                   
+if (isHomePlugEthertype(&frame))
+{                  
+ 	if (ihpapi_RxFrame(sizeof (packet), packet, &result))  
+	{
+       		processErrorStatus(&amp;result.opStatus)
+	}
+    	else
+	{
+       		if(IHPAPI_OPCODE_NOOP == result.opcode) 
+		{
+           			processTheResponse(&result);
+       		}	 
+		length = ihpapi_TxFrame(sa, da,  sizeof (packet), packet, &status)
+		if (length)
+		{
+			send (length, packet);
+		}
+  	}
+} 
+]]></programlisting>
+			<para>
+				The message handling code shown above briefly demonstrates how the Intellon Embedded API could be used to dynamically handle an incoming vendor-specific message. Notice that only two API functions are used: <ulink url="RxFrame.c.html" >RxFrame</ulink> and <ulink url="TxFrame.c.html">TxFrame</ulink>. The application developer must select the appropriate <function>read</function> and <function>send</function> function and must design and implement function <function>processTheResponse</function>.
+				</para>
+			</example>
+		</section>
+	<section id="api-external">
+		<title>
+			External API Functions
+			</title>
+	<section id="ihpapi-initializedevice" >
+		<title>
+			ihpapi_InitializeDevice
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+  				<funcdef>int <function>ihpapi_InitializeDevice</function></funcdef>
+    				<paramdef>uint8_t <parameter>sa</parameter> []</paramdef>
+    				<paramdef>uint8_t <parameter>da</parameter> []</paramdef>
+    				<paramdef>size_t  <parameter>FW_len</parameter></paramdef>
+ 	   			<paramdef>uint8_t <parameter>FW_pbuffer</parameter> []</paramdef>
+    				<paramdef>size_t  <parameter>PIB_len</parameter></paramdef>
+    				<paramdef>uint8_t <parameter>PIB_pbuffer</parameter> []</paramdef>
+    				<paramdef>insigned <parameter>options</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihpapi.h.html">ihpapi.h</ulink> and defined in <ulink url="InitializeDevice.c.html">InitializeDevice.c</ulink>. See an example of this function in <ulink url="RdModWrPib2.c.html">RdModWrPib2.c</ulink>.
+			</para>
+		</section>
+	<section id="ihpapi-updatedevice" >
+		<title>
+			ihpapi_UpdateDevice
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihpapi_UpdateDevice</function></funcdef>
+   				<paramdef>uint8_t <parameter>sa</parameter> []</paramdef>
+    				<paramdef>uint8_t <parameter>da</parameter> []</paramdef>
+				<paramdef>ihpapi_hostActionRequest_t <parameter>type</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			 The function is declared in <ulink url="ihpapi.h.html">ihpapi.h</ulink> and defined in <ulink url="UpdateDevice.c.html">UpdateDevice.c</ulink>. See examples of this function in <ulink url="Identity2.c.html">Identity2.c</ulink>,  <ulink url="ReadMAC2.c.html">ReadMAC2.c</ulink>,  <ulink url="ReadPIB2.c.html">ReadPIB2.c</ulink> and <ulink url="RdModWrPib2.c.html">RdModWrPib2.c</ulink>.
+			</para>
+		</section>
+	<section id="ihpapi-resetdevice">
+		<title>
+			ihpapi_ResetDevice
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihpapi_ResetDevice</function></funcdef>
+   				<paramdef>uint8_t <parameter>sa</parameter> []</paramdef>
+    				<paramdef>uint8_t <parameter>da</parameter> []</paramdef>
+				<paramdef>size_t <parameter>bufferLen</parameter></paramdef>
+				<paramdef>uint8_t <parameter>buffer</parameter> []</paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Encode a frame buffer as an Intellon vendor-specific managment message that will reset the Intellon powerline device. Return the number of bytes actually encoded on success or <constant>0</constant> on failure. On return, global variable <varname>errno</varname> will identify the cause of any failure with a POSIX error code. The function is declared in <ulink url="ihpapi.h.html">ihpapi.h</ulink> and defined in <ulink url="ResetDevice.c.html">ResetDevice.c</ulink>. See an example of this function in <ulink url="ResetDevice2.c.html">ResetDevice2.c</ulink>.
+			</para>
+		<para>
+			Arguments <varname>sa</varname> and <varname>da</varname> point to the 6 octet source and destination Ethernet addresses to be used. Argument <varname>buffer</varname> points to the frame buffer and argument <varname>length</varname> is the buffer length.  
+			</para>
+		</section>
+	<section id="ihpapi-rxframe" >
+		<title>
+			ihpapi_RxFrame
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihpapi_RxFrame</function></funcdef>
+   				<paramdef>size_t <parameter>length</parameter></paramdef>
+    				<paramdef>uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>ihpapi_result_t *<parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihpapi.h.html">ihpapi.h</ulink> and defined in <ulink url="RxFrame.c.html">RxFrame.c</ulink>. See an example of this function in <ulink url="ReadMME2.c.html">ReadMME2.c</ulink>.
+			</para>
+		</section>
+	<section id="ihpapi-txframe" >
+		<title>
+			ihpapi_TxFrame
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihpapi_TxFrame</function></funcdef>
+   				<paramdef>size_t <parameter>length</parameter></paramdef>
+    				<paramdef>uint8_t <parameter>buffer</parameter> []</paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihpapi.h.html">ihpapi.h</ulink> and defined in <ulink url="TxFrame.c.html">TxFrame.c</ulink>. See an example of this function in <ulink url="RdModWrPib2.c.html">RdModWrPib2.c</ulink>.
+			</para>
+		</section>
+	<section id="ihpapi-manageenetphy" >
+		<title>
+			ihpapi_ManageEnetPHY
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihpapi_ManageEnetPHY</function></funcdef>
+   				<paramdef>uint8_t <parameter>sa</parameter> []</paramdef>
+    				<paramdef>uint8_t <parameter>da</parameter> []</paramdef>
+ 				<paramdef>size_t <parameter>bufferLen</parameter></paramdef>
+    				<paramdef>uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>ihpapi_enetPHYCtl_t *<parameter>inputEnetPHYInfo</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihpapi.h.html">ihpapi.h</ulink> and defined in <ulink url="ManageEnetPHY.c.html">ManageEnetPHY.c</ulink>. This function is not used.
+			</para>
+		</section>
+ 	<section id="ihpapi-setsdramconfig" >
+		<title>
+			ihpapi_SetSDRAMConfig
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihpapi_SetSDRAMConfig</function></funcdef>
+   				<paramdef>uint8_t <parameter>sa</parameter> []</paramdef>
+    				<paramdef>uint8_t <parameter>da</parameter> []</paramdef>
+ 				<paramdef>size_t <parameter>bufferLen</parameter></paramdef>
+    				<paramdef>uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>SDRAM_Len</parameter></paramdef>
+				<paramdef>uint8_t <parameter>SDRAM_buffer</parameter> []</paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihpapi.h.html">ihpapi.h</ulink> and defined in <ulink url="SetSDRAMConfig.c.html">SetSDRAMConfig.c</ulink>. See an example of this function in <ulink url="SetSDRAM2.c.html">SetSDRAM2.c</ulink>.
+			</para>
+		</section>
+ 	<section id="ihpapi-getversioninfo" >
+		<title>
+			ihpapi_GetVersionInfo
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihpapi_GetVersionInfo</function></funcdef>
+   				<paramdef>uint8_t <parameter>sa</parameter> []</paramdef>
+    				<paramdef>uint8_t <parameter>da</parameter> []</paramdef>
+ 				<paramdef>size_t <parameter>bufferLen</parameter></paramdef>
+    				<paramdef>uint8_t <parameter>buffer</parameter> []</paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihpapi.h.html">ihpapi.h</ulink> and defined in <ulink url="GetVersionInfo.c.html">GetVersionInfo.c</ulink>. See an example of this function in <ulink url="VersionInfo2.c.html">VersionInfo2.c</ulink>.
+			</para>
+		</section>
+ 	<section id="ihpapi-getmanufacturerinfo" >
+		<title>
+			ihpapi_GetManufacturerInfo
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihpapi_GetManufacturerInfo</function></funcdef>
+   				<paramdef>uint8_t <parameter>sa</parameter> []</paramdef>
+    				<paramdef>uint8_t <parameter>da</parameter> []</paramdef>
+ 				<paramdef>size_t <parameter>bufferLen</parameter></paramdef>
+    				<paramdef>uint8_t <parameter>buffer</parameter> []</paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihpapi.h.html">ihpapi.h</ulink> and defined in <ulink url="GetManufacturerInfo.c.html">GetManufacturerInfo.c</ulink>. See an example of this function in <ulink url="MfgString2.c.html">MfgString2.c</ulink>.
+			</para>
+		</section>
+ 	<section id="ihpapi-setkey" >
+		<title>
+			ihpapi_SetKey
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihpapi_SetKey</function></funcdef>
+   				<paramdef>uint8_t <parameter>sa</parameter> []</paramdef>
+    				<paramdef>uint8_t <parameter>da</parameter> []</paramdef>
+ 				<paramdef>size_t <parameter>bufferLen</parameter></paramdef>
+    				<paramdef>uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>ihpapi_key_t *<parameter>keyparam</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihpapi.h.html">ihpapi.h</ulink> and defined in <ulink url="SetKey.c.html">SetKey.c</ulink>. See an example of this function in <ulink url="SetKey2.c.html">SetKey2.c</ulink>.
+			</para>
+		</section>
+ 	<section id="ihpapi-getnetworkinfo" >
+		<title>
+			ihpapi_GetNetworkInfo
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihpapi_GetNetworkInfo</function></funcdef>
+   				<paramdef>uint8_t <parameter>sa</parameter> []</paramdef>
+    				<paramdef>uint8_t <parameter>da</parameter> []</paramdef>
+ 				<paramdef>size_t <parameter>bufferLen</parameter></paramdef>
+    				<paramdef>uint8_t <parameter>buffer</parameter> []</paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihpapi.h.html">ihpapi.h</ulink> and defined in <ulink url="GetNetworkInfo.c.html">GetNetworkInfo.c</ulink>. See an example of this function in <ulink url="NetworkInfo2.c.html">NetworkInfo2.c</ulink>.
+			</para>
+		</section>
+ 	<section id="ihpapi-getconnectioninfo" >
+		<title>
+			ihpapi_GetConnectionInfo
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihpapi_GetConnectionInfo</function></funcdef>
+   				<paramdef>uint8_t <parameter>sa</parameter> []</paramdef>
+    				<paramdef>uint8_t <parameter>da</parameter> []</paramdef>
+ 				<paramdef>size_t <parameter>bufferLen</parameter></paramdef>
+    				<paramdef>uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>ihpapi_connectCtl_t *<parameter>inputConnectInfo</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihpapi.h.html">ihpapi.h</ulink> and defined in <ulink url="GetConnectionInfo.c.html">GetConnectionInfo.c</ulink>. This function is not used.
+			</para>
+		</section>
+ 	<section id="ihpapi-gettonemapinfo" >
+		<title>
+			ihpapi_GetToneMapInfo
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihpapi_GetToneMapInfo</function></funcdef>
+   				<paramdef>uint8_t <parameter>sa</parameter> []</paramdef>
+    				<paramdef>uint8_t <parameter>da</parameter> []</paramdef>
+ 				<paramdef>size_t <parameter>bufferLen</parameter></paramdef>
+    				<paramdef>uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>ihpapi_toneMapCtl_t *<parameter>inputToneMapInfo</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihpapi.h.html">ihpapi.h</ulink> and defined in <ulink url="GetToneMap.c.html">GetToneMap.c</ulink>. This function is not used.
+			</para>
+		</section>
+		</section>
+	<section id="api-internal">
+		<title>
+			Internal API Functions
+			</title>
+	<section id="ihp-EncodeEthernetHeader" >
+		<title>
+			EncodeEthernetHeader
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>size_t <function>EncodeEthernetHeader</function></funcdef>
+				<paramdef>uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>signed <parameter>length</parameter></paramdef>
+				<paramdef>uint8_t <parameter>ODA </parameter> []</paramdef>
+				<paramdef>uint8_t <parameter>OSA </parameter> []</paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Encode a buffer of specified length in bytes with a standard Ethernet header. The encoded header will contain the specified destination address <varname>ODA</varname> and source address <varname>OSA</varname> and the <trademark class='registered'>HomePlug</trademark> AV Ethertype constant <constant>HOMEPLUG_MTYPE</constant>. Return the number of bytes actually encoded or 0 on encoding error. Set global variable <varname>errno</varname> to an appropriate POSIX error code defined in <filename>errno.h</filename>. The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="EncodeEthernetHeader.c.html">EncodeEthernetHeader.c</ulink>. Constant <constant>HOMEPLUG_MTYPE</constant> is defined in <ulink url="ihp.h.html">ihp.h</ulink>.
+			</para>
+		</section>
+	<section id="ihp-EncodeIntellonHeader">
+		<title>
+			EncodeIntellonHeader
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>size_t <function>EncodeIntellonHeader</function></funcdef>
+				<paramdef>uint8_t <parameter>buffer </parameter> []</paramdef>
+				<paramdef>signed <parameter>length</parameter></paramdef>
+				<paramdef>uint16_t <parameter>MMTYPE</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			Encode a buffer of specified length in bytes with an Intellon vendor-specific message header. The encoded header will contain the <trademark class='registered'>HomePlug</trademark> AV protocol version constant <constant>HOMEPLUG_MMV</constant> and the specified Intellon message type <constant>MMTYPE</constant>. Return the number of bytes actually encoded or 0 on encoding error. Set global variable <varname>errno</varname> to an appropriate POSIX error code defined in <filename>errno.h</filename>. The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="EncodeIntellonHeader.c.html">EncodeIntellonHeader.c</ulink>. Constant <constant>HOMEPLUG_MMV</constant> is defined in <ulink url="ihp.h.html">ihp.h</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeGetVersion">
+		<title>
+			ihp_DecodeGetVersion
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeGetVersion</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer </parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeGetVersion.c.html">DecodeGetVersion.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+
+			</para>
+		</section>
+	<section id="ihp-DecodeLinkStats">
+		<title>
+			ihp_DecodeLinkStats
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeLinkStats</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeLinkStats.c.html">DecodeLinkStats.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeNetworkInfo">
+		<title>
+			ihp_DecodeNetworkInfo
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeNetworkInfo</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeNetworkInfo.c.html">DecodeNetworkInfo.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeSetKey">
+		<title>
+			ihp_DecodeSetKey
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeSetKey</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeSetKey.c.html">DecodeSetKey.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeMfgString">
+		<title>
+			ihp_DecodeMfgString
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeMfgString</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeMfgString.c.html">DecodeMfgString.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DeviceHostAction">
+		<title>
+			ihp_DecodeHostAction
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeHostAction</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeHostAction.c.html">DecodeHostAction.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeResetDevice">
+		<title>
+			ihp_DecodeResetDevice
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeResetDevice</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeResetDevice.c.html">DecodeResetDevice.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeResetToFactoryDefaults">
+		<title>
+			ihp_DecodeResetToFactoryDefaults
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeResetToFactoryDefaults</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeResetToFactoryDefaults.c.html">DecodeResetToFactoryDefaults.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeSetSDRAMCfg">
+		<title>
+			ihp_DecodeSetSDRAMCfg
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeSetSDRAMCfg</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeSetSDRAMCfg.c.html">DecodeSetSDRAMCfg.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeGetToneMapInfo">
+		<title>
+			ihp_DecodeGetToneMapInfo
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeGetToneMapInfo</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeGetToneMapInfo.c.html">DecodeGetToneMapInfo.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeEthernetPHYSettings">
+		<title>
+			ihp_DecodeEthernetPHYSettings
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeEthernetPHYSettings</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeEthernetPHYSettings.c.html">DecodeEthernetPHYSettings.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeGetRxToneMap">
+		<title>
+			ihp_DecodeGetRxToneMap
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeRxToneMap</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeRxToneMap.c.html">DecodeRxToneMap.c</ulink>.See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp_DecodeSetLEDBehavior">
+		<title>
+			ihp_DecodeSetLEDBehavior
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeSetLEDBehavior</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeSetLEDBehavior.c.html">DecodeSetLEDBehavior.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeStartMAC">
+		<title>
+			ihp_DecodeStartMAC
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeStartMAC</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				<paramdef>BlockInfo * <parameter>block</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeStartMAC.c.html">DecodeStartMAC.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeReadModule">
+		<title>
+			ihp_DecodeReadModule
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeReadModule</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeReadModule.c.html">DecodeReadModule.c</ulink>. See an example of this function in <ulink url="SequenceReadModule.c.html">ihpapi_sequenceReadModule.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeWriteModule">
+		<title>
+			ihp_DecodeWriteModule
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeWriteModule</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				<paramdef>WrtModBlock * <parameter>wrmodblk</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeWriteModule.c.html">DecodeWriteModule.c</ulink>. See an example of this function in <ulink url="SequenceWriteModule.c.html">ihpapi_SequenceWriteModule.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeWriteMemory">
+		<title>
+			ihp_DecodeWriteMemory
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeWriteMemory</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				<paramdef>WrtMemBlock * <parameter>wrmemblk</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeWriteMemory.c.html">DecodeWriteMemory.c</ulink>. See an example of this function in <ulink url="SequenceWriteMemory.c.html">ihpapi_SequenceWriteMemory.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp_DecodeFlashNVM">
+		<title>
+			ihp_DecodeFlashNVM
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeFlashNVM</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				<paramdef>BlockInfo * <parameter>block</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeFlashNVM.c.html">DecodeFlashNVM.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-DecodeGetNVM">
+		<title>
+			ihp_DecodeGetNVM
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_DecodeGetNVM</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				<paramdef>struct MemoryInfo * <parameter>memory</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="DecodeGetNVM.c.html">DecodeGetNVM.c</ulink>. This function is not used.
+			</para>
+		</section>
+	<section id="ihp-SequenceReadModule">
+		<title>
+			ihp_SequenceReadModule
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_SequenceReadModule</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="SequenceReadModule.c.html">SequenceReadModule.c</ulink>.See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-SequenceWriteModule">
+		<title>
+			ihp_SequenceWriteModule
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_SequenceWriteModule</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="SequenceWriteModule.c.html">SequenceWriteModule.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+
+			</para>
+		</section>
+	<section id="ihp_SequenceWriteMemory">
+		<title>
+			ihp_SequenceWriteMemory
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>int <function>ihp_SequenceWriteMemory</function></funcdef>
+				<paramdef>const uint8_t <parameter>buffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				<paramdef>ihpapi_result_t * <parameter>result</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="SequenceWriteMemory.c.html">SequenceWriteMemory.c</ulink>. See an example of this function in <ulink url="RxFrame.c.html">ihpapi_RxFrame.c</ulink>.
+			</para>
+		</section>
+	<section id="ihp-FindFWHeader">
+		<title>
+			ihp_FindFWHeader
+			</title>
+		<funcsynopsis>
+			<funcprototype>
+				<funcdef>NVMBlockHeader *<function>ihp_FindFWHeader</function></funcdef>
+				<paramdef>const uint8_t <parameter>FW_pbuffer</parameter> []</paramdef>
+				<paramdef>size_t <parameter>length</parameter></paramdef>
+				</funcprototype>
+			</funcsynopsis>
+		<para>
+			The function is declared in <ulink url="ihp.h.html">ihp.h</ulink> and defined in <ulink url="FindFWHeader.c.html">FindFWHeader.c</ulink>. See an example of this function in <ulink url="InitializeDevice.c.html">ihpapi_InitializeDevice.c</ulink>.
+
+			</para>
+		</section>
+		</section>
+	</chapter>

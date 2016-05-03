@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ $1 = "enable" ];then
+	echo 1 > /proc/sys/dev/wifi0/tunnel_fast_forward
+	echo 1 > /proc/sys/dev/wifi1/tunnel_fast_forward
+else
+	echo 0 > /proc/sys/dev/wifi0/tunnel_fast_forward
+	echo 0 > /proc/sys/dev/wifi1/tunnel_fast_forward
+fi

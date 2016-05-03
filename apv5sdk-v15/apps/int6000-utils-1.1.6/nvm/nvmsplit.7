@@ -1,0 +1,51 @@
+.TH nvmsplit 7 "Intellon Corporation, Ocala FL USA" "int6000-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+nvmsplit - Intellon Image File Exploder
+.SH SYNOPSIS
+.BR nvmsplit
+.RI [ options ]
+.IR file
+.RI [ file ]
+[...]
+.SH DESCRIPTION
+Extract all images from an Intellon image file and leave the original intact. Extracted images appear in files having the input file basename with sequence numbers indicating the relative position of the image within the original file. For example, image file \fBabc.nvm\fR might result in files \fBabc-00.nvm\fR, \fBabc-01.nvm\fR, \fBabc-02.nvm\fR and so on. Each output file is a valid, single-image file and so they can be combined using program \fBnvmmerge\fR.
+.PP
+Intellon image files consist of a chain of image headers, each followed by an image block. Image blocks can contain data, applets or programs. Intellon software reads the header chain and decides which images to download and execute based on information in the image headers. Tampering with image headers or images may void some contractual obligations made by Intellon.
+.PP
+This program is part of the Intellon Linux Toolkit. See the \fBilt\fR man page for an overview and installation instructions.
+.SH OPTIONS
+.TP
+.RB - q
+Suppress routine messages. This option has no effect at this time.
+.TP
+.RB - v
+Print component file names on stderr as they are created.
+.TP
+.RB - ? ,-- help
+Print program help summary on stdout. This option takes precedence over other options on the command line. 
+.TP
+.RB - ! ,-- version
+Print program version information on stdout. This option takes precedence over other options on the command line. Usethis option when sending screen dumps to Intellon Technical Support so that they know exactly which version of the Linux Toolkit you are using.
+.SH ARGUMENTS
+.TP
+.IR file
+The name of an Intellon image file. By convention, Intellon Image files have a \fB.nvm\fR file extension but this program does not enforce this convention. Invalid image files will be rejected causing the output to be incomplete.
+.SH EXAMPLES
+The following example reads Intellon image file \fBabc.nvm\fR and creates one or more output files. Each file contains one image with associated header.
+.PP
+   # nvmsplit abc.nvm -v
+   nvmsplit: abc.nvm --> abc-00.nvm
+   nvmsplit: abc.nvm --> abc-01.nvm
+   nvmsplit: abc.nvm --> abc-02.nvm
+   nvmsplit: abc.nvm --> abc-03.nvm
+.SH DISCLAIMER
+Intellon image file structure and content is proprietary to Intellon Corporation, Ocala FL USA. Consequently, public information is not available. Intellon Corporation reserves the right to change file structure or content in future firmware releases without any obligation to notify or compensate users of this program. This program is reserved for use by Intellon Field Application Engineers. Use of this program may void some contractual obligations made by Intellon.
+.SH SEE ALSO
+.BR chknvm ( 7 ),
+.BR int6k ( 7 ),
+.BR int6kf ( 7 ),
+.BR int6ktest ( 7 ),
+.BR nvmmerge ( 7 ),
+.BR setnvm ( 7 )
+.SH CREDITS
+ Charles Maier <charles.maier@intellon.com>

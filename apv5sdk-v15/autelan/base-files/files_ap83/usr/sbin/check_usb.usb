@@ -1,0 +1,96 @@
+#!/bin/sh
+
+#
+#check_device(sda1)
+#
+check_device()
+{
+	local DEVICE=$1
+	local PATH
+	if [ $DEVICE == "sda1" ]; then
+		PATH=/tmp/udisk
+	fi
+	if [ $DEVICE == "sdb1" ]; then
+		PATH=/tmp/udisk1
+				fi	
+	if [ $DEVICE == "sdc1" ]; then
+		PATH=/tmp/udisk2
+	fi	
+
+#	echo "=============$DEVICE start=============="
+#	echo "usb check:"
+	/bin/umount /dev/$DEVICE >/dev/null 2>&1
+	
+	mkdir $PATH >/dev/null 2>&1
+	/bin/mount /dev/$DEVICE $PATH >/dev/null 2>&1
+	/bin/mount | /bin/grep -o -q /dev/$DEVICE
+	if [ $? -ne 0 ];then 
+#		echo "mount fail!"
+		NUM=1
+		echo "=======$DEVICE NOT PASS!======"
+	else
+	{	
+		touch $PATH/$MAC
+		if [ $? -ne 0 ];then 
+#			echo "write fail!"
+			NUM=1
+			echo "===========$DEVICE NOT PASS!============"
+		else
+		{
+			/bin/umount /dev/$DEVICE >/dev/null 2>&1
+			/bin/mount | /bin/grep -o -q "/dev/$DEVICE"
+ 			if [ $? -eq 0 ];then 
+#				NUM=1
+				echo "umount fail!"
+				echo "===========$DEVICE NOT PASS!============"
+			else
+			{
+				/bin/mount /dev/$DEVICE $PATH >/dev/null 2>&1
+				/bin/mount | /bin/grep -o -q /dev/$DEVICE
+				if [ $? -ne 0 ];then 
+#					echo "mount fail!"
+					NUM=1
+					echo "===========$DEVICE NOT PASS!============"
+				else
+				{
+					cat $PATH/$MAC
+					if [ $? -eq 0 ];then 
+						echo "=========$DEVICE PASS!========"
+						rm $PATH/$MAC >/dev/null 2>&1
+					
+					else
+#						echo "read fail!"
+						NUM=1
+						echo "===========$DEVICE NOT PASS!============"
+					fi
+				}
+				fi
+			}
+			fi
+		}
+		fi
+	}
+	fi
+#echo "=============$DEVICE PASS!=============="
+}
+local NUM=0
+local MAC=`ifconfig | awk -F ' ' '/HWaddr/{print $5}' | sed -n '1p' | sed -e 's/://g' `
+/etc/init.d/mini_httpd_udisk stop >/dev/null 2>&1
+check_device sda1
+check_device sdb1 
+check_device sdc1 
+
+if [ $NUM -eq 0 ];then
+	echo " "
+	echo "========== PASS! =========="
+else
+	echo " "
+	echo "========== FAIL! =========="
+fi
+
+killall acc_setget >/dev/null 2>&1
+sleep 1
+#echo "=============set acc timer=============="
+acc_setget -D 10 >/dev/null 2>&1
+#echo "=============acc timer=============="
+

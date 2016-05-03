@@ -1,0 +1,331 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			efsu.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='efreopen.c.html' title=' efreopen.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='emalloc.c.html' title=' emalloc.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   efsu.c - Ethernet Frame Send Utility;
+ *
+ *   convert hexadecimal text files to ethernet frames and transmit
+ *   them over the network; basically, it is a 'send your own frame'
+ *   utility; 
+ *
+ *   the program works like cat, sending file after file to a given
+ *   interface; as each file is read, all hexadecimal octets in the
+ *   file are converted to bytes and buffered; a semicolon causes a
+ *   buffer transmit as does the end of file; script-style comments
+ *   starting with hash (#) and c-language-style comments starting
+ *   with slash-slash or slash-asterisk are consumed and discard as
+ *   the file is read; the errors that can occur are non-hex digits
+ *   and odd number of hex digits;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;limits.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/putoptv.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/symbol.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../ether/channel.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/hexencode.c&quot;
+#include &quot;../tools/hexdump.c&quot;
+#include &quot;../tools/hexin.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/uintspec.c&quot;
+#include &quot;../tools/basespec.c&quot;
+#include &quot;../tools/synonym.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ether/openchannel.c&quot;
+#include &quot;../ether/closechannel.c&quot;
+#include &quot;../ether/readpacket.c&quot;
+#include &quot;../ether/sendpacket.c&quot;
+#include &quot;../ether/channel.c&quot;
+#endif
+
+/*====================================================================*
+ *   program contants;
+ *--------------------------------------------------------------------*/
+
+#define PLCDEVICE &quot;PLC&quot;
+#define PROTOCOLS 2
+
+#ifndef ETHER_CRC_LEN
+#define ETHER_CRC_LEN 4
+#endif
+
+/*====================================================================*
+ *   program variables;
+ *--------------------------------------------------------------------*/
+
+static const struct _term_ protocols [PROTOCOLS] =
+{
+	{
+		&quot;hp10&quot;,
+		&quot;887B&quot;
+	},
+	{
+		&quot;hpav&quot;,
+		&quot;88E1&quot;
+	}
+};
+
+/*====================================================================*
+ *   
+ *   void function (struct channel * channel, void * memory, size_t extent);
+ *
+ *   read Ethernet frame descriptions from stdin and transmit as raw 
+ *   ethernet frames; optionally, wait for a response before return;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static void function (struct channel * channel, void * memory, size_t extent) 
+
+{
+	struct ether_header * frame = (struct ether_header *)(memory);
+	size_t length;
+	while ((length = hexin (memory, extent, stdin)) &gt; 0) 
+	{
+		if (length &lt; (ETHER_MIN_LEN - ETHER_CRC_LEN)) 
+		{
+			error (1, EINVAL, &quot;frame size of %d is less than %d bytes&quot;, length, (ETHER_MIN_LEN - ETHER_CRC_LEN));
+		}
+		if (length &gt; (ETHER_MAX_LEN - ETHER_CRC_LEN)) 
+		{
+			error (1, EINVAL, &quot;frame size of %d is more than %d bytes&quot;, length, (ETHER_MAX_LEN - ETHER_CRC_LEN));
+		}
+		if (_anyset (channel-&gt;flags, CHANNEL_UPDATE_TARGET)) 
+		{
+			memcpy (frame-&gt;ether_dhost, channel-&gt;peer, sizeof (frame-&gt;ether_dhost));
+		}
+		if (_anyset (channel-&gt;flags, CHANNEL_UPDATE_SOURCE)) 
+		{
+			memcpy (frame-&gt;ether_shost, channel-&gt;host, sizeof (frame-&gt;ether_shost));
+		}
+		sendpacket (channel, memory, (signed)(length));
+		if (_anyset (channel-&gt;flags, CHANNEL_LISTEN)) 
+		{
+			while (readpacket (channel, memory, (signed)(extent)) &gt; 0);
+		}
+	}
+	return;
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char * argv []);
+ *
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	extern struct channel channel;
+	static const char *optv [] = 
+	{
+		&quot;d:e:hi:l:p:t:vw:&quot;,
+		PUTOPTV_S_FUNNEL,
+		&quot;Ethernet Frame Send Utility&quot;,
+		&quot;d x\treplace destination address with x&quot;,
+		&quot;e x\techo return frames having ethertype x [88E1]&quot;,
+		&quot;h\treplace source address with host address&quot;,
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		&quot;i n\tuse host interface n [2]&quot;,
+
+#else
+
+		&quot;i s\tuse host interface s [&quot; CHANNEL_ETHDEVICE &quot;]&quot;,
+
+#endif
+
+		&quot;l n\trepeat file sequence n times [1]&quot;,
+		&quot;p n\twait n seconds between files [0]&quot;,
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		&quot;t n\tread capture time is (n) milliseconds [50]&quot;,
+
+#else
+
+		&quot;t n\tread timeout is (n) milliseconds [50]&quot;,
+
+#endif
+
+		&quot;v\tverbose messages&quot;,
+		&quot;w n\twait n seconds between loops [0]&quot;,
+		(const char *) (0) 
+	};
+	byte buffer [ETHER_MAX_LEN];
+	unsigned pause = 0;
+	unsigned delay = 0;
+	unsigned loop = 1;
+	signed c;
+	if (getenv (PLCDEVICE)) 
+	{
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		channel.id = atoi (getenv (PLCDEVICE));
+
+#else
+
+		channel.name = strdup (getenv (PLCDEVICE));
+
+#endif
+
+	}
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch (c) 
+		{
+		case 'd':
+			_setbits (channel.flags, CHANNEL_UPDATE_TARGET);
+			if (hexencode (channel.peer, sizeof (channel.peer), optarg) == -1) 
+			{
+				error (1, errno, &quot;%s&quot;, optarg);
+			}
+			break;
+		case 'e':
+			_setbits (channel.flags, CHANNEL_LISTEN);
+			channel.type = (uint16_t)(basespec (synonym (optarg, protocols, PROTOCOLS), 16, sizeof (channel.type)));
+			channel.type = channel.type;
+			break;
+		case 'h':
+			_setbits (channel.flags, CHANNEL_UPDATE_SOURCE);
+			break;
+		case 'i':
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+			channel.id = atoi (optarg);
+
+#else
+
+			channel.name = optarg;
+
+#endif
+
+			break;
+		case 'l':
+			loop = (unsigned)(uintspec (optarg, 0, UINT_MAX));
+			break;
+		case 'p':
+			pause = (unsigned)(uintspec (optarg, 0, 1200));
+			break;
+		case 'q':
+			_setbits (channel.flags, CHANNEL_SILENCE);
+			break;
+		case 't':
+			channel.timeout = (unsigned)(uintspec (optarg, 0, UINT_MAX));
+			break;
+		case 'v':
+			_setbits (channel.flags, CHANNEL_VERBOSE);
+			break;
+		case 'w':
+			delay = (unsigned)(uintspec (optarg, 0, 1200));
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	openchannel (&amp;channel);
+	if (!argc) 
+	{
+		function (&amp;channel, buffer, sizeof (buffer));
+		loop = 0;
+	}
+	while (loop--) 
+	{
+		int argn;
+		for (argn = 0; argn &lt; argc; argn++) 
+		{
+			if (!freopen (argv [argn], &quot;r&quot;, stdin)) 
+			{
+				error (1, errno, &quot;Can't open %s&quot;, argv [argn]);
+			}
+			function (&amp;channel, buffer, sizeof (buffer));
+			if (argn &lt; argc) 
+			{
+				sleep (pause);
+			}
+		}
+		if (loop) 
+		{
+			sleep (delay);
+		}
+	}
+	closechannel (&amp;channel);
+	return (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='efreopen.c.html' title=' efreopen.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='emalloc.c.html' title=' emalloc.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

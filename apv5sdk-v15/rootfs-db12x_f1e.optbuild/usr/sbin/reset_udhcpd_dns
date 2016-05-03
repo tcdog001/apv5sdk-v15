@@ -1,0 +1,42 @@
+#!/bin/sh
+
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+. /usr/lib/web/sysinit.sh
+. /usr/lib/web/function.sh
+. /etc/wlan/vendor_setup.sh
+
+#                                                                               
+#usage                                                                          
+#                                                                               
+usage()                                                                         
+{                                                                               
+    echo "set_dns_server [IP]"                                   
+    exit 1                                                                      
+}                                                                               
+                                                                                        
+if [ ! $# -eq 1 ];then                                                          
+   usage                                                                      
+fi 
+
+FILEPATH=/tmp/udhcpd.conf               
+FILEPATH_TMP=/tmp/udhcpd.conf.tmp
+
+local xml_dhcp=`config_read /config/network/dhcp/dhcpserver`               
+local xml_dhcp_enable=`config_getoption "$xml_dhcp" enable`  
+
+if [ "$xml_dhcp_enable" == "no" ];then  
+   echo "<dhcpserver><enable>yes</enable></dhcpserver> first"
+   exit 1
+fi
+
+if [ ! -f ${FILEPATH} ]; then
+   dhcpserver_conf
+fi
+
+cp $FILEPATH $FILEPATH_TMP
+/bin/sed -i "s/`/bin/grep dns $FILEPATH`/opt dns $1/g" $FILEPATH
+
+killall udhcpd
+/bin/cat $FILEPATH
+/usr/sbin/udhcpd $FILEPATH

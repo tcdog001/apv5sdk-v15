@@ -1,0 +1,7 @@
+WTPDriverInteraction.c: In function 'CWCheckWifiScanAndPosParam':
+WTPDriverInteraction.c:2440: warning: unused variable 'ret'
+WTPDriverInteraction.c: In function 'CWSendWifiScanAndPosParamToDetector':
+WTPDriverInteraction.c:2623: warning: passing argument 2 of 'printmsg' from incompatible pointer type
+WTPDriverInteraction.c:2597: warning: unused variable 'i'
+WTPDriverInteraction.c: At top level:
+WTPDriverInteraction.c:2548: warning: 'assoc_usr_locate_enable_by_radio' defined but not used

@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			reorder.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='regview.c.html' title=' regview.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='reword.c.html' title=' reword.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   void reorder (NODE * node, unsigned index, unsigned level);
+ *
+ *   nodes.h
+ *   
+ *   
+ *.  Motley Tools by Charles Maier &lt;cmaier@cmassoc.net&gt;;
+ *:  Published 2006 by Charles Maier Associates Limited;
+ *;  Released under the GNU General Public Licence v2 and later;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef REORDER_SOURCE
+#define REORDER_SOURCE
+
+#include &quot;../nodes/nodes.h&quot;
+
+#if NODE_LIST
+
+void reorder (NODE * node) 
+
+{
+	static unsigned index = 0;
+	static unsigned level = 0;
+	while (node) 
+	{
+		node-&gt;index = index++;
+		node-&gt;level = level;
+		node-&gt;count = index;
+		level++;
+		reorder (node-&gt;below);
+		level--;
+		node-&gt;count = index - node-&gt;count;
+		node = node-&gt;after;
+	}
+	return;
+}
+
+#endif
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='regview.c.html' title=' regview.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='reword.c.html' title=' reword.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

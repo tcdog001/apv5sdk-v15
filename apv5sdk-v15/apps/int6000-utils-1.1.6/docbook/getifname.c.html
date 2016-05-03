@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			getifname.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='gethwaddr.c.html' title=' gethwaddr.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='getoptv.c.html' title=' getoptv.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   char * getifname (signed number);
+ *
+ *   ether.h
+ *
+ *   return the PCAP interface name for a given interface number; this
+ *   function is only needed when using LIBPCAP or WINPCAP libraries;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Nathan Houghton &lt;nathan.houghton@intellon.com&gt;
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *      
+ *--------------------------------------------------------------------*/
+
+#ifndef GETIFNAME_SOURCE
+#define GETIFNAME_SOURCE
+
+#include &lt;string.h&gt;
+#include &lt;pcap.h&gt;
+
+#include &quot;../ether/ether.h&quot;
+#include &quot;../tools/error.h&quot;
+
+char * getifname (signed index) 
+
+{
+	char * name = (char *)(0);
+#if defined (WINPCAP) || defined (LIBPCAP)
+	char buffer [PCAP_ERRBUF_SIZE];
+	pcap_if_t *devices = (pcap_if_t *)(0);
+	pcap_if_t *device;
+	signed count;
+	if (pcap_findalldevs (&amp;devices, buffer) == -1) 
+	{
+		error (1, errno, &quot;can't enumerate pcap devices&quot;);
+	}
+	for (device = devices, count = 0; device; device = device-&gt;next) 
+	{
+		if (++count == index) 
+		{
+			name = strdup (device-&gt;name);
+			break;
+		}
+	}
+	if (!device) 
+	{
+		error (1, EINVAL, &quot;invalid interface: %d&quot;, index);
+	}
+	pcap_freealldevs (devices);
+#endif
+	return (name);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='gethwaddr.c.html' title=' gethwaddr.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='getoptv.c.html' title=' getoptv.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

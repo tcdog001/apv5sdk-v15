@@ -1,0 +1,50 @@
+#!/bin/sh
+SHOWSYSINFO=/usr/sbin/showsysinfo
+COMPANY_NAME="`${SHOWSYSINFO} | awk -F':' '/Company Name/{print $2}'`" 
+if [ `echo $COMPANY_NAME|grep -o -i -e 'DATANG'` ];then
+	Temp_COMPANY_NAME=DATANG
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'HONGXIN'` ];then
+	Temp_COMPANY_NAME=HONGXIN
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'FIBERHOME'` ];then
+	Temp_COMPANY_NAME=HONGXIN
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'COMBA'` ];then
+	Temp_COMPANY_NAME=COMBA
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'Alcatel'` ];then
+	Temp_COMPANY_NAME=Alcatel
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'sunnada'` ];then
+	Temp_COMPANY_NAME=sunnada
+else if [ `echo $COMPANY_NAME|grep -o -i -e 'Postcom'` ];then
+	Temp_COMPANY_NAME=Postcom
+else
+	Temp_COMPANY_NAME=Autelan
+fi
+fi
+fi
+fi
+fi
+fi
+fi
+
+case $Temp_COMPANY_NAME in
+	DATANG )
+		SIZE="10.4MB"
+		;;
+	HONGXIN )
+		SIZE="10.3MB"
+		;;
+	COMBA )
+		SIZE="10.2MB"
+		;;
+	Alcatel )
+		SIZE="10.1MB"
+		;;
+	sunnada | Postcom | Autelan)
+		SIZE="10.0MB"
+		;;
+esac
+if [ -f /jffs/.size ];then
+    if [ ! -z "`cat /jffs/.size`" ];then
+        SIZE=`cat /jffs/.size`
+    fi
+fi
+echo "filesize: ${SIZE}"

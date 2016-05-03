@@ -1,0 +1,7 @@
+cmd_ethreg.c: In function 'do_ethreg':
+cmd_ethreg.c:162: warning: implicit declaration of function 's27_rd_phy'
+cmd_ethreg.c:166: warning: implicit declaration of function 'athrs27_reg_read'
+cmd_ethreg.c:171: warning: implicit declaration of function 's27_wr_phy'
+cmd_ethreg.c:176: warning: implicit declaration of function 'athrs27_reg_write'
+cmd_ethreg.c: At top level:
+cmd_ethreg.c:70: warning: 'phyaddr' defined but not used

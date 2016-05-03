@@ -1,0 +1,116 @@
+#!/bin/sh
+
+. /usr/lib/web/xmlconf.sh
+
+SETOEMINFO=/etc/wlan/setoeminfo
+
+oem_info=`wrcpuutil -i | awk -F: '/oem data is/{print $2}'`
+#setoem( type )
+setoem()
+{
+	local xml_tag=""
+	case $1 in
+		vendor)
+		xml_tag="vendor"
+		;;
+		productname)
+		xml_tag="model"
+		;;
+		hversion)
+		xml_tag="hver"
+		;;
+		sn)
+		xml_tag="sn"
+		;;
+		ethmac0)
+		xml_tag="ethmac"
+		;;
+		wifimac0)
+		xml_tag="wifimac"
+		;;
+		oid)
+		xml_tag="oid"
+		;;
+		location)
+		xml_tag="location"
+		;;
+		contact)
+		xml_tag="contact"
+		;;
+		vendor_user)
+		xml_tag="user"
+		;;
+		vendor_pass)
+		xml_tag="password"
+		;;
+		vendor_ssid)
+		xml_tag="ssid"
+		;;
+		vendor_cfg_name)
+		xml_tag="configfile"
+		;;
+		vendor_work_mode)
+		xml_tag="workmode"
+		;;
+	esac
+
+	local oem_value=`config_getoption "${oem_info}" ${xml_tag}`
+
+	if [ ! -z "${oem_value}"  ];then
+		${SETOEMINFO} ${1}  "${oem_value}" 
+	fi
+}
+
+if [ ! -d /jffs/.OEM ];then
+	if [ ! -z "${oem_info}" ];then
+		setoem vendor
+		setoem productname
+		setoem hversion
+		setoem sn
+		setoem ethmac0
+		setoem wifimac0
+		setoem oid
+		setoem location
+		setoem contact
+		setoem vendor_user
+		setoem vendor_pass
+		setoem vendor_ssid
+		setoem vendor_cfg_name
+		setoem vendor_work_mode
+	fi
+fi
+
+#set oem logo
+VENDOR_PATH="/jffs/.OEM/.company_name"
+PRODUCT_PATH="/jffs/.OEM/.product_name"
+LOGO_PATH="/etc/wlan/logo"
+
+if [ -f ${VENDOR_PATH} ];then
+	vendor_name=`cat ${VENDOR_PATH}`	
+fi
+
+if [ ! -z "${vendor_name}" ];then
+	case "${vendor_name}" in
+		*DATANG*)
+			logo_file="${LOGO_PATH}/TD/TD.jpg"
+		;;
+		*Comba*|*COMBA*)
+			product_name=`cat ${PRODUCT_PATH}`
+			case "${product_name}" in
+				*AP2400*)
+					logo_file="${LOGO_PATH}/XJ/AP2400.jpg"
+				;;
+				*AP2600*)
+					logo_file="${LOGO_PATH}/XJ/AP2600.jpg"
+				;;
+			esac
+		;;
+		*FIBERHOME*|*HONGXIN*)
+			logo_file="${LOGO_PATH}/XH/XH.jpg"
+		;;
+		*Ruijie*)
+			logo_file="${LOGO_PATH}/JR/JR.jpg"
+		;;
+	esac
+	${SETOEMINFO} logo "${logo_file}"
+fi

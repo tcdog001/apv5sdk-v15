@@ -1,0 +1,160 @@
+OCTEON_ROOT ?= ${TOPDIR}/ap83sdk/build
+ROOTFSDIR := /home/shark/builddir/rootfs
+#file name and path declare
+PKG := haserl 
+VERSION := 0.9.24
+PKG_NAME := $(PKG)-$(VERSION)
+#PKG_BUILD_DIR := $(PKG_NAME)
+PKG_BUILD_DIR:=src
+
+CAVIUM_CPPFLAGS ?= -I$(OCTEON_ROOT)/gcc-3.4.4-2.16.1/build_mips_nofpu/mips-linux-uclibc/sys-include
+CAVIUM_LDFLAGS ?= -L$(OCTEON_ROOT)/gcc-3.4.4-2.16.1/build_mips_nofpu/mips-linux-uclibc/lib
+PKG_INSTALL_DIR := $(shell pwd)/$(PKG_BUILD_DIR)/ipkg-install/$(PKG)
+
+#command replace
+CPDIR := cp -r 
+CP := cp -fpR
+MKDIR := mkdir -p
+MV := mv
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR = src
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif
+
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE), amcc)
+CROSS=powerpc-apm-linux-gnu
+else ifeq ($(BOARD_TYPE), armada370)
+CROSS=arm-marvell-linux-gnueabi
+else
+CROSS=mips-linux-uclibc
+endif
+#wangyu add end
+CC=${CROSS}-gcc
+
+#TOOLCHAIN_ABI_64=y
+
+ifdef TOOLCHAIN_ABI_N32
+  export TOOLCHAIN_ABI=-mabi=n32
+  export LDFLAGS=-melf32btsmipn32
+  export LIBDIR=/usr/lib32
+endif
+
+ifdef TOOLCHAIN_ABI_64
+  export TOOLCHAIN_ABI=-mabi=64
+  export LDFLAGS=-melf64btsmip
+  export LIBDIR=/usr/lib64
+endif
+
+ifdef TOOLCHAIN_UCLIBC
+  export TOOLCHAIN_ABI=-muclibc
+  export LDFLAGS=-melf32btsmipn32
+  export LIBDIR=/uclibc/usr/lib
+endif
+
+
+#configure option
+FPIC := -fPIC
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE), amcc)
+TARGET_CROSS ?= powerpc-apm-linux-gnu-
+else ifeq ($(BOARD_TYPE), armada370)
+TARGET_CROSS ?= arm-marvell-linux-gnueabi-
+else
+TARGET_CROSS ?= mips-linux-uclibc-
+endif
+#wangyu add end
+TARGET_CC ?= $(TARGET_CROSS)gcc
+TARGET_CFLAGS = 
+EXTRA_CFLAGS = 
+TARGET_CPPFLAGS = $(CAVIUM_CPPFLAGS) 
+EXTRA_CPPFLAGS = 
+TARGET_LDFLAGS = $(CAVIUM_LDFLAGS)
+EXTRA_LDFLAGS = 
+
+#wangyu add MACRO for apv6
+ifeq ($(BOARD_TYPE), amcc)
+GNU_TARGET_NAME ?= mips-linux
+else ifeq ($(BOARD_TYPE), armada370)
+GNU_TARGET_NAME ?= arm-linux
+else
+GNU_TARGET_NAME ?= powerpc-apm-linux
+endif
+#wangyu add end
+
+
+DISABLE_NLS ?= --disable-nls 
+TARGET_CONFIGURE_OPTS ?= \
+  AR=$(TARGET_CROSS)ar \
+  AS="$(TARGET_CC) -c $(TARGET_CFLAGS)" \
+  LD=$(TARGET_CROSS)ld \
+  NM=$(TARGET_CROSS)nm \
+  CC="$(TARGET_CC)" \
+  GCC="$(TARGET_CC)" \
+  CXX=$(TARGET_CROSS)g++ \
+  RANLIB=$(TARGET_CROSS)ranlib \
+  STRIP=$(TARGET_CROSS)strip \
+  OBJCOPY=$(TARGET_CROSS)objcopy \
+  OBJDUMP=$(TARGET_CROSS)objdump \
+  SIZE=$(TARGET_CROSS)size
+
+CONFIGURE_VARS = \
+                $(TARGET_CONFIGURE_OPTS) \
+                CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CXXFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CPPFLAGS="$(TARGET_CPPFLAGS) $(EXTRA_CPPFLAGS)" \
+                LDFLAGS="$(TARGET_LDFLAGS) $(EXTRA_LDFLAGS)" \
+			
+CONFIGURE_ARGS = \
+                --target=$(GNU_TARGET_NAME) \
+                --host=$(GNU_TARGET_NAME) \
+                --build=$(GNU_HOST_NAME) \
+                --program-prefix="" \
+                --program-suffix="" \
+                --prefix=/usr \
+                --exec-prefix=/usr \
+                --bindir=/usr/bin \
+                --sbindir=/usr/sbin \
+                --libexecdir=/usr/lib \
+                --sysconfdir=/etc \
+                --datadir=/usr/share \
+                --localstatedir=/var \
+                --mandir=/usr/man \
+                --infodir=/usr/info \
+
+MAKE_FLAGS = \
+		$(TARGET_CONFIGURE_OPTS) \
+		CROSS="$(TARGET_CROSS)" \
+		ARCH="$(ARCH)"
+MAKE_VARS = \
+		CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+		CPPFLAGS="$(TARGET_CPPFALGS) $(EXTRA_CPPFLAGS)" \
+ 		CXXFLAGS="$(TARGET_CFALGS) $(EXTAR_CFLAGS)" \
+		LDFLAGS="$(TARGET_LDFLAGS) $(EXTRA_LDFLAGS)"
+
+.PHONY: all
+all: configure compile install 
+
+.PHONY: configure
+configure:
+	( cd $(PKG_BUILD_DIR) && \
+	  $(CONFIGURE_VARS) \
+	  ./configure \
+	  $(CONFIGURE_ARGS); \
+	); \
+
+.PHONY: compile
+compile:
+	${MAKE} -C ${PKG_BUILD_DIR} PREFIX=${ROOTFSDIR}/usr CC="${CC}" CFLAGS="${TOOLCHAIN_ABI}" LDFLAGS="${TOOLCHAIN_ABI}" STRIPFLAGS="${TOOLCHAIN_ABI} -Wl,-s" 
+
+.PHNOY: install
+install:
+	cp -f ${PKG_BUILD_DIR}/src/haserl ${ROOTFSDIR}/usr/bin
+
+.PHONY: clean
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) clean

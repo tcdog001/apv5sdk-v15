@@ -1,0 +1,277 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_wlwan=`config_read /config/network/wlwan`
+xml_wlwan_enable=`config_getoption "$xml_wlwan" enable`
+xml_wlwan_ssid=`config_getoption "$xml_wlwan" ssid`
+xml_wlan_security=`config_getoption "$xml_wlwan" sectype`
+
+xml_wep=`config_read /config/network/wlwan/wep`
+xml_wlan_authmode=`config_getoption "$xml_wep" wepmode`
+xml_wlan_wepkeytype=`config_getoption "$xml_wep" wepkeytype`
+xml_wlan_wepkey=`config_getoption "$xml_wep" cwepkey`
+xml_wlan_passkey1=`config_getoption "$xml_wep" wepkey1`
+xml_wlan_passkey2=`config_getoption "$xml_wep" wepkey2`
+xml_wlan_passkey3=`config_getoption "$xml_wep" wepkey3`
+xml_wlan_passkey4=`config_getoption "$xml_wep" wepkey4`
+
+xml_wpa=`config_read /config/network/wlwan/wpa`
+xml_wlan_passphrase=`config_getoption "$xml_wpa" wpapass`
+
+xml_ip=`config_read /config/network/wlwan/ip`
+xml_wlwan_ip=`config_getoption "$xml_ip" iptype`
+xml_wlwan_ipaddr=`config_getoption "$xml_ip" ipaddr`
+xml_wlwan_netmask=`config_getoption "$xml_ip" netmask`
+xml_wlwan_gateway=`config_getoption "$xml_ip" gateway`
+
+xml_dns=`config_read /config/network/wlwan/dns`
+xml_wlwan_dns=`config_getoption "$xml_dns" dnstype`
+xml_wlwan_dnsprimary=`config_getoption "$xml_dns" primarydns`
+xml_wlwan_dnsecondary=`config_getoption "$xml_dns" seconddns`
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>WAN Connection</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<script type="text/javascript">
+function shielding(){
+   if(document.all.security[0].checked == true){
+	  document.getElementById("weps1").style.display="none";
+	  document.getElementById("wept1").style.display="none";
+	  document.getElementById("wepk1").style.display="none";
+	  document.getElementById("wepk2").style.display="none";
+	  document.getElementById("wepk3").style.display="none";
+	  document.getElementById("wepk4").style.display="none";
+	  document.getElementById("wpas1").style.display="none";
+	  document.getElementById("wpak1").style.display="none";
+	  
+	  }
+	else if(document.all.security[1].checked == true){
+		document.getElementById("weps1").style.display="";
+		document.getElementById("wept1").style.display="";
+		document.getElementById("wepk1").style.display="";
+		document.getElementById("wepk2").style.display="";
+		document.getElementById("wepk3").style.display="";
+		document.getElementById("wepk4").style.display="";
+	  document.getElementById("wpas1").style.display="none";
+	  document.getElementById("wpak1").style.display="none";
+	}
+  else if(document.all.security[2].checked == true||document.all.security[3].checked == true){
+	  document.getElementById("weps1").style.display="none";
+	  document.getElementById("wept1").style.display="none";
+	  document.getElementById("wepk1").style.display="none";
+	  document.getElementById("wepk2").style.display="none";
+	  document.getElementById("wepk3").style.display="none";
+	  document.getElementById("wepk4").style.display="none";
+	  document.getElementById("wpas1").style.display="";
+	  document.getElementById("wpak1").style.display="";
+	}
+	
+	if(document.all.ipselect[0].checked == true){
+	  document.getElementById("ipaddr1").style.display="none";
+	  document.getElementById("ipmask1").style.display="none";
+	  document.getElementById("gateway1").style.display="none";
+	}else{
+		document.getElementById("ipaddr1").style.display="";
+	  document.getElementById("ipmask1").style.display="";
+	  document.getElementById("gateway1").style.display="";
+	}
+	
+	if(document.all.dnsselect[0].checked == true){
+	  document.getElementById("dnsp1").style.display="none";
+	  document.getElementById("dnss1").style.display="none";
+	}else{
+		document.getElementById("dnsp1").style.display="";
+	  document.getElementById("dnss1").style.display="";
+	}
+}
+
+function g_OpenWindow(pageURL, innerWidth, innerHeight)
+{
+	var ScreenWidth = screen.availWidth
+	var ScreenHeight = screen.availHeight
+	var StartX = (ScreenWidth - innerWidth) / 2
+	var StartY = (ScreenHeight - innerHeight) / 2
+	var wins = window.open(pageURL, 'OpenWin', 'left='+ StartX + ', top='+ StartY + ', Width=' + innerWidth +', height=' + innerHeight + ', resizable=no, scrollbars=yes, status=no, toolbar=no, menubar=no, location=no')
+	wins.focus();
+}	
+</script>
+</head>
+
+<body bgcolor="#efefef" onLoad="shielding()">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1"><a href="wan_status.htm" target="MainFrame">Status</a></td>
+          <td class="top1"><a href="3g_wan_setting.htm" target="MainFrame">3G WAN Setting</a></td>
+		  <td class="top1">802.11 WAN Setting</td>
+		  <td class="top1"><a href="wan_selection.htm" target="MainFrame">WAN selection</a></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">WAN Setting -->802.11 WAN Connection</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form name="form1" method="post" action="<%= $action_cgi %>" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="802.11 WAN illustration">802.11 WAN</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+    <tr>
+			<td class="td_style" width="150">802.11 WAN Status</td>
+			<td class="td_style" width="350"><input type="checkbox" <% webui_checkbox_check "$xml_wlwan_enable" "yes" %> name="wanenable" value="yes" >&nbsp;</td>
+		</tr>   
+        
+		<tr>
+				<td class="td_style">Associated SSID</td>
+				<td class="td_style"><input type="text" name="ssidname" value="<%= "$xml_wlwan_ssid" %>">&nbsp;<input type="button" value="scanning" name="scanning" onclick="javascript:g_OpenWindow('scan_vap.htm','650','500')"></td>
+		</tr>
+		
+		<tr>
+				<td class="td_style">&nbsp;</td>
+				<td class="td_style">&nbsp;</td>
+		</tr>
+		
+		<tr>
+				<td class="td_style" width="150"><b>Security</b></td>
+				<td class="td_style" width="350">
+					<input type="radio" <% webui_radiobutton_check "$xml_wlan_security" "none" %> name="security" value="none" onClick="shielding()">None &nbsp;
+					<input type="radio" <% webui_radiobutton_check "$xml_wlan_security" "wep" %> name="security" value="wep" onClick="shielding()">WEP &nbsp;
+					<input type="radio" <% webui_radiobutton_check "$xml_wlan_security" "wpa" %> name="security" value="wpa" onClick="shielding()"> WPA &nbsp;
+					<input type="radio" <% webui_radiobutton_check "$xml_wlan_security" "wpa2" %> name="security" value="wpa2" onClick="shielding()"> WPA2 &nbsp; 
+				</td>
+		</tr>
+		
+		<tr id="weps1">
+				<td class="td_style" width="150">Mode</td>
+				<td class="td_style" width="350">
+					<select name="authmode" onChange="shielding()">
+					<option value="1" <% webui_listbox_select "$xml_wlan_authmode" "1" %>>Open System</option>
+				  <option value="2" <% webui_listbox_select "$xml_wlan_authmode" "2" %>>Shared Key</option>
+					</select>
+				</td>
+			</tr>
+			
+			<tr id="wept1">
+				<td class="td_style" >Encryption Type</td>
+				<td class="td_style" >
+					<select name="etype">
+					<option value="hex" <% webui_listbox_select "$xml_wlan_wepkeytype" "hex" %>>Hexadecimal</option>
+					<option value="ascii" <% webui_listbox_select "$xml_wlan_wepkeytype" "ascii" %>>Ascii</option>
+					</select>
+				</td>
+			</tr>
+																		
+			<tr id="wepk1">
+				<td class="td_style">WEP Key 1</td><td class="td_style"><input type="radio" <% webui_radiobutton_check "$xml_wlan_wepkey" "0" %>  name="wepkey" value="0">&nbsp;
+				<input type="text" name="passkey1" value="<%= "$xml_wlan_passkey1" %>"></td>
+			</tr>
+												
+			<tr id="wepk2">
+					<td class="td_style">WEP Key 2</td><td class="td_style"><input type="radio" <% webui_radiobutton_check "$xml_wlan_wepkey" "1" %>  name="wepkey" value="1">&nbsp;
+					<input type="text" name="passkey2" value="<%= "$xml_wlan_passkey2" %>"></td>
+			</tr>
+												
+			<tr id="wepk3">
+					<td class="td_style" >WEP Key 3</td><td class="td_style"><input type="radio" <% webui_radiobutton_check "$xml_wlan_wepkey" "2" %>  name="wepkey" value="2" >&nbsp;
+					<input type="text" name="passkey3" value="<%= "$xml_wlan_passkey3" %>"></td>
+			</tr>
+												
+			<tr id="wepk4">
+					<td class="td_style">WEP Key 4</td><td class="td_style"><input type="radio" <% webui_radiobutton_check "$xml_wlan_wepkey" "3" %>  name="wepkey" value="3" >&nbsp;
+					<input type="text" name="passkey4" value="<%= "$xml_wlan_passkey4" %>"></td>
+			</tr>						
+		
+			<tr id="wpas1">
+					<td class="td_style">WPA with</td>
+					<td class="td_style">
+					PSK
+					</select>
+					</td>
+			</tr>
+		
+			<tr id="wpak1">
+					<td class="td_style">Passphrase</td>
+					<td class="td_style"><input type="text" name="passphrase"  value="<%= "$xml_wlan_passphrase" %>"></td>
+			</tr>
+			
+			<tr>
+				<td class="td_style">&nbsp;</td>
+				<td class="td_style">&nbsp;</td>
+		  </tr>
+			
+			<tr>
+				<td class="td_style" ><b>IP</b></td>
+				<td class="td_style" >
+					<input type="radio" <% webui_radiobutton_check "$xml_wlwan_ip" "auto" %> name="ipselect" value="auto" onClick="shielding()">Auto IP &nbsp;
+					<input type="radio" <% webui_radiobutton_check "$xml_wlwan_ip" "manual" %> name="ipselect" value="manual" onClick="shielding()">Manual IP &nbsp;
+				</td>
+		 </tr>
+			
+			<tr id="ipaddr1">
+          <td class="td_style" >IP Address </td>
+          <td class="td_style" ><input type="text" name="ip_address" value="<%= "$xml_wlwan_ipaddr" %>" style="height:12px; width:88px" /></td>
+      </tr>
+      
+		  <tr id="ipmask1">
+          <td class="td_style">Subnet Mask </td>
+          <td class="td_style"><input type="text" name="subnet_mask" value="<%= "$xml_wlwan_netmask" %>" style="height:12px; width:88px" /></td>
+      </tr>
+      
+      <tr id="gateway1">
+          <td class="td_style">Gateway </td>
+          <td class="td_style"><input type="text" name="gateway" value="<%= "$xml_wlwan_gateway" %>" style="height:12px; width:88px" /></td>
+      </tr>
+      
+      <tr>
+				<td class="td_style">&nbsp;</td>
+				<td class="td_style">&nbsp;</td>
+		  </tr>
+      
+      <tr>
+				<td class="td_style" ><b>DNS</b></td>
+				<td class="td_style" >
+					<input type="radio" <% webui_radiobutton_check "$xml_wlwan_dns" "auto" %> name="dnsselect" value="auto" onClick="shielding()">Auto DNS &nbsp;
+					<input type="radio" <% webui_radiobutton_check "$xml_wlwan_dns" "manual" %> name="dnsselect" value="manual" onClick="shielding()">Manual DNS &nbsp;
+				</td>
+		 </tr>
+			
+			<tr id="dnsp1">
+          <td class="td_style" >Primary DNS</td>
+          <td class="td_style" ><input type="text" name="primarydns" value="<%= "$xml_wlwan_dnsprimary" %>" style="height:12px; width:88px" /></td>
+      </tr>
+      
+		  <tr id="dnss1">
+          <td class="td_style">Secondary DNS</td>
+          <td class="td_style"><input type="text" name="secondns" value="<%= "$xml_wlwan_dnsecondary" %>" style="height:12px; width:88px" /></td>
+      </tr>
+      
+      <tr >
+          <td ></td>
+          <td ></td>
+      </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><input id="but" type="submit" name="wan_connect_commit" value="Submit"/></td>
+  </tr>
+</table>
+<input type="hidden" value="Wlwan Apply" name="SERVLET">
+</form>
+</div>
+</body>
+</html>

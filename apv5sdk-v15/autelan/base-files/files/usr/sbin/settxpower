@@ -1,0 +1,58 @@
+#!/bin/sh
+#settxpower vapname txpower
+IWCONFIG=/usr/sbin/iwconfig
+
+#
+#usage()
+#
+usage()
+{
+	echo "settxpower vapname txpower"
+	exit 1
+}
+
+#
+#get_wifiname( vapname )
+#
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+get_wifiname()
+{
+	local thinap=`cat /proc/sys/dev/wifi0/thinap`
+	if [  0${thinap} -eq 0 ];then
+		local wifinum=`echo ${vapname} | grep -o '[0-9]\{1,\}'`
+		wifinum=$((wifinum+1))
+		local vap_path="/config/network/vap${wifinum}"
+		local vap_str=`config_read ${vap_path}`
+		wifiname=`config_getoption "$vap_str" wifi`
+	else
+		local wifinum=`echo ${vapname} | cut -d. -f2 | cut -d- -f1`
+		wifiname="wifi${wifinum}"
+	fi
+}
+
+if [ ! $# -eq 2 ];then
+	usage 
+fi
+
+vapname="${1}"
+txpower="${2}"
+wifiname=""
+
+get_wifiname
+
+if [ "${wifiname}" = "wifi0" ];then
+	if [ -f /jffs/tx-offset ];then
+		threshold=`cat /jffs/tx-offset`
+		if [ -z ${threshold} ];then
+			threshold=11 
+		fi
+		if [ ${txpower} -le ${threshold}  ];then
+			txpower=1
+		else
+			txpower=$((${txpower}-${threshold}))
+		fi
+	fi
+fi
+
+${IWCONFIG} ${vapname} txpower ${txpower}

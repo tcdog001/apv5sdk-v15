@@ -1,0 +1,57 @@
+.TH AR7420-hello 7a "June 2012" "plc-utils-2.1.1" "Qualcomm Atheros Powerline Toolkit"
+.SH NAME
+hello.nvm - simple demonstration applet
+.SH SYNOPSIS
+.BR plctest  
+.BR hello.nvm
+.RI [ ... ]
+.SH PURPOSE
+This applet runs, prints a basic message on the console and returns to the bootloader. It can be used to demonstrate \fBplctest\fR program functionality where one or more applets are to be chained together to form sequence. This applet, together with applet \fBgoodbye.nvm\fR can be ordered and/or merged to illustrate various sequences.
+.SH PREREQUISITES
+This applet runs on the AR7420 chipset. Bootloader software must be running. SDRAM need not be configured. You must use program \fBplctest\fR to load and execute it.
+.SH DISCLAIMER
+Qualcomm Atheros image file structure and content is proprietary to Qualcomm Atheros, Ocala FL USA. Consequently, public information is not available. Qualcomm Atheros reserves the right to change file structure or content in future firmware releases without any obligation to notify or compensate users of this program. This applet is reserved for use by Qualcomm Atheros Engineers for internal use. Qualcomm Atheros makes no claims concerning the reliability of this applet or the suitability of this applet for any particular purpose.
+.SH EXAMPLES
+The following example uses program \fBplctest\fR to download and execute \fBhello.nvm\fR. The applets executes, sends an ARPC message and and exits, returning to the bootloader. Observe that the console prompt appears after execution because this applet terminates.
+.PP
+   # plctest hello.nvm 
+   eth1 00:B0:52:00:00:01 Writing hello.nvm (0) (00210000:5104)
+   eth1 00:B0:52:00:00:01 Written
+   eth1 00:B0:52:00:00:01 Starting Software (00210004)
+   eth1 00:B0:52:00:00:01 Started
+   *** Hello World!!! ***
+   #
+.PP
+The next example downloads and executes three \fBhello.nvm\fR applets. Each applet executes in turn and returns to the bootloader, allowing the next applet to execute. This is the easiest way to create an applet chain. Observe that the console prompt appears after execution because this applet terminates.
+.PP
+   # plctest hello.nvm hello.nvm hello.nvm
+   eth1 00:B0:52:00:00:01 Writing hello.nvm (0) (00210000:5104)
+   eth1 00:B0:52:00:00:01 Written
+   eth1 00:B0:52:00:00:01 Starting Software (00210004)
+   eth1 00:B0:52:00:00:01 Started
+   *** Hello World!!! ***
+   eth1 00:B0:52:00:00:01 Writing hello.nvm (0) (00210000:5104)
+   eth1 00:B0:52:00:00:01 Written
+   eth1 00:B0:52:00:00:01 Starting Software (00210004)
+   eth1 00:B0:52:00:00:01 Started
+   *** Hello World!!! ***
+   eth1 00:B0:52:00:00:01 Writing hello.nvm (0) (00210000:5104)
+   eth1 00:B0:52:00:00:01 Written
+   eth1 00:B0:52:00:00:01 Starting Software (00210004)
+   eth1 00:B0:52:00:00:01 Started
+   *** Hello World!!! ***
+   #
+.PP
+The next example does the same thing but option \fB-q\fR is used to suppress progress information. Observe that the console prompt appears after execution because this applet terminates.
+.PP
+   # plctest -q hello.nvm hello.nvm hello.nvm
+   *** Hello World!!! ***
+   *** Hello World!!! ***
+   *** Hello World!!! ***
+   #
+.SH SEE ALSO
+.BR applets ( 7 ),
+.BR goodbye ( 7 )
+.SH CREDITS
+ John Byron <john.byron@qca.qualcomm.com>
+

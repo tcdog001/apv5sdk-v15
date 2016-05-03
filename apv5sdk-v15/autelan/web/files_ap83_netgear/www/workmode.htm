@@ -1,0 +1,303 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_ac_addr=`awk '/^[1-9][0-9]{0,2}\./' /etc/config/config.wtp`
+xml_ac_addr1=`echo $xml_ac_addr | cut -f 1 -d" "`
+xml_ac_addr2=`echo $xml_ac_addr | cut -f 2 -d" "`
+xml_ac_addr3=`echo $xml_ac_addr | cut -f 3 -d" "`
+xml_ac_addr4=`echo $xml_ac_addr | cut -f 4 -d" "`
+if [ $xml_ac_addr2 == $xml_ac_addr1 ]; then
+	xml_ac_addr2=""
+fi
+if [ $xml_ac_addr3 == $xml_ac_addr1 ]; then
+	xml_ac_addr3=""
+fi
+if [ $xml_ac_addr4 == $xml_ac_addr1 ]; then
+	xml_ac_addr4=""
+fi
+xml_ac_name=`awk -F'> ' '/WTP_NAME/{print $2}' /etc/config/config.wtp`
+xml_ac_location=`awk -F'> ' '/WTP_LOCATION/{print $2}' /etc/config/config.wtp`
+xml_ac_proto=`awk -F'> ' '/WTP_LEV3_PROTOCOL/{print $2}' /etc/config/config.wtp`
+xml_ac_mtu=`awk -F'> ' '/WTP_FORCE_MTU/{print $2}' /etc/config/config.wtp`
+xml_ac_fileable=`awk -F'> ' '/AC_LOG_FILE_ENABLE/{print $2}' /etc/config/config.wtp`
+xml_ac_filesize=`awk -F'> ' '/AC_LOG_FILE_SIZE/{print $2}' /etc/config/config.wtp`
+xml_ac_domain=`awk -F'> ' '/WTP_AC_DOMAIN_NAME/{print $2}' /etc/config/config.wtp`
+xml_wtp=`config_read /config/system`
+xml_wtp_enable=`config_getoption "$xml_wtp" wtpenable`
+
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js admin_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	init_mmenu(flag);
+	init_adminmenu(flag);
+	init_workm(flag);
+function valvalidate()
+{
+    	overlayer();
+}
+
+
+
+String.prototype.trim   =   function()
+{
+         //   用正则表达式将前后空格
+         //   用空字符串替代。
+         return   this.replace(/(^\s*)|(\s*$)/g,   "");
+}
+
+
+
+
+
+function check()
+{ 
+if(document.all.wtpenable.checked == true)
+	{
+	     x1=document.all.ac_adress1; 
+		 x2=document.all.ac_adress2;
+		 x3=document.all.ac_adress3;
+		 x4=document.all.ac_adress4;
+		 var reg = /^([1-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$/;
+
+		 if ( x1.value.trim() == "" && x2.value.trim() == "" && x3.value.trim() == "" && x4.value.trim() == "" ){
+			alert("AC address is null .");
+			var ac_null_flag=1;
+					x1.focus();
+					return false;
+		 }
+		 if ( !reg.test(x1.value)&& x1.value.trim()!="" ){
+			alert("AC ADDRESSES 1 is error .");
+			x1.focus();
+			return false;
+		 }
+		 
+		 if ( !reg.test(x2.value)&& x2.value.trim()!="" ){
+			alert("AC ADDRESSES 2 is error .");
+			x2.focus();
+			return false;
+		 }
+		 
+		 if ( !reg.test(x3.value)&& x3.value.trim()!="" ){
+			alert("AC ADDRESSES 3 is error .");
+			x3.focus();
+			return false;
+		 }
+		 
+		 if ( !reg.test(x4.value)&& x4.value.trim()!="" ){
+			alert("AC ADDRESSES 4 is error .");
+			x4.focus();
+					return false;
+		 }
+		 
+     if ( document.all.ac_wtpname.value.trim() == "" ){
+        alert(document.all.ac_wtpname.name + " is null .");
+				document.all.ac_wtpname.focus();
+				return false;
+     }
+     
+     if ( document.all.ac_location.value.trim() == "" ){
+        alert(document.all.ac_location.name + " is null .");
+				document.all.ac_location.focus();
+				return false;
+     }
+     
+     if ( document.all.protocol.value.trim() == "" ){
+        alert(document.all.protocol.name + " is null .");
+				document.all.protocol.focus();
+				return false;
+     }
+     
+     if ( document.all.forcemtu.value.trim() == "" ){
+        alert(document.all.forcemtu.name + " is null .");
+				document.all.forcemtu.focus();
+				return false;
+     }
+     
+     if ( document.all.fileable.value.trim() == "" ){
+        alert(document.all.fileable.name + " is null .");
+				document.all.fileable.focus();
+				return false;
+     }
+     
+     if ( document.all.filesize.value.trim() == "" ){
+        alert(document.all.filesize.name + " is null .");
+				document.all.filesize.focus();
+				return false;
+     }
+     
+     if ( document.all.domain.value.trim() == "" ){
+        alert(document.all.domain.name + " is null .");
+				document.all.domain.focus();
+				return false;
+     }
+    }
+else
+	{
+	 alert("AP工作模式自动切换未选中");
+	 return false;
+	}
+     
+		 
+		 valvalidate();
+} 
+</script>
+</head>
+<body>
+<%in overlayer.htm %>
+<%in menu_administration7.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return check()">
+<div align="center" >
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+			<tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#d9d9d9" bordercolor="#d9d9d9"><b><script language="javascript">replace(workm_name1)</script>&nbsp;</b></td>
+			</tr>
+			
+<tr>
+			<td colspan="2" height="10">
+			</td>
+</tr>
+			
+<tr>
+		<td height="28" align="right" bordercolor="#ffffff" width="280"><script language="javascript">replace(workm_wtpd)</script>&nbsp;</td>
+		<td bordercolor="#ffffff" width="370"><input type="checkbox" <% webui_checkbox_check "$xml_wtp_enable" "yes" %> name="wtpenable" value="yes" >&nbsp;</td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff"><script language="javascript">replace(workm_addr1)</script>&nbsp;</td>
+<td   bordercolor="#ffffff"><input type="text" name="ac_adress1" value="<%= "$xml_ac_addr1" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff"><script language="javascript">replace(workm_addr2)</script>&nbsp;</td>
+<td   bordercolor="#ffffff"><input type="text" name="ac_adress2" value="<%= "$xml_ac_addr2" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff"><script language="javascript">replace(workm_addr3)</script>&nbsp;</td>
+<td   bordercolor="#ffffff"><input type="text" name="ac_adress3" value="<%= "$xml_ac_addr3" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff"><script language="javascript">replace(workm_addr4)</script>&nbsp;</td>
+<td   bordercolor="#ffffff"><input type="text" name="ac_adress4" value="<%= "$xml_ac_addr4" %>"></td>
+</tr>
+
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff"><script language="javascript">replace(workm_wtpn)</script>&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="ac_wtpname" value="<%= "$xml_ac_name" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff"><script language="javascript">replace(workm_wtpl)</script>&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="ac_location" value="<%= "$xml_ac_location" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff"><script language="javascript">replace(workm_wtpp)</script>&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="protocol" value="<%= "$xml_ac_proto" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff"><script language="javascript">replace(workm_wtpm)</script>&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="forcemtu" value="<%= "$xml_ac_mtu" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff"><script language="javascript">replace(workm_loge)</script>&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="fileable" value="<%= "$xml_ac_fileable" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff"><script language="javascript">replace(workm_logs)</script>&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="filesize" value="<%= "$xml_ac_filesize" %>"></td>
+</tr>
+
+<tr>
+<td align="right" height="28"  bordercolor="#ffffff"><script language="javascript">replace(workm_domain)</script>&nbsp;</td>
+<td bordercolor="#ffffff"><input type="text" name="domain" value="<%= "$xml_ac_domain" %>"></td>
+</tr>
+			
+<tr>
+			<td colspan="2" height="10">
+			</td>
+</tr>
+			</table>
+<table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+<tr height="40">
+<td align="center" ><script language="javascript">replace(workm_appset)</script></td>
+
+</tr>
+</table>
+</div>
+ 
+</form>
+</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>">
+<div align="center" >
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="0" cellpadding="0" cellspacing="0" width="650">
+
+<tr>
+<td colspan="2" align="left" width="100%"  height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(workm_name)</script>&nbsp;</b></td>
+</tr>
+
+	<tr>
+			<td colspan="2" height="10">
+			</td>
+</tr>		
+
+<tr>
+       <td align="center" ><script language="javascript">replace(workm_turntothin)</script> </td>
+	   </tr>
+	   	<tr>
+			<td colspan="2" height="10">
+			</td>
+</tr>	
+</table>
+</div>
+<tr>
+
+        <td align="right"   colspan="2"><script language="javascript">replace(workm_help)</script></td>
+      </tr>
+ 
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

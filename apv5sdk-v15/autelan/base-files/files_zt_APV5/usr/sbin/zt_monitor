@@ -1,0 +1,182 @@
+#!/bin/sh
+RESET_FLAG=0
+
+INTERVAL=15
+REBOOT=/sbin/sysreboot
+THINAP=`cat /proc/sys/dev/wifi0/thinap`
+COUNT=0
+check_info=""
+reason=""
+
+WATCHSTATE=/proc/sys/dev/wifi0/thinap_state
+WATCHDOG=/proc/sys/dev/wifi0/thinap_check_timer
+
+ZTMON_LOG=/jffs/ztmon.log
+
+if [ $# -eq 1 ]; then
+	INTERVAL=${1}
+fi
+
+#mem_check
+MEM_MAX_COUNT=2
+MEM_CHECK_FLAG=0
+mem_check()
+{
+	local mem_exc=`free | awk '/Mem/{ mr=$3/$2 }END{ if ( mr > 0.9) {print 1} else {print 0} }'`
+	if [ ${mem_exc} -eq 1 ]; then
+		MEM_CHECK_FLAG=$((${MEM_CHECK_FLAG}+1))
+	fi
+	if [ ${MEM_CHECK_FLAG} -gt ${MEM_MAX_COUNT} ]; then
+		local mem_free=`free | awk '/Mem/{print $4}'`
+		check_info="memory check error, memory free:${mem_free}"
+		RESET_FLAG=1
+	fi
+}
+write_log()
+{
+	nline=`cat ${ZTMON_LOG} | wc -l`
+	timestr=`date`
+	if [ $nline -gt 100 ]; then
+		echo "$timestr  the ap reset" > ${ZTMON_LOG}
+	else
+		echo "$timestr  the ap reset" >> ${ZTMON_LOG}
+	fi
+}
+proc_check()
+{
+	local apctl_count=`ps | grep "apctl" | grep -v "grep" | wc -l`
+	local apcomm_count=`ps | grep "apcomm" | grep -v "grep" | wc -l`
+	if [ $apctl_count -eq 0 ] || [ $apcomm_count -eq 0 ] || [ -f /tmp/apctl_flag_v ]; then
+		echo "check apcomm/apctl is not exists!"
+		if [ $apctl_count -eq 0 ] || [ -f /tmp/apctl_flag_v ]; then
+			if [ -f /tmp/apctl_flag_v ]; then
+				date >> $ZTMON_LOG
+				echo "apctl_flag_v is exists! apctl killed" >> $ZTMON_LOG
+				killall -9 apctl
+				rm /tmp/apctl_flag_v
+			fi
+			date >> $ZTMON_LOG
+			echo "apctl is not exists! apctl restarted" >> $ZTMON_LOG
+#			reason="reboot"
+			killall -9 dhcpsnooping
+			killall -9 linkcheck
+			killall -9 ntpclient
+			killall -9 hostapd
+			killall -9 iwlist_scan
+			killall -9 cpu_util_rate
+			#rm /tmp/zt_state
+			write_log
+			sleep 1
+			apctl -v -i default &
+		fi
+		if [ $apcomm_count -eq 0 ]; then
+			date >> $ZTMON_LOG
+			echo "apcomm is not exists! apctl and apcomm restarted" >> $ZTMON_LOG
+			reason="apcommexit"
+			killall -9 apcomm
+			killall -9 apctl
+			killall -9 dhcpsnooping
+			killall -9 linkcheck
+			killall -9 ntpclient
+			killall -9 hostapd
+			killall -9 iwlist_scan
+			killall -9 cpu_util_rate
+			rm /tmp/zt_state
+			rm /tmp/ap-addr
+			des_wlan
+			sleep 1
+			write_log
+			apcomm &
+	 		apctl -i default -r $reason &
+		fi
+#		if [ $reason=="apcommexit" ] ||  [ $reason=="redhcp" ];then
+#	 		apctl -i default -r $reason &
+#		else
+#			apctl -i default &		
+#		fi
+		COUNT=$(($COUNT + 1))
+		if [ $COUNT -gt 10 ]; then
+			RESET_FLAG=1
+			check_info="reboot apctl/apcomm overtime 150 seconds"
+			echo $check_info
+		fi
+	else
+		echo "check apcomm/apctl is exists!"
+		if [ -f /tmp/zt_state ];then
+			COUNT=0
+		else
+			COUNT=$(($COUNT + 1))
+			if [ $COUNT -gt 10 ]; then
+				RESET_FLAG=1
+				check_info="disconnected AC!"
+				echo $check_info
+			fi
+		fi
+	fi
+	
+	
+}
+
+# ap ip address check, if ip changed, then restart apcomm & apctl
+ip_check()
+{
+	if [ -f /tmp/ap-addr ]; then
+		local ap_ip=`cat /tmp/ap-addr`
+		local host_ip=`ifconfig default | awk -F " " '/inet addr/ {print $2}' | awk -F ":" '{print $2}'`
+
+		if [ ${ap_ip} != ${host_ip} ]; then
+			date >> $ZTMON_LOG
+			echo "ap ip address changed! apctl and apcomm restarted" >> $ZTMON_LOG
+			reason="redhcp"
+			killall -9 apcomm
+			killall -9 apctl
+			killall -9 dhcpsnooping
+			killall -9 linkcheck
+			killall -9 ntpclient
+			killall -9 hostapd
+			killall -9 iwlist_scan
+			killall -9 cpu_util_rate
+			rm /tmp/zt_state
+			rm /tmp/ap-addr
+			des_wlan
+			sleep 1
+			write_log
+			apcomm &
+	 		apctl -i default -r $reason &
+		fi
+	fi
+}
+
+#fat_check()
+fat_check()
+{
+	mem_check
+	proc_check
+	ip_check
+}
+
+#thin_check()
+thin_check()
+{
+	echo "check tinap not support"
+}
+if [ -f /proc/sys/dev/wifi0/monitor_process ];then
+	echo $$ > /proc/sys/dev/wifi0/monitor_process
+fi
+while :
+do
+	if [ ${THINAP} -eq 1  ];then
+	    thin_check
+	else
+		fat_check
+		#echo 0 > ${WATCHDOG}
+	fi
+	if [ ${RESET_FLAG} -eq 1  ];then
+		date >> ${ZTMON_LOG}
+		echo "${check_info}" >> ${ZTMON_LOG}
+		tail -n 200 /tmp/apctl.log > /jffs/apctl_tmp.log
+		echo x > /proc/kes_debug_flag
+		${REBOOT}
+	fi
+	sleep ${INTERVAL}
+done

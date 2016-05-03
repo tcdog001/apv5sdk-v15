@@ -1,0 +1,8 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/mlme/ieee80211_mgmt.c: In function 'ieee80211_parse_beacon':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/mlme/ieee80211_mgmt.c:1597: warning: passing argument 2 of 'ieee80211_note_mac' discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/mlme/ieee80211_mgmt.c:1811: warning: passing argument 2 of 'ieee80211_note_mac' discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/mlme/ieee80211_mgmt.c:1811: warning: passing argument 2 of 'ieee80211_note_mac' discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/mlme/ieee80211_mgmt.c:1814: warning: passing argument 2 of 'ieee80211_note_mac' discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/mlme/ieee80211_mgmt.c:1814: warning: passing argument 2 of 'ieee80211_note_mac' discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/mlme/ieee80211_mgmt.c:1818: warning: passing argument 2 of 'ieee80211_note_mac' discards qualifiers from pointer target type
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/mlme/ieee80211_mgmt.c:1818: warning: passing argument 2 of 'ieee80211_note_mac' discards qualifiers from pointer target type

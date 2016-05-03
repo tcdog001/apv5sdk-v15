@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			EthernetHeader.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='EncodeSetSDRAMCfg.c.html' title=' EncodeSetSDRAMCfg.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='FactoryDefaults.c.html' title=' FactoryDefaults.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   signed EthernetHeader (struct header_eth * header, const uint8_t ODA [], const uint8_t OSA []);
+ *
+ *   message.h
+ *
+ *   encode buffer with a standard Ethernet header having a specified
+ *   source address (OSA) and destination address (ODA) address and a
+ *   HomePlug AV ethertype (HOMEPLUG_MTYPE);
+ *
+ *   return the number of bytes encoded or 0 on encode error; set
+ *   errno to the appropriate POSIX error number;
+ *
+ *   OSA is the hardware (MAC) address of the source device;
+ *
+ *   ODA is the hardware (MAC) address of the desintation device;
+ *
+ *   MTYPE is the HomePlug AV Ethertype;
+ *
+ *   There is no need to flush the header since this function writes
+ *   to all locations unless there is an error; the caller may elect
+ *   to flush the buffer before calling this function;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s): 
+ *	Charles Maier, charles.maier@intellon.com
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef ETHERNETHEADER_SOURCE
+#define ETHERNETHEADER_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;memory.h&gt;
+#include &lt;arpa/inet.h&gt;
+
+#include &quot;../int6k/homeplug.h&quot;
+#include &quot;../int6k/message.h&quot;
+
+const uint8_t broadcast [ETHER_ADDR_LEN] = 
+
+{
+	0xFF,
+	0xFF,
+	0xFF,
+	0xFF,
+	0xFF,
+	0xFF 
+};
+
+signed EthernetHeader (struct header_eth * header, const uint8_t ODA [], const uint8_t OSA []) 
+
+{
+	memcpy (header-&gt;ODA, ODA, sizeof (header-&gt;ODA));
+	memcpy (header-&gt;OSA, OSA, sizeof (header-&gt;OSA));
+	header-&gt;MTYPE = htons (HOMEPLUG_MTYPE);
+	return (sizeof (struct header_eth));
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='EncodeSetSDRAMCfg.c.html' title=' EncodeSetSDRAMCfg.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='FactoryDefaults.c.html' title=' FactoryDefaults.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

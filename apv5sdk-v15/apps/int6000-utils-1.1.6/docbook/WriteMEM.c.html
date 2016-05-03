@@ -1,0 +1,188 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			WriteMEM.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='WriteCFG.c.html' title=' WriteCFG.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='WriteMOD.c.html' title=' WriteMOD.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   int WriteMEM (struct int6k * int6k, struct _file_ * file, uint32_t offset, uint32_t length);
+ *
+ *   int6k.h
+ *
+ *   Write the contents of a file directly into device SDRAM using
+ *   VS_WR_MEM messages; the bootloader must be running for this to
+ *   work; the function is used to dowload firmware or test applets;
+ *
+ *   this function makes no attempt to validate the information sent
+ *   to the device;
+ *   
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Nathan Houghton &lt;nathan.houghton@intellon.com&gt;
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef WRITEMEM_SOURCE
+#define WRITEMEM_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;memory.h&gt;
+
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/files.h&quot;
+
+int WriteMEM (struct int6k * int6k, struct _file_ * file, uint32_t offset, uint32_t extent) 
+
+{
+
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_wr_mem_request 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint32_t MOFFSET;
+		uint32_t MLENGTH;
+		uint8_t BUFFER [INT6K_BLOCKSIZE];
+	}
+	* request = (struct vs_wr_mem_request *) (message);
+	struct __packed vs_wr_mem_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint32_t MOFFSET;
+		uint32_t MLENGTH;
+	}
+	* confirm = (struct vs_wr_mem_confirm *) (message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	signed length = INT6K_BLOCKSIZE;
+	Request (int6k, &quot;Write Memory (%08X:%d)&quot;, offset, extent);
+	while (extent) 
+	{
+		memset (message, 0, sizeof (struct message));
+		EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+		IntellonHeader (&amp;message-&gt;intellon, (VS_WR_MEM | MMTYPE_REQ));
+		if (length &gt; (signed)(extent)) 
+		{
+			length = extent;
+		}
+		if (read (file-&gt;file, request-&gt;BUFFER, length) &lt; length) 
+		{
+			error (1, errno, &quot;Can't read %s&quot;, filepart (file-&gt;name));
+		}
+		request-&gt;MLENGTH = HTOLE32 (length);
+		request-&gt;MOFFSET = HTOLE32 (offset);
+		int6k-&gt;packetsize = sizeof (struct vs_wr_mem_request);
+		if (SendMME (int6k) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTSEND);
+			return (-1);
+		}
+		if (ReadMME (int6k, (VS_WR_MEM | MMTYPE_CNF)) &lt;= 0) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), ECANCELED, INT6K_CANTREAD);
+			return (-1);
+		}
+		if (confirm-&gt;MSTATUS) 
+		{
+			Failure (int6k, INT6K_WONTDOIT);
+			return (-1);
+		}
+
+#if 1
+
+		if (LE32TOH (confirm-&gt;MLENGTH) != length) 
+		{
+			Failure (int6k, INT6K_ERR_LENGTH);
+			return (-1);
+		}
+		if (LE32TOH (confirm-&gt;MOFFSET) != offset) 
+		{
+			Failure (int6k, INT6K_ERR_OFFSET);
+			return (-1);
+		}
+
+#else
+
+		if (LE32TOH (confirm-&gt;MLENGTH) != length) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), 0, INT6K_ERR_LENGTH);
+			length = INT6K_BLOCKSIZE;
+			offset = 0;
+			continue;
+		}
+		if (LE32TOH (confirm-&gt;MOFFSET) != offset) 
+		{
+			error ((int6k-&gt;flags &amp; INT6K_BAILOUT), 0, INT6K_ERR_OFFSET);
+			length = INT6K_BLOCKSIZE;
+			offset = 0;
+			continue;
+		}
+
+#endif
+
+		extent -= length;
+		offset += length;
+	}
+	Confirm (int6k, &quot;Wrote %s&quot;, filepart (file-&gt;name));
+	return (0);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='WriteCFG.c.html' title=' WriteCFG.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='WriteMOD.c.html' title=' WriteMOD.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

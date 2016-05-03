@@ -1,0 +1,32 @@
+#!/usr/local/bin/efsu -hvieth0
+#
+# This is an example of a VS_SET_KEY.REQ frame that has been documented using
+# script style comments; see program efsu documentation for more information;
+# the bang-path string above means you can execute this file directly on Linux
+# provided it has proper execute permissions;
+#
+# INT6000-MAC-3-1-3173-1706-20071209-FINAL-B 
+#
+# Local Device Address
+00 B0 52 00 00 01 
+# Local Host Address
+00 00 00 00 00 00 
+# HomePlug AV Ethertype
+88 E1 
+# Intellon Version
+00 
+# VS_SET_KEY.REQ Message Type
+50 A0 
+# Intellon OUI
+00 B0 52 
+# EKS must be 0x01 to change NMK
+01 
+# Remote Device NMK (New NMK)
+50 D3 E4 93 3F 85 5B 70 40 78 4D F8 15 AA 8D B7 
+# PEKS must be 0 for Remote Device
+00 
+# Remote Device Address
+00 B0 52 BA BE 55 
+# Remote Device DAK 
+00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF
+

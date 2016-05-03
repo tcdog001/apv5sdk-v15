@@ -1,0 +1,7 @@
+../src/mxml_output.c: In function 'mxml_output_new':
+../src/mxml_output.c:22: warning: incompatible implicit declaration of built-in function 'malloc'
+../src/mxml_output.c:30: warning: incompatible implicit declaration of built-in function 'free'
+../src/mxml_output.c: In function 'mxml_output_destroy':
+../src/mxml_output.c:59: warning: incompatible implicit declaration of built-in function 'free'
+../src/mxml_output.c: In function 'mxml_output_string':
+../src/mxml_output.c:81: warning: incompatible implicit declaration of built-in function 'strlen'

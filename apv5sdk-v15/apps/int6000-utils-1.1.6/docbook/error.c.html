@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			error.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='enhex.c.html' title=' enhex.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='expect.c.html' title=' expect.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void error (int status, errno_t number, const char *format, ...);
+ *
+ *   error.h
+ *
+ *   custom implementation of the GNU error() function for systems
+ *   that do not have it;
+ *
+ *.  Motley Tools by Charles Maier &lt;cmaier@cmassoc.net&gt;;
+ *:  Published 2005 by Charles Maier Associates Limited;
+ *;  Released under the GNU General Public Licence v2 and later;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef ERROR_SOURCE
+#define ERROR_SOURCE
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdarg.h&gt;
+#include &lt;string.h&gt;
+
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/error.h&quot;
+
+#ifdef __GNUC__
+
+__attribute__ ((format (printf, 3, 4))) 
+
+#endif
+
+void error (int status, errno_t number, const char *format, ...) 
+
+{
+	extern const char *program_name;
+	if ((program_name) &amp;&amp; (*program_name)) 
+	{
+		fprintf (stderr, &quot;%s: &quot;, program_name);
+	}
+	if ((format) &amp;&amp; (*format)) 
+	{
+		va_list arglist;
+		va_start (arglist, format);
+		vfprintf (stderr, format, arglist);
+		va_end (arglist);
+	}
+	if (number) 
+	{
+		fprintf (stderr, &quot;: %s&quot;, strerror (number));
+	}
+	fprintf (stderr, &quot;\n&quot;);
+	fflush (stderr);
+	if (status) 
+	{
+		exit (status);
+	}
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='enhex.c.html' title=' enhex.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='expect.c.html' title=' expect.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

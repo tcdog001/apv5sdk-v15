@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			copytoken.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='copyquote.c.html' title=' copyquote.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='coqos_add.c.html' title=' coqos_add.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void copytoken (SCAN * content, char buffer [], signed length);
+ *
+ *   scan.h
+ *
+ *   copy the current token to a user supplied buffer of specified 
+ *   length; the token is truncated and NUL terminated when needed 
+ *   to fit the buffer;
+ *
+ *.  released 2005 by charles maier associates ltd. for public use;
+ *:  compiled on debian gnu/linux with gcc 2.95 compiler;
+ *;  licensed under the gnu public license version two;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef COPYTOKEN_SOURCE
+#define COPYTOKEN_SOURCE
+
+# include &quot;../scan/scan.h&quot;
+
+void copytoken (SCAN * content, char buffer [], signed length) 
+
+{
+	if (length-- &gt; 0) 
+	{
+		content-&gt;index = content-&gt;first;
+		while ((length-- &gt; 0) &amp;&amp; (content-&gt;index &lt; content-&gt;final)) 
+		{
+			*buffer++ = *content-&gt;index++;
+		}
+		*buffer = (char)(0);
+	}
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='copyquote.c.html' title=' copyquote.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='coqos_add.c.html' title=' coqos_add.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

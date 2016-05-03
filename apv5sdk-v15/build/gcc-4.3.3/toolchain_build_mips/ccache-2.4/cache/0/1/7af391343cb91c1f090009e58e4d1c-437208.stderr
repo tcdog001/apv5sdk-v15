@@ -1,0 +1,2 @@
+arch/mips/pci/pci.c: In function 'pcibios_init':
+arch/mips/pci/pci.c:160: warning: passing argument 2 of 'pci_fixup_irqs' from incompatible pointer type

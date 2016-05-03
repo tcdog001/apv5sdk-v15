@@ -1,0 +1,45 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Ramdisk</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><meta name="keywords" content="
+				int6k 
+				, 
+				powerline 
+				"><link rel="start" href="index.html" title="Intellon INT6000 Linux Toolkit"><link rel="up" href="ch07.html" title="Chapter 7.  Embedded Applications"><link rel="prev" href="ch07s04.html" title="Busybox™"><link rel="next" href="ch07s06.html" title="Intellon Toolkit"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">
+			Ramdisk
+			</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s04.html">Prev</a> </td><th width="60%" align="center">Chapter 7. 
+		Embedded Applications
+		</th><td width="20%" align="right"> <a accesskey="n" href="ch07s06.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="AMiLDA-ramdisk"></a>
+			Ramdisk
+			</h2></div></div></div><p>
+			Folder <code class="filename">AMiLDA/ramdisk</code> contains the <code class="filename">Makfile</code> that creates a compressed filesystem image that is loaded into <acronym class="acronym">SDRAM</acronym> and mounted when <span class="productname">Linux</span>™ boots. You should study this <code class="filename">Makefile</code> carefully because most system changes will require changes here.
+			</p><p>
+Essentially,  this <code class="filename">Makefile</code> creates a temporary folder, mounts it as an <span class="application">ext2</span> filesystem, populates it with required folders and files, unmounts it and compresses it. The compressed image is ultimately included in the image file <code class="filename">AMiLDA/linux/vmlinuz</code>. 			
+			</p><p>
+			This section covers the folders and files needed for proper operation of the Intellon Linux Toolkit. It does not cover any other folders and files that may be needed by components of the <span class="productname">AMiLDA</span>™ environment. 
+			</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="AMiLDA-bin"></a>
+					Intellon Toolkit
+					</h3></div></div></div><p>
+					The Intellon Toolkit requires folder <code class="filename">/usr/local/bin</code> to be present on the ramdisk. This folder must be created and desired programs should be copied there. Additionally, this folder should be added to the user environment,  in some way, because it is not part of the standard <span class="productname">Busybox</span>™ environment.
+					</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="AMiLDA-website"></a>
+				Web Interface
+				</h3></div></div></div><p>
+				The Intellon Toolkit web interfaces requires the following folders and files to be present on the ramdisk.
+				</p><div class="variablelist"><dl><dt><span class="term">
+						<code class="filename">/www/cgi-bin</code>
+						</span></dt><dd><p>
+							Contains the main application program,  <code class="filename">intellon.cgi</code>, that receives and services <acronym class="acronym">CGI</acronym> requests sent from the client browser. This folder must be created on the ramdisk and desired application programs copied to it. In addition, this folder should be added to the user environment, in some way, on login since is is not part of the standard <span class="productname">Busybox</span>™ environment.
+							</p></dd><dt><span class="term">
+						<code class="filename">/www/styles</code>
+						</span></dt><dd><p>
+							Contains the main application stylesheet, <code class="filename">amilda.css</code>. This folder must be creted on the ramdisk and the ctylesheet must be copied to it.
+							</p></dd><dt><span class="term">
+						<code class="filename">/www/images</code>
+						</span></dt><dd><p>
+							Contains application images. This folder must be created on the ramdisk and the required images copied to it.
+							</p></dd><dt><span class="term">
+						/var/state
+						</span></dt><dd><p>
+							Contains the application session variable, <code class="filename">intellon.dat</code>. This folder must be created on the ramdisk, if it does not already exist,  or the web interace will not preserve information from one session to the next. A default session variable may be copied here, but it is not required, because it is dynamically created.
+							</p></dd></dl></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s04.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s06.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">
+			<span class="productname">Busybox</span>™
+			 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 
+			Intellon Toolkit
+			</td></tr></table></div></body></html>

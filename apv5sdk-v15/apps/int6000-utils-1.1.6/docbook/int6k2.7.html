@@ -1,0 +1,225 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			int6k2.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='int6k.7.html' title=' int6k.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kboot.7.html' title=' int6kboot.7 '>NEXT</a>]
+			</div>
+<pre>
+int6k2(7)                                                                               int6k2(7)
+
+NAME
+       int6k2 - Intellon Device Manager for Linux
+
+SYNOPSIS
+       int6k2 [options] device [device] [...]
+
+DESCRIPTION
+       This version of the Intellon Device Manager for Linux performs the basic device operations
+       described in the Intellon HomePlug AV API Users Guide using Intellon HomePlug AV API soft‐
+       ware. THe program can be used to initialize devices, interrogate them and control them. It
+       can also upgrade them when on-board NVRAM is present.  It  supports  INT6000  devices  and
+       INT6300 devices with or without on-board NVRAM. See int6k for an alternative that uses raw
+       Ethernet packets to perform similar operations.
+
+       This program is part of the Intellon Linux Toolkit. See the ilt man page for  an  overview
+       and installation instructions.
+
+OPTIONS
+       device The  Media Access Control (MAC) address of some device. Addresses are 6 hexadecimal
+              octets optionally separated by colon. For example,  the  addresses  &quot;00b052000001&quot;,
+              &quot;00:b0:52:00:00:01&quot;  and  &quot;00b052:000001&quot;  are all valid and equivalent. For conve‐
+              nience, the symbolic address &quot;local&quot; resolves to &quot;00:b0:52:00:00:01&quot; and  the  sym‐
+              bolic addresses &quot;all&quot; and &quot;broadcast&quot; both resolve to &quot;ff:ff:ff:ff:ff:ff&quot;.
+
+       -D xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx
+              Define  the  16 octet Device Access Key (DAK) in hex format. The DAK is used by the
+              -J option. The symbolic names, &quot;key1&quot; and &quot;key2&quot; are recognized as described in the
+              KEYS section.
+
+       -F option
+              Intialize  the  device using ihpapi_InitializeDevice. option must be &quot;INT6K_FLASH&quot;,
+              &quot;INT6K_NOFLASH&quot; or &quot;INT6K_FW_FLASH&quot; as defined in  the  Intellon  Homeplug  AV  API
+              Users Guide.
+
+       -h     Wait  indefinitely  for  VS_HST_ACTION messages from devices and service them. This
+              effectively behaves like an embedded host processor for upgrade and  bootload  pur‐
+              poses.
+
+       -i interface
+              Select  the  host  Ethernet interface. All requests are sent via this interface and
+              only reponses received via this interface are recognized. The default interface  is
+              eth1  because  most people use eth0 as their principle network connection; however,
+              if environment string &quot;PLC&quot; is defined then it takes precedence  over  the  default
+              interface. This option then takes precedence over either default.
+
+       -I     Read  the  device  parameter block using ihpapi_UpdateDevice and print the firmware
+              major revision number, PIB minor revision number, Device Access Key (DAK),  Network
+              Membership Key (NMK), MAC address and other information on stdout.
+
+       -J     Set  the  Network Membership Key (NMK) on a remote device using iphapi_SetKey. This
+              is similar to option -K but requires the remote device DAK in addition to  NMK  and
+              MAC  address.  The  NMK value is defined using option -K unless you want to use the
+              default value. The remote Device Access Key (DAK) is defined using option -D unless
+              you  want  to use the default value. Programming remote device keys is complicated.
+              It is often easier to connect the device directly to the host and  use  option  -K.
+              The  default value for both the DAK and NMK key is &quot;key1&quot; which as described in the
+              KEYS section below.
+
+       -K xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx
+              Define the Network Membership Key (NMK) used by options -M or -J. It  may  also  be
+              set to &quot;key1&quot; or &quot;key2&quot;, in which case they will be replaced with the keys shown in
+              the KEYS section below.
+
+       -m     Read network topology information using ihpapi_GetNetworkInfo.
+
+       -M     Sets the Network Membership Key (NMK) on the local device using ihpapi_SetKey.  The
+              NMK value is defined using option -K unless you want to use the default value.
+
+       -l count
+              Repeat command line operations count times for each device. This is most often used
+              for one device.
+
+       -n filename
+              Read firmware  from  the  device  and  write  it  to  the  named  .nvm  file  using
+              ihpapi_UpdateDevice. No assumptions are made based on filename and no filename con‐
+              ventions are enforced. This option is performed before -N when both are  specified.
+
+       -N filename
+              Read  the named .nvm file and write it to the device using ihpapi_InitializeDevice.
+              No assumptions are made based on filename and no filename conventions are enforced;
+              however,  files having invalid.nvm format will be rejected. This option is executed
+              after -n when both are specified.
+
+       -p filename
+              Read the device parameter  block  and  write  it  to  the  named  .pib  file  using
+              ihpapi_UpdateDevice. No assumptions are made based on filename and no filename con‐
+              vetions are enforced. This option is executed before BP when both are specified.
+
+       -P filename
+              Read the named .pib and write it to the device  using  ihpapi_InitializeDevice.  No
+              assumptions  are  made  based on filename and no filename conventions are enforced;
+              however, files having invalid.pib format will be rejected. This option is  executed
+              after -p when both are specified.
+
+       -q     Suppresses status messages on stdout.
+
+       -r     Read  device  firmware  and  hardware revision using ihpapi_GetVersionInfo. Example
+              output     might     look      lik      &quot;eth0      00:B0:52:00:00:01      INT6300A0
+              INT6000-MAC-2-0-2000-1018-20070611-SP1-B NOT-UPGRADEABLE&quot;.
+
+       -R     Reset the device using ihpapi_ResetDevice. This option is executed after all others
+              specified on the same command line.
+
+       -s     Read the device manufacturer string using ihpapi_GetManufacturerInfo.
+
+       -S filename
+              Read the named .config file and write it to the device using ihpapi_SetSDRAMConfig.
+              No assumptions are make based on filename and no filename conventions are enforced.
+              Do not confuse.config with.cfg files. See chkcfg and config2cfg for  more  informa‐
+              tion on SDRAM configuration file formats.
+
+       -T     Reset device to factory defaults using ihapi_ResetFactoryDefaults.
+
+       -v     Prints  additional information on stdout. In particular, this option dumps incoming
+              and outgoing packets on stdout.
+
+       -w seconds
+              Define the number of seconds to wait before repeating command  line  options.  This
+              value only has effect when option -l is specified with a non-zero value.
+
+       -x     Cause the program to exit immediately on the first error instead of continuing with
+              remaining iterations, operations or devices. Normally, the program  reports  errors
+              and  moves  on  to the next operation, iteration or device depending on the command
+              line.
+
+       -?, --help
+              Displays program help information on stdout. This option takes precedence over  all
+              other options on the command line except -! and --version.
+
+       -!, --version
+              Displays  program  version information on stdout. This option takes precedence over
+              all other options on the command line except -? or --help.  Use  this  option  when
+              sending screen dumps to Intellon technical staff.
+
+KEYS
+       Encryption  keys  are  long, tedious to type and prone to error. The symbolic names &quot;key1&quot;
+       and &quot;key2&quot; may be used when specifying key values for options -D  and  -K.  Symbol  &quot;key1&quot;
+       translates  to  the  HomePlug  AV  compliant hash for password &quot;HomePlugAV&quot;. Symbol &quot;key2&quot;
+       translates to the HomePlug AV compliant hash for  password  &quot;HomePlugAV0123&quot;.  The  hashed
+       value  for  a given pass phrase is different for DAK and NMK. These symbols are for conve‐
+       nience only.
+
+EXAMPLES
+       The following set of  examples  illustrate  a  typical  flash-less  device  initialization
+       sequence.  It  assumes that the reader is familiar with difference between boot-from-flash
+       and boot-from-host operations..PP The following command  requests  hardware  and  firmware
+       revision  information  from  the local device. Since no hardware address is specified, the
+       default address, 00:B0:52:00:00:01, is used. The is  sent  over  Ethernet  interface  eth1
+       because  that  is  the  default Ethernet interface unless the environment variable PLC has
+       been defined.
+
+       # int6k2 -r
+
+       Since the following steps are only recognized by the bootloader program, verify  that  the
+       previous  command indicates that the Intellon bootloader is running..PP The following com‐
+       mand downloads SDRAM Configuration file, 16MB_SDRAM.config, to the bootloader so that  the
+       bootloader  knows can determine to store information that will be downloaded in successive
+       steps. Normally, the bootloader would automatically read this information from  NVRAM  but
+       there is no NVRAM in this example.
+
+       # int6k2 -S 16MB_SDRAM.config local
+
+       Unlike  programs  int6k  and  int6kf, the SDRAM configuration configuration file used here
+       specifies parameters as a 64 character ASCII hexadecimal character string  instead  of  32
+       binary bytes. This format is the same one used by the Intellon Windows Device Manager.
+
+       The  following command downloads PIB file, WA-NA.pib, and NVM file, vs-B-LA.nvm, one after
+       the other under control of the bootloader and starts firmware execution when the  download
+       completes. This operation is multi-stage.
+
+       # int6k2 -P WA-NA.pib -N v3-B-LA.nvm local
+
+       The  following command, as above, requests hardware and firmware revision information from
+       the local device. It convirms that the download was successful.
+
+       # int6k2 -r
+
+REFERENCES
+       See the Intellon HomePlug AV API Users Guide for more information.
+
+DISCLAIMER
+       The Intellon HomePlug AV Application Programming Interfaces  is  proprietary  to  Intellon
+       Corporation,  Ocala  FL  USA.  Consequently, public information is not available. Intellon
+       Corporation reserves the right to modify  the  interface  and  the  underlying  functional
+       behaviour in future software releases without any obligation to notify or compensate users
+       of this program.
+
+SEE ALSO
+       ilt(7), int6k(7), int6kf(7), chknvm(7), chkpib(7), modpib(7)
+
+CREDITS
+        Charles Maier &lt;charles.maier@intellon.com&gt;
+        Alex Vasque &lt;alex.vasquez@intellon.com&gt;
+
+Intellon Linux Toolkit          Intellon Device Manager for Linux                       int6k2(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='int6k.7.html' title=' int6k.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kboot.7.html' title=' int6kboot.7 '>NEXT</a>]
+			</div>
+		</body>
+	</html>

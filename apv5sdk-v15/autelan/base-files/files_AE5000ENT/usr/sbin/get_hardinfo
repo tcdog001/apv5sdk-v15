@@ -1,0 +1,52 @@
+#!/bin/sh
+
+WRCPUUTIL=/usr/bin/pro_ctl_util
+PRODUCT_TYPE="`$WRCPUUTIL -i|awk -F':' '/product type/{print $2}'`"
+CPU_TYPE="`cat /proc/cpuinfo |awk -F':' '/system type/{print $2}'`"
+#hardinfo mach AP_TYPE
+
+
+       AP_FLASH_TYPE="MX25L12865E@SOP16"
+       AP_FLASH_SIZE=16M
+       AP_MEM_TYPE=NT5DS32M16DS-5T
+       AP_MEM_SIZE=64M
+       AP_ETH_NUM=2
+       AP_UP_SPEED=100M
+       CPU_FREQ=400MHz
+
+if [ -d /jffs/.hardinfo ];then
+	if [ -f /jffs/.hardinfo/cpu_type ];then
+		CPU_TYPE=`cat /jffs/.hardinfo/cpu_type`
+	fi
+	if [ -f /jffs/.hardinfo/flash_type ];then
+		AP_FLASH_TYPE=`cat /jffs/.hardinfo/flash_type`
+	fi
+	if [ -f /jffs/.hardinfo/flash_size ];then
+		AP_FLASH_SIZE=`cat /jffs/.hardinfo/flash_size`
+	fi
+	if [ -f /jffs/.hardinfo/mem_type ];then
+		AP_MEM_TYPE=`cat /jffs/.hardinfo/mem_type`
+	fi
+	if [ -f /jffs/.hardinfo/mem_size ];then
+		AP_MEM_SIZE=`cat /jffs/.hardinfo/mem_size`
+	fi
+	if [ -f /jffs/.hardinfo/eth_num ];then
+		AP_ETH_NUM=`cat /jffs/.hardinfo/eth_num`
+	fi
+	if [ -f /jffs/.hardinfo/up_speed ];then
+		AP_UP_SPEED=`cat /jffs/.hardinfo/up_speed`
+	fi	
+    if [ -f /jffs/.hardinfo/cpu_freq ];then
+		CPU_FREQ=`cat /jffs/.hardinfo/cpu_freq`
+	fi
+
+fi
+
+echo cpu_type:$CPU_TYPE
+echo cpu_freq:$CPU_FREQ
+echo flash_type:$AP_FLASH_TYPE 
+echo flash_size:$AP_FLASH_SIZE
+echo mem_type:$AP_MEM_TYPE
+echo mem_size:$AP_MEM_SIZE
+echo eth_num:$AP_ETH_NUM
+echo up_speed:$AP_UP_SPEED

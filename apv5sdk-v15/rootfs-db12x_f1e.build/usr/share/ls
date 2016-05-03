@@ -1,0 +1,226 @@
+
+if [ $# -le 0 ];then
+    echo "error: need device type"
+    exit 0
+fi
+
+if [ -z $2 ];then
+    config_file_path=/tmp/device_info.xml
+else
+    config_file_path=$2
+    if [ ! -d $(dirname $config_file_path) ];then
+        echo "error: file path error"
+        exit 0
+    fi
+fi
+
+case "$1" in
+AQ1010)
+	echo "AQ1010"
+	cpu_t=soc
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bg
+	eth_n=1
+		eth0=enable
+	;;
+AQ1110)
+	echo "AQ1110"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bg
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+AQ1110-N)
+	echo "AQ1110-N"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bgn
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+AQ2010)
+	echo "AQ2010"
+	cpu_t=soc
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bg
+	eth_n=2
+		eth0=enable
+	;;
+AQ2110)
+	echo "AQ2110"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=abg
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+AQ2120)
+	echo "AQ2120"
+	cpu_t=octeon5010
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=abg
+		wifi1=enable
+			wifi1_mode=bg
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+AQ2110-N)
+	echo "AQ2110-N"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bgn
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+AQ2120-N)
+	echo "AQ2120-N"
+	cpu_t=octeon5010
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=bgn
+		wifi1=enable
+			wifi1_mode=an
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+AQ2110-H)
+	echo "AQ2110-H"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=abg
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+AQ2120-H)
+	echo "AQ2120-H"
+	cpu_t=octeon5010
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=abg
+		wifi1=enable
+			wifi1_mode=bg
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+AQ3110)
+	echo "AQ3110"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=abg
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+AQ3120)
+	echo "AQ3120"
+	cpu_t=octeon5010
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=abg
+		wifi1=enable
+			wifi1_mode=bg
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+AQ3110-N)
+	echo "AQ3100-N"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=bgn
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+AQ3120-N)
+	echo "AQ3120-N"
+	cpu_t=octeon5010
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=bgn
+		wifi1=enable
+			wifi1_mode=an
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+AQ3110-H)
+	echo "AQ3110-H"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=abg
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+AQ3120-H)
+	echo "AQ3120-H"
+	cpu_t=octeon5010
+	wifi_n=1
+		wifi0=enable
+			wifi0_mode=abg
+		wifi1=enable
+			wifi1_mode=bg
+		wifi
+	eth_n=2
+		eth0=enable
+		eth1=enable
+	;;
+*)
+	echo "no such device type"
+	exit 0
+	;;
+esac
+
+echo "<device>" > $config_file_path
+echo "    <product_model>${1}</product_model>" >> $config_file_path
+echo "    <cpu_type>${cpu_t}</cpu_type>" >> $config_file_path
+echo "    <wifi_total>" >> $config_file_path
+echo "        <count>${wifi_n}</count>" >> $config_file_path
+echo "        <wifi_sol>" >> $config_file_path 
+for n in `seq $wifi_n`
+do
+n=$(($n-1))
+echo "            <wifi${n}>" >> $config_file_path
+eval "value=\$wifi${n}"
+echo "                <status>${value}</status>" >> $config_file_path
+eval "value=\$wifi${n}_mode"
+echo "                <mode>${value}</mode>" >> $config_file_path
+echo "            </wifi$n>" >> $config_file_path
+done
+echo "        </wifi_sol>" >> $config_file_path
+echo "    </wifi_total>" >> $config_file_path
+echo "    <if_total>" >> $config_file_path
+echo "        <count>${eth_n}</count>" >> $config_file_path
+echo "        <if_sol>" >> $config_file_path
+for n in `seq $eth_n`
+do
+n=$(($n-1))
+echo "        <if${n}>" >> $config_file_path
+eval "value=\$eth${n}"
+echo "            <status>${value}</status>" >> $config_file_path
+echo "        </if${n}>" >> $config_file_path
+done
+echo "        </if_sol>" >> $config_file_path
+echo "    </if_total>" >> $config_file_path
+echo "</device>"  >> $config_file_path

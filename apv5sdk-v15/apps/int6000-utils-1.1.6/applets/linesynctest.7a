@@ -1,0 +1,30 @@
+.TH linesynctest 7a "Intellon Corporation" "int6000-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+linesynctest - Powerline Synchronization Diagnostic Applet
+.SH SYNOPSIS
+.BR int6ktest
+.BR linesynctest.nvm
+.RB [ ... ]
+.SH PURPOSE
+This diagnostic applet runs in SDRAM. It checks onboard zero-cross detection circuitry and reports the powerline frequecy. Possible outcomes are \fB50hz detected\fR, \fB60hz detected\fR, \fBunsupported frequency detected\fR and \fBno frequency detected\fR. 
+.PP
+Progress and status messages appear on the local host console. Control returns to the bootloader on completion.
+.SH PREREQUISITES
+Bootloader software must be running. The SDRAM controller need not be configured. 
+.SH EXAMPLES
+The following example uses program \fBint6ktest\fR to download and execute applet \fBlinesync.nvm\fR.
+.PP
+   # int6ktest linesynctest.nvm
+   eth2 00:B0:52:00:00:01 Start Applet linesynctest.nvm (0)
+   eth2 00:B0:52:00:00:01 Write Memory (00001000:1800)
+   eth2 00:B0:52:00:00:01 Wrote linesynctest.nvm
+   eth2 00:B0:52:00:00:01 (00) Line Sync test - Zero Cross detected - 60HZ
+.SH SEE ALSO
+.BR int6ktest ( 7 ),
+.BR flashtest ( 7 ),
+.BR marchloop ( 7 ),
+.BR memctl ( 7 )
+.SH CREDITS
+ John Byron <john.byron@intellon.com>
+
+

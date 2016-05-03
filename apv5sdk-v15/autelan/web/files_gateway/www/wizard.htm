@@ -1,0 +1,270 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Wizard</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<script language="javascript" src="JAS.js">
+</script>
+</head>
+
+<body bgcolor="#efefef">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td>&nbsp;</td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">Wizard</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<table width="500" border="0">
+  <tr>
+    <td>
+	  <table width="500" border="0">
+        <tr>
+          <td id="myTd1">&nbsp;</td>
+          <td id="myTd2" width="500"><input id="but" type="button" value="Next" onclick="wizard_display(2);"/></td>
+        </tr>
+      </table>
+	</td>
+  </tr> 
+  
+  
+  <tr id="wizard1">
+    <td>
+	  <p style="text-indent:30px">The wizard will show you how to set up your gateway in the safe way; Click "Next" to continue, click "Back" and "Next" to navigate, and click "Finish" to save the settings..</p>
+	  <br/>
+	  <p style="text-indent:30px">Notes: </p>
+	  <p style="text-indent:30px">Basic paremeters can be set in this wizard. For advanced parameters, you need to set them in other menus.</p>
+	</td>
+  </tr>   
+  
+  
+  <tr id="wizard2" style="display:none">
+    <td>
+	<table width="500" border="0" class="main">
+        <tr>
+          <td><font class="table_head" title="APN illustration">APN</font></td>
+        </tr>
+        <tr>
+          <td style="padding-top:5px; padding-bottom:10px">
+	        <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	          <tr>
+                <td class="td_style" width="150">APN Setting </td>
+                <td class="td_style" width="350">
+				  <table width="350" border="0">
+                    <tr>
+                      <td width="80"><input type="radio" name="apn_setting" value="auto_apn"/>Auto APN</td>
+                      <td width="270"><input type="radio" name="apn_setting" value="manual_apn"/>Manual APN</td>
+                    </tr>
+                  </table>				  
+				</td>
+              </tr>
+		      <tr>
+                <td class="td_style">APN</td>
+                <td class="td_style"><input type="text" name="apn" style="height:12px"/></td>
+              </tr>
+	        </table>
+	      </td>
+        </tr>
+        <tr>
+          <td><font class="table_head" title="Dial Setting illustration">Dial Setting</font></td>
+        </tr>
+        <tr>
+          <td style="padding-top:5px; padding-bottom:10px">
+	        <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	          <tr>
+                <td class="td_style" width="135">Dial NO. </td>
+                <td class="td_style" width="355"><input type="text" name="dial_num" style="height:12px" value="*99#"/></td>
+              </tr>
+	        </table>
+	      </td>
+        </tr>
+        <tr>
+          <td><font class="table_head" title="PDP Type illustration">PDP Type</font></td>
+        </tr>
+        <tr>
+          <td style="padding-top:5px; padding-bottom:10px">
+	        <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	          <tr>
+                <td class="td_style" width="150">PDP Type </td>
+                <td class="td_style" width="350">
+				  <table width="350" border="0">
+                    <tr>
+                      <td width="80"><input type="radio" name="pdp_type" value="ip"/>IP</td>
+                      <td width="270"><input type="radio" name="pdp_type" value="ppp"/>PPP</td>
+                    </tr>
+                  </table>
+				</td>
+              </tr>
+	        </table>
+	      </td>
+        </tr>
+        <tr>
+          <td><font class="table_head" title="PDP illustration">PDP</font></td>
+        </tr>
+        <tr>
+          <td style="padding-top:5px; padding-bottom:10px">
+	        <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	          <tr>
+                <td class="td_style" width="150">PDP Setting </td>
+                <td class="td_style" width="350">
+				  <table width="350" border="0">
+                    <tr>
+                      <td width="80"><input type="radio" name="pdp_setting" value="auto_pdp"/>Auto PDP</td>
+                      <td width="270"><input type="radio" name="pdp_setting" value="manual_pdp"/>Manual PDP</td>
+                    </tr>
+                  </table>
+				</td>
+              </tr>
+	        </table>
+	      </td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  
+  
+  <tr id="wizard3" style="display:none">
+    <td>
+	<table width="500" border="0" class="main">
+        <tr>
+          <td><font class="table_head" title="PPP Authentication illustration">PPP Authentication</font></td>
+        </tr>
+        <tr>
+          <td style="padding-top:5px; padding-bottom:10px">
+	        <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	          <tr>
+                <td class="td_style" width="150">Authentication</td>
+                <td class="td_style" width="350">
+				  <table width="350" border="0">
+                    <tr>
+                      <td width="60"><input type="radio" name="authentication" value="chap"/>CHAP</td>
+                      <td width="290"><input type="radio" name="authentication" value="pap"/>PAP</td>
+                    </tr>
+                  </table>				  
+				</td>
+              </tr>
+		      <tr>
+                <td class="td_style">User Name </td>
+                <td class="td_style"><input type="text" name="user_name" style="height:12px; width:90px"/></td>
+              </tr>
+			  <tr>
+                <td class="td_style">Password</td>
+                <td class="td_style"><input type="text" name="password" style="height:12px; width:90px"/></td>
+              </tr>
+	        </table>
+	      </td>
+        </tr>
+        <tr>
+          <td><font class="table_head" title="PPP Setting illustration">PPP Setting</font></td>
+        </tr>
+        <tr>
+          <td style="padding-top:5px; padding-bottom:10px">
+	        <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	          <tr>
+                <td class="td_style" width="135">Idle Time Setting</td>
+                <td class="td_style" width="355">
+				  <table width="350" border="0">
+                    <tr>
+                      <td width="60"><input type="radio" name="idle_time_setting" value="enable"/>Enable</td>
+                      <td width="290"><input type="radio" name="idle_time_setting" value="disable"/>Disable</td>
+                    </tr>
+                  </table>	
+				</td>
+              </tr>
+			  <tr>
+                <td class="td_style" width="135">MTU</td>
+                <td class="td_style" width="355"><input type="text" name="mtu" style="height:12px; width:90px" value="1500"/></td>
+              </tr>
+	        </table>
+	      </td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  
+  
+  <tr id="wizard4" style="display:none">
+    <td><table width="500" border="0" class="main">
+        <tr>
+          <td><font class="table_head" title="DNS illustration">DNS</font></td>
+        </tr>
+        <tr>
+          <td style="padding-top:5px; padding-bottom:10px">
+	        <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	          <tr>
+                <td class="td_style" width="150">DNS</td>
+                <td class="td_style" width="350">
+				  <table width="350" border="0">
+                    <tr>
+                      <td width="80"><input type="radio" name="dns" value="auto_dns"/>Auto DNS</td>
+                      <td width="270"><input type="radio" name="dns" value="manual_dns"/>Manual DNS</td>
+                    </tr>
+                  </table>				  
+				</td>
+              </tr>
+	        </table>
+	      </td>
+        </tr>
+      </table></td>
+  </tr>
+  
+  
+  <tr id="wizard5" style="display:none">
+    <td>
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">APN Type</td>
+          <td class="td_style" width="350">manual</td>
+        </tr>
+		<tr>
+          <td class="td_style">APN</td>
+          <td class="td_style">123456</td>
+        </tr>
+		<tr>
+          <td class="td_style">PDP Type</td>
+          <td class="td_style">IP</td>
+        </tr>
+		<tr>
+          <td class="td_style">PDP</td>
+          <td class="td_style">auto</td>
+        </tr>
+		<tr>
+          <td class="td_style">PPP Authentication </td>
+          <td class="td_style">chap</td>
+        </tr>
+		<tr>
+          <td class="td_style">Idle Time Setting </td>
+          <td class="td_style">disable</td>
+        </tr>
+		<tr>
+          <td class="td_style">MTU</td>
+          <td class="td_style">1500</td>
+        </tr>
+		<tr>
+          <td class="td_style">Dial NO. </td>
+          <td class="td_style">*99#</td>
+        </tr>
+		<tr>
+          <td class="td_style">DNS</td>
+          <td class="td_style">auto</td>
+        </tr>		
+	  </table>
+	</td>
+  </tr>  
+</table>
+</div>
+</body>
+</html>

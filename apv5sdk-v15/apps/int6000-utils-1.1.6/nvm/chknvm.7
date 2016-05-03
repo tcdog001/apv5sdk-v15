@@ -1,0 +1,86 @@
+.TH chknvm 7 "Intellon Corporation, Ocala FL USA" "int6000-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+chknvm - Intellon Firmware File Validator
+.SH SYNOPSIS
+.BR chknvm
+.RI [ options ]
+.IR file
+.RI [ file ]
+.RI [ ... ]
+.SH DESCRIPTION
+The Intellon Firmware File Validator checks Intellon HomePlug AV firmware files for obvious errors, including obsolete format, incorrect file size, bad checksums and read errors. It makes no attempt to check any internal information other than firmware header checksums, image lengths and image checksums. 
+.P
+This program is part of the Intellon Linux Toolkit. See the \fBilt\fR man page for an overview and installation instructions.
+.SH OPTIONS
+.TP
+.RB - r
+Print firmware revision string on stdout. This option automatically suppresses the summary 'looks good' message.
+.TP
+.RB - s
+Print SDRAM configuration block on stdout. This option automatically suppresses the summary 'looks good' message.
+.TP
+.RB - q
+Suppresses printing of routine messages. Specifically, it suppresses the summary 'looks good' message.
+.TP
+.RB - v
+Print additional information such as the image header for each image processed. This information can be used to distinguish one firmware file from another, if you know what to look for. 
+.TP
+.RB - ? ,-- help
+Print program help summary on stdout. This option takes precedence over other options on the command line. 
+.TP
+.BR - ! ,-- version
+Print program version information on stdout. This option takes precedence over other options on the command line. Usethis option when sending screen dumps to Intellon Technical Support so that they know exactly which version of the Linux Toolkit you are using.
+.SH ARGUMENTS
+.TP
+.IR file
+The name of an Intellon image file. By convention, Intellon Image files have a \fB.nvm\fR file extension but this program does not enforce this convention. 
+.SH EXAMPLES
+The following example reads file abc.nvm and validates it. The message shown indicates that the file is the correct length, image headers and images have the correct length and checksum and there are no read errors.
+.PP
+    # chknvm abc.nvm
+    chknvm: abc.nvm looks good
+.PP
+The following example reads three files in succession and reports on each one. You can suppress good news with the \fB-q\fR option.
+.PP
+    # chknvm abc.nvm def.nvm ghi.nvm
+    chknvm: abc.nvm looks good
+    chknvm: def.nvm is corrupt
+    chknvm: ghi.nvm looks good
+.PP
+The following example displays the SDRAM image found in firmware files having names that match the wildcard pattern \fBint6000-v3.0.2-*.nvm\fR. We can see that type \fBA\fR is for 32mb ram devices and type \fBB\fR is for 16mb ram devices. Program output could have been sent to a file and saved for later reference.
+.PP
+    # chknvm -s int6000-v3.0.2-*.nvm
+    ------- int6000-v3.0.2-0-2-A-FINAL.nvm -------
+            SIZE=0x02000000 (32mb)
+            CONF=0x00143188
+            TIM0=0x01E1D491
+            TIM1=0x000883D6
+            CNTRL=0x00003089
+            REF=0x00000366
+            CLOCK=0x00000001
+    ------- int6000-v3.0.2-0-2-B-FINAL.nvm -------
+            SIZE=0x01000000 (16mb)
+            CONF=0x00142F68
+            TIM0=0x0115124E
+            TIM1=0x000883D6
+            CNTRL=0x00003089
+            REF=0x00000493
+            CLOCK=0x00000001
+.PP
+The following example prints the internal firmware revision string from the firmware image block. The can be used to identify the actual firmware image contained in the file.
+.PP
+    # chknvm -r abc.nvm
+    INT6000-MAC-3-1-3183-1713-20071222-FINAL
+	
+.SH DISCLAIMER
+Firmware file structure and content is proprietary to Intellon Corporation, Ocala FL USA. Consequently, public information is not available. Intellon Corporation reserves the right to change file structure or content in future firmware releases without any obligation to notify or compensate users of this program.
+.SH SEE ALSO
+.BR chknvm2 ( 7 ),
+.BR chkpib ( 7 ),
+.BR int6kf (7),
+.BR int6ktest (7),
+.BR nvmmerge ( 7 ),
+.BR nvmsplit ( 7 ),
+.BR setnvm ( 7 )
+.SH CREDITS
+ Charles Maier <charles.maier@intellon.com>

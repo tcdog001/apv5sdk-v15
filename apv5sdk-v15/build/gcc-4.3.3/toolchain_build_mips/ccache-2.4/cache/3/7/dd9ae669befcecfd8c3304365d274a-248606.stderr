@@ -1,0 +1,9 @@
+networking/udhcp/script.c: In function 'fill_envp':
+networking/udhcp/script.c:282: warning: operation on 'j' may be undefined
+networking/udhcp/script.c:306: warning: ISO C90 forbids mixed declarations and code
+networking/udhcp/script.c:314: warning: ISO C90 forbids mixed declarations and code
+networking/udhcp/script.c:338: warning: operation on 'j' may be undefined
+networking/udhcp/script.c:167: warning: unused variable 'n'
+networking/udhcp/script.c: In function 'udhcp_run_script':
+networking/udhcp/script.c:171: warning: 'sub_opt' may be used uninitialized in this function
+networking/udhcp/script.c:171: note: 'sub_opt' was declared here

@@ -1,0 +1,224 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_config=`config_read /config/network/radius`
+
+xml_wlan_radiusip=`config_getoption "$xml_config" radiusip`
+xml_wlan_authport=`config_getoption "$xml_config" authport`
+xml_wlan_sharekey=`config_getoption "$xml_config" sharekey`
+
+xml_wlan_radiusip1=`config_getoption "$xml_config" radiusip1`
+xml_wlan_authport1=`config_getoption "$xml_config" authport1`
+xml_wlan_sharekey1=`config_getoption "$xml_config" sharekey1`
+
+xml_wlan_radiusaip=`config_getoption "$xml_config" radiusaip`
+xml_wlan_acceptport=`config_getoption "$xml_config" acceptport`
+xml_wlan_asharekey=`config_getoption "$xml_config" asharekey`
+
+xml_wlan_radiusaip1=`config_getoption "$xml_config" radiusaip1`
+xml_wlan_acceptport1=`config_getoption "$xml_config" acceptport1`
+xml_wlan_asharekey1=`config_getoption "$xml_config" asharekey1`
+
+xml_wlan_wepbit=`config_getoption "$xml_config" wepbit`
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js wireless_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script type="text/javascript">
+	 var flag="<%= $xml_session_lang %>";
+	init_mmenu(flag);
+	init_wiremenu(flag);
+	init_radius(flag);
+        function valid_range(this1, min, max) {
+            var value = parseInt(this1.value);
+            var reg = /^[0-9]{0,5}$/;
+            if (!reg.test(this1.value)){
+                alert(this1.name + "may have illegal characters or its size great than 5 .");
+            }
+            else
+                if (value < min || value > max){
+		        alert(this1.name + " value is out of range .");
+                }
+                
+             
+        }
+        
+function Ip() {
+    var reg = /^(\d{1,2}|1\d\d|2[0-1]\d|2[0-2][0-3])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+    var x = document.all.radiusip;
+    var y = document.all.radiusip1;
+    var z = document.all.radiusaip;
+    var w = document.all.radiusaip1;
+    if ((!reg.test(x.value)&&x.value!="")||(!reg.test(y.value)&&y.value!="")||(!reg.test(z.value)&&z.value!="")||(!reg.test(w.value)&&w.value!="")) {
+		     alert("Please input IP  correctly.");   
+		     return false;
+	  }   
+    if(document.getElementById("sharekey").value.length > 32){
+    	alert("Shared key is too long!");
+    	document.getElementById("sharekey").focus();
+    	return false;
+    }    
+     if(document.getElementById("sharekey1").value.length > 32){
+    	alert("Shared key is too long!");
+    	document.getElementById("sharekey1").focus();
+    	return false;
+    }    
+     if(document.getElementById("asharekey").value.length > 32){
+    	alert("Shared key is too long!");
+    	document.getElementById("asharekey").focus();
+    	return false;
+    }    
+     if(document.getElementById("asharekey1").value.length > 32){
+    	alert("Shared key is too long!");
+    	document.getElementById("asharekey1").focus();
+    	return false;
+    }    
+        
+	 overlayer();
+}       
+</script>
+</head>
+<body>
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_wireless2.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return Ip()">
+<div align="center">
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0">
+			<tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(radius_rss)</script></b></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10"></td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24" width="280" bordercolor="#ffffff"><script language="javascript">replace(radius_sip)</script>&nbsp;</td>
+			<td  width="370" bordercolor="#ffffff"><input type="text" name="radiusip" value="<%= "$xml_wlan_radiusip" %>"  </td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(radiusc_authport)</script>&nbsp;</td>
+			<td bordercolor="#ffffff"><input type="text" name="authport" value="<%= "$xml_wlan_authport" %>" onBlur="valid_range(this,10,65535)"></td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(radius_sk)</script>&nbsp;</td>
+			<td bordercolor="#ffffff"><input type="text" name="sharekey" id="sharekey" value="<%= "$xml_wlan_sharekey" %>"></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10"></td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(radius_sip1)</script>&nbsp;</td>
+			<td   bordercolor="#ffffff"><input type="text" name="radiusip1" value="<%= "$xml_wlan_radiusip1" %>"  </td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(radiusc_authport1)</script>&nbsp;</td>
+			<td bordercolor="#ffffff"><input type="text" name="authport1" value="<%= "$xml_wlan_authport1" %>" onBlur="valid_range(this,10,65535)"></td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(radius_sk1)</script>&nbsp;</td>
+			<td bordercolor="#ffffff"><input type="text" name="sharekey1" id="sharekey1" value="<%= "$xml_wlan_sharekey1" %>"></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10"></td>
+			</tr>
+			
+			<tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(radius_arss)</script></b></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10"></td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(radius_aip)</script>&nbsp;</td>
+			<td   bordercolor="#ffffff"><input type="text" name="radiusaip" value="<%= "$xml_wlan_radiusaip" %>"  </td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(radiusc_ap)</script>&nbsp;</td>
+			<td bordercolor="#ffffff"><input type="text" name="acceptport" value="<%= "$xml_wlan_acceptport" %>" onBlur="valid_range(this,10,65535)"></td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(radius_ask)</script>&nbsp;</td>
+			<td bordercolor="#ffffff"><input type="text" name="asharekey" id="asharekey" value="<%= "$xml_wlan_asharekey" %>"></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10"></td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(radius_aip1)</script>&nbsp;</td>
+			<td   bordercolor="#ffffff"><input type="text" name="radiusaip1" value="<%= "$xml_wlan_radiusaip1" %>"  </td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(radiusc_ap1)</script>&nbsp;</td>
+			<td bordercolor="#ffffff"><input type="text" name="acceptport1" value="<%= "$xml_wlan_acceptport1" %>" onBlur="valid_range(this,10,65535)"></td>
+			</tr>
+			
+			<tr>
+			<td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(radius_ask1)</script>&nbsp;</td>
+			<td bordercolor="#ffffff"><input type="text" name="asharekey1" id="asharekey1" value="<%= "$xml_wlan_asharekey1" %>"></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10"></td>
+			</tr>
+			</table>
+		  <table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+			<tr>
+			<td align="center" height="40" valign="middle" colspan="2"><script language="javascript">replace(radius_apply)</script>&nbsp;</td>
+			</tr>
+			<tr>
+        <td align="right"   colspan="2"><script language="javascript">replace(radius_help)</script></td>
+      </tr>
+</table>
+</div>
+<input type="hidden" value="RADIUS Setup" name="SERVLET">
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+
+
+<%in page_footer.htm %>
+</body>
+</html>
+

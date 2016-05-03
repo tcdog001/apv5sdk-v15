@@ -1,0 +1,19 @@
+#!/bin/sh
+
+WRCPUUTIL=/usr/bin/pro_ctl_util
+PRODUCT_TYPE="`$WRCPUUTIL -i|awk -F':' '/product type/{print $2}'`"
+CPU_TYPE="`cat /proc/cpuinfo |awk -F':' '/system type/{print $2}'`"
+#hardinfo mach AP_TYPE
+ 	AP_FLASH_TYPE="Spansion FL128PIF"
+ 	AP_FLASH_SIZE=16M
+ 	AP_MEM_TYPE=M13S2561616A
+ 	AP_MEM_SIZE=64M
+	AP_ETH_NUM=1
+	AP_UP_SPEED=1000M
+echo cpu_type:$CPU_TYPE
+echo flash_type:$AP_FLASH_TYPE 
+echo flash_size:$AP_FLASH_SIZE
+echo mem_type:$AP_MEM_TYPE
+echo mem_size:$AP_MEM_SIZE
+echo eth_num:$AP_ETH_NUM
+echo up_speed:$AP_UP_SPEED

@@ -1,0 +1,83 @@
+#!/bin/sh
+IWPRIV=/usr/sbin/iwpriv
+IWCONFIG=/usr/sbin/iwconfig
+#
+#usage()
+#
+usage()
+{
+	echo "Usage:"
+	echo "	 set_mcs {interface} {mcs}"
+}
+
+if [ ! $# -eq 2 ];then
+	usage
+	exit 1
+fi
+
+INTERFACE=$1
+MCS=$2
+#STREAMS=$3
+#if [ $STREAMS -eq 1 ]||[ $STREAMS -eq 2 ];then STREAMS=0
+#else
+#    STREAMS=1
+#fi
+
+mcs_to_code()
+{
+#    if [ $STREAMS -eq 0 ];then
+        if [ $1 -eq 0 ];then CODE1="80" CODE2="80" CODE3="80" CODE4="80"
+        fi
+        if [ $1 -eq 1 ];then CODE1="81" CODE2="81" CODE3="80" CODE4="80"
+        fi
+        if [ $1 -eq 2 ];then CODE1="82" CODE2="82" CODE3="81" CODE4="80"
+        fi
+        if [ $1 -eq 3 ];then CODE1="83" CODE2="82" CODE3="81" CODE4="80"
+        fi
+        if [ $1 -eq 4 ];then CODE1="84" CODE2="83" CODE3="82" CODE4="81"
+        fi
+        if [ $1 -eq 5 ];then CODE1="85" CODE2="84" CODE3="83" CODE4="82"
+        fi
+        if [ $1 -eq 6 ];then CODE1="86" CODE2="85" CODE3="84" CODE4="83"
+        fi
+        if [ $1 -eq 7 ];then CODE1="87" CODE2="86" CODE3="85" CODE4="84"
+        fi
+ #   else
+        if [ $1 -eq 8 ];then CODE1="88" CODE2="88" CODE3="88" CODE4="88"
+        fi
+        if [ $1 -eq 9 ];then CODE1="89" CODE2="89" CODE3="88" CODE4="88"
+        fi
+        if [ $1 -eq 10 ];then CODE1="8A" CODE2="8A" CODE3="89" CODE4="88"
+        fi
+        if [ $1 -eq 11 ];then CODE1="8B" CODE2="8A" CODE3="89" CODE4="88"
+        fi
+        if [ $1 -eq 12 ];then CODE1="8C" CODE2="8B" CODE3="8A" CODE4="89"
+        fi
+        if [ $1 -eq 13 ];then CODE1="8D" CODE2="8C" CODE3="8B" CODE4="8A"
+        fi
+        if [ $1 -eq 14 ];then CODE1="8E" CODE2="8D" CODE3="8C" CODE4="8B"
+        fi
+        if [ $1 -eq 15 ];then CODE1="8F" CODE2="8E" CODE3="8D" CODE4="8C"
+        fi
+        if [ $1 -eq 250 ];then CODE1="00" CODE2="00" CODE3="00" CODE4="00"
+        fi
+  #  fi
+ #   return $CODE
+}
+
+#CEDE1='rate_to_code $RATE1'
+mcs_to_code ${MCS}
+#CODE1=$?
+#echo $CODE1
+#echo $CODE2
+#echo $CODE3
+#echo $CODE4
+#declare -i CODEE=16#${CODE}
+#echo $[ CODE - 1 ]
+#echo $((CODE-1))
+#CODEE1=CODEE-1
+#echo $?
+${IWPRIV} ${INTERFACE} set11NRates 0x$CODE1$CODE2$CODE3$CODE4
+${IWPRIV} ${INTERFACE} set11NRetries 0x02020202
+#echo "the setcmd is: ${IWPRIV} ${INTERFACE} set11NRates 0x${CODE1}${CODE2}${CODE3}${CODE4}"
+#echo "the setcmd is: ${IWPRIV} ${INTERFACE} set11NRetries 0x02020101"

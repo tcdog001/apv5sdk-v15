@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			mrgpib.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='modpib.7.html' title=' modpib.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='nvmmerge.7.html' title=' nvmmerge.7 '>NEXT</a>]
+			</div>
+<pre>
+mrgpib(7)                             Intellon Linux Toolkit                            mrgpib(7)
+
+NAME
+       mrgpib - Intellon PIB Merge Utility
+
+SYNOPSIS
+       mrgpib [options] target source
+
+DESCRIPTION
+       (DO NOT USE THIS PROGRAM TO MERGE PIBS 4-0 OR LOWER WITH PIBS 4-1 OR HIGHER.)
+
+       Copy  information  from  one  PIB  file to another while preseving PIB version, length and
+       checksum. The program automatically adjusts for differences in PIB version and  length  so
+       don’t worry. Be happy!
+
+       This  program  is part of the Intellon Linux Toolkit. See the ilt man page for an overview
+       and installation instructions.
+
+OPTIONS
+       -q     Suppress progress messages. Does nothing for this application.
+
+       -v     Print additional information. Does nothing for this application.
+
+       -?,--help
+              Print program help summary on stdout.  This  option  takes  precedence  over  other
+              options on the command line.
+
+       -!,--version
+              Print  program  version  information  on  stdout. This option takes precedence over
+              other options on the command line. Usethis option  when  sending  screen  dumps  to
+              Intellon  Technical  Support  so  that they know exactly which version of the Linux
+              Toolkit you are using.
+
+ARGUMENTS
+       target The target PIB file. Information in this file will be replaced  with  corresponding
+              information  in  the  source file. If the source file is longer that this file then
+              excess information is not copied; otherwise, all source file information is copied.
+              No assumptions are made based on filename and no filename conventions are enforced.
+
+       source The source PIB file. Information in this file will replace  corresponding  informa‐
+              tion  in the target file. If the target file is longer that this file, all informa‐
+              tion will be copied; otherwise, excess information is not  copied.  No  assumptions
+              are made based on filename and no filename conventions are enforced.
+
+EXAMPLES
+       The following example copies information from file old.pib to file new.pib.
+
+          # mrgpib new.pib old.pib
+
+DISCLAIMER
+       PIB  file structure and content is proprietary to Intellon Corporation, Ocala FL USA. Con‐
+       sequently, public information is not available. Intellon Corporation reserves the right to
+       modify PIB file structure or content in future firmware releases without any obligation to
+       notify or compensate users of this program.
+
+SEE ALSO
+       chkpib(7), modpib(7), pxe(7), setpib(7)
+
+CREDITS
+        Charles Maier &lt;charles.maier@intellon.com&gt;
+
+int6000-utils-linux                    Intellon Corporation                             mrgpib(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='modpib.7.html' title=' modpib.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='nvmmerge.7.html' title=' nvmmerge.7 '>NEXT</a>]
+			</div>
+		</body>
+	</html>

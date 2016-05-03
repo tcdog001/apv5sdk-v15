@@ -1,0 +1,363 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+
+xml_vap=`config_read /config/network`
+vapnum=`config_getoption "$xml_vap" vapnum`
+vapname="vap$vapnum"
+
+for vap_allnum in `seq $NUM_ap`
+do
+	eval "xml_wlan_config_vap${vap_allnum}=\`config_read /config/network/vap${vap_allnum}\`"
+	eval "xml_wlan_vap${vap_allnum}_enable=\`config_getoption \"\$xml_wlan_config_vap${vap_allnum}\" create\`"
+done
+
+xml_config=`config_read /config/network/vap$vapnum`
+xml_wlan_workmode=`config_getoption "$xml_config" wlanmode`
+xml_wlan_macfilter=`config_getoption "$xml_config" macfilter`
+xml_wlan_filtermode=`config_getoption "$xml_config" filtermode`
+xml_wlan_mac_count=`config_getoption "$xml_config" mac_count`
+xml_mac1=`config_getoption "$xml_config" mac1`
+xml_mac2=`config_getoption "$xml_config" mac2`
+xml_mac3=`config_getoption "$xml_config" mac3`
+xml_mac4=`config_getoption "$xml_config" mac4`
+xml_mac5=`config_getoption "$xml_config" mac5`
+xml_mac6=`config_getoption "$xml_config" mac6`
+xml_mac7=`config_getoption "$xml_config" mac7`
+xml_mac8=`config_getoption "$xml_config" mac8`
+xml_mac9=`config_getoption "$xml_config" mac9`
+xml_mac10=`config_getoption "$xml_config" mac10`
+xml_mac11=`config_getoption "$xml_config" mac11`
+xml_mac12=`config_getoption "$xml_config" mac12`
+xml_mac13=`config_getoption "$xml_config" mac13`
+xml_mac14=`config_getoption "$xml_config" mac14`
+xml_mac15=`config_getoption "$xml_config" mac15`
+xml_mac16=`config_getoption "$xml_config" mac16`
+xml_mac17=`config_getoption "$xml_config" mac17`
+xml_mac18=`config_getoption "$xml_config" mac18`
+xml_mac19=`config_getoption "$xml_config" mac19`
+xml_mac20=`config_getoption "$xml_config" mac20`
+
+
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js wireless_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+var flag="<%= $xml_session_lang %>";
+var array_vapcreate=["<%= $xml_wlan_vap1_enable %>","<%= $xml_wlan_vap2_enable %>","<%= $xml_wlan_vap3_enable %>","<%= $xml_wlan_vap4_enable %>","<%= $xml_wlan_vap5_enable %>","<%= $xml_wlan_vap6_enable %>","<%= $xml_wlan_vap7_enable %>","<%= $xml_wlan_vap8_enable %>","<%= $xml_wlan_vap9_enable %>","<%= $xml_wlan_vap10_enable %>","<%= $xml_wlan_vap11_enable %>","<%= $xml_wlan_vap12_enable %>",];
+var vapname="<%= $vapname %>";
+var allvap_num="<%= $NUM_ap %>";
+var work_mode="<%= $xml_wlan_workmode %>";
+	init_mmenu(flag);
+	init_wiremenu(flag);
+	init_mac(flag);       
+function macvalidate() {
+    	var reg = /^([0-9a-fA-F]{2})(([/\s:][0-9a-fA-F]{2}){5})$/;
+       document.all.vap_name.value=document.all.vapname.value;
+			overlayer();
+}
+
+function vap_specific()
+{
+	 document.form0.onsubmit();
+	 document.form0.action="action.cgi";
+	 document.form0.submit(); 
+}
+
+function vapname_display()
+{
+	for(var i = 1;i <= allvap_num;i++)
+	{
+		if(array_vapcreate[i-1] == "yes")
+		{
+			var tmp_vapname="vap"+i;
+			if(vapname == tmp_vapname)
+			{
+			 		document.write("<option value='"+tmp_vapname+"' selected='selected' >"+tmp_vapname+"</option>");
+			}
+			else
+			{
+				  document.write("<option value='"+tmp_vapname+"' >"+tmp_vapname+"</option>");
+			}
+	  }
+	}
+}
+
+function shielding(){
+	if( work_mode != "sta" && work_mode != "client")
+	{
+		  document.getElementById("tab0").style.display="";
+		  document.getElementById("tab5").style.display="";
+	}
+	else
+	{
+			document.getElementById("tab0").style.display="none";
+			document.getElementById("tab5").style.display="none";
+	}
+}	
+
+
+function addrulecount()
+{
+	if(url_table.rows.length<24)
+	{
+		var count=parseInt(document.all.rule_num.value)+1;
+		document.all.rule_num.value = count;
+	}
+}
+function delrulecount()
+{
+	if(url_table.rows.length>5)
+	{
+		var count=parseInt(document.all.rule_num.value)-1;
+		document.all.rule_num.value = count;
+	}
+}
+function initrulecount()
+{
+	if( document.all.rule_num.value == "0")
+		document.all.rule_num.value = "1";
+}
+
+/*********************************************/
+/*control of url.htm                        */
+/*********************************************/
+var url_count="<%= $xml_wlan_mac_count %>";
+var url_status="<%= $xml_wlan_macfilter %>";
+var url_arr=["<%= $xml_mac1 %>","<%= $xml_mac2 %>","<%= $xml_mac3 %>","<%= $xml_mac4 %>","<%= $xml_mac5 %>","<%= $xml_mac6 %>","<%= $xml_mac7 %>","<%= $xml_mac8 %>","<%= $xml_mac9 %>","<%= $xml_mac10 %>","<%= $xml_mac11 %>","<%= $xml_mac12 %>","<%= $xml_mac13 %>","<%= $xml_mac14 %>","<%= $xml_mac15 %>","<%= $xml_mac16 %>","<%= $xml_mac17 %>","<%= $xml_mac18 %>","<%= $xml_mac19 %>","<%= $xml_mac20 %>"];
+var num = 1;
+var i = 0;
+function urltable_insRow(obj)
+{
+	if( obj == "first entry")
+	{
+		if( url_status == "yes")
+		{
+			for(var i=1;i<url_table.rows.length;i++)
+				document.getElementById("url_table").rows[i].style.display="";
+		}
+		else
+		{
+			for(var i=1;i<url_table.rows.length;i++)
+				document.getElementById("url_table").rows[i].style.display="none";
+		}
+		for( i=0; i<url_count; i++)
+		{
+			var td1 = "mac" + String(i+1);
+			var row_num = "url_tr" + String(i+1);
+	
+			var newRow = document.getElementById('url_table').insertRow(url_table.rows.length-1);
+       	    		newRow.id = row_num;
+			var cell0 = newRow.insertCell(0);
+			cell0.innerHTML="&nbsp;";
+			var cell1 = newRow.insertCell(1);
+			cell1.innerHTML="<table width='350' border='0'><tr><td><input type='text' name='" + td1 +"' value='" + url_arr[i] + "' style='height:20px; width:140px'/></td></tr></table>";
+		}
+		num = i;
+	}
+	else
+	{
+	
+	if(url_table.rows.length<24)
+	{
+		num = num + 1;
+		var td1 = "mac" + String(num);
+		var row_num = "url_tr" + String(num);
+	
+		var newRow = document.getElementById('url_table').insertRow(url_table.rows.length-1);
+        	newRow.id = row_num;
+		var cell0 = newRow.insertCell(0);
+		cell0.innerHTML="&nbsp;";
+		var cell1 = newRow.insertCell(1);
+		cell1.innerHTML="<table width='350' border='0'><tr><td><input type='text' name='" + td1 +"' style='height:20px; width:140px'/></td></tr></table>";
+		}
+		else
+	  	alert("Max number of fiter MAC is 20!");
+	}
+
+}
+
+function urltable_delRow(){
+	if(url_table.rows.length>5)
+	{
+		num = num - 1;
+	 	document.getElementById('url_table').deleteRow(url_table.rows.length-2);
+	}
+	else
+	{
+		alert("There must be at least one url-filter entry!");
+	}
+}
+
+function url_radio_display(obj)
+{
+	if(parseInt(obj) == 1)
+	{
+		for(var i=1;i<url_table.rows.length;i++)
+			document.getElementById("url_table").rows[i].style.display="none";
+	}
+	else
+	{
+		for(var i=1;i<url_table.rows.length;i++)
+			document.getElementById("url_table").rows[i].style.display="";
+			
+		if( url_table.rows.length<5 )
+		{
+			var row_num = "url_tr1";
+	
+			var newRow = document.getElementById('url_table').insertRow(url_table.rows.length-1);
+        		newRow.id = row_num;
+			var cell0 = newRow.insertCell(0);
+			cell0.innerHTML="&nbsp;";
+			var cell1 = newRow.insertCell(1);
+			cell1.innerHTML="<table width='350' border='0'><tr><td><input type='text' name='mac1' style='height:20px; width:140px'/></td></tr></table>";
+		}
+	}
+}
+</script>
+</head>
+<body onload='shielding();urltable_insRow("first entry")'>
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_wireless3.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+
+<div align="center">
+	<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0">
+	<tr>
+		<td bordercolor="#456f95">
+			<form method="post" name="form0" action="<%= $action_cgi %>" onsubmit="return overlayer()">
+				<table  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+			              <tr>
+												<td width="100%"  colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(wset_selectap)</script></b></td>
+												</tr>
+												
+												<tr>
+												<td colspan="2" height="10">
+												</td>
+												</tr>
+												
+												<tr>
+													<td align="left" height="24" bordercolor="#ffffff" width="280"><script language="javascript">replace(wset_currentap)</script>&nbsp;</td>
+													<td  bordercolor="#ffffff" width="370">
+													<select name="vapname" onChange="vap_specific()">
+														<script language="JavaScript" type="text/javascript">vapname_display()</script>
+													</select>	
+													</td>
+												</tr>
+										    
+										    
+										    
+										   
+											</table>
+												<input type="hidden" value="VAPSpec MF" name="SERVLET">
+											</form>
+												<form method="post" name="form1" action="<%= $action_cgi %>" onsubmit="return macvalidate()">
+			                 <table id="tab0"  bgcolor="#ffffff" align="center"    border="0" cellpadding="0" cellspacing="0" width="650">
+			<tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(mac_use)</script>&nbsp;</b></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10"></td>
+			</tr>
+			
+			<tr>
+			<td align="center" colspan="2"  bordercolor="#ffffff">
+			<table id="url_table" width="650" border="0"  bgcolor="#FFFFFF">
+	    <tr>
+          <td  width="280"><script language="javascript">replace(mac_filter)</script></td>
+          <td  width="370">
+		    		<table width="370" border="0">
+              <tr>
+              	<td  ><input type="radio" <% webui_radiobutton_check "$xml_wlan_macfilter" "yes" %> name="macfilter" value="yes" onclick="url_radio_display(2);initrulecount();">
+								<script language="javascript">replace(mac_enable)</script> &nbsp;<input type="radio" <% webui_radiobutton_check "$xml_wlan_macfilter" "no" %> name="macfilter" value="no" onclick="url_radio_display(1);">
+								<script language="javascript">replace(mac_disable)</script>&nbsp;
+								</td>
+              </tr>
+            </table>
+		  		</td>
+        </tr>	
+        
+        <tr style="display:none">
+							<td align="right">&nbsp;</td>
+							<td ><input type="radio" <% webui_radiobutton_check "$xml_wlan_filtermode" "prevent" %> name="filtermode" value="prevent">&nbsp;
+								<script language="javascript">replace(mac_prevent)</script> </td>
+							</tr>
+							
+				<tr style="display:none">
+							<td align="right">&nbsp;</td>
+							<td ><input type="radio" <% webui_radiobutton_check "$xml_wlan_filtermode" "permit" %> name="filtermode" value="permit">&nbsp;
+							<script language="javascript">replace(mac_permit)</script></td>
+							</tr>
+		
+		<tr style="display:none">
+	          <td >&nbsp;</td>
+	          <td >
+			    <table  border="0">
+	              <tr>
+	                <td><script language="javascript">replace(mac_add_button)</script></td>
+	                <td><script language="javascript">replace(mac_del_button)</script></td>
+	              </tr>
+	            </table>
+			  </td>
+	        </tr>
+	  </table>
+			</td> 
+			</tr>
+			
+			
+			<tr>
+			<td colspan="2" height="10"></td>
+			</tr>
+		</table>
+		 </td>
+   </tr>
+</table> 
+		<table id="tab5" align="center"  border="0" cellpadding="0" cellspacing="0" width="650">
+			<tr>
+			<td align="center" height="40" valign="middle" colspan="2"><script language="javascript">replace(mac_apply)</script>&nbsp;</td>
+			</tr>
+			<tr>
+        <td align="right"   colspan="2"><script language="javascript">replace(mac_help)</script></td>
+      </tr>
+     </table>
+
+<input type="hidden" value="MAC Setup" name="SERVLET" >
+<input type="hidden" name="vap_name" value="">
+<input type="hidden" value="<%= $xml_wlan_mac_count %>" name="rule_num">
+</form>
+</div>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+
+

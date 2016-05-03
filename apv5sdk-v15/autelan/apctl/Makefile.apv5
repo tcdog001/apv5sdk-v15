@@ -1,0 +1,44 @@
+PKG_BUILD_DIR:=src
+LIB_DIR:=lib
+
+#command replace
+CC ?= gcc
+CP := cp -fpR
+RM := rm -rf
+
+ifeq ($(AQ_TYPE),AQ2000N)
+EXTRA_CFLAGS += -DAR11N
+ZTOOL_DIR=ztool_7240
+#else ifeq ($(AQ_TYPE),PC018)
+else
+EXTRA_CFLAGS += -DPC018
+ZTOOL_DIR=ztool_v5
+endif
+
+.PHONY: all
+all: compile install 
+
+.PHONY: compile
+compile:
+	$(MAKE) -C $(PKG_BUILD_DIR)  \
+	EXTRA_CFLAGS="$(EXTRA_CFLAGS)"  
+
+	
+.PHNOY: install
+install:
+	$(STRIP) $(PKG_BUILD_DIR)/apctl
+	$(CP) $(PKG_BUILD_DIR)/apctl  $(ROOTFSDIR)/usr/sbin
+	echo "ztool:$(ZTOOL_DIR)"
+	$(CP) $(ZTOOL_DIR)/apcomm $(ROOTFSDIR)/usr/sbin
+	$(CP) $(ZTOOL_DIR)/ap_param_parse $(ROOTFSDIR)/usr/sbin
+	$(RM) $(ROOTFSDIR)/usr/lib/libiconv.so*
+	$(CP) $(LIB_DIR)/libiconv.so.2.5.1 $(ROOTFSDIR)/usr/lib
+	ln -s libiconv.so.2.5.1 $(ROOTFSDIR)/usr/lib/libiconv.so
+	ln -s libiconv.so.2.5.1 $(ROOTFSDIR)/usr/lib/libiconv.so.2
+#	$(CP) $(ZTOOL_DIR)/config_11n $(ROOTFSDIR)/etc/wlan/config.ap83
+#	$(CP) files/select_associate $(ROOTFSDIR)/usr/sbin
+#	$(CP) files/zt_monitor $(ROOTFSDIR)/usr/sbin
+
+.PHONY: clean
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) clean

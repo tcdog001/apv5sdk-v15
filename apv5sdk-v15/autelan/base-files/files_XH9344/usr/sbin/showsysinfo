@@ -1,0 +1,133 @@
+#!/bin/sh
+
+#common
+WRCPUUTIL=/usr/bin/pro_ctl_util
+if [ -d /jffs/.OEM ];then
+	PATHVENDOR=/jffs/.OEM
+	if [ ! -f /jffs/.OEM/.company_name ];then
+		COMPANY_NAME="`$WRCPUUTIL -i|awk -F':' '/company name/{print $2}'`"
+		PRODUCT_TYPE="`$WRCPUUTIL -i|awk -F':' '/product type/{print $2}'`"
+		SERIAL_NUMBER="`$WRCPUUTIL -i|awk -F':' '/SN:/{print $2}'`"
+		MAC="`$WRCPUUTIL -i|awk -F':' '/MAC/{print $2":"$3":"$4":"$5":"$6":"$7}'`"
+#		SOFT_VERSION="`cat /etc/version/version`#`cat /etc/version/buildno`"
+		SOFT_VERSION=4.7.1.1
+		MAIN_VER="`echo $SERIAL_NUMBER | cut -b 10`"
+		MINOR_VER="`echo $SERIAL_NUMBER | cut -b 11-12`"
+#		HARD_VERSION="$MAIN_VER.$MINOR_VER"
+		HARD_VERSION=V2.0
+	else
+		COMPANY_NAME="`cat $PATHVENDOR/.company_name`"
+		if [ -f /jffs/.OEM/.product_name ];then
+			PRODUCT_TYPE="`cat $PATHVENDOR/.product_name`"
+		else
+			PRODUCT_TYPE="`$WRCPUUTIL -i|awk -F':' '/product type/{print $2}'`"
+		fi
+		if [ -f /jffs/.OEM/.sn ];then
+			SERIAL_NUMBER="`cat $PATHVENDOR/.sn`"
+		else
+			SERIAL_NUMBER="`$WRCPUUTIL -i|awk -F':' '/SN:/{print $2}'`"
+		fi
+		if [ -f /jffs/.OEM/.mac_eth0 ];then
+#			MAC=`cat $PATHVENDOR/.mac_eth0`
+			temp_mac="`cat $PATHVENDOR/.mac_eth0`"
+			MAC="`/sbin/set_mac org $temp_mac`"
+		else
+			MAC="`$WRCPUUTIL -i|awk -F':' '/MAC/{print $2":"$3":"$4":"$5":"$6":"$7}'`"
+		fi
+		if [ -f /jffs/.OEM/.software_version ];then
+			if [ -f /jffs/.OEM/.build_no ];then
+				SOFT_VERSION="`cat $PATHVENDOR/.software_version`#`cat $PATHVENDOR/.build_no`"
+			else
+				SOFT_VERSION="`cat $PATHVENDOR/.software_version`"
+			fi
+		else
+#			SOFT_VERSION="`cat /etc/version/version`#`cat /etc/version/buildno`"
+			SOFT_VERSION=4.7.1.1
+		fi
+		if [ -f /jffs/.OEM/.hardware_version ];then
+			HARD_VERSION="`cat $PATHVENDOR/.hardware_version`"
+		else
+			MAIN_VER="`echo $SERIAL_NUMBER | cut -b 10`"
+			MINOR_VER="`echo $SERIAL_NUMBER | cut -b 11-12`"
+#			HARD_VERSION="$MAIN_VER.$MINOR_VER"
+			HARD_VERSION=V2.0
+		fi
+	fi
+else
+	COMPANY_NAME="`$WRCPUUTIL -i|awk -F':' '/company name/{print $2}'`"
+	PRODUCT_TYPE="`$WRCPUUTIL -i|awk -F':' '/product type/{print $2}'`"
+	SERIAL_NUMBER="`$WRCPUUTIL -i|awk -F':' '/SN/{print $2}'`"
+	MAC="`$WRCPUUTIL -i|awk -F':' '/MAC/{print $2":"$3":"$4":"$5":"$6":"$7}'`"
+#	SERIAL_NUMBER=${MAC}
+#	SOFT_VERSION="`cat /etc/version/version`#`cat /etc/version/buildno`"
+	SOFT_VERSION=4.7.1.1
+	MAIN_VER="`echo $SERIAL_NUMBER | cut -b 10`"
+	MINOR_VER="`echo $SERIAL_NUMBER | cut -b 11-12`"
+#	HARD_VERSION="$MAIN_VER.$MINOR_VER"
+	HARD_VERSION=V2.0
+fi
+	AP_MODE="`cat /proc/sys/dev/wifi0/thinap`"
+
+#show
+echo "    Company Name:$COMPANY_NAME"
+echo "              SN:$SERIAL_NUMBER"
+if [ $AP_MODE = "1" ];then
+	echo "         Ap Mode:thinap"
+else
+	echo "         Ap Mode:fatap"
+fi
+echo "     Device Type:$PRODUCT_TYPE"
+echo "             MAC:$MAC"
+
+#soft_version by company
+DTCOMPANY_NAME=`echo $COMPANY_NAME|grep -o -i -e 'DATANG'`
+[ $? = 0 ]&&SOFT_VERSION="V5.0.1.0"
+
+FIBCOMPANY_NAME=`echo $COMPANY_NAME | grep -o -i -e 'FIBERHOME'`
+if [ $? = 0 ];then
+	[ "$PRODUCT_TYPE" == "FH-AP2400(20G1T2)" ]&&SOFT_VERSION="3.3.12"
+else
+	FIBCOMPANY_NAME=`echo $COMPANY_NAME | grep -o -i -e 'HONGXIN'`
+	if [ $? -eq 0 ];then
+		[ "$PRODUCT_TYPE" == "FH-AP2400(20G1T2)" ]&&SOFT_VERSION="3.3.12"
+	fi
+fi
+NETGEARCOMPANY_NAME=`echo $COMPANY_NAME|grep -o -i -e 'NETGEAR'`
+if [ $? = 0 ]; then
+	{ echo $PRODUCT_TYPE | grep -q -i -e '^[ ]\{0,\}WG102[ ]\{0,\}$' ;} && [ $? = 0 ] &&SOFT_VERSION="1.0.0"
+	{ echo $PRODUCT_TYPE | grep -q -i -e '^[ ]\{0,\}WG102-500[ ]\{0,\}$' ;} && [ $? = 0 ] &&SOFT_VERSION="4.6.7"
+fi
+COMBACOMPANY_NAME=`echo $COMPANY_NAME | grep -o -i -e 'COMBA'`
+if [ $? = 0 ];then
+#	[ "$PRODUCT_TYPE" == "AP2400-IC,0100G00P" ]&&SOFT_VERSION="4.7.0.1"
+	SOFT_VERSION="4.7.1.1"
+fi
+
+ALCCOMPANY_NAME=`echo $COMPANY_NAME | grep -o -i -e 'Alcatel'`
+if [ $? = 0 ];then
+#	[ "$PRODUCT_TYPE" == "AP2400-IC,0100G00P" ]&&SOFT_VERSION="1.00"
+	SOFT_VERSION="1.00"
+fi
+
+SYDCOMPANY_NAME=`echo $COMPANY_NAME | grep -o -i -e 'Sunnada'`
+if [ $? = 0 ];then
+#	[ "$PRODUCT_TYPE" == "AP2400-IC,0100G00P" ]&&SOFT_VERSION="V6.1"
+	SOFT_VERSION="V6.1"
+fi
+
+POSTCOMPANY_NAME=`echo $COMPANY_NAME | grep -o -i -e 'Postcom'`
+if [ $? = 0 ];then
+#	[ "$PRODUCT_TYPE" == "AP2400-IC,0100G00P" ]&&SOFT_VERSION="V1.2.0.0"
+	SOFT_VERSION="V1.2.0.0"
+fi
+if [ -f /jffs/.OEM/.software_version ];then
+	if [ -f /jffs/.OEM/.build_no ];then
+		SOFT_VERSION="`cat $PATHVENDOR/.software_version`#`cat $PATHVENDOR/.build_no`"
+	else
+		SOFT_VERSION="`cat $PATHVENDOR/.software_version`"
+	fi
+fi
+
+echo "Software Version:$SOFT_VERSION"
+echo "Hardware Version:$HARD_VERSION"
+

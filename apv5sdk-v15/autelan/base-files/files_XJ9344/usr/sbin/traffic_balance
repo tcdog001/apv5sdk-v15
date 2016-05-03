@@ -1,0 +1,359 @@
+#!/bin/sh
+
+AUTELAN=/usr/sbin/autelan
+
+DEVICE_MODEL="`/usr/sbin/showsysinfo | awk -F ":" '/Device Type/{print $2}'`"
+
+usage()
+{
+	echo "usage:"
+	echo "	traffic_balance {vapname} {mode} {wifi} {20/40} {flownum}"
+}
+
+disable_balance()
+{
+	${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_enable 0
+	echo 0 > /proc/sys/dev/wifi0/cache_enable
+        autelan 80211_cache ${1} set_cache_queue_maxlen_b 200
+        autelan 80211_cache ${1} set_cache_queue_maxlen_g 200
+        autelan 80211_cache ${1} set_cache_queue_maxlen_n 200
+        autelan 80211_cache ${1} set_cache_threshold_b 20
+        autelan 80211_cache ${1} set_cache_threshold_g 20
+        autelan 80211_cache ${1} set_cache_threshold_n 50
+        autelan 80211_cache ${1} set_cache_protocol 0
+
+        echo 0 > /proc/sys/dev/wifi0/cache_factor_b_wifi0
+        echo 0 > /proc/sys/dev/wifi0/cache_factor_g_wifi0
+        echo 0 > /proc/sys/dev/wifi0/cache_factor_n_wifi0
+
+        echo 0 > /proc/sys/dev/wifi0/cache_factor_b_wifi1
+        echo 0 > /proc/sys/dev/wifi0/cache_factor_g_wifi1
+        echo 0 > /proc/sys/dev/wifi0/cache_factor_n_wifi1
+	${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 0 0 0 3 10 4 0 0
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 1 0 0 3 10 4 0 0
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 2 0 0 3 10 4 0 0
+
+	iwpriv ${1} cwmin 0 1 4
+	iwpriv ${1} cwmin 0 0 4
+}
+
+puren_multi()
+{	
+case ${mode2040} in
+	
+	40)
+	if [ ${flownum} -eq 2 ];then
+		ifconfig ${1} down
+		echo 1 > /proc/sys/dev/wifi0/cache_enable
+		autelan 80211_cache ${1} set_cache_queue_maxlen_b 200
+		autelan 80211_cache ${1} set_cache_queue_maxlen_g 200
+		autelan 80211_cache ${1} set_cache_queue_maxlen_n 200
+		autelan 80211_cache ${1} set_cache_threshold_b 20
+		autelan 80211_cache ${1} set_cache_threshold_g 20
+		autelan 80211_cache ${1} set_cache_threshold_n 4
+		autelan 80211_cache ${1} set_cache_protocol 2500
+		ifconfig ${1} up
+		iwconfig ${1} txpower 20
+        	iwpriv ${1} cwmin 0 0 3
+        	iwpriv ${1} cwmin 0 1 8
+	else if [ ${flownum} -eq 1 ];then
+		echo 0 >/proc/sys/dev/wifi0/cache_enable
+		iwconfig ${1} txpower 20
+                iwpriv ${1} cwmin 0 0 4
+                iwpriv ${1} cwmin 0 1 6
+	fi
+	fi
+	;;
+	
+	20)
+	if [ ${flownum} -eq 2 ];then
+		ifconfig ${1} down
+       		echo 1 > /proc/sys/dev/wifi0/cache_enable
+        	autelan 80211_cache ${1} set_cache_queue_maxlen_b 200
+       		autelan 80211_cache ${1} set_cache_queue_maxlen_g 200
+        	autelan 80211_cache ${1} set_cache_queue_maxlen_n 200
+       		autelan 80211_cache ${1} set_cache_threshold_b 20
+        	autelan 80211_cache ${1} set_cache_threshold_g 20
+        	autelan 80211_cache ${1} set_cache_threshold_n 4
+        	autelan 80211_cache ${1} set_cache_protocol 2500
+        	ifconfig ${1} up
+        	iwconfig ${1} txpower 20
+        	iwpriv ${1} cwmin 0 0 3
+        	iwpriv ${1} cwmin 0 1 8
+	else if [ ${flownum} -eq 1 ];then
+		echo 0 >/proc/sys/dev/wifi0/cache_enable
+                iwconfig ${1} txpower 20
+                iwpriv ${1} cwmin 0 0 4
+                iwpriv ${1} cwmin 0 1 6
+	fi
+	fi
+	;;
+	*)
+	echo "{mode2040} error!"
+	;;
+esac
+}
+
+bgn_multi()
+{
+	ifconfig ${1} down
+	echo 1 > /proc/sys/dev/wifi0/cache_enable 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_b 20 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_g 20 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_n 50 
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_b 200
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_g 200 
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_n 200 
+	echo 200000 > /proc/sys/dev/wifi0/cache_factor_b_wifi0 
+	echo 80000 > /proc/sys/dev/wifi0/cache_factor_g_wifi0 
+	echo 0 > /proc/sys/dev/wifi0/cache_factor_n_wifi0 
+	
+	echo 200000 > /proc/sys/dev/wifi0/cache_factor_b_wifi1
+        echo 80000 > /proc/sys/dev/wifi0/cache_factor_g_wifi1
+        echo 0 > /proc/sys/dev/wifi0/cache_factor_n_wifi1
+	ifconfig ${1} up
+
+	iwconfig ${1} txpower 20
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_enable 1
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 0 0 0 3 10 8 0 0
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 1 0 0 3 10 7 0 0
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 2 0 0 3 10 2 0 0
+	
+}
+
+bg_multi()
+{
+	ifconfig ${1} down
+	echo 1 > /proc/sys/dev/wifi0/cache_enable 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_b 20 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_g 20 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_n 50 
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_b 200
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_g 200 
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_n 200 
+	echo 100000 > /proc/sys/dev/wifi0/cache_factor_b_wifi0 
+	echo 0 > /proc/sys/dev/wifi0/cache_factor_g_wifi0 
+	echo 0 > /proc/sys/dev/wifi0/cache_factor_n_wifi0 
+	
+	echo 100000 > /proc/sys/dev/wifi0/cache_factor_b_wifi1
+        echo 0 > /proc/sys/dev/wifi0/cache_factor_g_wifi1
+        echo 0 > /proc/sys/dev/wifi0/cache_factor_n_wifi1
+	ifconfig ${1} up
+
+	iwconfig ${1} txpower 20
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_enable 1
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 0 0 0 3 10 8 0 0
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 1 0 0 3 10 2 0 0
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 2 0 0 3 10 2 0 0
+	
+}
+
+gn_multi()
+{
+	ifconfig ${1} down
+	echo 1 > /proc/sys/dev/wifi0/cache_enable 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_b 20 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_g 20 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_n 50 
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_b 200
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_g 200 
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_n 200 
+	echo 100000 > /proc/sys/dev/wifi0/cache_factor_b_wifi0 
+	echo 100000 > /proc/sys/dev/wifi0/cache_factor_g_wifi0 
+	echo 0 > /proc/sys/dev/wifi0/cache_factor_n_wifi0 
+	
+	echo 100000 > /proc/sys/dev/wifi0/cache_factor_b_wifi1
+        echo 100000 > /proc/sys/dev/wifi0/cache_factor_g_wifi1
+        echo 0 > /proc/sys/dev/wifi0/cache_factor_n_wifi1
+	ifconfig ${1} up
+
+	iwconfig ${1} txpower 20
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_enable 1
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 0 0 0 3 10 8 0 0
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 1 0 0 3 10 7 0 0
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 2 0 0 3 10 1 0 0
+	
+}
+
+an_multi()
+{
+	ifconfig ${1} down
+	echo 1 > /proc/sys/dev/wifi0/cache_enable 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_b 20 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_g 20 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_n 50 
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_b 200
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_g 200 
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_n 200 
+	echo 200000 > /proc/sys/dev/wifi0/cache_factor_b_wifi0 
+	echo 200000 > /proc/sys/dev/wifi0/cache_factor_g_wifi0 
+	echo 0 > /proc/sys/dev/wifi0/cache_factor_n_wifi0 
+	
+	echo 200000 > /proc/sys/dev/wifi0/cache_factor_b_wifi1
+        echo 200000 > /proc/sys/dev/wifi0/cache_factor_g_wifi1
+        echo 0 > /proc/sys/dev/wifi0/cache_factor_n_wifi1
+	ifconfig ${1} up
+
+	iwconfig ${1} txpower 20
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_enable 1
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 0 0 0 3 10 8 0 0
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 1 0 0 3 10 7 0 0
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 2 0 0 3 10 1 0 0
+	
+}
+
+bgan_multi()
+{
+	ifconfig ${1} down
+	echo 1 > /proc/sys/dev/wifi0/cache_enable 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_b 20 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_g 20 
+	${AUTELAN} 80211_cache ${1} set_cache_threshold_n 50 
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_b 200
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_g 200 
+	${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_n 200 
+	echo 200000 > /proc/sys/dev/wifi0/cache_factor_b_wifi0 
+	echo 0 > /proc/sys/dev/wifi0/cache_factor_g_wifi0 
+	echo 0 > /proc/sys/dev/wifi0/cache_factor_n_wifi0 
+	ifconfig ${1} up
+
+	iwconfig ${1} txpower 20
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_enable 1
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 0 0 0 3 10 8 0 0
+        ${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_param 1 0 0 3 10 2 0 0
+	
+}
+
+hour24_multi()
+{
+
+	echo 1 > /proc/sys/dev/wifi0/cache_enable
+	${AUTELAN} cmcc_wmm_by_stamode ${1} set_wmm_enable 0
+	case $DEVICE_MODEL in
+
+	"AP2600-IFM,0101AN00P2")
+
+		echo AP2600-IFM,0101AN00P2
+		case ${wifi} in
+        	1)
+                ${AUTELAN} 80211_cache ${1} set_enable 1
+                ${AUTELAN} 80211_cache ${1} set_cache_enable 1
+                ${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_b 200
+                ${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_g 200
+                ${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_n 200
+                ${AUTELAN} 80211_cache ${1} set_cache_threshold_b 20
+                ${AUTELAN} 80211_cache ${1} set_cache_threshold_g 20
+                ${AUTELAN} 80211_cache ${1} set_cache_threshold_n 4
+                ${AUTELAN} 80211_cache ${1} set_cache_protocol 4608
+
+        	;;
+        	0)
+                ${AUTELAN} 80211_cache ${1} set_enable 1
+                ${AUTELAN} 80211_cache ${1} set_cache_enable 1
+                ${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_b 200
+                ${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_g 200
+                ${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_n 200
+                ${AUTELAN} 80211_cache ${1} set_cache_threshold_b 20
+                ${AUTELAN} 80211_cache ${1} set_cache_threshold_g 20
+                ${AUTELAN} 80211_cache ${1} set_cache_threshold_n 6
+                ${AUTELAN} 80211_cache ${1} set_cache_protocol 7680
+
+        	;;
+        	*)
+                usage
+        	;;
+		esac
+	;;
+
+	"AP2600-OFM,0505AN00P2")
+
+		echo AP2600-OFM,0505AN00P2
+		case ${wifi} in
+        	0)
+                ${AUTELAN} 80211_cache ${1} set_enable 1
+                ${AUTELAN} 80211_cache ${1} set_cache_enable 1
+                ${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_b 200
+                ${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_g 200
+                ${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_n 200
+                ${AUTELAN} 80211_cache ${1} set_cache_threshold_b 20
+                ${AUTELAN} 80211_cache ${1} set_cache_threshold_g 20
+                ${AUTELAN} 80211_cache ${1} set_cache_threshold_n 4
+                ${AUTELAN} 80211_cache ${1} set_cache_protocol 4608
+
+        	;;
+        	1)
+                ${AUTELAN} 80211_cache ${1} set_enable 1
+                ${AUTELAN} 80211_cache ${1} set_cache_enable 1
+                ${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_b 200
+                ${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_g 200
+                ${AUTELAN} 80211_cache ${1} set_cache_queue_maxlen_n 200
+                ${AUTELAN} 80211_cache ${1} set_cache_threshold_b 20
+                ${AUTELAN} 80211_cache ${1} set_cache_threshold_g 20
+                ${AUTELAN} 80211_cache ${1} set_cache_threshold_n 6
+                ${AUTELAN} 80211_cache ${1} set_cache_protocol 7680
+
+        	;;
+        	*)
+                usage
+        	;;
+		esac
+
+	;;
+
+	*)
+
+	echo "no such device"
+
+	;;
+
+	esac
+}
+
+if [ ! $# -eq 5 ];then
+	usage
+	exit
+fi
+
+mode="$2"
+if="$1"
+wifi="$3"
+mode2040="$4"
+flownum="$5"
+
+ifconfig ${1} down
+ifconfig wifi${3} down
+ifconfig wifi${3} up
+sleep 1
+ifconfig ${1} up
+
+case ${mode} in
+	0)
+		disable_balance ${if}
+	;;
+	1)
+		puren_multi ${if}
+	;;
+	2)
+		bgn_multi ${if}
+	;;
+	3)
+		hour24_multi ${if}
+	;;
+	4)
+		an_multi ${if}
+	;;
+	5)
+		bg_multi ${if}
+	;;
+	6)
+		gn_multi ${if}
+	;;
+	7)
+		bgan_multi ${if}
+	;;
+	*)
+		usage
+	;;
+esac
+exit 1
+ 

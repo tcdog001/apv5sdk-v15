@@ -1,0 +1,187 @@
+#!/bin/sh
+
+ERRORS_RECV_ATH_FILE=/tmp/pkt/errors_recv_ath
+ERRORS_SEND_ATH_FILE=/tmp/pkt/errors_send_ath
+ERRORS_FRAMES_RECV_ATH_FILE=/tmp/pkt/errframes_recv_ath
+ERRORS_RECV_ETH_FILE=/tmp/pkt/errors_recv_eth
+ERRORS_SEND_ETH_FILE=/tmp/pkt/errors_send_eth
+ERRORS_FRAMES_RECV_ETH_FILE=/tmp/pkt/errframes_recv_eth
+DROP_RECV_ATH_FILE=/tmp/pkt/drop_recv_ath
+DROP_SEND_ATH_FILE=/tmp/pkt/drop_send_ath
+DROP_RECV_ETH_FILE=/tmp/pkt/drop_recv_eth
+DROP_SEND_ETH_FILE=/tmp/pkt/drop_send_eth
+BADMIC_RECV_ATH_FILE=/tmp/pkt/badmic_recv_ath
+BADMIC_RECV_ETH_FILE=/tmp/pkt/badmic_recv_eth
+BADCRYPT_RECV_ATH_FILE=/tmp/pkt/badcrypt_recv_ath
+BADCRYPT_RECV_ETH_FILE=/tmp/pkt/badcrypt_recv_eth
+
+OPT_DIR=/tmp/pkt/
+OPT_FILE=''
+PKT=''
+num=1
+
+#usage
+usage()
+{
+    echo "usage:"
+    echo "          sendpkt [ath/eth] [errors/drop/errframes/badmic/badcrypt] [recv/send] [pkt]"
+    echo "          								pkt:pkt at start"
+    exit 1
+}
+
+if [ ! $# -eq 4 ];then
+    usage
+fi
+
+case ${1} in
+    ath)
+    	case ${2} in
+    		errors)
+    			case ${3} in
+    				recv)
+    					OPT_FILE=${ERRORS_RECV_ATH_FILE}
+    				;;
+    				send)
+    					OPT_FILE=${ERRORS_SEND_ATH_FILE}
+    				;;
+    				*)
+    					usage
+    				;;
+    			esac
+    		;;
+    		drop)
+    			case ${3} in
+    				recv)
+    					OPT_FILE=${DROP_RECV_ATH_FILE}
+    				;;
+    				send)
+    					OPT_FILE=${DROP_SEND_ATH_FILE}
+    				;;
+    				*)
+    					usage
+    				;;
+    			esac
+    		;;
+    		errframes)
+    			case ${3} in
+    				recv)
+    					OPT_FILE=${ERRORS_FRAMES_RECV_ATH_FILE}
+    				;;
+    				*)
+    					usage
+    				;;
+    			esac
+    		;;
+    		badmic)
+    			case ${3} in
+    				recv)
+    					OPT_FILE=${BADMIC_RECV_ATH_FILE}
+    				;;
+    				*)
+    					usage
+    				;;
+    			esac
+    		;;
+    		badcrypt)
+    			case ${3} in
+    				recv)
+    					OPT_FILE=${BADCRYPT_RECV_ATH_FILE}
+    				;;
+    				*)
+    					usage
+    				;;
+    			esac
+    		;;
+    		*)
+    			usage
+    		;;
+   	esac
+    ;;
+    eth)
+    	case ${2} in
+    		errors)
+    			case ${3} in
+    				recv)
+    					OPT_FILE=${ERRORS_RECV_ETH_FILE}
+    				;;
+    				send)
+    					OPT_FILE=${ERRORS_SEND_ETH_FILE}
+    				;;
+    				*)
+    					usage
+    				;;
+    			esac
+    		;;
+    		drop)
+    			case ${3} in
+    				recv)
+    					OPT_FILE=${DROP_RECV_ETH_FILE}
+    				;;
+    				send)
+    					OPT_FILE=${DROP_SEND_ETH_FILE}
+    				;;
+    				*)
+    					usage
+    				;;
+    			esac
+    		;;
+    		errframes)
+    			case ${3} in
+    				recv)
+    					OPT_FILE=${ERRORS_FRAMES_RECV_ETH_FILE}
+    				;;
+    				*)
+    					usage
+    				;;
+    			esac
+    		;;
+    		badmic)
+    			case ${3} in
+    				recv)
+    					OPT_FILE=${BADMIC_RECV_ETH_FILE}
+    				;;
+    				*)
+    					usage
+    				;;
+    			esac
+    		;;
+    		badcrypt)
+    			case ${3} in
+    				recv)
+    					OPT_FILE=${BADCRYPT_RECV_ETH_FILE}
+    				;;
+    				*)
+    					usage
+    				;;
+    			esac
+    		;;
+    		*)
+    			usage
+    		;;
+    	esac
+    ;;
+    *)
+        usage
+    ;;
+esac    
+    
+PKT=${4}
+#echo "opt_file:${OPT_FILE}"
+#echo "pkt:${PKT}"
+
+mkdir -p ${OPT_DIR}
+echo ${PKT} > ${OPT_FILE}
+
+while :
+
+do
+    sleep 5
+    num=$((${num} % 5))
+    num=$((${num} + 1))
+#    echo "num:${num}"
+    PKT=$((${PKT} + ${num}))
+    mkdir -p ${OPT_DIR}
+    echo ${PKT} > ${OPT_FILE}
+#    echo "pkt:${PKT}"
+done
+

@@ -1,0 +1,450 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			coqos_info.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='coqos_add.c.html' title=' coqos_add.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='coqos_man.c.html' title=' coqos_man.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   coqos_info.c - Retrieve MCMSA stream info
+ *
+ *   this program sends and receives raw ethernet frames and so needs
+ *   root priviledges; if you install it using &quot;chmod 555&quot; and &quot;chown 
+ *   root:root&quot; then you must login as root to run it; otherwise, you 
+ *   can install it using &quot;chmod 4555&quot; and &quot;chown root:root&quot; so that 
+ *   anyone can run it; the program will refuse to run until you get
+ *   things right;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Bill Wike &lt;bill.wike@intellon.com&gt;
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *      Abdel Younes &lt;younes@leacom.fr&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*&quot;
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;limits.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/symbol.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../coqos/coqos.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/basespec.c&quot;
+#include &quot;../tools/hexdump.c&quot;
+#include &quot;../tools/hexencode.c&quot;
+#include &quot;../tools/bytespec.c&quot;
+#include &quot;../tools/ipv4spec.c&quot;
+#include &quot;../tools/ipv6spec.c&quot;
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/typename.c&quot;
+#include &quot;../tools/endian.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/synonym.c&quot;
+#include &quot;../tools/lookup.c&quot;
+#include &quot;../tools/assist.c&quot;
+#include &quot;../tools/expect.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../int6k/Confirm.c&quot;
+#include &quot;../int6k/Display.c&quot;
+#include &quot;../int6k/Failure.c&quot;
+#include &quot;../int6k/ReadMME.c&quot;
+#include &quot;../int6k/Request.c&quot;
+#include &quot;../int6k/SendMME.c&quot;
+#include &quot;../int6k/devices.c&quot;
+#include &quot;../int6k/EthernetHeader.c&quot;
+#include &quot;../int6k/IntellonHeader.c&quot;
+#include &quot;../int6k/UnwantedPacket.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ether/channel.c&quot;
+#include &quot;../ether/openchannel.c&quot;
+#include &quot;../ether/closechannel.c&quot;
+#include &quot;../ether/readpacket.c&quot;
+#include &quot;../ether/sendpacket.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../mme/MMECode.c&quot;
+#endif
+
+/*====================================================================*
+ *   constants;    
+ *--------------------------------------------------------------------*/
+
+#define CONTROLS 6
+#define CONTROL &quot;control&quot;
+
+/*====================================================================*
+ *   program variables;
+ *--------------------------------------------------------------------*/
+
+#define CONTROL_STA 0x00
+#define CONTROL_CID 0x01
+#define CONTROL_RSVD 0x02
+#define CONTROL_VIC 0x03
+#define CONTROL_BW 0x04
+#define CONTROL_BWC 0xFF
+
+static struct _code_ controls [CONTROLS] = 
+
+{
+	{
+		CONTROL_STA,
+		&quot;STA&quot; 
+	},
+	{
+		CONTROL_CID,
+		&quot;CID&quot; 
+	},
+	{
+		CONTROL_RSVD,
+		&quot;RSVD&quot; 
+	},
+	{
+		CONTROL_VIC,
+		&quot;VIC&quot; 
+	},
+	{
+		CONTROL_BW,
+		&quot;BW&quot; 
+	},
+	{
+		CONTROL_BWC,
+		&quot;BWC&quot; 
+	}
+};
+
+/*====================================================================*
+ *
+ *   signed con_info (struct int6k * int6k, uint8_t TYPE, uint16_t CID, uint16_t TOT_BW_USED);
+ *
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Bill Wike &lt;bill.wike@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed con_info (struct int6k * int6k, uint8_t TYPE, uint16_t CID, uint16_t TOT_BW_USED) 
+
+{
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_con_info_req 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t REQ_TYPE;
+		uint32_t RSVD;
+		uint16_t CSPEC_VER;
+		uint16_t CID;
+		uint16_t TOT_BW_USED;
+	}
+	* request = (struct vs_con_info_req *)(int6k-&gt;message);
+	struct __packed vs_con_info_cnf 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t REQ_TYPE;
+		uint8_t MSTATUS;
+		uint16_t ERR_REC_CODE;
+		uint32_t RSVD;
+		uint8_t NUM_CONN;
+		struct conn_info CONN_INFO [64];
+	}
+	* confirm = (struct vs_con_info_cnf *)(int6k-&gt;message);
+	struct conn_info * conn_info = (struct conn_info*)(confirm-&gt;CONN_INFO);
+	struct vs_con_info_cnf * indicate = (struct vs_con_info_cnf *)(int6k-&gt;message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	int i;
+	Request (int6k, &quot;COQOS connection information&quot;);
+	memset (int6k-&gt;message, 0, sizeof (struct message));
+	EthernetHeader (&amp;int6k-&gt;message-&gt;ethernet, int6k-&gt;channel-&gt;peer, int6k-&gt;channel-&gt;host);
+	IntellonHeader (&amp;int6k-&gt;message-&gt;intellon, (VS_CON_INFO | MMTYPE_REQ));
+	int6k-&gt;packetsize = ETHER_MIN_LEN;
+	request-&gt;REQ_TYPE = TYPE;
+	request-&gt;CID = CID;
+	request-&gt;TOT_BW_USED = TOT_BW_USED;
+	request-&gt;CSPEC_VER = 0x01;
+	if (SendMME (int6k) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, INT6K_CANTSEND);
+		return (-1);
+	}
+	while (ReadMME (int6k, (VS_CON_INFO | MMTYPE_CNF)) &lt;= 0);
+	if (confirm-&gt;MSTATUS) 
+	{
+		Failure (int6k, &quot;Error requesting information.&quot;);
+		return (-1);
+	}
+
+/* BW exceeded request and &quot;cancel all requests&quot; do not send indicate */
+
+	if ((TYPE == CONTROL_BW) || (TYPE == CONTROL_BWC)) 
+	{
+		Confirm (int6k, &quot;Success&quot;);
+		return (0);
+	}
+	Confirm (int6k, &quot;Received confirm, waiting for indicate...&quot;);
+	while (ReadMME (int6k, (VS_CON_INFO | MMTYPE_IND)) &lt;= 0);
+	if (indicate-&gt;MSTATUS) 
+	{
+		Failure (int6k, &quot;Error requesting information.&quot;);
+		return (-1);
+	}
+	printf (&quot;Number of Connections: %d\n&quot;, (int)indicate-&gt;NUM_CONN);
+	conn_info = (struct conn_info *)(indicate-&gt;CONN_INFO);
+	for (i = 0; i &lt; indicate-&gt;NUM_CONN; i++) 
+	{
+		printf (&quot;SNID: %02X &quot;, conn_info-&gt;SNID);
+		printf (&quot;CID: %04X &quot;, conn_info-&gt;CID);
+		printf (&quot;STEI: %02X &quot;, conn_info-&gt;STEI);
+		printf (&quot;DTEI: %02X &quot;, conn_info-&gt;DTEI);
+		printf (&quot;LLID: %02X &quot;, conn_info-&gt;LLID);
+		printf (&quot;CSPEC_VERSION: %04X &quot;, conn_info-&gt;CSPECVERSION);
+		printf (&quot;CONN_CAP: %02d &quot;, conn_info-&gt;CONN_CAP);
+		printf (&quot;CONN_COQOS_PRIO: %02d &quot;, conn_info-&gt;CONN_COQOS_PRIO);
+		printf (&quot;CONN_RATE: %d &quot;, conn_info-&gt;CONN_RATE);
+		printf (&quot;CONN_TTL: %d &quot;, conn_info-&gt;CONN_TTL);
+		printf (&quot;BW_USED: %d \n&quot;, conn_info-&gt;BW_USED);
+		conn_info++;
+	}
+	return (0);
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char * argv[]);
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	extern struct channel channel;
+	extern const struct _term_ devices [];
+	static const char *optv [] = 
+	{
+		&quot;ei:qv&quot;,
+		&quot;sta,cid,rsvd,vic,bw,bwc [limit] [device] [...]&quot;,
+		&quot;CoQos Stream Utility&quot;,
+		&quot;e\tredirect stderr messages to stdout&quot;,
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		&quot;i n\thost interface number [2]&quot;,
+
+#else
+
+		&quot;i s\thost interface name [&quot; CHANNEL_ETHDEVICE &quot;]&quot;,
+
+#endif
+
+		&quot;q\tquiet - suppress routine messages&quot;,
+		&quot;v\tverbose messages&quot;,
+		(const char *) (0) 
+	};
+
+#include &quot;../int6k/int6k-struct.c&quot;
+
+	uint16_t cid = 0;
+	uint16_t limit;
+	uint8_t type;
+	signed code;
+	signed c;
+	if (getenv (PLCDEVICE)) 
+	{
+#if defined (WINPCAP) || defined (LIBPCAP)
+		channel.id = atoi (getenv (PLCDEVICE));
+#else
+		channel.name = strdup (getenv (PLCDEVICE));
+#endif
+	}
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'e':
+			dup2 (STDOUT_FILENO, STDERR_FILENO);
+			break;
+		case 'i':
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+			channel.id = atoi (optarg);
+
+#else
+
+			channel.name = optarg;
+
+#endif
+
+			break;
+		case 'q':
+			_setbits (channel.flags, CHANNEL_SILENCE);
+			_setbits (int6k.flags, INT6K_SILENCE);
+			break;
+		case 'v':
+			_setbits (channel.flags, CHANNEL_VERBOSE);
+			_setbits (int6k.flags, INT6K_VERBOSE);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+
+#ifndef WIN32
+
+/*
+ *      raw packets require root priviledges on linux; one does not have to be
+ *      root when this program is installed setuid using 'chown root:root' and 
+ *      'chmod 4555';
+ */
+
+	if (geteuid ()) 
+	{
+		error (1, EPERM, INT6K_NEEDROOT);
+	}
+
+#endif
+
+	if ((code = lookup (*argv++, controls, CONTROLS)) == -1) 
+	{
+		assist (*--argv, CONTROL, controls, CONTROLS, stderr);
+	}
+	type = (uint8_t)(code);
+	argc--;
+	if (type == CONTROL_CID) 
+	{
+		if (!argc) 
+		{
+			error (1, errno, &quot;Expected Connection Identifier&quot;);
+		}
+		if (!hexencode ((uint8_t *)(&amp;cid), sizeof (cid), *argv++)) 
+		{
+			error (1, errno, &quot;Invalid CID&quot;);
+		}
+		cid = htons (cid);
+		argc--;
+	}
+	else if (type == CONTROL_BW) 
+	{
+		if (!argc) 
+		{
+			error (1, errno, &quot;Expected Bandwidth Limit&quot;);
+		}
+		limit = atoi (*argv++);
+		argc--;
+	}
+	openchannel (&amp;channel);
+	if (!(int6k.message = malloc (sizeof (struct message)))) 
+	{
+		error (1, errno, INT6K_ERR_MEMORY);
+	}
+	if (!argc) 
+	{
+		con_info (&amp;int6k, type, cid, limit);
+	}
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		if (!hexencode (channel.peer, sizeof (channel.peer), synonym (*argv, devices, DEVICES))) 
+		{
+			error (1, errno, INT6K_BAD_MAC, *argv);
+		}
+		con_info (&amp;int6k, type, cid, limit);
+		argc--;
+		argv++;
+	}
+	free (int6k.message);
+	closechannel (&amp;channel);
+	exit (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='coqos_add.c.html' title=' coqos_add.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='coqos_man.c.html' title=' coqos_man.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

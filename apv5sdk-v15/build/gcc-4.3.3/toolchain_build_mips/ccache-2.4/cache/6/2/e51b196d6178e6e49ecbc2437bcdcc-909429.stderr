@@ -1,0 +1,2 @@
+kernel/signal.c: In function 'find_process':
+kernel/signal.c:2711: warning: ISO C90 forbids mixed declarations and code

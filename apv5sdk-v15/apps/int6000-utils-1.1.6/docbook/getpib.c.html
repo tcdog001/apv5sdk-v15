@@ -1,0 +1,374 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			getpib.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='getoptv.c.html' title=' getoptv.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='gpioinfo.c.html' title=' gpioinfo.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   getpib.c - PIB Data Extractor
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*&quot;
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;limits.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../pib/pib.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/uintspec.c&quot;
+#include &quot;../tools/basespec.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/hexout.c&quot;
+#include &quot;../tools/error.c&quot;
+#endif
+
+/*====================================================================*
+ *   constants;
+ *--------------------------------------------------------------------*/
+
+#define SETPIB_VERBOSE (1 &lt;&lt; 0)
+#define SETPIB_SILENCE (1 &lt;&lt; 1)
+#define SETPIB_NEWLINE (1 &lt;&lt; 2)
+
+#define LENGTH_MAX 1024
+
+/*====================================================================*
+ *
+ *   int main (int argc, const char * argv []);
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	static const char *optv [] = 
+	{
+		&quot;qvn&quot;,
+		&quot;file offset type [size]\n\n\t  standard-length types are 'byte'|'word'|'long'|'hfid'|'mac'|'key'\n\t  variable-length types are 'data'|'text'&quot;,
+		&quot;PIB Data Extractor&quot;,
+		&quot;n\tappend newline&quot;,
+		&quot;q\tquiet mode&quot;,
+		&quot;v\tverbose mode&quot;,
+		(const char *) (0) 
+	};
+	struct _file_ file;
+	struct header_pib * header;
+	signed offset = 0;
+	signed length = 0;
+	byte * buffer;
+	byte * memory;
+	byte * extent;
+	const char * string;
+	flag_t flags = (flag_t)(0);
+	signed c;
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch (c) 
+		{
+		case 'n':
+			_setbits (flags, SETPIB_NEWLINE);
+			break;
+		case 'q':
+			_setbits (flags, SETPIB_SILENCE);
+			break;
+		case 'v':
+			_setbits (flags, SETPIB_VERBOSE);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	if (!argc) 
+	{
+		error (1, 0, &quot;No file to read&quot;);
+	}
+	file.name = *argv;
+	if ((file.file = open (file.name, O_BINARY|O_RDONLY)) == -1) 
+	{
+		error (1, errno, &quot;Can't open %s&quot;, file.name);
+	}
+	if ((length = lseek (file.file, 0, SEEK_END)) == -1) 
+	{
+		error (1, errno, &quot;Can't size %s&quot;, file.name);
+	}
+	if (!(buffer = malloc (length))) 
+	{
+		error (1, errno, &quot;Can't span %s&quot;, file.name);
+	}
+	if (lseek (file.file, 0, SEEK_SET)) 
+	{
+		error (1, errno, &quot;Can't seek %s&quot;, file.name);
+	}
+	if (read (file.file, buffer, length) &lt; length) 
+	{
+		error (1, errno, &quot;Can't load %s&quot;, file.name);
+	}
+	close (file.file);
+	argc--;
+	argv++;
+	header = (struct header_pib *)(buffer);
+	if (length != LE16TOH (header-&gt;PIBLENGTH)) 
+	{
+		error (1, ECANCELED, &quot;Bad PIB filesize: %s&quot;, file.name);
+	}
+	if (!argc) 
+	{
+		error (1, ECANCELED, &quot;Need an offset&quot;);
+	}
+	offset = (uint32_t)(basespec (*argv, 16, sizeof (uint32_t)));
+	if (offset &gt;= length) 
+	{
+		error (1, ECANCELED, &quot;PIB offset %X exceeds PIB length %X&quot;, offset, length);
+	}
+	memory = buffer + offset;
+	extent = buffer + length;
+	argc--;
+	argv++;
+	if (!argc) 
+	{
+		_setbits (flags, SETPIB_VERBOSE);
+	}
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		const char * object = *argv;
+		argv++;
+		argc--;
+		if (!strcmp (object, &quot;byte&quot;)) 
+		{
+			uint8_t byte;
+			if (memory + sizeof (byte) &gt; extent) 
+			{
+				error (1, ECANCELED, &quot;%s exceeds PIB length %X&quot;, object, length);
+			}
+			memcpy (&amp;byte, memory, sizeof (byte));
+			memory += sizeof (byte);
+			printf (&quot;%u&quot;, byte);
+		}
+		else if (!strcmp (object, &quot;word&quot;)) 
+		{
+			uint16_t word;
+			if (memory + sizeof (word) &gt; extent) 
+			{
+				error (1, ECANCELED, &quot;%s exceeds PIB length %X&quot;, object, length);
+			}
+			memcpy (&amp;word, memory, sizeof (word));
+			memory += sizeof (word);
+			printf (&quot;%u&quot;, LE16TOH (word));
+		}
+		else if (!strcmp (object, &quot;long&quot;)) 
+		{
+			uint32_t word;
+			if (memory + sizeof (word) &gt; extent) 
+			{
+				error (1, ECANCELED, &quot;%s exceeds PIB length %X&quot;, object, length);
+			}
+			memcpy (&amp;word, memory, sizeof (word));
+			memory += sizeof (word);
+			printf (&quot;%u&quot;, LE32TOH (word));
+		}
+		else if (!strcmp (object, &quot;xbyte&quot;)) 
+		{
+			uint8_t byte;
+			if (memory + sizeof (byte) &gt; extent) 
+			{
+				error (1, ECANCELED, &quot;%s exceeds PIB length %X&quot;, object, length);
+			}
+			memcpy (&amp;byte, memory, sizeof (byte));
+			memory += sizeof (byte);
+			printf (&quot;0x%02X&quot;, byte);
+		}
+		else if (!strcmp (object, &quot;xword&quot;)) 
+		{
+			uint16_t word;
+			if (memory + sizeof (word) &gt; extent) 
+			{
+				error (1, ECANCELED, &quot;%s exceeds PIB length %X&quot;, object, length);
+			}
+			memcpy (&amp;word, memory, sizeof (word));
+			memory += sizeof (word);
+			printf (&quot;0x%04X&quot;, LE16TOH (word));
+		}
+		else if (!strcmp (object, &quot;xlong&quot;)) 
+		{
+			uint32_t word;
+			if (memory + sizeof (word) &gt; extent) 
+			{
+				error (1, ECANCELED, &quot;%s exceeds PIB length %X&quot;, object, length);
+			}
+			memcpy (&amp;word, memory, sizeof (word));
+			memory += sizeof (word);
+			printf (&quot;0x%08X&quot;, LE32TOH (word));
+		}
+		else if (!strcmp (object, &quot;hfid&quot;)) 
+		{
+			string = (char *)(memory);
+			length = PIB_HFID_LEN;
+			if (memory + length &gt; extent) 
+			{
+				error (1, ECANCELED, &quot;%s exceeds PIB length %X&quot;, object, length);
+			}
+			memory += length;
+			while (isprint (*string) &amp;&amp; (length--)) 
+			{
+				putc (*string++, stdout);
+			}
+		}
+		else if (!strcmp (object, &quot;mac&quot;)) 
+		{
+			length = ETHER_ADDR_LEN;
+			if (memory + length &gt; extent) 
+			{
+				error (1, ECANCELED, &quot;%s exceeds PIB length %X&quot;, object, length);
+			}
+			hexout (memory, length, ':', stdout);
+			memory += length;
+		}
+		else if (!strcmp (object, &quot;key&quot;)) 
+		{
+			length = HPAVKEY_DAK_LEN;
+			if (memory + length &gt; extent) 
+			{
+				error (1, ECANCELED, &quot;%s exceeds PIB length %X&quot;, object, length);
+			}
+			hexout (memory, length, ':', stdout);
+			memory += length;
+		}
+		else if (!strcmp (object, &quot;data&quot;)) 
+		{
+			const char * size = *argv++;
+			if (!size) 
+			{
+				error (1, EINVAL, &quot;%s needs a length&quot;, object);
+			}
+			length = (unsigned)(uintspec (size, 1, LENGTH_MAX));
+			if (memory + length &gt; extent) 
+			{
+				error (1, ECANCELED, &quot;%s exceeds PIB length %X&quot;, object, length);
+			}
+			hexout (memory, length, 0, stdout);
+			memory += length;
+		}
+		else if (!strcmp (object, &quot;text&quot;)) 
+		{
+			const char * size = *argv++;
+			string = (char *)(memory);
+			if (!size) 
+			{
+				error (1, EINVAL, &quot;'%s' needs a length&quot;, object);
+			}
+			length = (unsigned)(uintspec (size, 1, LENGTH_MAX));
+			if (memory + length &gt; extent) 
+			{
+				error (1, ECANCELED, &quot;%s exceeds PIB length %X&quot;, object, length);
+			}
+			memory += length;
+			while (isprint (*string) &amp;&amp; (length--)) 
+			{
+				putc (*string++, stdout);
+			}
+		}
+		else if (!strcmp (object, &quot;skip&quot;)) 
+		{
+			const char * size = *argv++;
+			if (!size) 
+			{
+				error (1, EINVAL, &quot;%s needs a length&quot;, object);
+			}
+			length = (unsigned)(uintspec (size, 1, LENGTH_MAX));
+			memory += length;
+			continue;
+		}
+		else 
+		{
+			error (1, ENOTSUP, &quot;%s&quot;, *argv);
+		}
+		if ((argc) &amp;&amp; (*argv)) 
+		{
+			putc (' ', stdout);
+		}
+	}
+	if (_anyset (flags, SETPIB_NEWLINE)) 
+	{
+		putc ('\n', stdout);
+	}
+	return (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='getoptv.c.html' title=' getoptv.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='gpioinfo.c.html' title=' gpioinfo.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,506 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+right_package=0
+error_package=0
+right_eth=0
+error_eth=0
+wlrx_package=0
+wltx_package=0
+wlrx_bytes=0
+wltx_bytes=0
+wdrx_package=0
+wdtx_package=0
+wdrx_bytes=0
+wdtx_bytes=0
+wd_error_pkrate=0
+wl_error_pkrate=0
+tmp_uptime=`/usr/bin/uptime 2>/dev/null|awk '{print $3 }'`
+uptime=`echo $uptime|awk -F':' '{print $2}'`
+if [ "$uptime" == "" ]; then
+	uptime="00:$tmp_uptime"
+else
+	uptime=$tmp_uptime
+fi
+$IFCONFIG > /tmp/interface_info 2>/dev/null
+cp /tmp/interface-rate /tmp/interface_rate_info
+cp /tmp/user-rate /tmp/user_rate_info
+echo "VapName	UserJoinCounter	UserJoinSuccessfulCounter	RespondUsersJoinCount" > /tmp/user_connect_info
+for vap_num in `seq $NUM_ap`
+do
+	cvap_num=`expr $vap_num - 1`
+	eval "vap_up=\`cat /tmp/interface_info|grep -o -i -e 'ath${cvap_num}' 2>/dev/null\`"
+	[ "$vap_up" != "" ]&&{
+		eval "\`sed 's/ath${cvap_num}/vap${vap_num}/g' /tmp/interface_info > /tmp/interface_info_tmp 2>/dev/null\`"
+		mv /tmp/interface_info_tmp /tmp/interface_info 2>/dev/null
+	}
+	eval "rate_vap_up=\`cat /tmp/interface_rate_info|grep -o -i -e 'ath${cvap_num}' 2>/dev/null\`"
+	[ "$rate_vap_up" != "" ]&&{
+		eval "\`sed 's/ath${cvap_num}/vap${vap_num}/g' /tmp/interface_rate_info > /tmp/interface_rate_info_tmp 2>/dev/null\`"
+		mv /tmp/interface_rate_info_tmp /tmp/interface_rate_info 2>/dev/null
+	}
+	eval "rate_vap_user=\`cat /tmp/user_rate_info|grep -o -i -e 'ath${cvap_num}' 2>/dev/null\`"
+	[ "$rate_vap_user" != "" ]&&{
+		eval "\`sed 's/ath${cvap_num}/vap${vap_num}/g' /tmp/user_rate_info > /tmp/user_rate_info_tmp 2>/dev/null\`"
+		mv /tmp/user_rate_info_tmp /tmp/user_rate_info 2>/dev/null
+	}
+	eval "right_package_tx=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/vap$vap_num/{print \$0}'|awk -F \"[ ]+|:\" '/TX packets/{print \$4}' 2>/dev/null\`"
+	eval "right_package_rx=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/vap$vap_num/{print \$0}'|awk -F \"[ ]+|:\" '/RX packets/{print \$4}' 2>/dev/null\`"
+	[ "$right_package_tx" != "" ]&&right_package=`expr $right_package + $right_package_tx 2>/dev/null`
+	[ "$right_package_rx" != "" ]&&right_package=`expr $right_package + $right_package_rx 2>/dev/null`
+	[ "$right_package_tx" != "" ]&&wltx_package=`expr $wltx_package + $right_package_tx 2>/dev/null`
+	[ "$right_package_rx" != "" ]&&wlrx_package=`expr $wlrx_package + $right_package_rx 2>/dev/null`
+	
+	eval "error_package_tx=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/vap$vap_num/{print \$0}'|awk -F \"[ ]+|:\" '/errors/{print \$6}'|sed -n '1p' 2>/dev/null\`"
+	eval "error_package_rx=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/vap$vap_num/{print \$0}'|awk -F \"[ ]+|:\" '/RX packets/{print \$6}'|sed -n '2p' 2>/dev/null\`"
+	[ "$error_package_tx" != "" ]&&error_package=`expr $error_package + $error_package_tx 2>/dev/null`
+	[ "$error_package_rx" != "" ]&&error_package=`expr $error_package + $error_package_rx 2>/dev/null`
+	
+	eval "wlrx_vap_bytes=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/vap$vap_num/{print \$0}'|awk -F \"[ ]+|:\" '/RX bytes/{print \$4}' 2>/dev/null\`"
+	eval "wltx_vap_bytes=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/vap$vap_num/{print \$0}'|awk -F \"[ ]+|:\" '/TX bytes/{print \$9}' 2>/dev/null\`"
+	[ "$wlrx_vap_bytes" != "" ]&&wlrx_bytes=`expr $wlrx_bytes + $wlrx_vap_bytes 2>/dev/null`
+	[ "$wltx_vap_bytes" != "" ]&&wltx_bytes=`expr $wltx_bytes + $wltx_vap_bytes 2>/dev/null`
+	
+	eval "join_user=\`cat /proc/sys/net/ath$cvap_num/users_join_counter 2>/dev/null\`"
+	eval "join_user_success=\`cat /proc/sys/net/ath$cvap_num/users_join_successful_counter 2>/dev/null\`"
+	eval "respond_user=\`cat /proc/sys/net/ath$cvap_num/respond_users_join_cnt 2>/dev/null\`"
+	
+	[ "$join_user" != "" ]&&echo "vap$vap_num	$join_user		$join_user_success		$respond_user" >> /tmp/user_connect_info
+done
+	eval "rate_vap_up=\`cat /tmp/interface_rate_info|grep -o -i -e 'ath' 2>/dev/null\`"
+	[ "$rate_vap_up" != "" ]&&{
+		eval "\`sed 's/ath/vap/g' /tmp/interface_rate_info > /tmp/interface_rate_info_tmp 2>/dev/null\`"
+		mv /tmp/interface_rate_info_tmp /tmp/interface_rate_info 2>/dev/null
+	}
+	eval "rate_vap_user=\`cat /tmp/user_rate_info|grep -o -i -e 'ath' 2>/dev/null\`"
+	[ "$rate_vap_user" != "" ]&&{
+		eval "\`sed 's/ath/vap/g' /tmp/user_rate_info > /tmp/user_rate_info_tmp 2>/dev/null\`"
+		mv /tmp/user_rate_info_tmp /tmp/user_rate_info 2>/dev/null
+	}
+[ "$right_package" != "0" ]&&eval "wl_error_pkrate=\`echo \"\"|awk '{error=${error_package}/${right_package};print error}' 2>/dev/null\`"
+
+eval "right_eth0_tx=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/eth0/{print \$0}'|awk -F \"[ ]+|:\" '/TX packets/{print \$4}' 2>/dev/null\`"
+eval "right_eth0_rx=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/eth0/{print \$0}'|awk -F \"[ ]+|:\" '/RX packets/{print \$4}' 2>/dev/null \`"
+[ "$right_eth0_tx" != "" ]&&{
+	for num in `seq 9`
+	do
+		eval "tmp_eth0_tx=\`echo \"$right_eth0_tx\"|sed -n '${num}p'\`"
+		[ -z "$tmp_eth0_tx" ]&&break
+		right_eth=`expr $right_eth + $tmp_eth0_tx 2>/dev/null`
+	done
+}
+
+[ "$right_eth0_rx" != "" ]&&{
+	for num in `seq 9`
+	do
+		eval "tmp_eth0_rx=\`echo \"$right_eth0_rx\"|sed -n '${num}p'\`"
+		[ -z "$tmp_eth0_rx" ]&&break
+		right_eth=`expr $right_eth + $tmp_eth0_rx 2>/dev/null`
+	done
+}
+
+[ "$right_eth0_tx" != "" ]&&{
+	for num in `seq 9`
+	do
+		eval "tmp_eth0_tx=\`echo \"$right_eth0_tx\"|sed -n '${num}p'\`"
+		[ -z "$tmp_eth0_tx" ]&&break
+		wdtx_package=`expr $wdtx_package + $tmp_eth0_tx 2>/dev/null`
+	done
+}
+
+[ "$right_eth0_rx" != "" ]&&{
+	for num in `seq 9`
+	do
+		eval "tmp_eth0_rx=\`echo \"$right_eth0_rx\"|sed -n '${num}p'\`"
+		[ -z "$tmp_eth0_rx" ]&&break
+		wdrx_package=`expr $wdrx_package + $tmp_eth0_rx 2>/dev/null`
+	done
+}
+
+eval "error_eth0_tx=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/eth0/{print \$0}'|awk -F \"[ ]+|:\" '/errors/{print \$6}'|sed -n '1p' 2>/dev/null\`"
+eval "error_eth0_rx=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/eth0/{print \$0}'|awk -F \"[ ]+|:\" '/errors/{print \$6}'|sed -n '2p' 2>/dev/null\`"
+[ "$error_eth0_tx" != "" ]&&error_eth=`expr $error_eth + $error_eth0_tx 2>/dev/null`
+[ "$error_eth0_rx" != "" ]&&error_eth=`expr $error_eth + $error_eth0_rx 2>/dev/null`
+
+eval "right_eth1_tx=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/eth1/{print \$0}'|awk -F \"[ ]+|:\" '/TX packets/{print \$4}' 2>/dev/null\`"
+eval "right_eth1_rx=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/eth1/{print \$0}'|awk -F \"[ ]+|:\" '/RX packets/{print \$4}' 2>/dev/null\`"
+[ "$right_eth1_tx" != "" ]&&{
+	for num in `seq 9`
+	do
+		eval "tmp_eth1_tx=\`echo \"$right_eth1_tx\"|sed -n '${num}p'\`"
+		[ -z "$tmp_eth1_tx" ]&&break
+		right_eth=`expr $right_eth + $tmp_eth1_tx 2>/dev/null`
+	done
+}
+
+[ "$right_eth1_rx" != "" ]&&{
+	for num in `seq 9`
+	do
+		eval "tmp_eth1_rx=\`echo \"$right_eth1_rx\"|sed -n '${num}p'\`"
+		[ -z "$tmp_eth1_rx" ]&&break
+		right_eth=`expr $right_eth + $tmp_eth1_rx 2>/dev/null`
+	done
+}
+
+right_eth=`expr $right_eth + $right_eth1_rx 2>/dev/null`
+[ "$right_eth1_tx" != "" ]&&{
+	for num in `seq 9`
+	do
+		eval "tmp_eth1_tx=\`echo \"$right_eth1_tx\"|sed -n '${num}p'\`"
+		[ -z "$tmp_eth1_tx" ]&&break
+		wdtx_package=`expr $wdtx_package + $tmp_eth1_tx 2>/dev/null`
+	done
+}
+
+[ "$right_eth1_rx" != "" ]&&{
+	for num in `seq 9`
+	do
+		eval "tmp_eth1_rx=\`echo \"$right_eth1_rx\"|sed -n '${num}p'\`"
+		[ -z "$tmp_eth1_rx" ]&&break
+		wdrx_package=`expr $wdrx_package + $tmp_eth1_rx 2>/dev/null`
+	done
+}
+
+eval "error_eth1_tx=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/eth1/{print \$0}'|awk -F \"[ ]+|:\" '/errors/{print \$6}'|sed -n '1p' 2>/dev/null\`"
+eval "error_eth1_rx=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/eth1/{print \$0}'|awk -F \"[ ]+|:\" '/errors/{print \$6}'|sed -n '2p' 2>/dev/null\`"
+[ "$error_eth1_tx" != "" ]&&error_eth=`expr $error_eth + $error_eth1_tx 2>/dev/null`
+[ "$error_eth1_rx" != "" ]&&error_eth=`expr $error_eth + $error_eth1_rx 2>/dev/null`
+
+eval "wdrx_eth0_bytes=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/eth0/{print \$0}'|awk -F \"[ ]+|:\" '/RX bytes/{print \$4}' 2>/dev/null\`"
+eval "wdtx_eth0_bytes=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/eth0/{print \$0}'|awk -F \"[ ]+|:\" '/TX bytes/{print \$9}' 2>/dev/null\`"
+[ "$wdrx_eth0_bytes" != "" ]&&{
+	for num in `seq 9`
+	do
+		eval "tmp_wdrx_eth0_bytes=\`echo \"$wdrx_eth0_bytes\"|sed -n '${num}p'\`"
+		[ -z "$tmp_wdrx_eth0_bytes" ]&&break
+		wdrx_bytes=`expr $wdrx_bytes + $tmp_wdrx_eth0_bytes 2>/dev/null`
+	done
+}
+
+[ "$wdtx_eth0_bytes" != "" ]&&{
+	for num in `seq 9`
+	do
+		eval "tmp_wdtx_eth0_bytes=\`echo \"$wdtx_eth0_bytes\"|sed -n '${num}p'\`"
+		[ -z "$tmp_wdtx_eth0_bytes" ]&&break
+		wdtx_bytes=`expr $wdtx_bytes + $tmp_wdtx_eth0_bytes 2>/dev/null`
+	done
+}
+
+eval "wdrx_eth1_bytes=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/eth1/{print \$0}'|awk -F \"[ ]+|:\" '/RX bytes/{print \$4}' 2>/dev/null\`"
+eval "wdtx_eth1_bytes=\`cat /tmp/interface_info |awk 'BEGIN{RS=\"\n\n\"}/eth1/{print \$0}'|awk -F \"[ ]+|:\" '/TX bytes/{print \$9}' 2>/dev/null\`"
+[ "$wdrx_eth1_bytes" != "" ]&&{
+	for num in `seq 9`
+	do
+		eval "tmp_wdrx_eth1_bytes=\`echo \"$wdrx_eth1_bytes\"|sed -n '${num}p'\`"
+		[ -z "$tmp_wdrx_eth1_bytes" ]&&break
+		wdrx_bytes=`expr $wdrx_bytes + $tmp_wdrx_eth1_bytes 2>/dev/null`
+	done
+}
+
+[ "$wdtx_eth1_bytes" != "" ]&&{
+	for num in `seq 9`
+	do
+		eval "tmp_wdtx_eth1_bytes=\`echo \"$wdtx_eth1_bytes\"|sed -n '${num}p'\`"
+		[ -z "$tmp_wdtx_eth1_bytes" ]&&break
+		wdtx_bytes=`expr $wdtx_bytes + $tmp_wdtx_eth1_bytes 2>/dev/null`
+	done
+}	
+
+[ $right_eth != "" ]&&[ "$right_eth" != "0" ]&&eval "wd_error_pkrate=\`echo \"\"|awk '{error2=${error_eth}/${right_eth};print error2}' 2>/dev/null\`"
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js status_info.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	init_mmenu(flag);
+	init_stamenu(flag);
+	init_wlansta(flag);
+</script>
+</head>
+<body>
+<%in page_header.htm %>
+<%in menu_status4.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="login.cgi">
+<div align="center">
+<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+						<tr>
+						<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(stat_interface_info)</script></b></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><pre><% cat /tmp/interface_info 2>/dev/null %></pre></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(stat_run_time)</script></b></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff" align="right"></td>
+						<td width="550" bordercolor="#ffffff" align="left"><script language="javascript">replace(stat_time)</script>:&nbsp;&nbsp;&nbsp;&nbsp;<%= $uptime %></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(stat_rate_wire_interface)</script></b></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><pre><% /usr/sbin/ethtool eth0 2>/dev/null %></pre></td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><pre><% /usr/sbin/ethtool eth1 2>/dev/null %></pre></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(stat_rate_interface)</script></b></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><pre><% cat /tmp/interface_rate_info 2>/dev/null %></pre></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(stat_rate_user)</script></b></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><pre><% cat /tmp/user_rate_info 2>/dev/null %></pre></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(stat_packet_traffic)</script></b></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><script language="javascript">replace(stat_wireless_send_bytes)</script>&nbsp;&nbsp;&nbsp;&nbsp;<%= $wltx_bytes %></td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><script language="javascript">replace(stat_wireless_recv_bytes)</script>&nbsp;&nbsp;&nbsp;&nbsp;<%= $wlrx_bytes %></td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><script language="javascript">replace(stat_wireless_send_package)</script>&nbsp;&nbsp;&nbsp;&nbsp;<%= $wltx_package %></td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><script language="javascript">replace(stat_wireless_recv_package)</script>&nbsp;&nbsp;&nbsp;&nbsp;<%= $wlrx_package %></td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><script language="javascript">replace(stat_wire_send_bytes)</script>&nbsp;&nbsp;&nbsp;&nbsp;<%= $wdtx_bytes %></td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><script language="javascript">replace(stat_wire_recv_bytes)</script>&nbsp;&nbsp;&nbsp;&nbsp;<%= $wdrx_bytes %></td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><script language="javascript">replace(stat_wire_send_package)</script>&nbsp;&nbsp;&nbsp;&nbsp;<%= $wdtx_package %></td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><script language="javascript">replace(stat_wire_recv_package)</script>&nbsp;&nbsp;&nbsp;&nbsp;<%= $wdrx_package %></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(stat_user_assoc)</script></b></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff"></td>
+						<td width="550" bordercolor="#ffffff"><pre><% cat /tmp/user_connect_info 2>/dev/null %></pre></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(stat_wrong_package_ratio)</script></b></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff" align="right"></td>
+						<td width="550" bordercolor="#ffffff" align="left"><script language="javascript">replace(stat_wireless_wrong_ratio)</script>:&nbsp;&nbsp;&nbsp;&nbsp;<%= $wl_error_pkrate  %></td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff" align="right"></td>
+						<td width="550" bordercolor="#ffffff" align="left"><script language="javascript">replace(stat_wire_wrong_ratio)</script>:&nbsp;&nbsp;&nbsp;&nbsp;<%= $wd_error_pkrate  %></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(stat_system)</script></b></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff" align="right"></td>
+						<td width="550" bordercolor="#ffffff" align="left"><script language="javascript">replace(stat_cpu_percent)</script>:&nbsp;&nbsp;&nbsp;&nbsp;<% top -n 1 -d 1  2>/dev/null| awk -F "[ ]+|:" '/average/{print $4}' 2>/dev/null %></td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff" align="right"></td>
+						<td width="550" bordercolor="#ffffff" align="left"><script language="javascript">replace(stat_recv_signal_level)</script>:&nbsp;&nbsp;&nbsp;&nbsp;2.9v</td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff" align="right"></td>
+						<td width="550" bordercolor="#ffffff" align="left"><script language="javascript">replace(stat_temperature)</script>:&nbsp;&nbsp;&nbsp;&nbsp;<% /usr/bin/avrutil -T | awk -F':' '{print $2}'  %></td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff" align="right"></td>
+						<td width="550" bordercolor="#ffffff" align="left"><script language="javascript">replace(stat_mem_capa)</script>:&nbsp;&nbsp;&nbsp;&nbsp;<% /usr/bin/free | awk '/Mem/{print $2}'   %>Kb</td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff" align="right"></td>
+						<td width="550" bordercolor="#ffffff" align="left"><script language="javascript">replace(stat_mem_used_percent)</script>:&nbsp;&nbsp;&nbsp;&nbsp;<% /usr/sbin/get_performance_info mem  %>%</td>
+						</tr>
+						
+						<tr>
+						<td width="100" bordercolor="#ffffff" align="right"></td>
+						<td width="550" bordercolor="#ffffff" align="left"><script language="javascript">replace(stat_flash_info)</script>:&nbsp;&nbsp;&nbsp;&nbsp;Total:32MB,Remain:<% /usr/sbin/get_performance_info flash|awk -F":" '{print $3}'  %></td>
+						</tr>
+						
+						<tr>
+						<td colspan="2" height="10">
+						</td>
+						</tr>
+</table>
+<table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+			<tr>
+								<td colspan="2" height="20">
+								</td>
+			</tr>
+			
+</table>
+</div>
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

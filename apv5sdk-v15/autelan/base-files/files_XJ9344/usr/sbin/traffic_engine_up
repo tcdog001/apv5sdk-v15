@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ ! $# -eq 4 ];then
+        echo "traffic_engine_up {if} {mode} {min} {max}"
+        exit
+fi
+
+if="$1"
+mode="$2"
+cwmin="$3"
+cwmax="$4"
+
+autelan cmcc_wmm_by_stamode ${if} set_wmm_enable 1
+autelan cmcc_wmm_by_stamode ${if} set_wmm_param ${mode} 0 0 3 ${cwmax} ${cwmin} 0 0

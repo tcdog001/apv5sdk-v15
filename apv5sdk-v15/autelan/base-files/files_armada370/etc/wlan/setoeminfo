@@ -1,0 +1,238 @@
+#!/bin/sh
+. /etc/wlan/vendor_setup.sh
+. /usr/lib/web/sysinit.sh
+. /usr/lib/web/xmlconf.sh
+. /usr/lib/web/constant.sh
+#oem path
+OEM_PATH="/jffs/.OEM"
+OEM_LOGO="${OEM_PATH}/.logo"
+OEM_DEFAULT="${OEM_PATH}/.default"
+ORG_LOGO="/www/image/logo.jpg"
+
+#oem file
+VENDOR="${OEM_PATH}/.company_name"
+PRODUCT="${OEM_PATH}/.product_name"
+SOFTWARE="${OEM_PATH}/.software_version"
+HARDWARE="${OEM_PATH}/.hardware_version"
+BUILD="${OEM_PATH}/.build_no"
+SERIES="${OEM_PATH}/.sn"
+MACETH="${OEM_PATH}/.mac_eth"
+MACWIFI="${OEM_PATH}/.mac_wifi"
+OID="${OEM_PATH}/.vendor_oid"
+OUI="${OEM_PATH}/.vendor_oui"
+LOCATION="${OEM_PATH}/.location"
+CONTACT="${OEM_PATH}/.contact"
+USERNAME="${OEM_DEFAULT}/.def_user"
+PASSWORD="${OEM_DEFAULT}/.def_pass"
+VENDORSSID="${OEM_DEFAULT}/.def_ssid"
+CONFNAME="${OEM_PATH}/.cfg_name"
+VENDORWMODE="${OEM_DEFAULT}/.def_wmode"
+#usage()
+#print usage
+usage()
+{
+	echo "usage:"
+	echo "/etc/wlan/setoeminfo vendor {vendorname}"
+	echo "/etc/wlan/setoeminfo productname {product name}"
+	echo "/etc/wlan/setoeminfo sversion {software version}"
+	echo "/etc/wlan/setoeminfo hversion {hardware version}"
+	echo "/etc/wlan/setoeminfo buildno {build number}"
+	echo "/etc/wlan/setoeminfo sn {series number}"
+	echo "/etc/wlan/setoeminfo logo {logo file path}"
+	echo "/etc/wlan/setoeminfo ethmac[0-9] {eth[n] mac address such as : 00096b2314cc or 00:09:6b:23:14:cc}"
+	echo "/etc/wlan/setoeminfo wifimac[0-9] {wifi[n] mac address}"
+	echo "/etc/wlan/setoeminfo oid {vendor oid}"
+	echo "/etc/wlan/setoeminfo oui {vendor oui}"
+	echo "/etc/wlan/setoeminfo location {vendor location}"
+	echo "/etc/wlan/setoeminfo contact {vendor contacts}"
+	echo "/etc/wlan/setoeminfo vendor_user {vendor default user name}"
+	echo "/etc/wlan/setoeminfo vendor_pass {vendor default user password}"
+	echo "/etc/wlan/setoeminfo vendor_ssid {vendor default ssid}"
+	echo "/etc/wlan/setoeminfo vendor_cfg_name {vendor config file name}"
+	echo "/etc/wlan/setoeminfo vendor_work_mode {vendor default work mode}"
+	echo "/etc/wlan/setoeminfo clean"
+	exit 0
+}
+
+#checkfinish()
+#check validity
+checkfinish()
+{
+	( [ ! -f ${VENDOR} ] && echo "oem information is empty" && rm -rf ${OEM_PATH} && exit 0 )
+	( [ ! -f ${OEM_LOGO}/logo.jpg ] && echo "not set vendor logo, will use default log instead" && exit 0 )
+	echo "vendor information valid" && exit 0
+}
+
+#main process
+
+( [ "$1" = "-h" ] || [ "$1" = "-help" ] ) && usage
+if [ $# -gt 2 ];then
+	echo "parameter is wrong ,please add \" \""
+	exit 1
+fi
+
+filename=""
+value=$2
+case "$1" in
+	vendor)
+		[ ! -f ${OEM_LOGO} ] && ( mkdir -p ${OEM_LOGO} )
+		[ ! -f ${OEM_DEFAULT} ] && ( mkdir -p ${OEM_DEFAULT} )
+		echo "$2" > ${VENDOR}
+		exit 0
+	;;
+	productname)
+		filename=${PRODUCT}
+		#check arg
+	;;
+	sversion)
+		filename=${SOFTWARE}
+		#check arg
+	;;
+	hversion)
+		filename=${HARDWARE}
+		#check arg
+	;;
+	buildno)
+		filename=${BUILD}
+		#check arg
+	;;
+	sn)
+		filename=${SERIES}
+		#check arg
+	;;
+	ethmac[0-9]*)
+	  tmp_length=`echo "$value" | wc -c`
+	  #length=$(($(echo "$value" | wc -c)-1))
+	  length=`expr $tmp_length - 1`
+	  if [ $length -ne 12 ]&&[ $length -ne 17 ];then
+	      echo "please input the vaild mac address"
+	      usage && exit 0
+	  fi
+	  if [ $length -eq 17 ]; then 
+	      high_byte=$(echo "$value" |awk -F'[: ]' '{print $1}')
+	      value=$(echo "$value" |awk -F'[: ]' '{print $1$2$3$4$5$6}')
+	  else
+	      high_byte=`echo "$value" | cut -c 1-2`
+	  fi
+	  	  echo "$value" |grep [^0-9a-fA-F] -q
+	  if [ $? -eq 0 ]; then
+	       echo "please input the vaild mac address"
+	       usage && exit 0
+	  fi 
+      high_byte=0x$high_byte 
+	  is_mul=$(($high_byte&0x01))
+	  if [ $is_mul -eq 1 ]; then
+	      echo "please input the vaild mac address"
+	      usage && exit 0
+	  fi
+		num=`echo $1 | grep -o '[0-9]\{1,\}'`
+		filename=${MACETH}${num}
+		#check arg
+	;;
+	wifimac[0-9]*)
+	  length=$(($(echo $value | wc -c)-1))
+	  if [ $length -ne 12 ]&&[ $length -ne 17 ];then
+	      echo "please input the vaild mac address"
+	      usage && exit 0
+	  fi
+	 	if [ $length -eq 17 ]; then 
+	      high_byte=$(echo "$value" |awk -F'[: ]' '{print $1}')
+	      value=$(echo "$value" |awk -F'[: ]' '{print $1$2$3$4$5$6}')
+	  else
+	      high_byte=`echo "$value" | cut -c 1-2`
+	  fi
+	  echo "$value" |grep [^0-9a-fA-F] -q
+	  if [ $? -eq 0 ]; then
+	       echo "please input the vaild mac address"
+	       usage && exit 0
+	  fi  
+      high_byte=0x$high_byte 
+	  is_mul=$(($high_byte&&0x01))
+	  if [ $is_mul -eq 1 ]; then
+	      echo "please input the vaild mac address"
+	      usage && exit 0
+	  fi
+		num=`echo $1 | grep -o '[0-9]\{1,\}'`
+		filename=${MACWIFI}${num}
+		#check arg
+	;;
+	logo)
+		[ ! -f "$2" ] && echo "error:logo file not exist" && exit 0
+		[ ! -f ${VENDOR} ] && echo "error:need set vendor name first" && exit 0
+		[ ! -f ${OEM_LOGO} ] && mkdir -p ${OEM_LOGO}  
+		cp $2 ${OEM_LOGO}
+		mv ${OEM_LOGO}/* ${OEM_LOGO}/.logo.jpg 
+		# cp ${OEM_LOGO}/.logo.jpg  ${ORG_LOGO}
+		# add by wangxl 2012-11-27 
+		cp ${OEM_LOGO}/.logo.jpg  /tmp/logo/logo.jpg 
+		exit 0
+	;;
+	check)
+		checkfinish
+	;;
+	oid)
+		filename=${OID}
+		#check arg
+	;;
+	oui)
+		filename=${OUI}
+		#check arg
+	;;
+	location)
+		filename=${LOCATION}
+	;;
+	contact)
+		filename=${CONTACT}
+	;;
+	vendor_user)
+		mkdir -p ${OEM_DEFAULT}
+		filename=${USERNAME}
+	;;
+	vendor_pass)
+		mkdir -p ${OEM_DEFAULT}
+		filename=${PASSWORD}
+	;;
+	vendor_ssid)
+		mkdir -p ${OEM_DEFAULT}
+		filename=${VENDORSSID}
+	;;
+	vendor_cfg_name)
+		filename=${CONFNAME}
+	;;
+	vendor_work_mode)
+		mkdir -p ${OEM_DEFAULT}
+		filename=${VENDORWMODE}
+	;;
+	clean)
+		if [ -d /jffs/.OEM/.default_set ];then
+			if [ -f /jffs/.OEM/.default_set/.def_user  ];then
+				if [ -f /jffs/.OEM/.default_set/.def_pass  ];then
+					default_user="admin"
+					default_pass="admin"
+					vendor_user_setup "${default_user}" "${default_pass}"
+					sys_user_setup
+				fi
+			fi
+			if [ -f /jffs/.OEM/.default_set/.def_ssid ];then
+				default_ssid="wireless ssid"
+				vendor_ssid_setup "${default_ssid}"
+			fi
+			if [ -f /jffs/.OEM/.default_set/.def_wmode ];then
+				default_wmode="0"
+				vendor_wmode_setup ${default_wmode}
+			fi
+		fi
+		rm -rf /jffs/.OEM
+		exit 0
+	;;
+	*)
+		usage
+	;;
+esac
+
+[ ! -f ${VENDOR} ] && echo "error:need set vendor name first" && exit 0
+echo "$value" > $filename
+
+
+
+	

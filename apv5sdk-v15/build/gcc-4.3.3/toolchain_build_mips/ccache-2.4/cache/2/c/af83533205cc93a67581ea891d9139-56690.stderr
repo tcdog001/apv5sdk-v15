@@ -1,0 +1,13 @@
+In file included from shell/mxml_document.c:12:
+shell/mxml.h:27: warning: function declaration isn't a prototype
+shell/mxml.h:32: warning: function declaration isn't a prototype
+shell/mxml.h:37: warning: function declaration isn't a prototype
+shell/mxml.h:64: warning: function declaration isn't a prototype
+shell/mxml.h:137: warning: function declaration isn't a prototype
+shell/mxml_document.c:15: warning: function declaration isn't a prototype
+shell/mxml_document.c: In function 'mxml_document_new':
+shell/mxml_document.c:16: warning: implicit declaration of function 'malloc'
+shell/mxml_document.c:16: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_document.c: In function 'mxml_document_destroy':
+shell/mxml_document.c:47: warning: implicit declaration of function 'free'
+shell/mxml_document.c:47: warning: incompatible implicit declaration of built-in function 'free'

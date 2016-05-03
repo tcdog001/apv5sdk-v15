@@ -1,0 +1,52 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Chapter 7.  Embedded Applications</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><meta name="keywords" content="
+				int6k 
+				, 
+				powerline 
+				"><link rel="start" href="index.html" title="Intellon INT6000 Linux Toolkit"><link rel="up" href="index.html" title="Intellon INT6000 Linux Toolkit"><link rel="prev" href="ch06s12.html" title="User Interaction"><link rel="next" href="ch07s02.html" title="ADM5120™"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 7. 
+		Embedded Applications
+		</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06s12.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch07s02.html">Next</a></td></tr></table><hr></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="embedded"></a>Chapter 7. 
+		Embedded Applications
+		</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ch07.html#embedded-intro">
+			Introduction 
+			</a></span></dt><dt><span class="section"><a href="ch07s02.html">
+			<span class="productname">ADM5120</span>™
+			</a></span></dt><dd><dl><dt><span class="section"><a href="ch07s02.html#ADM5120-connection">
+				Connections
+				</a></span></dt><dt><span class="section"><a href="ch07s02.html#ADM5120-usb-serial">
+				USB-to-Serial Port Connection
+				</a></span></dt><dt><span class="section"><a href="ch07s02.html#ADM5120-boot-menu">
+				Bootloader Menu
+				</a></span></dt></dl></dd><dt><span class="section"><a href="ch07s03.html">
+			<span class="productname">AMiLDA</span>™
+			</a></span></dt><dd><dl><dt><span class="section"><a href="ch07s03.html#AMiLDA-compiling">
+				Compiling
+				</a></span></dt><dt><span class="section"><a href="ch07s03.html#AMiLDA-images">
+				Firmware Images
+				</a></span></dt><dt><span class="section"><a href="ch07s03.html#AMiLDA-download">
+				Downloading Images
+				</a></span></dt></dl></dd><dt><span class="section"><a href="ch07s04.html">
+			<span class="productname">Busybox</span>™
+			</a></span></dt><dt><span class="section"><a href="ch07s05.html">
+			Ramdisk
+			</a></span></dt><dd><dl><dt><span class="section"><a href="ch07s05.html#AMiLDA-bin">
+					Intellon Toolkit
+					</a></span></dt><dt><span class="section"><a href="ch07s05.html#AMiLDA-website">
+				Web Interface
+				</a></span></dt></dl></dd><dt><span class="section"><a href="ch07s06.html">
+			Intellon Toolkit
+			</a></span></dt><dd><dl><dt><span class="section"><a href="ch07s06.html#AMiLDA-integration">
+				Integration
+				</a></span></dt><dt><span class="section"><a href="ch07s06.html#AMiLDA-configuration">
+				Configuration
+				</a></span></dt></dl></dd><dt><span class="section"><a href="ch07s07.html">
+			HTTP Interface
+			</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="embedded-intro"></a>
+			Introduction 
+			</h2></div></div></div><p>
+			The Intellon Linux Toolkit has been developed with embedded applications in mind but it is not an embedded turn-key system. The Intellon Toolkit will cross-compile and run on several embedded controllers but Intellon does not claim to support cross-compilation for any particular environment or guarantee proper program execution on all hardware platforms. Customers should have (or obtain) embedded system expertise or allow time to develop the expertise before attempting any embedded project.
+			</p><p>
+			Many embedded systems use <acronym class="acronym">NVRAM</acronym> for persistent storage. When power is applied, an image is read from <acronym class="acronym">NVRAM</acronym> into <acronym class="acronym">SDRAM</acronym> and executed. The image contains an operating system kernel and filesystem image. The kernel mounts the filesystem image and starts applications found there. This filesystem stores application programs, support libraries and configuration files and should have enough free space for temporary files that might be needed. A common system uses <span class="productname">Linux</span>™ as the operating system kernel, <span class="productname">Busybox</span>™ as the principle application and <span class="productname">uClib</span>™ as the support library. All executable components must be compiled for the target host processor instruction set. 					</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06s12.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch07s02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">
+			User Interaction
+			 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 
+			<span class="productname">ADM5120</span>™
+			</td></tr></table></div></body></html>

@@ -1,0 +1,51 @@
+#!/bin/sh
+. /usr/lib/web/xmlconf.sh
+
+#
+#usage()
+#
+usage()
+{
+	echo "changeip2 static IP netmask gateway firstdns secdns"
+	echo "changeip2 dhcp"
+	exit 1
+}
+#
+#setdhcp()
+#
+setdhcp()
+{
+	echo "changeip2 dhcp IP "
+	exit 1
+}
+
+CONFIG_XML=/etc/config/config.xml
+
+if [ "$1" == "dhcp" ];then
+	lan=`config_read "/config/network/lan"`
+	lan=`config_setoption "$lan" proto "$1"`
+	config_write "/config/network/lan" "$lan"
+	setdhcp
+fi
+if [ ! $# -eq 6 ];then
+	usage
+fi
+PROTO=$1
+IPADDR=$2
+NETMASK=$3
+GATEWAY=$4
+FIRSTDNS=$5
+SECDNS=$6
+
+lan=`config_read "/config/network/lan"`
+lan=`config_setoption "$lan" proto "$PROTO"`
+lan=`config_setoption "$lan" ipaddr "$IPADDR"`
+lan=`config_setoption "$lan" netmask "$NETMASK"`
+lan=`config_setoption "$lan" gateway "$GATEWAY"`
+lan=`config_setoption "$lan" nameserver1 "$FIRSTDNS"`
+lan=`config_setoption "$lan" nameserver2 "$SECDNS"`
+config_write "/config/network/lan" "$lan"
+
+xml_sroute=`config_read /config/network/sroute`
+xml_sroute=`config_setoption "$xml_sroute" route1 "$GATEWAY"`
+config_write "/config/network/sroute" "$xml_sroute"

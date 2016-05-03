@@ -1,0 +1,151 @@
+#!/bin/sh
+
+VERSION="$(basename $0) ver.1.0"
+USAGE="Usage: $(basename $0) <eth0|eth1> <port1|port2|...> <s=[0|10|100]> <d=[0|1]>"
+DESCRIPTION="Description: get or set the specified port's link status,auto-negotiation status,speed mode and duplex mode,
+s means speed(speed=0 means auto-negotiation),d means duplex(duplex=0 means half duplex,duplex=1 means full duplex),
+if only have eth and port args,$(basename $0) will do get operation"
+
+if [ $# -lt 2 ];then
+	echo "${USAGE}" >&2
+	echo "${DESCRIPTION}" >&2
+	exit 1
+fi
+
+ETH=
+PORT=
+
+case "${1}" in
+	eth0 | eth1)
+		ETH="${1}"
+		;;
+	*)
+		echo "${USAGE}" >&2
+		echo "${DESCRIPTION}" >&2
+		exit 1
+		;;
+esac
+
+case "${2}" in
+	port1 | port2 | port3 | port4)
+		PORT=`echo "${2}" | grep -o '[0-9]'`
+		;;
+	*)
+		echo "${USAGE}" >&2
+		echo "${DESCRIPTION}" >&2
+		exit 1
+		;;
+esac
+
+PHYCONTROLREGVAL=`ethreg -i ${ETH} -p $((${PORT} - 1)) 0 | awk '{print $5}'`
+PORTSTATUSREGVAL=`ethreg -i ${ETH} -p 15 $((${PORT} * 0x100 + 0x100)) | awk '{print $5}'`
+
+SPEEDMODE=$((${PORTSTATUSREGVAL} & 0x03))
+DUPLEXMODE=$((${PORTSTATUSREGVAL} & 0x40))
+LINKSTATUS=$((${PORTSTATUSREGVAL} & 0x100))
+
+if [ $# -eq 2 ];then
+
+echo "${1} ${2} status: "
+if [ ${LINKSTATUS} -eq $((0x100)) ]; then
+	echo "link status: up"
+else
+	echo "link status: down"
+fi
+
+if [ $((${PHYCONTROLREGVAL} & 0x1000)) -eq $((0x1000)) ]; then
+	echo "auto-negotiation: enabled"
+else
+	echo "auto-negotiation: disabled"
+fi
+
+case ${SPEEDMODE} in
+	0 )
+		echo "speed: 10 Mbps"
+	;;
+	1 )
+		echo "speed: 100 Mbps"
+	;;
+	2 )
+		echo "speed: reserved"
+	;;
+	3 )
+		echo "speed: speed mode error"
+	;;
+esac
+
+case ${DUPLEXMODE} in
+	0 )
+		echo "duplex: half duplex"
+	;;
+	* )
+		echo "duplex: full duplex"
+	;;
+esac
+
+else
+FLAG=0
+opt=
+val=
+shift 2
+while [ $# -ge 1 ]; do
+	opt=`echo $1|awk -F "=" '{print $1}'`
+	val=`echo $1|awk -F "=" '{print $2}'`
+	case "${opt}" in
+		s)
+			case ${val} in
+				0|10|100 )
+					FLAG=1
+					SPEEDMODE=${val}
+					;;
+				* )
+					echo "${USAGE}" >&2
+					echo "${DESCRIPTION}" >&2
+					exit 1
+					;;
+			esac
+			;;
+		d)
+			case ${val} in
+				half )
+					DUPLEXMODE=0
+					;;
+				full )
+					DUPLEXMODE=1
+					;;
+				* )
+					echo "${USAGE}" >&2
+					echo "${DESCRIPTION}" >&2
+					exit 1
+					;;
+			esac
+			;;		
+		*)
+			echo "${USAGE}" >&2
+			echo "${DESCRIPTION}" >&2
+			exit 1
+			;;
+	esac
+	shift
+done
+if [ ${DUPLEXMODE} -ne 0 ]; then
+DUPLEXMODE=1
+fi
+
+if [ ${FLAG} -ne 1 ]; then
+	case ${SPEEDMODE} in
+		0 )
+			SPEEDMODE=10
+			;;
+		1 )
+			SPEEDMODE=100
+		;;
+		* )
+			echo "${USAGE}" >&2
+			echo "${DESCRIPTION}" >&2
+			exit 1
+		;;
+	esac
+fi
+ethreg -i ${ETH} -f $((${PORT} - 1))=${SPEEDMODE} -d ${DUPLEXMODE}
+fi

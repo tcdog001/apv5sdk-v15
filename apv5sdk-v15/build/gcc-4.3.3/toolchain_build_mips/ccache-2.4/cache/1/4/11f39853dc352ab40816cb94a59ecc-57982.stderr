@@ -1,0 +1,15 @@
+In file included from shell/mxml_refil.c:13:
+shell/mxml.h:27: warning: function declaration isn't a prototype
+shell/mxml.h:32: warning: function declaration isn't a prototype
+shell/mxml.h:37: warning: function declaration isn't a prototype
+shell/mxml.h:64: warning: function declaration isn't a prototype
+shell/mxml.h:137: warning: function declaration isn't a prototype
+shell/mxml_refil.c: In function 'mxml_refil_new':
+shell/mxml_refil.c:26: warning: implicit declaration of function 'malloc'
+shell/mxml_refil.c:26: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_refil.c:34: warning: implicit declaration of function 'free'
+shell/mxml_refil.c:34: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_refil.c: In function 'mxml_refil_destroy':
+shell/mxml_refil.c:88: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_refil.c: In function 'mxml_refill_from_handle_func':
+shell/mxml_refil.c:151: warning: implicit declaration of function 'read'

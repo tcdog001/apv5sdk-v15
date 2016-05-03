@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			channel.h
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='buffer.h.html' title=' buffer.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='chars.h.html' title=' chars.h '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   channel.h - raw packet channel definitions and declarations;
+ *
+ *   the channel structure contains information needed to perform
+ *   raw packet I/O on specific platforms;
+ *
+ *.  Intellon Linux Toolkit; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *      Nathan Houghton &lt;nathan.houghton@intellon.com&gt;
+ *	Abdel Younes &lt;younes@leacom.fr&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef CHANNEL_HEADER
+#define CHANNEL_HEADER
+
+/*====================================================================*
+ *  system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdint.h&gt;
+
+/*====================================================================*
+ *  custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/types.h&quot;
+#include &quot;../ether/ether.h&quot;
+
+/*====================================================================*
+ *   channel flagword bitmasks;
+ *--------------------------------------------------------------------*/
+
+#define CHANNEL_VERBOSE (1 &lt;&lt; 0)
+#define CHANNEL_SILENCE (1 &lt;&lt; 1)
+#define CHANNEL_WARNING (1 &lt;&lt; 2)
+#define CHANNEL_SUCCESS (1 &lt;&lt; 3)
+#define CHANNEL_FAILURE (1 &lt;&lt; 4)
+
+#define CHANNEL_UPDATE_TARGET (1 &lt;&lt; 5) /* used by efsu only */
+#define CHANNEL_UPDATE_SOURCE (1 &lt;&lt; 6) /* used by efsu only */
+#define CHANNEL_LISTEN (1 &lt;&lt; 7)	       /* used by efsu only */
+
+#define CHANNEL_ETHNUMBER 1
+#if defined (__linux__)
+#	define CHANNEL_ETHDEVICE &quot;eth1&quot;
+#elif defined (__APPLE__)
+#	define CHANNEL_ETHDEVICE &quot;en0&quot;
+#	define CHANNEL_BPFDEVICE &quot;/dev/bpf%d&quot;
+#elif defined (__OpenBSD__)
+#	define CHANNEL_ETHDEVICE &quot;bce0&quot;
+#	define CHANNEL_BPFDEVICE &quot;/dev/bpf%d&quot;
+#else
+#	define CHANNEL_ETHDEVICE &quot;nic1&quot;
+#endif
+#define CHANNEL_ETHERTYPE 0x88E1 /* in host byte order */
+#define CHANNEL_PCAP_TIMEOUT 10
+#define CHANNEL_TIMEOUT 50
+#define CHANNEL_BAILOUT 0
+#define CHANNEL_OPTIONS 0
+
+/*====================================================================*
+ *   communication channel structure;
+ *--------------------------------------------------------------------*/
+
+typedef struct channel 
+
+{
+	signed fd;
+	signed id;
+	const char * name;
+	uint8_t peer [ETHER_ADDR_LEN];
+	uint8_t host [ETHER_ADDR_LEN];
+	uint16_t type;
+
+#if defined (__linux__)
+
+#elif defined (__APPLE__) 
+
+	signed bpf_length;
+
+#elif defined (__OpenBSD__)
+
+	signed bpf_length;
+
+#elif defined (WINPCAP) 
+
+	pcap_t * socket;
+	char errbuf [PCAP_ERRBUF_SIZE];
+
+#else
+#error &quot;Unknown Environment&quot;
+#endif
+
+	signed timeout;
+	flag_t flags;
+}
+
+CHANNEL;
+
+/*====================================================================*
+ *   channel functions;
+ *--------------------------------------------------------------------*/
+
+signed openchannel (struct channel *);
+signed closechannel (struct channel *);
+signed sendpacket (struct channel *, void * packet, signed packetsize);
+signed readpacket (struct channel *, void * packet, signed packetsize);
+
+/*====================================================================*
+ *   
+ *--------------------------------------------------------------------*/
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='buffer.h.html' title=' buffer.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='chars.h.html' title=' chars.h '>NEXT</a>]
+			</div>
+		</body>
+	</html>

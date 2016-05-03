@@ -1,0 +1,9 @@
+LOCAL_PATH:= $(call my-dir)
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES:= ecc.c
+LOCAL_CFLAGS += -DWN_ECC_GCCINT64 -DASUE
+LOCAL_MODULE := libecc
+
+include $(BUILD_STATIC_LIBRARY)
+

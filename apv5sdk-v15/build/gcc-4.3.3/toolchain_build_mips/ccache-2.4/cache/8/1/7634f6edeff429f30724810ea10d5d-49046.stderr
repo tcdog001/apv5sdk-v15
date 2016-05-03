@@ -1,0 +1,2 @@
+sntp.c: In function 'SntpStart':
+sntp.c:85: warning: integer overflow in expression

@@ -1,0 +1,39 @@
+.NOTPARALLEL:
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR = src
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+EXTRA_CFLAGS= -DAR11N
+
+ifdef TOOLCHAIN_UCLIBC
+  export TOOLCHAIN_ABI=-muclibc
+  export LDFLAGS=-melf32btsmipn32
+  export LIBDIR=/uclibc/usr/lib
+endif
+
+
+unexport LDFLAGS
+
+.PHONY: all
+all: build install
+
+.PHONY: build
+build:
+	${MAKE} -C ${PKG_BUILD_DIR} EXTRA_CFLAGS="${EXTRA_CFLAGS}"
+
+.PHONY: clean
+
+clean:
+	${MAKE} -C ${PKG_BUILD_DIR} clean
+
+#install dir /usr/sbin
+.PHONY: install
+install: 
+			cp -f ${PKG_BUILD_DIR}/detector ${ROOTFSDIR}/usr/bin
+#			cp -f ${PKG_BUILD_DIR}/nvram ${ROOTFSDIR}/usr/sbin
+

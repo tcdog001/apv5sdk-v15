@@ -1,0 +1,232 @@
+#file name and path declare
+PKG := net-snmp
+VERSION := 5.1.2
+PKG_NAME := $(PKG)-$(VERSION)
+#PKG_BUILD_DIR := $(PKG_NAME)
+PKG_BUILD_DIR := src
+CAVIUM_CPPFLAGS ?= -I$(OCTEON_ROOT)/tools/mips64-octeon-linux-gnu/sys-root/usr/include
+CAVIUM_LDFLAGS ?= -L$(OCTEON_ROOT)/tools/mips64-octeon-linux-gnu/sys-root/lib64 -L$(OCTEON_ROOT)/tools/mips64-octeon-linux-gun/sys-root/usr/lib64
+PKG_INSTALL_DIR := $(shell pwd)/$(PKG_BUILD_DIR)/ipkg-install/net-snmp
+APLIB_DIR := $(ROOTFSDIR)/../autelan/aplib
+
+#command replace
+CPDIR := cp -r 
+CP := cp -fpr
+MKDIR := mkdir -p
+MV := mv
+
+#configure option
+TARGET_CROSS ?= mips-linux-uclibc-
+TARGET_CC ?= $(TARGET_CROSS)gcc
+TARGET_CPPFLAGS = $(CAVIUM_CPPFLAGS) 
+TARGET_LDFLAGS = $(CAVIUM_LDFLAGS)
+EXTRA_CPPFLAGS = -I$(APLIB_DIR)/src/include 
+EXTRA_LDFLAGS = -L$(APLIB_DIR)/src/src -lapfunc
+GNU_TARGET_NAME ?= mips-linux
+DISABLE_NLS ?= --disable-nls 
+TARGET_CONFIGURE_OPTS ?= \
+  AR=$(TARGET_CROSS)ar \
+  AS="$(TARGET_CC) -c $(TARGET_CFLAGS)" \
+  LD=$(TARGET_CROSS)ld \
+  NM=$(TARGET_CROSS)nm \
+  CC="$(TARGET_CC)" \
+  GCC="$(TARGET_CC)" \
+  CXX=$(TARGET_CROSS)g++ \
+  RANLIB=$(TARGET_CROSS)ranlib \
+  STRIP=$(TARGET_CORSS)strip \
+  OBJCOPY=$(TARGET_CROSS)objcopy \
+  OBJDUMP=$(TARGET_CROSS)objdump \
+  SIZE=$(TARGET_CORSS)size
+
+CONFIGURE_VARS = \
+                $(TARGET_CONFIGURE_OPTS) \
+                CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CXXFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+                CPPFLAGS="$(TARGET_CPPFLAGS) $(EXTRA_CPPFLAGS)" \
+                LDFLAGS="$(TARGET_LDFLAGS) $(EXTRA_LDFLAGS)" \
+#                PKG_CONFIG_PATH="$(STAGING_DIR)/usr/lib/pkgconfig" \
+#                PKG_CONFIG_LIBDIR="$(STAGING_DIR)/usr/lib/pkgconfig"
+			
+CONFIGURE_ARGS = \
+                --target=$(GNU_TARGET_NAME) \
+                --host=$(GNU_TARGET_NAME) \
+                --build=$(GNU_HOST_NAME) \
+                --program-prefix="" \
+                --program-suffix="" \
+                --prefix=/usr \
+                --exec-prefix=/usr \
+                --bindir=/usr/bin \
+                --sbindir=/usr/sbin \
+                --libexecdir=/usr/lib \
+                --sysconfdir=/etc \
+                --datadir=/usr/share \
+                --localstatedir=/var \
+                --mandir=/usr/man \
+                --infodir=/usr/info \
+                $(DISABLE_NLS)
+
+MAKE_FLAGS = \
+		$(TARGET_CONFIGURE_OPTS) \
+		CROSS="$(TARGET_CROSS)" \
+		ARCH="$(ARCH)"
+MAKE_VARS = \
+		CFLAGS="$(TARGET_CFLAGS) $(EXTRA_CFLAGS)" \
+		CPPFLAGS="$(TARGET_CPPFALGS) $(EXTRA_CPPFLAGS)" \
+ 		CXXFLAGS="$(TARGET_CFALGS) $(EXTAR_CFLAGS)" \
+		LDFLAGS="$(TARGET_CFLAGS) $(EXTRA_LDFLAGS)"
+
+SNMP_MIB_MODULES_INCLUDED = \
+        host/hr_device \
+        host/hr_disk \
+        host/hr_filesys \
+        host/hr_network \
+        host/hr_partition \
+        host/hr_proc \
+        host/hr_storage \
+        host/hr_system \
+	autelan-mib/autelan-sourceFile/wapi/11i \
+	autelan-mib/autelan-sourceFile/wapi/alarmService \
+	autelan-mib/autelan-sourceFile/wapi/iwlib  \
+	autelan-mib/autelan-sourceFile/wapi/mii_app  \
+	autelan-mib/autelan-sourceFile/wapi/readKey  \
+	autelan-mib/autelan-sourceFile/wapi/readRadius  \
+	autelan-mib/autelan-sourceFile/wapi/syslogService  \
+	autelan-mib/autelan-sourceFile/wapi/wapicgifunc  \
+	autelan-mib/autelan-sourceFile/wapi/wapiiwfunc  \
+	autelan-mib/autelan-sourceFile/wapi/wapiPwlanAp  \
+	autelan-mib/autelan-sourceFile/wapi/wirelessStatus  \
+	mibII/at \
+        mibII/icmp \
+        mibII/interfaces \
+        mibII/ip \
+        mibII/snmp_mib \
+        mibII/sysORTable \
+        mibII/system_mib \
+        mibII/tcp \
+        mibII/udp \
+        mibII/vacm_context \
+        mibII/vacm_vars \
+        snmpv3/snmpEngine \
+        snmpv3/snmpMPDStats \
+        snmpv3/usmStats \
+        snmpv3/usmUser \
+        snmpv3mibs \
+        tunnel \
+        ucd-snmp/disk \
+        ucd-snmp/dlmod \
+        ucd-snmp/extensible \
+        ucd-snmp/loadave \
+        ucd-snmp/memory \
+        ucd-snmp/pass \
+        ucd-snmp/proc \
+        ucd-snmp/vmstat \
+        util_funcs \
+        utilities/execute \
+	autelan-mib/ieee802dot11	\
+	autelan-mib/autelan-sourceFile/stationAp	\
+	autelan-mib/autelan-sourceFile/accessAp	\
+	autelan-mib/autelan-sourceFile/apAttributeInfo	\
+	autelan-mib/autelan-sourceFile/apCounterInfo	\
+	autelan-mib/autelan-sourceFile/apGlobalInfo	\
+	autelan-mib/autelan-sourceFile/apNetworkInfo	\
+	autelan-mib/autelan-sourceFile/apPropertyTable	\
+	autelan-mib/autelan-sourceFile/apStatisticsTable	\
+	autelan-mib/autelan-sourceFile/apCommonInfo	\
+	autelan-mib/autelan-sourceFile/apWholeInfo	\
+	autelan-mib/autelan-sourceFile/apGeneralInfo	\
+	autelan-mib/autelan-sourceFile/apFileConfigInfo	\
+	autelan-mib/autelan-sourceFile/attackLogTable	\
+
+
+SNMP_MIB_MODULES_EXCLUDED = \
+	if-mib/ifTable \
+        agent_mibs \
+        agentx \
+        host \
+	mibII \
+	ip-mib/data_access/ipaddress_linux \
+        xdjecton/iwniofunc \
+        notification \
+        target \
+        ucd_snmp \
+        utilities \
+ 
+SNMP_TRANSPORTS_INCLUDED = Callback UDP
+
+SNMP_TRANSPORTS_EXCLUDED = TCP TCPv6 UDPv6 Unix
+
+CONFIGURE_ARGS += \
+        --enable-shared \
+        --enable-static \
+        --with-endianness=big \
+        --with-logfile=/var/log/snmpd.log \
+        --with-persistent-directory=/usr/lib/snmp/ \
+        --with-default-snmp-version=1 \
+        --with-sys-contact=root@localhost \
+        --with-sys-location=Unknown \
+        --enable-applications \
+        --disable-debugging \
+        --disable-ipv6 \
+        --disable-manuals \
+        --disable-mibs \
+        --disable-scripts \
+        --with-out-mib-modules="$(SNMP_MIB_MODULES_EXCLUDED)" \
+        --with-mib-modules="$(SNMP_MIB_MODULES_INCLUDED)" \
+        --with-out-transports="$(SNMP_TRANSPORTS_EXCLUDED)" \
+        --with-transports="$(SNMP_TRANSPORTS_INCLUDED)" \
+        --with-openssl="$(ROOTFSDIR)/../source/openssl/src" \
+        --without-libwrap \
+        --without-rpm \
+        --without-zlib \
+	--disable-embedded-perl \
+
+
+.PHONY: all
+#all: install
+all: configure compile install 
+#all: compile install 
+
+.PHONY: configure
+configure:
+	( cd $(PKG_BUILD_DIR) && \
+  	  $(CONFIGURE_VARS) \
+  	  ./configure \
+  	  $(CONFIGURE_ARGS); \
+	); \
+
+.PHONY: compile
+compile:
+	rm -rf $(PKG_INSTALL_DIR)
+	$(MKDIR) $(PKG_INSTALL_DIR) 
+	$(MAKE) -C $(PKG_BUILD_DIR) \
+		INSTALL_PREFIX="$(PKG_INSTALL_DIR)" \
+		OTHERINSTALL=" " \
+		 sedscript EXAMPLE.conf standardall net-snmp-config-x install
+	( cd $(PKG_INSTALL_DIR) && \
+	  $(MV) ./usr/sbin/snmpd ./usr/sbin/snmpd-shared ;)
+
+
+.PHONY: install
+install:
+	$(MKDIR) $(ROOTFSDIR)/etc/default 
+	$(MKDIR) $(ROOTFSDIR)/etc/init.d
+	$(MKDIR) $(ROOTFSDIR)/etc/snmp
+	mkdir -p $(ROOTFSDIR)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/../../agent/.libs/*.so.* $(PKG_INSTALL_DIR)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/../../agent/helpers/.libs/*.so.* $(PKG_INSTALL_DIR)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libnetsnmpagent.so.* $(ROOTFSDIR)/usr/lib		
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libnetsnmphelpers.so.* $(ROOTFSDIR)/usr/lib		
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libnetsnmpmibs.so.* $(ROOTFSDIR)/usr/lib		
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libnetsnmp.so.* $(ROOTFSDIR)/usr/lib		
+	$(CP) ./files/snmpd.conf $(ROOTFSDIR)/etc/snmpd.conf
+	$(CP) ./files/snmpd.default $(ROOTFSDIR)/etc/default/snmpd
+	$(CP) ./files/snmpd.init $(ROOTFSDIR)/etc/init.d/snmpd
+	$(CP) ./files/snmp/* $(ROOTFSDIR)/etc/
+	$(CP) ./files/wapi $(ROOTFSDIR)/etc
+	$(CP) $(PKG_INSTALL_DIR)/usr/sbin/snmpd-shared $(ROOTFSDIR)/usr/sbin/snmpd
+	$(CP) $(PKG_INSTALL_DIR)/usr/bin/snmptrap $(ROOTFSDIR)/usr/sbin/snmptrap
+
+.PHONY: clean
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) distclean
+

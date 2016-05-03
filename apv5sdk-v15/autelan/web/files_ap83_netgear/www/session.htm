@@ -1,0 +1,71 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% response_headers %>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" src="js/util.js" type="text/javascript"></script>
+</head>
+<body>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<%in panel_action_status.htm %>
+<form method="post" action="/">
+<div align="center">
+<table bgcolor="#f4f9fd" align="center"   cellpadding="0" cellspacing="0">
+<tr>
+<td colspan="2" height="10">
+</td>
+</tr>
+
+<tr>
+<td colspan="2" align="center" ><input type="submit" value="Back to Login page" name="SERVLET"></td>
+</tr>
+
+<tr>
+<td colspan="2" height="10">
+</td>
+</tr>
+</table>
+</div>
+</form>
+
+<%
+USED_BY=`echo -n "$my_action_status" | grep -o "Used by"`
+if [ "$USED_BY" == "Used by" ]; then
+%>
+<form method="post" action="<%= $login_cgi %>">
+<div align="center">
+<table bgcolor="#f4f9fd" align="center"   cellpadding="0" cellspacing="0">
+<tr>
+<td colspan="2" height="10">
+</td>
+</tr>
+
+<tr>
+<td colspan="2" align="center" ><input type="submit" value="Force Login" name="SERVLET"></td>
+</tr>
+
+<tr>
+<td colspan="2" height="10"></td>
+</td>
+</tr>
+</table>
+</div>
+</form>
+</td>
+</tr>
+</table>
+</div>
+<%
+fi
+%>
+
+<%in page_footer.htm %>
+</body>
+</html>

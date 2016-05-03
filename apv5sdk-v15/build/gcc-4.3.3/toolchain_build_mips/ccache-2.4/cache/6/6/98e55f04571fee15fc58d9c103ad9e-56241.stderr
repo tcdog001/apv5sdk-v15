@@ -1,0 +1,14 @@
+In file included from shell/mxml_index.c:12:
+shell/mxml.h:27: warning: function declaration isn't a prototype
+shell/mxml.h:32: warning: function declaration isn't a prototype
+shell/mxml.h:37: warning: function declaration isn't a prototype
+shell/mxml.h:64: warning: function declaration isn't a prototype
+shell/mxml.h:137: warning: function declaration isn't a prototype
+shell/mxml_index.c:15: warning: function declaration isn't a prototype
+shell/mxml_index.c: In function 'mxml_index_new':
+shell/mxml_index.c:16: warning: implicit declaration of function 'malloc'
+shell/mxml_index.c:16: warning: incompatible implicit declaration of built-in function 'malloc'
+shell/mxml_index.c: In function 'mxml_index_destroy':
+shell/mxml_index.c:38: warning: implicit declaration of function 'free'
+shell/mxml_index.c:38: warning: incompatible implicit declaration of built-in function 'free'
+shell/mxml_index.c:40: warning: incompatible implicit declaration of built-in function 'free'

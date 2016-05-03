@@ -1,0 +1,337 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			chknvm.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='chipset.c.html' title=' chipset.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='chknvm2.c.html' title=' chknvm2.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   chknvm.c - Intellon image file validator;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;memory.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;errno.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../ram/sdram.h&quot;
+#include &quot;../nvm/nvm.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/checksum_32.c&quot;
+#include &quot;../tools/fdchecksum_32.c&quot;
+#include &quot;../tools/alert.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/strfbits.c&quot;
+#include &quot;../tools/filepart.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ram/sdrampeek.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../nvm/nvmpeek.c&quot;
+#endif
+
+/*====================================================================*
+ *
+ *   int chknvm (struct _file_ * file, flag_t flags);
+ *
+ *   nvm.h
+ *
+ *   open an NVM file and validate it by walking headers and images
+ *   to check lengths and checksums; return 0 on success or -1 on
+ *   error;
+ *
+ *   the checksum of the entire header, including header checksum, is
+ *   always 0 for valid headers; similarly, the checksum of the image
+ *   and image checksum is always 0 for valid images;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed chknvm (struct _file_ * file, flag_t flags) 
+
+{
+	struct header_nvm header_nvm;
+	struct config_ram config_ram;
+	unsigned image = 0;
+	memset (&amp;header_nvm, 0, sizeof (header_nvm));
+	if (lseek (file-&gt;file, 0, SEEK_SET)) 
+	{
+		if (_allclr (flags, NVM_SILENCE)) 
+		{
+			error (0, errno, &quot;Can't rewind file: %s&quot;, file-&gt;name);
+		}
+		return (-1);
+	}
+	do 
+	{
+		if (lseek (file-&gt;file, 0, SEEK_CUR) != LE32TOH (header_nvm.NEXTHEADER)) 
+		{
+			printf (&quot;offset=%ld header=%d\n&quot;, (long)(lseek (file-&gt;file, 0, SEEK_CUR)), LE32TOH (header_nvm.NEXTHEADER));
+			if (_allclr (flags, NVM_SILENCE)) 
+			{
+				error (0, 0, &quot;Bad file position: %s (%d)&quot;, file-&gt;name, image);
+			}
+			return (-1);
+		}
+		if (read (file-&gt;file, &amp;header_nvm, sizeof (struct header_nvm)) &lt; sizeof (struct header_nvm)) 
+		{
+			if (_allclr (flags, NVM_SILENCE)) 
+			{
+				error (0, errno, &quot;Can't read image header: %s (%d)&quot;, file-&gt;name, image);
+			}
+			return (-1);
+		}
+		if (header_nvm.HEADERVERSION != HTOLE32 (NVM_HEADER_VERSION)) 
+		{
+			if (_allclr (flags, NVM_SILENCE)) 
+			{
+				alert (&quot;Bad header version: %s (%d)&quot;, file-&gt;name, image);
+			}
+			return (-1);
+		}
+		if (checksum_32 (&amp;header_nvm, sizeof (struct header_nvm), 0)) 
+		{
+			if (_allclr (flags, NVM_SILENCE)) 
+			{
+				alert (&quot;Bad header checksum: %s (%d)&quot;, file-&gt;name, image);
+			}
+			return (-1);
+		}
+		if (_anyset (flags, NVM_VERBOSE)) 
+		{
+			printf (&quot;------- %s (%d) -------\n&quot;, file-&gt;name, image);
+			nvmpeek (&amp;header_nvm);
+		}
+		if (header_nvm.HEADERMINORVERSION) 
+		{
+			if (header_nvm.IMAGETYPE == NVM_IMAGE_CONFIG_SYNOPSIS) 
+			{
+				if (_anyset (flags, NVM_SDRAM)) 
+				{
+					printf (&quot;------- %s (%d) -------\n&quot;, file-&gt;name, image);
+					read (file-&gt;file, &amp;config_ram, sizeof (config_ram));
+					lseek (file-&gt;file, 0 - sizeof (config_ram), SEEK_CUR);
+					sdrampeek (&amp;config_ram);
+				}
+			}
+			else if (header_nvm.IMAGETYPE == NVM_IMAGE_FIRMWARE) 
+			{
+				if (_anyset (flags, NVM_VERSION)) 
+				{
+					uint8_t revision [256];
+					read (file-&gt;file, revision, sizeof (revision));
+					lseek (file-&gt;file, 0 - sizeof (revision), SEEK_CUR);
+					printf (&quot;%s (%d) %s\n&quot;, file-&gt;name, image, revision);
+				}
+			}
+		}
+		else if (!image) 
+		{
+			if (_anyset (flags, NVM_SDRAM)) 
+			{
+				printf (&quot;------- %s (%d) -------\n&quot;, file-&gt;name, image);
+				read (file-&gt;file, &amp;config_ram, sizeof (config_ram));
+				lseek (file-&gt;file, 0 - sizeof (config_ram), SEEK_CUR);
+				sdrampeek (&amp;config_ram);
+			}
+		}
+		else if (!header_nvm.NEXTHEADER) 
+		{
+			if (_anyset (flags, NVM_VERSION)) 
+			{
+				uint8_t revision [256];
+				read (file-&gt;file, revision, sizeof (revision));
+				printf (&quot;%s (%d) %s\n&quot;, file-&gt;name, image, revision);
+				lseek (file-&gt;file, 0 - sizeof (revision), SEEK_CUR);
+			}
+		}
+		if (fdchecksum_32 (file-&gt;file, LE32TOH (header_nvm.IMAGELENGTH), header_nvm.IMAGECHECKSUM)) 
+		{
+			if (_allclr (flags, NVM_SILENCE)) 
+			{
+				alert (&quot;Bad image checksum: %s (%d)&quot;, file-&gt;name, image);
+			}
+			return (-1);
+		}
+		image++;
+	}
+	while (header_nvm.NEXTHEADER);
+	if (lseek (file-&gt;file, 0, SEEK_CUR) != lseek (file-&gt;file, 0, SEEK_END)) 
+	{
+		if (_allclr (flags, NVM_SILENCE)) 
+		{
+			error (0, errno, &quot;Bad header chain: %s (%d)&quot;, file-&gt;name, image);
+		}
+		return (-1);
+	}
+	if (lseek (file-&gt;file, 0, SEEK_SET)) 
+	{
+		if (_allclr (flags, NVM_SILENCE)) 
+		{
+			error (0, errno, &quot;Can't rewind file: %s&quot;, file-&gt;name);
+		}
+		return (-1);
+	}
+	if (_allclr (flags, (NVM_VERBOSE|NVM_SILENCE|NVM_VERSION|NVM_SDRAM))) 
+	{
+		alert (&quot;%s looks good&quot;, file-&gt;name);
+	}
+	return (0);
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char * argv []);
+ *   
+ *   
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	static const char *optv [] = 
+	{
+		&quot;qrsv&quot;,
+		&quot;file [file] [...]&quot;,
+		&quot;Intellon image file validator&quot;,
+		&quot;r\tprint firmware revision strings&quot;,
+		&quot;s\tprint SDRAM configuration blocks&quot;,
+		&quot;q\tquiet&quot;,
+		&quot;v\tverbose messages&quot;,
+		(const char *) (0) 
+	};
+	struct _file_ nvm;
+	signed state = 0;
+	flag_t flags = (flag_t)(0);
+	signed c;
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'r':
+			_setbits (flags, NVM_VERSION);
+			break;
+		case 's':
+			_setbits (flags, NVM_SDRAM);
+			break;
+		case 'q':
+			_setbits (flags, NVM_SILENCE);
+			break;
+		case 'v':
+			_setbits (flags, NVM_VERBOSE);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		nvm.name = *argv;
+		if ((nvm.file = open (nvm.name, O_BINARY|O_RDONLY)) == -1) 
+		{
+			error (0, errno, &quot;Can't open %s&quot;, nvm.name);
+			state = 1;
+		}
+		else if (chknvm (&amp;nvm, flags)) 
+		{
+			state = 1;
+		}
+		close (nvm.file);
+		argc--;
+		argv++;
+	}
+	return (state);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='chipset.c.html' title=' chipset.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='chknvm2.c.html' title=' chknvm2.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

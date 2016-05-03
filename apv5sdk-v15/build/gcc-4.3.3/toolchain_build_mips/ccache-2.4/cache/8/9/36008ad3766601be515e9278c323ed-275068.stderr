@@ -1,0 +1,40 @@
+In file included from shell/conf_file_opt.h:25,
+                 from shell/ap_interface.c:7:
+shell/mxml.h:27: warning: function declaration isn't a prototype
+shell/mxml.h:32: warning: function declaration isn't a prototype
+shell/mxml.h:37: warning: function declaration isn't a prototype
+shell/mxml.h:64: warning: function declaration isn't a prototype
+shell/mxml.h:137: warning: function declaration isn't a prototype
+shell/ap_interface.c: In function 'conf_wireless_config_enable':
+shell/ap_interface.c:1001: warning: unused variable 'str_curssid'
+shell/ap_interface.c: In function 'wireless_get_status':
+shell/ap_interface.c:1090: warning: ISO C90 forbids mixed declarations and code
+shell/ap_interface.c: In function 'conf_wireless_config_ssid':
+shell/ap_interface.c:1115: warning: unused variable 'str_curssid'
+shell/ap_interface.c: In function 'ap_wireless_config_mode':
+shell/ap_interface.c:1394: warning: ISO C90 forbids mixed declarations and code
+shell/ap_interface.c: In function 'wireless_config_hidessid':
+shell/ap_interface.c:1518: warning: zero-length printf format string
+shell/ap_interface.c: In function 'wireless_config_noack':
+shell/ap_interface.c:2348: warning: passing argument 2 of 'wireless_get_noack' from incompatible pointer type
+shell/ap_interface.c:2350: warning: passing argument 1 of 'strcmp' from incompatible pointer type
+shell/ap_interface.c:2934:18: warning: unknown escape sequence '\}'
+shell/ap_interface.c:2934:18: warning: unknown escape sequence '\}'
+shell/ap_interface.c:2934:18: warning: unknown escape sequence '\}'
+shell/ap_interface.c:2934:18: warning: unknown escape sequence '\}'
+shell/ap_interface.c:2934:18: warning: unknown escape sequence '\}'
+shell/ap_interface.c:2934:18: warning: unknown escape sequence '\}'
+shell/ap_interface.c: In function 'ap_get_macaddressconnectedWithac':
+shell/ap_interface.c:2936: warning: passing argument 1 of 'fclose' from incompatible pointer type
+shell/ap_interface.c: In function 'ap_system_restore':
+shell/ap_interface.c:2950: warning: too many arguments for format
+shell/ap_interface.c: In function 'conf_wireless_sec_set_type':
+shell/ap_interface.c:4936: warning: implicit declaration of function 'set_data_by_path'
+shell/ap_interface.c: In function 'snmp_set_trapipaddr':
+shell/ap_interface.c:6137: warning: unused variable 'res'
+shell/ap_interface.c: In function 'wireless_security_filter_addmac':
+shell/ap_interface.c:4201: warning: control reaches end of non-void function
+shell/ap_interface.c: In function 'wireless_config_mode':
+shell/ap_interface.c:1441: warning: control reaches end of non-void function
+shell/ap_interface.c: At top level:
+shell/ap_interface.c:20: warning: 'ROUTEADD_HOST' defined but not used

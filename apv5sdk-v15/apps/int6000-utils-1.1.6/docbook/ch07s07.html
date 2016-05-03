@@ -1,0 +1,57 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>HTTP Interface</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><meta name="keywords" content="
+				int6k 
+				, 
+				powerline 
+				"><link rel="start" href="index.html" title="Intellon INT6000 Linux Toolkit"><link rel="up" href="ch07.html" title="Chapter 7.  Embedded Applications"><link rel="prev" href="ch07s06.html" title="Intellon Toolkit"><link rel="next" href="ch08.html" title="Chapter 8.  Embedded API Reference"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">
+			HTTP Interface
+			</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s06.html">Prev</a> </td><th width="60%" align="center">Chapter 7. 
+		Embedded Applications
+		</th><td width="20%" align="right"> <a accesskey="n" href="ch08.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="http-interface"></a>
+			HTTP Interface
+			</h2></div></div></div><p>
+			The Intellon <acronym class="acronym">HTTP</acronym> interface is a prototype that demonstrates one way to remotely inspect and manage a network of Intellon devices in a host independent manner. The key features are simplicity and small size. The only environmental requirements are an <acronym class="acronym">HTTP</acronym> web server that supports <acronym class="acronym">CSS2</acronym> and <acronym class="acronym">CGI</acronym> and enough space to store the application and image files.
+			</p><p>
+			The interface application consists of one <acronym class="acronym">CGI</acronym> program image and one (or two) image files. Major components are located in the toolkit <code class="filename">cgi</code> folder. Minor components are located in neighboring toolkit folders. The application is not automatically compiled or installed when the toolkit is compiled or installed. It must be compiled and installed independently using the <code class="filename">Makefile</code> found in the <code class="filename">cgi</code> folder. The <code class="filename">Makefile</code> has variables that define installation target folders.
+			</p><p>
+			The interface can be compiled on any Linux host then tested using a web server,  such as <span class="productname">Apache</span>™,  with <span class="productname">CSS2</span>™ and <acronym class="acronym">CGI</acronym> support enabled. The application can then be cross-compiled for other targets and downloaded when ready.
+			</p><pre class="screen">
+LAN_IP_ADDR='192.168.3.1'
+LAN_NETMASK='255.255.255.0'
+LAN_GATEWAY='0.0.0.0'
+LAN_MAC_ADDR='000000000000'
+LAN_DHCP_ENABLE=1
+LAN_DHCP_START='192.168.3.100'
+LAN_DHCP_END='192.168.3.254'
+WAN_MODE=0
+WAN_IP_ADDR='192.168.99.2'
+WAN_NETMASK='255.255.255.0'
+WAN_GATEWAY='192.168.99.10'
+WAN_MTU=0
+WAN_MAC_ADDR='000000000000'
+WAN_PPPOE_USER=''
+WAN_PPPOE_PASS=''
+WAN_PPPOE_DOM=''
+DNS_SERVER1='0.0.0.0'
+DNS_SERVER2='0.0.0.0'
+DNS_SERVER3='0.0.0.0'
+FW_ENABLED=0
+FW_SYN_ENABLED=1
+FW_SYN_RATE=5
+FW_SYN_TIME=0
+FW_SYN_BURST=3
+FW_POD_ENABLED=1
+FW_POD_RATE=5
+FW_POD_TIME=0
+FW_POD_BURST=3
+FW_PS_ENABLED=1
+FW_PS_LEVEL=5
+FW_NAT_ENABLED=0
+USR_LOGIN='admin'
+USR_PASSWORD='1234'
+HOST_NAME='nitwit3'
+HOST_DOMAIN='intellon.net'
+</pre></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s06.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch08.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">
+			Intellon Toolkit
+			 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 8. 
+		Embedded API Reference
+		</td></tr></table></div></body></html>

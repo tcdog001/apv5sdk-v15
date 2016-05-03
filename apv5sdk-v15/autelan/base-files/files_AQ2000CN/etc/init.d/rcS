@@ -1,0 +1,93 @@
+#!/bin/sh
+
+start()
+{
+echo "Mounting file systems"
+mount -a
+#mount -o remount +w /
+mount -t ramfs -n none /tmp
+mount -rw -t jffs2 /dev/mtdblock6 /etc/config
+mount -rw -t jffs2 /dev/mtdblock6 /jffs
+#mount -t tmpfs tmpfs /dev
+cd /lib/modules/2.6.15/net/
+insmod pro_ctl_mod.ko
+#mknod /dev/wrcpu c 10 131 >dev/null 2>&1
+
+mkdir -p /jffs/hostapd/
+
+#by liuyanbo
+#ghy add factory test
+#	local factory="`/usr/bin/pro_ctl_util -k | awk -F ":" '/product_test_flag_app/ {print $2}'`"
+	local factory="`/usr/bin/pro_ctl_util -k`"
+	if [ "$factory" -eq 1 ];then
+#		echo "$factory"
+		echo now into the factory test mode
+		echo factory > /tmp/flag
+		/etc/wlan/preconfig_test
+		/etc/wlan/postconfig
+	else
+#		echo "$factory"
+		echo now into the normal mode 
+		echo normal > /tmp/flag
+		if [ ! -f /etc/config/config.xml ]; then
+			cp -f /etc/defaults/config.xml /etc/config
+		fi
+			
+		if [ ! -f /etc/config/version ]; then
+			xml_upsystem_version="`cat /etc/version/version`"
+			echo $xml_upsystem_version > /etc/config/version
+		fi
+	        if [ -e /etc/config/config.xml ];then
+		        /usr/sbin/xmlupgrade
+	        fi
+		cp -f /etc/defaults/session.xml /tmp
+		if [ -f /jffs/system ];then
+			echo "AP"
+		else
+			cp -f /etc/wlan/system /etc/config
+		fi
+	
+		if [ -x /jffs/preconfig ];then
+			/jffs/preconfig
+		else
+			cp -f /etc/wlan/preconfig /jffs
+			/jffs/preconfig
+		fi
+		if [ -x /jffs/config.ap83 ];then
+			/jffs/config.ap83
+		else
+			cp -f /etc/wlan/config.ap83 /jffs
+			chmod 755 /jffs/config.ap83	
+			/jffs/config.ap83
+		fi
+		if [ -x /jffs/postconfig ];then
+			/jffs/postconfig
+		else
+			cp -f /etc/wlan/postconfig /jffs
+			/jffs/postconfig
+		fi
+		#/usr/sbin/iwevent & 
+		#/sbin/rate-stat &
+	fi	
+}
+
+stop()
+{
+    true
+}
+
+case "$2" in
+  boot)
+        start
+        ;;
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  *)
+        echo "Usage: $0 {boot|start|stop}"
+        exit 1
+esac
+

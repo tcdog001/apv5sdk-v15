@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			DecodeReadModule.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='DecodeNetworkInfo.c.html' title=' DecodeNetworkInfo.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DecodeResetDevice.c.html' title=' DecodeResetDevice.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   int ihp_DecodeReadModule (const uint8_t buffer [], size_t length, ihpapi_result_t * result);
+ *
+ *   ihp.h
+ *
+ *   decode buffer as a VS_RD_MOD Confirm MME; update structures
+ *   named by the caller; 
+ *
+ *   return 0 on decode success or -1 on decode failure;
+ *
+ *   See the INT6000 Firmware Technical Reference Manual
+ *   for more information;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon HomePlug AV Application Programming Interface;
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration and evaluation only; Not for production use;
+ *
+ *   Contributor(s): 
+ *	Charles Maier, charles.maier@intellon.com
+ *	Alex Vasquez, alex.vasquez@intellon.com
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef DECODEREADMODULE_SOURCE
+#define DECODEREADMODULE_SOURCE
+
+#include &lt;stdint.h&gt;
+#include &lt;string.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../ihpapi/ihp.h&quot;
+#include &quot;../tools/memory.h&quot;
+ 
+int ihp_DecodeReadModule (const uint8_t buffer [], size_t length, ihpapi_result_t * result) 
+
+{
+	extern struct SeqCB scb;
+	size_t size;
+	struct __packed vs_rd_mod_cnf 
+	{
+		struct header_vs header;
+		uint8_t MSTATUS;
+		uint8_t RES1 [3];
+		uint8_t MODULEID;
+		uint8_t RESERVED;
+		uint16_t LENGTH;
+		uint32_t OFFSET;
+		uint32_t CHKSUM;
+		uint8_t DATA [1];
+	}
+	* confirm = (struct vs_rd_mod_cnf *)(buffer);
+
+#if INTELLON_SAFEMODE
+ 
+	if (length &lt; sizeof (struct vs_rd_mod_cnf)) 
+	{
+		errno = EFAULT;
+		return (-1);
+	}
+	if (result == (ihpapi_result_t *)(0)) 
+	{
+		errno = EFAULT;
+		return (-1);
+	}
+
+#endif
+ 
+	result-&gt;validData = false;
+	result-&gt;opStatus.status = confirm-&gt;MSTATUS;
+	result-&gt;data.updateDev.type = confirm-&gt;MODULEID;
+	if (0 == result-&gt;opStatus.status) 
+	{
+		if (checksum32 ((uint32_t *)confirm-&gt;DATA, (size_t)intohs((confirm-&gt;LENGTH) &gt;&gt; 2), intohl(confirm-&gt;CHKSUM))) 
+		{
+			result-&gt;opStatus.status = errno = EINVAL;
+		}
+		else if (MAX_MODULE_TX_LENGTH &lt; intohs(confirm-&gt;LENGTH)) 
+		{
+			result-&gt;opStatus.status = errno = ERANGE;
+		}
+		else 
+		{
+			result-&gt;data.updateDev.bufferLen = intohs(confirm-&gt;LENGTH);
+			memcpy (result-&gt;data.updateDev.buffer, confirm-&gt;DATA, intohs(confirm-&gt;LENGTH));
+			result-&gt;validData = true;
+			result-&gt;dataLen = sizeof (ihpapi_updateDeviceData_t) - sizeof (result-&gt;data.updateDev.buffer) + result-&gt;data.updateDev.bufferLen;
+
+/*
+ *	calculate end of module
+ */
+ 
+			if (confirm-&gt;MODULEID == PIB_MODID &amp;&amp; intohl(confirm-&gt;OFFSET) == 0) 
+			{
+				PIBVersionHeader *pibhdr = (PIBVersionHeader *)&amp;confirm-&gt;DATA [0];
+				scb.moduleLen = intohs(pibhdr-&gt;PIBLength);
+				scb.offset = 0;
+			}
+			if (confirm-&gt;MODULEID == MACSW_MODID &amp;&amp; intohl(confirm-&gt;OFFSET) == scb.offset) 
+			{
+				NVMBlockHeader *nvmhdr = (NVMBlockHeader *)&amp;confirm-&gt;DATA [0];
+				if (checksum32 ((const uint32_t *)(nvmhdr), sizeof (NVMBlockHeader) &gt;&gt; 2, 0)) 
+				{
+					errno = EFAULT;
+					return (-1);
+				}
+				scb.moduleLen += intohl(nvmhdr-&gt;IMAGELENGTH) + sizeof (NVMBlockHeader);
+				scb.offset = intohl(nvmhdr-&gt;NEXTHEADER);
+			}
+			size = intohl(confirm-&gt;OFFSET) + intohs(confirm-&gt;LENGTH);
+			if (!scb.offset &amp;&amp; (size &gt;= scb.moduleLen)) 
+			{
+				result-&gt;data.updateDev.eof = true;
+			}
+			else 
+			{
+				result-&gt;data.updateDev.eof = false;
+			}
+		}
+	}
+	return (0);
+}
+
+#endif
+ 
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='DecodeNetworkInfo.c.html' title=' DecodeNetworkInfo.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='DecodeResetDevice.c.html' title=' DecodeResetDevice.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,121 @@
+#!/bin/sh
+
+VERSION="$(basename $0) ver.1.0"
+USAGE="Usage: $(basename $0) <eth0|eth1> <port1|port2|...> <tag> <priority> [rate]"
+DESCRIPTION="Description: config QoS settings based on 802.1p vlan, tag availability: 0-7, priority availability: 0-3"
+
+if [ $# -lt 2 ];then
+	echo "${USAGE}" >&2
+	echo "${DESCRIPTION}" >&2
+	exit 1
+fi
+
+case "${1}" in
+	eth0 | eth1)
+		ETH="${1}"
+		;;
+	*)
+		echo "${USAGE}" >&2
+		echo "${DESCRIPTION}" >&2
+		exit 1
+		;;
+esac
+
+if [ "${2}" == "default" ]; then
+ethreg 0x210=0x8001b
+ethreg 0x310=0x8001b
+ethreg 0x410=0x8001b
+ethreg 0x510=0x8001b
+ethreg 0x208=0x370001
+ethreg 0x308=0x370001
+ethreg 0x408=0x370001
+ethreg 0x508=0x370001
+ethreg 0x30=0x21f00600
+ethreg 0x40=0x9
+ethreg 0x11c=0x7fff7fff
+ethreg 0x120=0x7fff7fff
+exit 1
+fi
+
+case "${2}" in
+	port1 | port2 | port3 | port4)
+		PORT=`echo "${2}" | grep -o '[0-9]'`
+		;;
+	*)
+		echo "${USAGE}" >&2
+		echo "${DESCRIPTION}" >&2
+		exit 1
+		;;
+esac
+
+OFFSET=$((${PORT} * 0x100))
+
+if [ -n "${5}" ]; then
+case `echo ${5}|grep -o '[a-zA-Z]'` in
+	[kK] )
+		RATEVAL=`echo ${5}|grep -o '[0-9]*'`
+		RATE=$(( ${RATEVAL}/32 ))
+		;;
+	[mM] )
+		RATEVAL=`echo ${5}|grep -o '[0-9]*'`
+		RATE=$(( ${RATEVAL}*32 ))
+		;;
+	*) 
+		echo "${USAGE}" >&2
+		echo "${DESCRIPTION}" >&2
+		exit 1
+		;;
+esac
+fi
+
+# set Priority Control register
+################################
+
+REG=0x110
+OLDVAL=`ethreg -i ${ETH} -p 15 $(( ${REG} + ${OFFSET} )) | awk '{print $5}'`
+VAL=$(( ${OLDVAL} | 0x20000 ))
+VAL=$(( ${VAL} & 0xffffff0f ))
+VAL=$(( ${VAL} | 0x40 ))
+ethreg -i ${ETH} -p 15 $(( ${REG} + ${OFFSET} ))=${VAL}
+
+# set Priority Control register
+################################
+
+REG=0x108
+OLDVAL=`ethreg -i ${ETH} -p 15 $(( ${REG} + ${OFFSET} )) | awk '{print $5}'`
+VAL=$(( ${OLDVAL} & 0x7ffffff ))
+VAL=$(( ${VAL} | 0x40000000 ))
+ethreg -i ${ETH} -p 15 $(( ${REG} + ${OFFSET} ))=${VAL}
+
+# set VLAN Table Function 1 register
+################################
+
+REG=0x44
+OLDVAL=0x800
+VAL=$(( ${OLDVAL} +  (1<<${PORT}) + 1 ))
+ethreg -i ${ETH} -p 15 ${REG}=${VAL}
+
+# set VLAN Table Function 0 register
+################################
+
+REG=0x40
+VID=${3}
+PRI=${4}
+OLDVAL=0x8000000a
+VAL=$(( ${OLDVAL} + (((1<<${PORT}) + 1)<<8) + (${VID}<<16) + (${PRI}<<28) ))
+ethreg -i ${ETH} -p 15 ${REG}=${VAL}
+
+# set Rate Limit Register 1 or 2
+################################
+		
+if [ -n "${5}" ]; then
+PRI=$(( ${4}/2 ))
+if [ ${PRI} -lt 2 ]; then
+REG=0x11c
+else
+REG=0x120
+fi
+OLDVAL=`ethreg -i ${ETH} -p 15 ${REG} | awk '{print $5}'`
+VAL=$(( (${OLDVAL} & ~(0xffff<<((${PRI}%2)*16))) + (${RATE} << ((${PRI}%2)*16)) ))
+ethreg -i ${ETH} -p 15 ${REG}=${VAL}
+fi

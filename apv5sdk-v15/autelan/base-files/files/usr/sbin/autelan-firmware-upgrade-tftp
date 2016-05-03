@@ -1,0 +1,26 @@
+#!/bin/sh
+
+if [ $# -ne 2 ];
+then
+	echo "$0 <firmware-file> <tftpserver-ip-address>"
+	exit 1
+fi
+
+# Get firmware image 
+echo "*** Getting firmware file $1 using tftp server $2"
+tftp -g -l /tmp/wg102_firmware.bin -r $1 $2
+if [ $? -ne 0 ];
+then
+	exit 2
+fi
+
+touch 1
+
+nohup /usr/sbin/autelan-firmware-upgrade-file /tmp/wg102_firmware.bin > /tmp/nohup.out
+if [ $? -ne 0 ]; then
+				touch NOHUP_ERROR
+        exit 1
+fi
+echo nohup ok!!!
+touch 2
+exit 0

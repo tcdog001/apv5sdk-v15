@@ -1,0 +1,103 @@
+#file name and path declare
+ifndef ROOTFSDIR
+ROOTFSDIR := /home/shark/builddir/rootfs
+endif 
+PKG := hostapd
+VERSION := 0.6.6
+SRC_DIR := ${PKG}-${VERSION}/hostapd
+
+#command replace 
+CPDIR := sudo cp -r 
+CP := sudo cp -f 
+MKDIR := mkdir -p
+MV := sudo mv 
+STRIP = $(TARGET_CROSS)strip
+
+#make option
+TARGET_CROSS ?= mips64-octeon-linux-gnu-
+TARGET_CC ?= $(TARGET_CROSS)gcc
+TARGET_CPPFLAGS ?= $(CAVIUM_CPPFLAGS)
+TARGET_LDFLAGS ?= $(CAVIUM_LDFLAGS)
+GNU_TARGET_NAME ?= mips-linux
+DISABLE_NLS ?= --disable-nls
+TARGET_CONFIGURE_OPTS ?= \
+  AR=$(TARGET_CROSS)ar \
+  AS="$(TARGET_CC) -c $(TARGET_CFLAGS)" \
+  LD=$(TARGET_CROSS)ld \
+  NM=$(TARGET_CROSS)nm \
+  CC="$(TARGET_CC)" \
+  GCC="$(TARGET_CC)" \
+  CXX=$(TARGET_CROSS)g++ \
+  RANLIB=$(TARGET_CROSS)ranlib \
+  STRIP=$(TARGET_CROSS)strip \
+  OBJCOPY=$(TARGET_CROSS)objcopy \
+  OBJDUMP=$(TARGET_CROSS)objdump \
+  SIZE=$(TARGET_CORSS)size
+
+ifeq "$(MODE)" "11n"
+MADWIFI_N_DIR := $(ROOTFSDIR)/../source/ar11n
+MADWIFI_N_H := $(MADWIFI_N_DIR)/wlan -I $(MADWIFI_N_DIR)/wlan/linux
+endif
+ifeq "$(MODE)" "wapi"
+MADWIFI_BG_H := $(ROOTFSDIR)/../source/madwifi-trunk-r3314-wapi/src
+endif
+ifeq "$(MODE)" "11bg"
+MADWIFI_BG_H := $(ROOTFSDIR)/../source/madwifi-trunk3314/src
+endif
+OPENSSL_DIR := $(ROOTFSDIR)/../source/openssl/src
+
+.PHONY: all
+ifeq "$(MODE)" "11n"
+export CFLAGS=-MMD -O2 -Wall -g -D_BYTE_ORDER=_BIG_ENDIAN -DATH_WPS_IE
+all: maken
+else
+all: makebg
+endif 
+#all: clean compile_n install_n 
+
+.PHONY: makebg
+makebg: cleanbg compile_bg install_bg
+	@echo "make hostapd for 11bg"
+
+.PHONY: maken
+maken: cleann compile_n install_n
+	@echo "make hostapd for 11n"
+
+.PHONY: compile_bg
+compile_bg:
+	$(MAKE) -C $(SRC_DIR) \
+		$(TARGET_CONFIGURE_OPTS) \
+		MADWIFI_H="$(MADWIFI_BG_H)" \
+		SSL_H=$(OPENSSL_DIR)/include \
+		LIBS="-L$(OPENSSL_DIR) -lssl -lcrypto "
+
+
+.PHONY: install_bg
+install_bg:
+	$(STRIP) $(SRC_DIR)/hostapd
+	$(CP) $(SRC_DIR)/hostapd $(ROOTFSDIR)/usr/sbin	 
+
+.PHONY: compile_n
+compile_n:
+	$(MAKE) -C $(SRC_DIR) \
+		$(TARGET_CONFIGURE_OPTS) \
+		MADWIFI_H="$(MADWIFI_N_H)" \
+		SSL_H=$(OPENSSL_DIR)/include \
+		LIBS="-L$(OPENSSL_DIR) -lssl -lcrypto"
+
+.PHONY: install_n
+install_n:
+	$(STRIP) $(SRC_DIR)/hostapd
+	$(CP) $(SRC_DIR)/hostapd $(ROOTFSDIR)/usr/sbin/hostapd	 
+
+.PHONY: cleanbg
+cleanbg: 
+	$(MAKE) -C $(SRC_DIR) clean
+	sudo rm -rf $(ROOTFSDIR)/usr/sbin/hostapd 
+
+.PHONY: cleann
+cleann: 
+	$(MAKE) -C $(SRC_DIR) clean
+	sudo rm -rf $(ROOTFSDIR)/usr/sbin/hostapd 
+
+	

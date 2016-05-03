@@ -1,0 +1,6 @@
+#!/bin/sh
+ifconfig ath.0-1 up
+ifconfig ath.0-2 down
+echo 3 > /proc/sys/net/ath.0-2/vap_splitmac
+ifconfig ath.0-2 up
+

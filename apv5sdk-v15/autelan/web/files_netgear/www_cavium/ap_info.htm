@@ -1,0 +1,86 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+<%
+CONF_APNAME=`cat /jffs/apinfo.conf|awk -F'"' '/APNAME/{print $2}'`
+CONF_APLOCATION=`cat /jffs/apinfo.conf|awk -F'"' '/APLOCATION/{print $2}'`
+CONF_APDESCR=`cat /jffs/apinfo.conf|awk -F'"' '/APDESCR/{print $2}'`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js admin_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+
+</head>
+<body >
+<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_administration9.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="overlayer();">
+<div align="center">
+		<table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0" width="650">
+			<tr>
+			<td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(info_aptitle)</script></b></td>
+			</tr>
+			
+			<tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>
+
+			
+			<tr id="a1">
+			<td align="right" height="28" width="280" bordercolor="#ffffff"><script language="javascript">replace(info_apname)</script>
+			</td><td align="left" width="370" bordercolor="#ffffff"><input type="text" name="apname" id="apname" value="<%= "$CONF_APNAME" %>"  ></td>
+			</tr>
+			
+			<tr id="a2">
+			<td align="right" height="28" bordercolor="#ffffff"><script language="javascript">replace(info_aplocation)</script>
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="aplocation" id="aplocation" value="<%= "$CONF_APLOCATION" %>" ></td>
+			</tr>
+
+		  
+		  <tr >
+			<td align="right" height="28" bordercolor="#ffffff"><script language="javascript">replace(info_apdescribe)</script>
+			</td><td align="left" bordercolor="#ffffff"><input type="text" name="apdiscribe" id="apdiscribe"  value="<%= "$CONF_APDESCR" %>" ></td>
+			</tr>
+
+	    <tr>
+			<td colspan="2" height="10">
+			</td>
+			</tr>	
+		</table>
+		<table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+			<tr>
+			  <td align="center" height="40" valign="middle" colspan="2" ><script language="javascript" >replace(info_apply)</script>&nbsp;</td>
+			</tr>
+		</table>
+</div>
+<input type="hidden" value="AP INFO" name="SERVLET">
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>
+

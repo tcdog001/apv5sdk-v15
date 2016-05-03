@@ -1,0 +1,119 @@
+#!/bin/sh
+IFCONFIG=/sbin/ifconfig
+ROUTE=/sbin/route
+
+ACADDR_FILE=/tmp/ac-addr
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+. /usr/lib/web/sysinit.sh
+. /usr/lib/web/function.sh
+[ -z "$1" ] && echo "Error: should be run by udhcpc" && exit 1
+. /etc/functions.sh
+include /lib/network
+
+RESOLV_CONF="/tmp/resolv.conf.auto"
+
+if [ -f ${ACADDR_FILE} ] ;then
+	rm -fr ${ACADDR_FILE}
+fi
+
+hotplug_event() {
+	scan_interfaces
+	config_load /var/state/network
+	for ifc in $interfaces; do
+		config_get ifname $ifc ifname
+		[ "$ifname" = "$interface" ] || continue
+
+		config_get proto $ifc proto
+		[ "$proto" = "dhcp" ] || continue
+		[ ifup = "$1" ] && {
+			uci set "/var/state/network.$ifc.ipaddr=$ip"
+			uci set "/var/state/network.$ifc.netmask=${subnet:-255.255.255.0}"
+			uci set "/var/state/network.$ifc.dnsdomain=$domain"
+			uci set "/var/state/network.$ifc.dns=$dns"
+			uci set "/var/state/network.$ifc.gateway=$router"
+		}
+		env -i ACTION="$1" INTERFACE="$ifc" DEVICE="$ifname" PROTO=dhcp /sbin/hotplug-call iface
+	done
+}
+
+case "$1" in
+	deconfig)
+		$IFCONFIG $interface 0.0.0.0	
+                sys_lan_start $interface
+ 	        hotplug_event ifdown
+	;;
+	renew|bound)
+		$IFCONFIG $interface $ip \
+		netmask ${subnet:-255.255.255.0} \
+		broadcast ${broadcast:-+}
+#		$ROUTE | awk '$1~/default/ {has=100} END {if(has!=100) {system("route add default default")}}'
+
+		[ -n "$router" ] && {
+			for i in $router ; do
+				echo "adding router $i"
+				$ROUTE add default gw $i dev $interface
+				valid="$valid|$i"
+
+			done
+
+			echo "deleting old routes"
+			$($ROUTE -n | awk '/^0.0.0.0\W{9}('$valid')\W/ {next} /^0.0.0.0/ {print "route del -net "$1" gw "$2";"}')
+#if don't have default route add one
+			$ROUTE | awk '$1~/default/ {has=100} END {if(has!=100) {system("route add default default")}}'
+		}
+		
+		[ -n "$dns" ] && {
+			echo -n > "${RESOLV_CONF}.tmp"
+			${domain:+echo search $domain} >> "${RESOLV_CONF}.tmp"
+			for i in $dns ; do
+				echo "adding dns $i"
+				echo "nameserver $i" >> "${RESOLV_CONF}.tmp"
+			done
+			mv "${RESOLV_CONF}.tmp" "$RESOLV_CONF"
+		}
+		[ -n "$acaddr" ] && {
+		     if [ -f ${ACADDR_FILE}  ] ;then	
+		        echo ""
+		     else
+			echo -n "" > ${ACADDR_FILE}
+		      fi 
+			for addr in $acaddr
+			do
+				echo "option43" >> ${ACADDR_FILE}
+				echo $addr >> ${ACADDR_FILE}
+			done
+		}		
+		[ -n "$acaddr138" ] && {
+		     if [ -f ${ACADDR_FILE}  ] ;then	
+		        echo ""
+		     else
+			echo -n "" > ${ACADDR_FILE}
+		      fi 
+			for addr in $acaddr138
+			do
+				echo "option138" >> ${ACADDR_FILE}
+				echo $addr >> ${ACADDR_FILE}
+			done
+		}		
+		[ -n "$acaddr189" ] && {
+		     if [ -f ${ACADDR_FILE}  ] ;then	
+		        echo ""
+		     else
+			echo -n "" > ${ACADDR_FILE}
+		      fi 
+			for addr in $acaddr189
+			do
+				echo "option189" >> ${ACADDR_FILE}
+				echo $addr >> ${ACADDR_FILE}
+			done
+		}		
+		touch /tmp/dhcpflag
+		hotplug_event ifup
+		
+		# user rules
+		[ -f /etc/udhcpc.user ] && . /etc/udhcpc.user
+	;;
+esac
+
+exit 0

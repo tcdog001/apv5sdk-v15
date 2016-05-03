@@ -1,0 +1,22 @@
+#!/bin/sh
+########################################
+#system upgrad boot tool for web GUI,AQ2010
+#parameter numbers check and usage
+if [ $# -ne 1 ] ;then
+	echo "Usage: bootupgrade [SYSTEM-FILENAME]"
+	exit 1
+fi
+
+############################################
+#if file exist 
+if [ -e $1 ]; then
+	echo "boot file exist!"
+	cat /www/reboot.htm >/dev/null
+	cat /sbin/sysreboot >/dev/null
+#	cp /usr/sbin/update_img_tool /tmp/
+ #   	(free&&date&&/tmp/update_img_tool if=$1 ke=/dev/mtdblock1 fs=/dev/mtdblock2&&free&&date)>/tmp/sysupgradelog 2>&1
+	cp /usr/sbin/redboot_upgrade /tmp/
+    	(free&&date&&/tmp/redboot_upgrade $1 &&free&&date)>/tmp/sysupgradelog 2>&1
+   	 mv /tmp/sysupgradelog /jffs/sysupgradelog
+fi
+

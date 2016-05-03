@@ -1,0 +1,5 @@
+editors/awx_parser.l: In function 'yylex':
+editors/awx_parser.l:230: warning: statement with no effect
+editors/awx_parser.l: At top level:
+lex.yy.c:1333: warning: 'yyunput' defined but not used
+lex.yy.c:1376: warning: 'input' defined but not used

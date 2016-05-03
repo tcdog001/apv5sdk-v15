@@ -1,0 +1,121 @@
+g_glue.lo g_glue.o: g_glue.c mglueP.h ../src/gssglue/config.h mechglue.h \
+  ../src/gssglue/gssapi/gssapi.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../lib/gcc/mips64-octeon-linux-gnu/4.1.2/include/stddef.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/sys/types.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/features.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/sys/cdefs.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/wordsize.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/gnu/stubs.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/types.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/typesizes.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/time.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/endian.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/endian.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/sys/select.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/select.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/sigset.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/time.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/sys/sysmacros.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/pthreadtypes.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/stdio.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/libio.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/_G_config.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/wchar.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/wchar.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/gconv.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../lib/gcc/mips64-octeon-linux-gnu/4.1.2/include/stdarg.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/stdio_lim.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/sys_errlist.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/stdio.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/stdlib.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/alloca.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/string.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/string.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/string2.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/errno.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/errno.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/linux/errno.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/asm/errno.h \
+  /home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/asm-generic/errno-base.h
+
+mglueP.h:
+
+../src/gssglue/config.h:
+
+mechglue.h:
+
+../src/gssglue/gssapi/gssapi.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../lib/gcc/mips64-octeon-linux-gnu/4.1.2/include/stddef.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/sys/types.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/features.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/sys/cdefs.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/wordsize.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/gnu/stubs.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/types.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/typesizes.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/time.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/endian.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/endian.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/sys/select.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/select.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/sigset.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/time.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/sys/sysmacros.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/pthreadtypes.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/stdio.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/libio.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/_G_config.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/wchar.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/wchar.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/gconv.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../lib/gcc/mips64-octeon-linux-gnu/4.1.2/include/stdarg.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/stdio_lim.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/sys_errlist.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/stdio.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/stdlib.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/alloca.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/string.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/string.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/string2.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/errno.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/bits/errno.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/linux/errno.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/asm/errno.h:
+
+/home/shark/new_cavium/caviumworkspace/OCTEON-SDK/tools-gcc-4.1/bin/../mips64-octeon-linux-gnu/sys-root/usr/include/asm-generic/errno-base.h:

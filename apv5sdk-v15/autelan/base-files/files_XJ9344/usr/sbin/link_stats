@@ -1,0 +1,40 @@
+#!/bin/sh
+COUNT=0
+VAL="`ethreg -p 0 0x11 | awk -F' ' '/Read Reg/{print $5}'`"
+VAL=$(($VAL))
+if [ $VAL -ne 65535 ];then
+VAL=$(($VAL&0x0400))
+#echo $VAL    
+    if [ $VAL -eq 1024 ];then
+            COUNT=`expr $COUNT + 1`
+    fi
+fi
+for i in `seq 4`
+do
+VAL="`ethreg -p $i 0x11 | awk -F' ' '/Read Reg/{print $5}'`"
+VAL=$(($VAL))
+if [ $VAL -ne 65535 ];then
+VAL=$(($VAL&0x0400))
+#echo $VAL    
+    if [ $VAL -eq 1024 ];then
+        COUNT=`expr $COUNT + 1`
+    fi
+fi
+done
+
+#VAL=$(($VAL&0x0400))
+#echo $VAL
+#    if [ $VAL -eq 1024 ];then
+#        echo "link on"
+#    else
+#    if [ $VAL -eq 0 ];then
+#        echo "link down"
+#    fi
+#    fi
+
+#    if [ $COUNT -eq 1 ];then
+#        echo "link on"
+#    else
+#        echo "link down"
+#    fi
+	echo $COUNT

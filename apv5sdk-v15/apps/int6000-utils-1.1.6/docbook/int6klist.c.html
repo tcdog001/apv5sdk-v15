@@ -1,0 +1,417 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			int6klist.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='int6kid.c.html' title=' int6kid.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6klog.c.html' title=' int6klog.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   int6klist.c - list local devices on stdout;
+ *
+ *   this program sends and receives raw ethernet frames and so needs
+ *   root priviledges; if you install it using &quot;chmod 555&quot; and &quot;chown 
+ *   root:root&quot; then you must login as root to run it; otherwise, you 
+ *   can install it using &quot;chmod 4555&quot; and &quot;chown root:root&quot; so that 
+ *   anyone can run it; the program will refuse to run until you get
+ *   things right;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*&quot;
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;limits.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/symbol.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../int6k/int6k.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../int6k/Confirm.c&quot;
+#include &quot;../int6k/Display.c&quot;
+#include &quot;../int6k/Failure.c&quot;
+#include &quot;../int6k/Request.c&quot;
+#include &quot;../int6k/ReadMME.c&quot;
+#include &quot;../int6k/SendMME.c&quot;
+#include &quot;../int6k/EthernetHeader.c&quot;
+#include &quot;../int6k/IntellonHeader.c&quot;
+#include &quot;../int6k/UnwantedPacket.c&quot;
+#include &quot;../int6k/devices.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../tools/alert.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/uintspec.c&quot;
+#include &quot;../tools/hexdump.c&quot;
+#include &quot;../tools/hexencode.c&quot;
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/hexout.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/synonym.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ether/openchannel.c&quot;
+#include &quot;../ether/closechannel.c&quot;
+#include &quot;../ether/readpacket.c&quot;
+#include &quot;../ether/sendpacket.c&quot;
+#include &quot;../ether/channel.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../mme/MMECode.c&quot;
+#endif
+
+/*====================================================================*
+ *   program constants;
+ *--------------------------------------------------------------------*/
+
+#define INT6KLIST_VERBOSE 	(1 &lt;&lt; 0)
+#define INT6KLIST_SILENCE 	(1 &lt;&lt; 1)
+#define INT6KLIST_BRIDGE 	(1 &lt;&lt; 2)
+#define INT6KLIST_REMOTE 	(1 &lt;&lt; 3)
+
+/*====================================================================*
+ *   
+ *   signed LocalDevices (struct channel * channel, const char * space);
+ *
+ *   print local device hardware addresses on stdout;
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed LocalDevices (struct channel * channel, const char * space, const char * comma, flag_t flags) 
+
+{
+	struct message message;
+	memset (&amp;message, 0, sizeof (message));
+	EthernetHeader (&amp;message.ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message.intellon, (VS_SW_VER | MMTYPE_REQ));
+	if (sendpacket (channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+	{
+		return (-1);
+	}
+	while (readpacket (channel, &amp;message, sizeof (message)) &gt; 0) 
+	{
+		if (UnwantedPacket (&amp;message, (VS_SW_VER | MMTYPE_CNF))) 
+		{
+			continue;
+		}
+		hexout (message.ethernet.OSA, sizeof message.ethernet.OSA, HEX_EXTENDER, stdout);
+		if ((space) &amp;&amp; (*space)) 
+		{
+			printf (&quot;%s&quot;, space);
+		}
+	}
+	if ((comma) &amp;&amp; (*comma)) 
+	{
+		printf (&quot;%s&quot;, comma);
+	}
+	return (0);
+}
+
+/*====================================================================*
+ *
+ *   signed RemoteDevices (struct channel * channel, const char * space);
+ *
+ *   print remote devices associated with a specific device;
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+static signed RemoteDevices (struct channel * channel, const char * space, const char * comma, flag_t flags) 
+
+{
+	struct message message;
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed station 
+	{
+		uint8_t LDA [ETHER_ADDR_LEN];
+		uint8_t TEI;
+		uint8_t BDA [ETHER_ADDR_LEN];
+		uint8_t AVGTX;
+		uint8_t AVGRX;
+	}
+	* station;
+	struct __packed network 
+	{
+		uint8_t NID [7];
+		uint8_t SNID;
+		uint8_t TEI;
+		uint8_t ROLE;
+		uint8_t CCO_MAC [ETHER_ADDR_LEN];
+		uint8_t CCO_TEI;
+		uint8_t NUMSTAS;
+		struct station stations [1];
+	}
+	* network;
+	struct __packed networks 
+	{
+		uint8_t NUMAVLNS;
+		struct network network [1];
+	}
+	* networks = (struct networks *) (&amp;message.content);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	memset (&amp;message, 0, sizeof (message));
+	EthernetHeader (&amp;message.ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message.intellon, (VS_NW_INFO | MMTYPE_REQ));
+	if (sendpacket (channel, &amp;message, ETHER_MIN_LEN) &lt;= 0) 
+	{
+		return (-1);
+	}
+	while (readpacket (channel, &amp;message, sizeof (message)) &gt; 0) 
+	{
+		if (UnwantedPacket (&amp;message, (VS_NW_INFO | MMTYPE_CNF))) 
+		{
+			continue;
+		}
+		if (_anyset (flags, INT6KLIST_BRIDGE)) 
+		{
+			hexout (message.ethernet.OSA, sizeof message.ethernet.OSA, HEX_EXTENDER, stdout);
+			if ((space) &amp;&amp; (*space)) 
+			{
+				printf (&quot;%s&quot;, space);
+			}
+		}
+		network = (struct network *)(&amp;networks-&gt;network);
+		while (networks-&gt;NUMAVLNS-- &gt; 0) 
+		{
+			station = (struct station *)(&amp;network-&gt;stations);
+			while (network-&gt;NUMSTAS-- &gt; 0) 
+			{
+				if (_anyset (flags, INT6KLIST_REMOTE)) 
+				{
+					hexout (station-&gt;LDA, sizeof (station-&gt;LDA), HEX_EXTENDER, stdout);
+					if ((space) &amp;&amp; (*space)) 
+					{
+						printf (&quot;%s&quot;, space);
+					}
+				}
+				station++;
+			}
+			network = (struct network *)(station);
+		}
+		if ((comma) &amp;&amp; (*comma)) 
+		{
+			printf (&quot;%s&quot;, comma);
+		}
+	}
+	return (0);
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char * argv[]);
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	extern struct channel channel;
+	extern const struct _term_ devices [];
+	static const char *optv [] = 
+	{
+		&quot;i:bnqrsv&quot;,
+		&quot;device [device] [...] [&gt; stdout]&quot;,
+		&quot;Intellon Device Statistics Utility&quot;,
+		&quot;b\tprint bridge devices; exclude remote devices&quot;,
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		&quot;i n\thost interface number [2]&quot;,
+
+#else
+
+		&quot;i s\thost interface name [&quot; CHANNEL_ETHDEVICE &quot;]&quot;,
+
+#endif
+
+		&quot;n\tappend newline to output&quot;,
+		&quot;q\tquiet mode&quot;,
+		&quot;r\tprint remote devices; exclude bridge devices&quot;,
+		&quot;s\tprint newlines instead of spaces&quot;,
+		&quot;v\tverbose mode&quot;,
+		(const char *) (0) 
+	};
+	flag_t flags = (flag_t)(0);
+	const char * space = &quot; &quot;;
+	const char * comma = &quot;\0&quot;;
+	signed c;
+	if (getenv (PLCDEVICE)) 
+	{
+#if defined (WINPCAP) || defined (LIBPCAP)
+		channel.id = atoi (getenv (PLCDEVICE));
+#else
+		channel.name = strdup (getenv (PLCDEVICE));
+#endif
+	}
+	optind = 1;
+	opterr = 1;
+	optmin = 0;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'b':
+			_setbits (flags, INT6KLIST_BRIDGE);
+			break;
+		case 'i':
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+			channel.id = atoi (optarg);
+
+#else
+
+			channel.name = optarg;
+
+#endif
+
+			break;
+		case 'n':
+			comma = &quot;\n&quot;;
+			break;
+		case 'r':
+			_setbits (flags, INT6KLIST_REMOTE);
+			break;
+		case 's':
+			space = &quot;\n&quot;;
+			break;
+		case 'q':
+			_setbits (channel.flags, CHANNEL_SILENCE);
+			_setbits (flags, INT6KLIST_SILENCE);
+			break;
+		case 'v':
+			_setbits (channel.flags, CHANNEL_VERBOSE);
+			_setbits (flags, INT6KLIST_VERBOSE);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+
+#ifndef WIN32
+
+/*
+ *      raw packets require root priviledges on linux; one does not have to be
+ *      root when this program is installed setuid using 'chown root:root' and 
+ *      'chmod 4555';
+ */
+
+	if (geteuid ()) 
+	{
+		error (1, EPERM, INT6K_NEEDROOT);
+	}
+
+#endif
+
+	if (_allclr (flags, (INT6KLIST_BRIDGE|INT6KLIST_REMOTE))) 
+	{
+		_setbits (flags, (INT6KLIST_BRIDGE|INT6KLIST_REMOTE));
+	}
+	openchannel (&amp;channel);
+	if (!argc) 
+	{
+		LocalDevices (&amp;channel, space, comma, flags);
+	}
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		if (!hexencode (channel.peer, sizeof (channel.peer), synonym (*argv, devices, DEVICES))) 
+		{
+			error (1, errno, INT6K_BAD_MAC, *argv);
+		}
+		RemoteDevices (&amp;channel, space, comma, flags);
+		argc--;
+		argv++;
+	}
+	closechannel (&amp;channel);
+	return (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='int6kid.c.html' title=' int6kid.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6klog.c.html' title=' int6klog.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

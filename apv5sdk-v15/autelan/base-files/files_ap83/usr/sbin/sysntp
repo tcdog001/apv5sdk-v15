@@ -1,0 +1,8 @@
+NTPCLIENT="/usr/sbin/ntpclient"
+SEND_TRAP="/usr/sbin/send_trap"
+
+$NTPCLIENT -h $1 -s
+
+if [ ! $? -eq 0 ];then
+	$SEND_TRAP apNtpFail	
+fi

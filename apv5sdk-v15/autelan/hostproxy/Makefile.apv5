@@ -1,0 +1,48 @@
+.NOTPARALLEL:
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+#CFLAGS += -I$(LC_GENERL_INCLUDE_DIR)
+
+
+#LDFLAGS += -L$(LC_LIB_DIR)
+#LDFLAGS += -rdynamic
+LDFLAGS += -lpthread #\
+#			-ldl \
+#			-llctimer \
+#			-lcos \
+#			-lgcov \
+#			-llcdebug \
+#			-lsdkmem \
+#			-lsdkipc \
+#			-llcnv
+
+exclude_dirs := CVS results
+
+
+.PHONY: $(TARGET) install clean
+
+#TOOLCHAIN_ABI_64=y
+
+TARGET = hostproxyd
+SOURCE = proxy.c
+OBJECT = *.o
+
+.PHONY: all
+all: $(TARGET) install
+.PHONY: $(TARGET)
+
+$(TARGET): $(OBJECT)
+	@echo "building AT parser..."    
+	${CC} $(OBJECT)  $(CFLAGS) -o $(TARGET) $(LDFLAGS)
+$(OBJECT): $(SOURCE)	
+	${CC} -c $(SOURCE)
+
+.PHONY: clean
+clean:
+	rm -rf $(TARGET) $(OBJECT)
+
+.PHONY: install
+install: 
+	cp -f $(TARGET) ${ROOTFSDIR}/usr/sbin

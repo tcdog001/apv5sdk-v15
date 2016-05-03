@@ -1,0 +1,123 @@
+/****************************/
+/*body font-family style    */
+/****************************/
+body{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+}
+
+/**********************************/
+/*hidden transverse scroll bar    */
+/**********************************/
+html{
+	overflow-x:hidden;
+}
+
+/****************************/
+/*input style               */
+/****************************/
+input{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:10px;
+}
+/****************************/
+/*button style              */
+/****************************/
+#but{
+	background-image:url(button.jpg);
+	font-size:11px;
+	line-height:18px;
+	text-align:center;
+	float:right;
+	width:58px;
+	height:18px;
+	border:0;
+}
+
+
+/****************************/
+/*link style                */
+/****************************/
+a {
+	color: #000000;
+	text-decoration: none;
+}
+
+a.left:hover {
+	text-decoration: underline;
+	color:red;
+}
+
+a.left:active{
+	text-decoration: none;
+    color:#000000;
+}
+
+
+/****************************/
+/*left menu style           */
+/****************************/
+tr.orange{
+	height:26px;
+	background:url(orange/left.jpg);
+	font-weight:bold;
+	margin-left:5px;
+}
+
+/****************************/
+/*top Menu               */
+/****************************/
+
+td.top1{
+	font-weight:bold;
+	padding-right:20px;
+}	
+td.top2{
+	font-size:11px;
+	padding-left:35px;
+}	
+
+/****************************/
+/*the table of main Frame   */
+/****************************/	   
+table.main{
+	border-collapse:collapse;
+}
+font.table_head{
+	font-weight:bold;
+}	 
+td.td_style{
+	font-size:10px;
+	border:solid 1px #000000;
+	height:15px;
+	padding-left:6px;
+}
+
+/****************************/
+/*Image Link                */
+/****************************/	
+.imgLink{
+	background-image:url(button.jpg);
+	font-size:11px;
+	line-height:18px;
+	text-align:center;
+	float:right;
+	width:58px;
+	height:18px;
+}
+
+/****************************/
+/*ParagraphLink             */
+/****************************/	
+p{
+	margin-top:0px;
+	margin-bottom:0px;
+}
+
+
+
+
+
+
+
+

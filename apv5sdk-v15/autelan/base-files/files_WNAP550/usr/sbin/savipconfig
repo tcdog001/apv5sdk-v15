@@ -1,0 +1,51 @@
+#!/bin/sh
+. /usr/lib/web/xmlconf.sh
+
+#save addr,netmask,gateway,dns,vlanId in config.xml, read from "wrcpuutil -R"
+WRCPUUTIL=pro_ctl_util
+MAGIC="`${WRCPUUTIL} -R | awk -F ": " '/magic/ {print $2}'`"
+
+CONFIG_XML=/etc/config/config.xml
+
+echo "magic for thin:${MAGIC}"
+if [ ! "${MAGIC}" -eq "1464287568" ];then
+	echo "magic num is wrong, do not save config"
+	exit 0
+fi
+
+local ipaddr="`${WRCPUUTIL} -R | awk -F ": " '/ip/ {print $2}'`"
+local netmask="`${WRCPUUTIL} -R | awk -F ": " '/submask/ {print $2}'`"
+local gateway="`${WRCPUUTIL} -R | awk -F ": " '/gw/ {print $2}'`"
+local dns="`${WRCPUUTIL} -R | awk -F ": " '/dns/ {print $2}'`"
+local vlanid="`${WRCPUUTIL} -R | awk -F ": " '/vlan/ {print $2}'`"
+local dhcp="`${WRCPUUTIL} -R | awk -F ": " '/dhcp/ {print $2}'`"
+
+if [ "${dhcp}" -eq 1 ];then
+	local proto="dhcp"
+	local xml_config=`config_read /config/network/lan`
+	xml_config=`config_setoption "$xml_config" proto "$proto"`
+	config_write /config/network/lan "$xml_config"
+else
+	local proto="static"
+	local xml_config=`config_read /config/network/lan`
+	xml_config=`config_setoption "$xml_config" proto "$proto"`
+	xml_config=`config_setoption "$xml_config" ipaddr "$ipaddr"`
+	xml_config=`config_setoption "$xml_config" netmask "$netmask"`
+	xml_config=`config_setoption "$xml_config" gateway "$gateway"`
+	xml_config=`config_setoption "$xml_config" nameserver1 "$dns"`
+	config_write /config/network/lan "$xml_config"
+
+	local xml_bnet_sroute=`config_read /config/network/sroute`
+	xml_bnet_sroute=`config_setoption "$xml_bnet_sroute" route1 "$gateway"`
+	config_write /config/network/sroute "$xml_bnet_sroute"
+fi
+
+if [ "${vlanid}" -ge "1" ] && [ "${vlanid}" -le "4096" ]; then
+	local xml_config_vlan_default=`config_read /config/network/default_vlan`
+	xml_config_vlan_default=`config_setoption "$xml_config_vlan_default" create "yes"`
+	xml_config_vlan_default=`config_setoption "$xml_config_vlan_default" vid "$vlanid"`
+	config_write /config/network/default_vlan "$xml_config_vlan_default"
+fi
+
+ 
+ 

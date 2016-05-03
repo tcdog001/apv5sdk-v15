@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			HPAVKeyNMK.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='HPAVKeyNID.c.html' title=' HPAVKeyNID.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='HPAVKeyOut.c.html' title=' HPAVKeyOut.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *   
+ *   void HPAVKeyNMK (uint8_t NMK [], const char * string);
+ *
+ *   HPAVKey.h
+ *   
+ *   compute the HomePlugAV compliant Network Membership Key (NMK) 
+ *   for a NUL terminated string; return the key in buffer NMK []; 
+ *   the key will be HPAVKEY_NMK_LEN bytes as defined in HPAVKey.h; 
+ *
+ *   seed the digest then salt the digest then rehash the digest 999 
+ *   times per HomePlug AV Specification; 
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s);
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef HPAVKEYNMK_SOURCE
+#define HPAVKEYNMK_SOURCE
+
+#include &lt;memory.h&gt;
+
+#include &quot;../crypt/HPAVKey.h&quot;
+#include &quot;../crypt/SHA256.h&quot;
+
+void HPAVKeyNMK (uint8_t NMK [], const char * string) 
+
+{
+	struct sha256 sha256;
+	uint8_t digest [SHA256_DIGEST_LENGTH];
+	const uint8_t secret [] = 
+	{
+		0x08,
+		0x85,
+		0x6D,
+		0xAF,
+		0x7C,
+		0xF5,
+		0x81,
+		0x86 
+	};
+	int count = 999;
+	SHA256Reset (&amp;sha256);
+	SHA256Write (&amp;sha256, (uint8_t *)(string), strlen (string));
+	SHA256Write (&amp;sha256, secret, sizeof (secret));
+	SHA256Fetch (&amp;sha256, digest);
+	while (count-- &gt; 0) 
+	{
+		SHA256Reset (&amp;sha256);
+		SHA256Write (&amp;sha256, digest, sizeof (digest));
+		SHA256Fetch (&amp;sha256, digest);
+	}
+	memcpy (NMK, digest, HPAVKEY_NMK_LEN);
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='HPAVKeyNID.c.html' title=' HPAVKeyNID.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='HPAVKeyOut.c.html' title=' HPAVKeyOut.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

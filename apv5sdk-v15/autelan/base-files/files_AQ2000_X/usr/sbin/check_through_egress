@@ -1,0 +1,12 @@
+#!/bin/sh
+iperf -c "${1}" -t 5 >/tmp/spd_log_out 2>/dev/null & 
+sleep 10 
+
+spd_out=`cat /tmp/spd_log_out| awk '{if(NR==7){print $8substr($9,1,1)}}'`
+
+if [ ! -z "${spd_out}" ];then
+	echo "& egress: ${spd_out} &"
+else
+	echo "& egress: ${spd_out} &"
+fi
+	

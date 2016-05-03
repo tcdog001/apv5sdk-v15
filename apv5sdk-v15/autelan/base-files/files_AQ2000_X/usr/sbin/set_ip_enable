@@ -1,0 +1,23 @@
+#!/bin/sh
+#set_ip_enable vapname ip_enable
+
+AUTELAN=/usr/sbin/autelan
+#
+#usage()
+#
+usage()
+{
+	echo "set_ip_enable vapname ip_enable"
+	exit 1
+}
+
+if [ ! $# -eq 2 ];then
+	usage
+fi
+
+VAPNAME=$1
+IP_ENABLE=$2
+
+#echo "${AUTELAN} mac_binding ${VAPNAME} set_ip_auto_learning 1/0"
+${AUTELAN} mac_binding ${VAPNAME} set_ip_auto_learning ${IP_ENABLE}
+

@@ -1,0 +1,11 @@
+#!/bin/sh
+local n=1
+local VPATH=/jffs/lteversion
+if [ -f "$VPATH" ];then
+        n="`cat $VPATH|awk -F '.' '/v/{print $3}'`"
+        let "n = $n + 1"
+else
+        touch $VPATH
+fi
+        echo "v1.1.$n" > $VPATH
+        cat $VPATH

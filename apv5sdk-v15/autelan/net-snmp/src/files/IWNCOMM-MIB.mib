@@ -1,0 +1,4045 @@
+-- *****************************************************************
+-- IWNCOMMM-PWLAN-MIB :
+-- IWNCOMMM-PWLAN-MIB IEEE 8211 Management Information Base file
+--
+-- Copyright (c) 2007 by IWNOMM China.
+-- All rights reserved.
+-- *****************************************************************
+
+-- **********************************************************************
+-- * IEEE 8211 Management Information Base
+-- **********************************************************************
+
+IWNCOMM-PWLAN-MIB DEFINITIONS ::= BEGIN
+     
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE , NOTIFICATION-TYPE,
+        enterprises, Counter32 ,Unsigned32 ,Integer32              FROM SNMPv2-SMI  
+        DisplayString, MacAddress ,TruthValue  ,PhysAddress        FROM  SNMPv2-TC 
+        ifIndex                                                    FROM RFC1213-MIB ;
+iwncomm MODULE-IDENTITY
+    LAST-UPDATED "200706040000Z"
+    ORGANIZATION "www.iwncomm.com"
+    CONTACT-INFO  ""    DESCRIPTION 
+	 "IWNCOMM "
+    ::= { enterprises 4000 }
+
+iwncommPwlanAp MODULE-IDENTITY
+    LAST-UPDATED "200703050000Z"
+    ORGANIZATION "IWNCOMM"
+    CONTACT-INFO 
+           "E-mail: hhli@iwncomm.com
+                Chair: hhli
+                Postal:中国西安 科技二路68号西安软件园秦风阁A201
+                Tel: 86-29-87607834  87607835 87607836 87607837
+                Fax: 86-29-87607829
+                Postcode:710075 "
+  DESCRIPTION
+        "这个MIB库是为中国移动设计,服务对象是西电捷通公司的无线接入点设备
+        iso(1).org(3).dod(6).internet(1).private(4).enterprises(1).iwncomm(4000).iwncommPwlanApMib(100)"
+    ::= { iwncomm 100 }
+  iwncommApAdmin                      OBJECT IDENTIFIER 	::= { iwncommPwlanAp  1  }
+  iwncommApConfig		      OBJECT IDENTIFIER 	::= { iwncommPwlanAp  2  }
+  iwncommApSoftVersion       	      OBJECT IDENTIFIER 	::= { iwncommPwlanAp  4  }
+  iwncommApBasicInfo                  OBJECT IDENTIFIER 	::= { iwncommPwlanAp  5  }
+  iwncommApUpgrade                    OBJECT IDENTIFIER 	::= { iwncommPwlanAp  6  }
+--  iwncommApMacFilter    	      OBJECT IDENTIFIER 	::= { iwncommPwlanAp  7  }	
+  iwncommApAlarmAdmin                 OBJECT IDENTIFIER 	::= { iwncommPwlanAp  8  }
+  iwncommApNtpTimes                   OBJECT IDENTIFIER 	::= { iwncommPwlanAp  9  }
+  iwncommApMssid                      OBJECT IDENTIFIER 	::= { iwncommPwlanAp  10 }
+  iwncommApWAPI                       OBJECT IDENTIFIER 	::= { iwncommPwlanAp  11 }
+  iwncommApwapiConfig                 OBJECT IDENTIFIER 	::= { iwncommPwlanAp  12 }  
+  
+  iwncommConfigAp                     OBJECT IDENTIFIER 	::= { iwncommPwlanAp  13 } 
+  iwncommApQosBasicConfig             OBJECT IDENTIFIER 	::= { iwncommPwlanAp  14 }
+   
+  iwncommApWlanUserInfo               OBJECT IDENTIFIER 	::= { iwncommPwlanAp  15 } 
+  iwncommApWireless                   OBJECT IDENTIFIER 	::= { iwncommPwlanAp  16 } 
+  iwncommApWifiInterfaceStatistics    OBJECT IDENTIFIER 	::= { iwncommPwlanAp  17 } 
+  iwncommApWapiStats                  OBJECT IDENTIFIER 	::= { iwncommPwlanAp  18 }
+  iwncommApCapabeStatParameter        OBJECT IDENTIFIER 	::= { iwncommPwlanAp  19 }
+  iwncommApCapabeConfigParameter      OBJECT IDENTIFIER 	::= { iwncommPwlanAp  20 } 
+  iwncomm80211i                       OBJECT IDENTIFIER 	::= { iwncommPwlanAp  21 }
+  iwncommApSyslogd     	      	      OBJECT IDENTIFIER 	::= { iwncommPwlanAp  22 } 
+
+----------------------------------------------------------------------------------------------------
+--radiusSetting 
+----------------------------------------------------------------------------------------------------
+--    The Radius server setting.
+		radiusSetting OBJECT IDENTIFIER ::= { iwncomm80211i 1 }
+
+--    The primary authentication RADIUS server setting.
+		radiusAuthPrimaryServer OBJECT IDENTIFIER ::= { radiusSetting 1 }
+
+		
+		radiusAuthPrimaryServerIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the primary authentication RADIUS server IP address."
+			::= { radiusAuthPrimaryServer 1 }
+
+		
+		radiusAuthPrimaryServerPort OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the primary authentication RADIUS server port number.
+				Default: 1812."
+			::= { radiusAuthPrimaryServer 2 }
+
+		
+		radiusAuthPrimaryServerSecret OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the primary authentication RADIUS server shared secret string."
+			::= { radiusAuthPrimaryServer 3 }
+
+		
+--    The secondary authentication RADIUS server setting.
+		radiusAuthSecondaryServer OBJECT IDENTIFIER ::= { radiusSetting 2 }
+
+		
+		radiusAuthSecondaryServerIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the secondary authentication RADIUS server IP address."
+			::= { radiusAuthSecondaryServer 1 }
+
+		
+		radiusAuthSecondaryServerPort OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the secondary authentication RADIUS server port number.
+				Default: 1812."
+			::= { radiusAuthSecondaryServer 2 }
+
+		
+		radiusAuthSecondaryServerSecret OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the secondary authentication RADIUS server shared secret string."
+			::= { radiusAuthSecondaryServer 3 }
+
+		
+--    The primary account RADIUS server setting.
+		radiusAccountPrimaryServer OBJECT IDENTIFIER ::= { radiusSetting 3 }
+
+		
+		radiusAccountPrimaryServerIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the primary account RADIUS server IP address."
+			::= { radiusAccountPrimaryServer 1 }
+
+		
+		radiusAccountPrimaryServerPort OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the primary account RADIUS server port number.
+				Default: 1813."
+			::= { radiusAccountPrimaryServer 2 }
+
+		
+		radiusAccountPrimaryServerSecret OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the primary account RADIUS server shared secret string."
+			::= { radiusAccountPrimaryServer 3 }
+
+		
+--    The secondary account RADIUS server setting.
+		radiusAccountSecondaryServer OBJECT IDENTIFIER ::= { radiusSetting 4 }
+
+		
+		radiusAccountSecondaryServerIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the secondary account RADIUS server IP address."
+			::= { radiusAccountSecondaryServer 1 }
+
+		
+		radiusAccountSecondaryServerPort OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the secondary account RADIUS server port number.
+				Default: 1813."
+			::= { radiusAccountSecondaryServer 2 }
+
+		
+		radiusAccountSecondaryServerSecret OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..31))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This field shall indicate the secondary account RADIUS server shared secret string."
+			::= { radiusAccountSecondaryServer 3 }
+
+------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------
+--vapSetting
+------------------------------------------------------------------------------------------------------
+		-- 1.3.6.1.4.1.1567.5000.6.1
+		vapWepAndGlobalSettingTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF VapWepAndGlobalSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"VAP attributes setting table."
+			::= { iwncomm80211i 2 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.1.1
+		vapWepAndGlobalSettingEntry OBJECT-TYPE
+			SYNTAX VapWepAndGlobalSettingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				" VAP attributes setting table."
+			INDEX { ifIndex }
+			::= { vapWepAndGlobalSettingTable 1 }
+
+		
+		VapWepAndGlobalSettingEntry ::=
+			SEQUENCE { 
+				wepKeyType
+					INTEGER,
+				key1
+					DisplayString,
+				key2
+					DisplayString,
+				key3
+					DisplayString,
+				key4
+					DisplayString,
+				wepPassPhrase
+					DisplayString,
+				wpaReauthTime
+					INTEGER,
+				wpaGroupKeyUpdateCondition
+					INTEGER,
+				wpaGroupKeyUpdateIntervalSecond
+					INTEGER,
+				wpaGroupKeyUpdateIntervalPacket
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.1567.5000.6.1.1.1
+		wepKeyType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				none(0),
+				hex64(40),
+				alpha64(41),
+				phrase64(42),
+				hex128(104),
+				alpha128(105),
+				phrase128(106),
+				hex152(128),
+				alpha152(129),
+				phrase152(130)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field shall indicate the type of WEP key."
+			::= { vapWepAndGlobalSettingEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.1567.5000.6.1.1.2
+		key1 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..40))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates the key value of the first default wep key."
+			::= { vapWepAndGlobalSettingEntry 2 }
+
+		
+		key2 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..40))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates the key value of the second default wep key."
+			::= { vapWepAndGlobalSettingEntry 3 }
+
+		
+		key3 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..40))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates the key value of the third default wep key."
+			::= { vapWepAndGlobalSettingEntry 4 }
+
+		
+		key4 OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..40))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The field indicates the key value of the fourth default wep key."
+			::= { vapWepAndGlobalSettingEntry 5 }
+
+		
+		wepPassPhrase OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..39))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate WEP pass phrase, used to
+				generate four WEP keys."
+			::= { vapWepAndGlobalSettingEntry 6 }
+
+		
+		wpaReauthTime OBJECT-TYPE
+			SYNTAX INTEGER (100..3600)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate WPA reauth time."
+			::= { vapWepAndGlobalSettingEntry 7 }
+
+		
+		wpaGroupKeyUpdateCondition OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				never(0),
+				seconds(1),
+				packets(2),
+				secondsAndDisconnect(129),
+				packetsAndDisconnect(130)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This attribute shall indicate WPA group key update
+				condition."
+			::= { vapWepAndGlobalSettingEntry 8 }
+
+		
+		wpaGroupKeyUpdateIntervalSecond OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This fields indicates the wpa keyupdate sec interval."
+			::= { vapWepAndGlobalSettingEntry 9 }
+
+		
+		wpaGroupKeyUpdateIntervalPacket OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			UNITS "1000Packets"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This fields indicates the wpa keyupdate pkt interval."
+			::= { vapWepAndGlobalSettingEntry 10 }
+
+-----------------------------------------------------------------------------------------------------------
+
+
+
+-----------------------------------------------------------------------------------------------------------
+--wirelessSTatTable
+-----------------------------------------------------------------------------------------------------------
+		wirelessStatsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WirelessStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				" Wireless static List Table show multiple instances on an agent."
+			::= { iwncomm80211i 3 }
+
+		
+		wirelessStatsEntry OBJECT-TYPE
+			SYNTAX WirelessStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Wireless static list Entry show the connected station status "
+			INDEX { ifIndex }
+			::= { wirelessStatsTable 1 }
+
+		
+		WirelessStatsEntry ::=
+			SEQUENCE { 
+				wirelessReqAuthCount
+					Unsigned32,
+				wirelessSucceedAuthCount
+					Unsigned32,
+				wirelessAssocTrySum
+					Counter64,
+				wirelessAssocSucceedSum
+					Counter64,
+				wirelessAssocFailInval
+					INTEGER,
+				wirelessAssocFailTimeout
+					INTEGER,
+				wirelessAssocFailReject
+					INTEGER,
+--				wirelessAssocFailOther
+--					INTEGER,
+				wirelessReAssocTrySum
+					INTEGER,
+--				wirelessReAssocSucceedSum
+--					INTEGER,
+				wirelessReAssocFailInval
+					INTEGER,
+				wirelessReAssocFailTimeout
+					INTEGER,
+				wirelessReAssocFailReject
+					INTEGER,
+				wirelessReAssocFailOther
+					INTEGER,
+				wirelessAuthTrySum
+					INTEGER,
+				wirelessAuthSucceedSum
+					INTEGER,
+				wirelessAuthFailPassword
+					INTEGER,
+				wirelessAuthFailInval
+					INTEGER,
+				wirelessAuthFailTimeout
+					INTEGER,
+				wirelessAuthFailReject
+					INTEGER,
+				wirelessAuthFailOther
+					INTEGER,
+				wirelessDislinkSum
+					INTEGER,
+				wirelessDislinkUserLeaving
+					INTEGER,
+				wirelessDislinkAPNoRec
+					INTEGER,
+				wirelessDislinkExceptional
+					INTEGER,
+				wirelessDislinkOther
+					INTEGER,
+				wirelessDisassocSum
+					INTEGER,
+				wirelessDisassocUserLeaving
+					INTEGER,
+				wirelessDisassocAPNoRec
+					INTEGER,
+				wirelessDisassocExceptional
+					INTEGER,
+				wirelessDisassocOther
+					INTEGER,
+				}
+
+		wirelessReqAuthCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the sum of Request auth."
+			::= { wirelessStatsEntry 1 }			
+
+		wirelessSucceedAuthCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"the field indicates the sum of Auth succeed."
+			::= { wirelessStatsEntry 2 }			
+
+		wirelessAssocTrySum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates association retry num."
+			::= { wirelessStatsEntry 3 }
+
+		wirelessAssocSucceedSum OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates association succeed num."
+			::= { wirelessStatsEntry 4 }
+				
+		wirelessAssocFailInval OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates association fail invalid num."
+			::= { wirelessStatsEntry 5 }
+
+		wirelessAssocFailTimeout OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates association fail timeout num."
+			::= { wirelessStatsEntry 6 }
+
+		wirelessAssocFailReject OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates association fail reject num."
+			::= { wirelessStatsEntry 7 }
+
+--		wirelessAssocFailOther OBJECT-TYPE
+--			SYNTAX INTEGER
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"The field indicates association fail other num."
+--			::= { wirelessStatsEntry 52 }
+
+		wirelessReAssocTrySum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates reassociation retry num."
+			::= { wirelessStatsEntry 8 }
+
+				
+--		wirelessReAssocSucceedSum OBJECT-TYPE
+--			SYNTAX INTEGER
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"The field indicates reassociation succeed num."
+--			::= { wirelessStatsEntry 54 }
+
+ 		wirelessReAssocFailInval OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates reassociation fail  invalid num."
+			::= { wirelessStatsEntry 9 }
+
+		wirelessReAssocFailTimeout OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates reassociation fail  timeout num."
+			::= { wirelessStatsEntry 10 }
+
+		wirelessReAssocFailReject OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates reassociation fail  reject num."
+			::= { wirelessStatsEntry 11 }
+				
+		wirelessReAssocFailOther OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates reassociation fail  other num."
+			::= { wirelessStatsEntry 12 }
+
+		wirelessAuthTrySum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication retry num."
+			::= { wirelessStatsEntry 13 }
+
+		wirelessAuthSucceedSum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication succeed num."
+			::= { wirelessStatsEntry 14 }
+
+		wirelessAuthFailPassword OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication fail password num."
+			::= { wirelessStatsEntry 15 }
+				
+		wirelessAuthFailInval OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication fail invalid num."
+			::= { wirelessStatsEntry 16 }
+
+		wirelessAuthFailTimeout OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication fail timeout num."
+			::= { wirelessStatsEntry 17 }
+
+		wirelessAuthFailReject OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication fail reject num."
+			::= { wirelessStatsEntry 18 }
+				
+				
+		wirelessAuthFailOther OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates authentication fail other num."
+			::= { wirelessStatsEntry 19 }
+
+		wirelessDisassocSum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates disassociation num."
+			::= { wirelessStatsEntry 20 }
+
+
+		wirelessDisassocUserLeaving OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates disassociation because user leaving num."
+			::= { wirelessStatsEntry 21 }
+				
+
+
+		wirelessDisassocAPNoRec OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates disassociation because of AP resource not enough num."
+			::= { wirelessStatsEntry 22 }
+
+		wirelessDisassocExceptional OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates disassociation because of exceptional num."
+			::= { wirelessStatsEntry 23 }
+
+		wirelessDisassocOther OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The field indicates disassociation because of other num."
+			::= { wirelessStatsEntry 24 }
+-------------------------------------------------------------------------------------------------------
+
+  
+
+--********************************************************************************
+--* iwncommApSyslogd
+--********************************************************************************
+
+	syslogEnable OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			enabled(1),
+			disabled(0)
+			} 
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+	  "Start or stop the service of syslogd"
+		::= { iwncommApSyslogd 1}
+                            
+	
+    syslogMsgSend OBJECT-TYPE
+      SYNTAX OCTET STRING
+		  MAX-ACCESS read-write
+	  	STATUS current
+	  	DESCRIPTION
+	  	"Start or stop the service of syslogd"
+ 			::= { iwncommApSyslogd 2}
+                                   
+	  syslogMsgLevel OBJECT-TYPE
+		 SYNTAX INTEGER
+			{
+				emerg(0),
+				alert(1),
+				crit(2),
+				err(3),
+				warning(4),
+				notice(5),
+				info(6),
+				debug(7)
+			} 
+	  	MAX-ACCESS read-write
+	  	STATUS current
+	  	DESCRIPTION
+	  	"Msg level sended"
+ 			::= { iwncommApSyslogd 3}
+  				
+ 
+     iwnSyslogSettingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IwnSyslogSettingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "日志信息条目"
+   			 ::= { iwncommApSyslogd 4 }
+
+		iwnSyslogSettingEntry OBJECT-TYPE
+        SYNTAX IwnSyslogSettingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "告警信息条目"
+        INDEX { syslogIndex }
+    		::= { iwnSyslogSettingTable 1 }
+
+		IwnSyslogSettingEntry ::= 
+        SEQUENCE {	
+        	syslogIndex							INTEGER ,
+        	syslogServerPath			  OCTET STRING ,
+        	syslogLevel							INTEGER ,
+        	syslogFacility					INTEGER ,
+        	syslogConfInfo 					OCTET STRING }
+     	syslogIndex OBJECT-TYPE
+					  SYNTAX INTEGER  
+			  		MAX-ACCESS read-only
+			  		STATUS current
+			  		DESCRIPTION
+			  				"index"
+				::= { iwnSyslogSettingEntry 1} 
+				 	
+		 syslogServerPath OBJECT-TYPE
+			  SYNTAX OCTET STRING 
+			  MAX-ACCESS read-write
+			  STATUS current
+			  DESCRIPTION
+			      "Ip address and text path"
+				::= { iwnSyslogSettingEntry 2}
+		                            
+			syslogLevel OBJECT-TYPE
+				SYNTAX INTEGER
+					{
+					emerg(0),
+					alert(1),
+					crit(2),
+					err(3),
+					warning(4),
+					notice(5),
+					info(6),
+					debug(7)
+					} 
+			  	MAX-ACCESS read-write
+			  	STATUS current
+			  	DESCRIPTION
+			  	"Record events lesser than the level choised"
+					::= { iwnSyslogSettingEntry 3}
+					                        
+			syslogFacility OBJECT-TYPE
+				SYNTAX INTEGER
+					{
+					all(0),		 
+					auth(1),      
+					authpriv(2),   
+					cron(3),     
+					daemon(4),    
+					kern(5),       
+					security(6),  
+					syslog(7),      
+					user(8),   
+					local0(9),  
+					local1(10)
+					} 
+			  	MAX-ACCESS read-write
+			  	STATUS current
+			  	DESCRIPTION
+			  	"Record events lesser than the level choised"
+					::= { iwnSyslogSettingEntry 4}
+ 
+ 			syslogConfInfo OBJECT-TYPE
+				  SYNTAX OCTET STRING
+			  	MAX-ACCESS read-write
+			  	STATUS current
+			  	DESCRIPTION
+			  	"path  info"
+					::= { iwnSyslogSettingEntry 5}
+					
+		syslogUpdateIntervalTime 	OBJECT-TYPE
+        SYNTAX OCTET STRING 
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "配置日志文件保存更新时间"
+		::= { iwncommApSyslogd 5 } 
+    
+    	syslogSaveLogBakPath OBJECT-TYPE
+        SYNTAX OCTET STRING 
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "配置日志备份保存路径"
+    		::= { iwncommApSyslogd 6 }    
+ 		syslogServerPort OBJECT-TYPE
+		SYNTAX INTEGER  
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			  "配置日至服务器接收的端口"
+		::= { iwncommApSyslogd 7}  
+	  			
+--********************************************************************************
+--* iwncommConfigAp
+--********************************************************************************
+ 	iwnConfigFile	OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "下发配置文件"
+	::= { iwncommConfigAp 1 } 
+    
+    	iwnStartConfigAP	OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "开始配置ap"
+    	::= { iwncommConfigAp 2 }    
+--********************************************************************************
+--* iwncommApCapabeConfigParameter
+--********************************************************************************
+		
+		iwnApCapabeTable OBJECT-TYPE
+				SYNTAX SEQUENCE OF IwnApCapabeEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION 
+        	       		"AP设备配置管理功能QoS性能配置参数"
+				::= { iwncommApCapabeConfigParameter 1 }
+		
+		iwnApCapabeEntry OBJECT-TYPE
+				SYNTAX IwnApCapabeEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+				"表格iwnApCapabeEntry中的一个条目。"
+				INDEX { iwnQosTrafficClass }
+			::= { iwnApCapabeTable 1 }
+
+		IwnApCapabeEntry ::=
+			SEQUENCE {
+		    		iwnQosTrafficClass  				    INTEGER,
+				iwnMaxPallel 										INTEGER,
+				iwnBandwidth										INTEGER,
+				iwnBandwidthScale								INTEGER,
+				iwnUseFlowEqtQueue							INTEGER,
+				iwnSingleFlowMaxQueue						INTEGER,
+				iwnFlowAvgRate									INTEGER,
+				iwnFlowMaxDegree								INTEGER,
+				iwnUseWREDPolicy								INTEGER,
+				iwnUseTrafficShaping						INTEGER,
+			}
+
+		iwnQosTrafficClass OBJECT-TYPE
+			SYNTAX INTEGER { background(0), bestEffort(1), video(2), voice(3),all(4)}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"提供QoS机制的业务类型"
+		::= { iwnApCapabeEntry 1 }
+		
+		iwnMaxPallel OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION  
+        "最大并发数"
+    ::= { iwnApCapabeEntry 2 }
+    
+		iwnBandwidth OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "业务分配的带宽"
+    ::= { iwnApCapabeEntry 3 }
+    
+		iwnBandwidthScale OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "业务分配的带宽占用总带宽的百分比"
+    ::= { iwnApCapabeEntry 4 }
+    
+		iwnUseFlowEqtQueue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "是否使用基于流的公平排队"
+    ::= { iwnApCapabeEntry 5 }
+    
+		iwnSingleFlowMaxQueue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "单个流的最大排队长度"
+    ::= { iwnApCapabeEntry 6 }
+    
+		iwnFlowAvgRate OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "流的平均速率"
+    ::= { iwnApCapabeEntry 7 }
+    
+		iwnFlowMaxDegree OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "流的最大突发度"
+    ::= { iwnApCapabeEntry 8 }
+    
+		iwnUseWREDPolicy OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "是否使用WRED算法"
+    ::= { iwnApCapabeEntry 9 }
+    
+		iwnUseTrafficShaping OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "是否使用流量整形(Traffic Shaping）"
+    ::= { iwnApCapabeEntry 10 }
+--********************************************************************************
+--* iwncommApCapabeStatParameter
+--******************************************************************************** 
+		iwnApCapabeStatTable OBJECT-TYPE
+				SYNTAX SEQUENCE OF IwnApCapabeStatEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+				"AP设备配置管理功能QoS性能统计参数"
+		::= { iwncommApCapabeStatParameter 1 }
+	
+		iwnApCapabeStatEntry OBJECT-TYPE
+				SYNTAX IwnApCapabeStatEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+				"表格iwnApCapabeStatEntry中的一个条目。"
+				INDEX { iwnQosTrafficStatClass }
+		::= { iwnApCapabeStatTable 1 }
+
+		IwnApCapabeStatEntry ::=
+		SEQUENCE {
+		    iwnQosTrafficStatClass  				    INTEGER,
+		    iwnAvgTransRate 								INTEGER,
+				iwnAvgDregee 										INTEGER,
+				iwnLostRate											INTEGER,
+				iwnTransRate										INTEGER,
+				iwnTurnOnRate										INTEGER,
+				iwnTurnOffRate									INTEGER,
+				iwnMaxRefuse										INTEGER,}
+
+		iwnQosTrafficStatClass OBJECT-TYPE
+				SYNTAX INTEGER 			{ background(0), bestEffort(1), video(2), voice(3),all(4)}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+		    "提供QoS机制的业务类型"
+		::= { iwnApCapabeStatEntry 1 }
+		
+		iwnAvgTransRate OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "排队平均长度"
+    ::= { iwnApCapabeStatEntry 2 }
+    
+		iwnAvgDregee OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "平均突发度"
+    ::= { iwnApCapabeStatEntry 3 }
+    
+		iwnLostRate OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "丢包率"
+    ::= { iwnApCapabeStatEntry 4 }
+    
+		iwnTransRate OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "传输速率"
+    ::= { iwnApCapabeStatEntry 5 }
+    
+		iwnTurnOnRate OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "业务的接通率"
+    ::= { iwnApCapabeStatEntry 6 }
+    
+		iwnTurnOffRate OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "业务的掉话率"
+    ::= { iwnApCapabeStatEntry 7 }
+    
+		iwnMaxRefuse OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "超过Video用户数最大限制而拒绝的请求数"
+    ::= { iwnApCapabeStatEntry 8 } 
+--********************************************************************************
+--* iwncommApWapiStats
+--********************************************************************************
+		wapiStatsTable OBJECT-TYPE
+				SYNTAX SEQUENCE OF WapiStatsEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+				"该表维护WAPI的每个STA的统计指标。wapiStatsEntry设为
+				FF-FF-FF-FF-FF-FF的条目应包含广播/组播业务。"
+		::= { iwncommApWapiStats 1 }
+	
+		wapiStatsEntry OBJECT-TYPE
+				SYNTAX WapiStatsEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+				"表格wapiStatsEntry中的一个条目。"
+				INDEX { wapiStatsIndex }
+		::= { wapiStatsTable 1 }
+
+		WapiStatsEntry ::=
+		SEQUENCE {
+				wapiStatsIndex									Unsigned32,
+				--sTAAddress											OCTET STRING,
+				wapiStatsVersion								Unsigned32,
+				--controlledPortStatus						TruthValue,
+				selectedUnicastCipher						OCTET STRING,
+				wPIReplayCounters							Counter32,
+				wPIDecryptableErrors						Counter32,
+				wPIMICErrors										Counter32,
+				wAISignatureErrors							Counter32,
+				wAIHMACErrors										Counter32,
+				wAIAuthenticationResultFailures	Counter32,
+				wAIDiscardCounters							Counter32,
+				wAITimeoutCounters							Counter32,
+				wAIFormatErrors									Counter32,
+				wAICertificateHandshakeFailures	    Counter32,
+				wAIUnicastHandshakeFailures			Counter32,
+				wAIMulticastHandshakeFailures		Counter32}
+
+		wapiStatsIndex OBJECT-TYPE
+				SYNTAX Unsigned32 (1..4294967295)
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+		"表格wapiStatsTable的一个辅助索引。"
+		::= { wapiStatsEntry 1 }	
+
+		--sTAAddress	OBJECT-TYPE
+    --    SYNTAX OCTET STRING
+    --    ACCESS read-only
+    --    STATUS current
+    --    DESCRIPTION
+    --    "被统计AP的MAC地址"
+    --::= { wapiStatsEntry 2 }
+    
+		wapiStatsVersion OBJECT-TYPE
+        SYNTAX Unsigned32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "被统计AP所关联的WAPI版本"
+    ::= { wapiStatsEntry 3 }
+    
+		--controlledPortStatus OBJECT-TYPE
+    --   SYNTAX TruthValue
+    --    ACCESS read-only
+    --    STATUS current
+    --    DESCRIPTION
+    --    "鉴别子系统实体的受控端口的状态"
+    --::= { wapiStatsEntry 4 }
+
+		selectedUnicastCipher OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "关联过程中所使用的单播密码套件"
+    ::= { wapiStatsEntry 5 }
+    
+		wPIReplayCounters  OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "根据重放机制丢弃的WPI MPDU的数目"
+    ::= { wapiStatsEntry 6 }
+        wPIDecryptableErrors  OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "WPI-SMS4解密时没有有效的密钥而丢弃的MPDU数目"
+    ::= { wapiStatsEntry 7 }    
+    
+		wPIMICErrors OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "WPI-SMS4解密时MIC校验出错而丢弃的MPDU数目"
+    ::= { wapiStatsEntry 8 }
+    
+		wAISignatureErrors OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "接收到的WAI分组验证签名错数"
+    ::= { wapiStatsEntry 9 }
+    
+		wAIHMACErrors OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "接收到的WAI分组消息鉴别码校验出错数"
+    ::= { wapiStatsEntry 10 }
+    
+		wAIAuthenticationResultFailures OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "WAI鉴别结果不成功数"
+    ::= { wapiStatsEntry 11 }
+    
+		wAIDiscardCounters OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "接收到的WAI分组被丢弃数"
+    ::= { wapiStatsEntry 12 }
+    
+		wAITimeoutCounters OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "检测到WAI分组超时次数"
+    ::= { wapiStatsEntry 13 }
+    
+		wAIFormatErrors OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "检测到WAI分组格式出错数"
+    ::= { wapiStatsEntry 14 }
+    
+		wAICertificateHandshakeFailures OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "WAI证书鉴别过程失败次数"
+    ::= { wapiStatsEntry 15 }
+    
+		wAIUnicastHandshakeFailures OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "WAI单播密钥协商过程失败次数"
+    ::= { wapiStatsEntry 16 }
+    
+		wAIMulticastHandshakeFailures OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "WAI组播密钥通告过程失败次数"
+    ::= { wapiStatsEntry 17 }
+    
+    
+--********************************************************************************
+--* wapiSTAPortStatusTable
+--******************************************************************** 
+   
+    wapiSTAPortStatusTable OBJECT-TYPE
+				SYNTAX SEQUENCE OF WapiSTAPortStatusEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+				"该表维护WAPI的每个STA的统计指标。WapiSTAPortStatusEntry设为
+				FF-FF-FF-FF-FF-FF的条目应包含广播/组播业务。"
+		::= { iwncommApWapiStats 2 }
+	
+		wapiSTAPortStatusEntry OBJECT-TYPE
+				SYNTAX WapiSTAPortStatusEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+				"表格WapiSTAPortStatusEntry中的一个条目。"
+				INDEX { staMacAddress }
+		::= { wapiSTAPortStatusTable 1 }
+
+		WapiSTAPortStatusEntry ::=
+		SEQUENCE {
+				staMacAddress											OCTET STRING,
+				controlledPortStatus						TruthValue
+		}
+
+		staMacAddress	OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "被统计AP的MAC地址"
+    ::= { wapiSTAPortStatusEntry 1 }
+    
+		controlledPortStatus OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "鉴别子系统实体的受控端口的状态"
+    ::= { wapiSTAPortStatusEntry 2 }
+    
+--********************************************************************************
+--* iwncommApWifiInterfaceStatistics
+--********************************************************************************
+			iwnApWifiInterfaceStatisticsTable OBJECT-TYPE
+				SYNTAX SEQUENCE OF IwnApWifiInterfaceStatisticsEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+				"AP无线接口总体统计性能参数"
+		::= { iwncommApWifiInterfaceStatistics 1 }
+	
+		iwnApWifiInterfaceStatisticsEntry OBJECT-TYPE
+				SYNTAX IwnApWifiInterfaceStatisticsEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+				"AP无线接口总体统计性能参数中的一个条目。"
+				INDEX { ifIndex }
+		::= { iwnApWifiInterfaceStatisticsTable 1 }
+
+		IwnApWifiInterfaceStatisticsEntry ::=
+		SEQUENCE {
+				chStatsChannel  								INTEGER,
+				chStatsNumStations  						Integer32,
+				chStatsTotPkts	 								Counter32,
+				chStatsTotBytes	 								Counter32,
+				chStatsTotRetryPkts	 						Counter32,
+				chStatsTotFragmentedPkts	 			Counter32,
+				chStatsTotPhyErrPkts	 					Counter32,
+				chStatsTotMacErrPkts					  Counter32,
+				chStatsFrameErrorRate						Integer32,
+				chStatsFrameRetryRate	 					Integer32,
+				chStatsFrameNonUnicastRate	 		Integer32,
+				chStatsFrameBandwidthRate	 			Integer32,
+				chStatsFrameFragmentationRate	 	Integer32,
+				chStatsMonitoredTime	 					INTEGER}
+	
+		chStatsChannel OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "统计数据的频点（信道）。802.11b/802.11g信道：1~13 ; 802.11a信道:36~60和149~165 ."
+    ::= { iwnApWifiInterfaceStatisticsEntry 1 }
+    
+		chStatsNumStations OBJECT-TYPE
+        SYNTAX Integer32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "使用该信道的终端数"
+    ::= { iwnApWifiInterfaceStatisticsEntry 2 }
+    
+		chStatsTotPkts OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "信道上总的包数"
+    ::= { iwnApWifiInterfaceStatisticsEntry 3 }
+    
+		chStatsTotBytes OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "信道上总的字节数(kb)"
+    ::= { iwnApWifiInterfaceStatisticsEntry 4 }
+    
+		chStatsTotRetryPkts OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "信道上重传的包数"
+    ::= { iwnApWifiInterfaceStatisticsEntry 5 }
+    
+		chStatsTotFragmentedPkts OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "信道上总的帧数"
+    ::= { iwnApWifiInterfaceStatisticsEntry 6 }
+    
+		chStatsTotPhyErrPkts OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "信道上的物理层错包数"
+    ::= { iwnApWifiInterfaceStatisticsEntry 7 }
+    
+		chStatsTotMacErrPkts OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "信道上的MAC错包数"
+    ::= { iwnApWifiInterfaceStatisticsEntry 8 }
+    
+		chStatsFrameErrorRate OBJECT-TYPE
+        SYNTAX  Integer32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "信道上的帧的错包率,由于此值是比率，按整型取值小数位被臷掉了，为了有效统计，值被放大了100000000倍。"
+    ::= { iwnApWifiInterfaceStatisticsEntry 9 }
+    
+		chStatsFrameRetryRate OBJECT-TYPE
+        SYNTAX Integer32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "信道上帧的重传率,由于此值是比率，按整型取值小数位被臷掉了，为了有效统计，值被放大了100000000倍。"
+    ::= { iwnApWifiInterfaceStatisticsEntry 10 }
+    
+		chStatsFrameNonUnicastRate OBJECT-TYPE
+        SYNTAX Integer32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "信道上非单播帧的速率"
+    ::= { iwnApWifiInterfaceStatisticsEntry 11 }
+    
+		chStatsFrameBandwidthRate OBJECT-TYPE
+        SYNTAX Integer32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "信道上非单播帧的速率"
+    ::= { iwnApWifiInterfaceStatisticsEntry 12 }
+    
+		chStatsFrameFragmentationRate OBJECT-TYPE
+        SYNTAX Integer32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "信道上帧的分解速率"
+    ::= { iwnApWifiInterfaceStatisticsEntry 13 }
+    
+		chStatsMonitoredTime OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "监控时长"
+    ::= { iwnApWifiInterfaceStatisticsEntry 14 }
+
+--********************************************************************************
+--* iwncommApWireless
+--********************************************************************************
+		iwnApWirelessTable OBJECT-TYPE
+				SYNTAX SEQUENCE OF IwnApWirelessEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+				"AP无线接口性能参数"
+		::= { iwncommApWireless 1 }
+	
+		iwnApWirelessEntry OBJECT-TYPE
+				SYNTAX IwnApWirelessEntry
+				MAX-ACCESS not-accessible
+				STATUS current
+				DESCRIPTION
+				"AP无线接口性能参数中的一个条目。"
+				INDEX { ifIndex }
+		::= { iwnApWirelessTable 1 }
+
+		IwnApWirelessEntry ::=
+		SEQUENCE {				
+				apSnrBSSIDAverageSignalStrength 		Integer32,
+				apSnrBSSIDSignalPkts  							Integer32,
+				apSnrBSSIDHighestRxSignalStrength 	Integer32,
+				apSnrBSSIDLowestRxSignalStrength 		Integer32,
+				apSnrBSSIDSampleTime 								Integer32,
+				iwnapUplinkDateThroughput 					INTEGER,
+				iwnapDownlinkDateThroughput 				INTEGER,
+				iwnapWirelessUplinkUpdownTimes 							INTEGER,
+				iwnapWirelessDownlinkUpdownTimes 						INTEGER,
+				warpTLOctetsInQueue 								INTEGER,
+				warpTLPacketsInQueue 								INTEGER,
+				warpTLAvgDataRate 									INTEGER,
+				warpTLOutPackets 										Counter32,
+				warpTLInPackets 										Counter32,
+				uplinkSlotTimeEffAvg 								INTEGER,
+				warpTLPhyDataRate 									INTEGER,
+				warpTLPhyTxDistribution 						INTEGER,
+				warpTLPhyRxDistribution 						INTEGER,
+				warpTLPhyFailedTransmission					INTEGER
+				}
+				
+    
+		apSnrBSSIDAverageSignalStrength  OBJECT-TYPE
+        SYNTAX Integer32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "AP的信号总强度"
+    ::= { iwnApWirelessEntry 1 }
+    
+		apSnrBSSIDSignalPkts OBJECT-TYPE
+        SYNTAX Integer32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "AP的信令包数"
+    ::= { iwnApWirelessEntry 2 }
+  
+		apSnrBSSIDHighestRxSignalStrength OBJECT-TYPE
+        SYNTAX Integer32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "AP的最高信号强度"
+    ::= { iwnApWirelessEntry 3 }
+  
+		apSnrBSSIDLowestRxSignalStrength OBJECT-TYPE
+        SYNTAX Integer32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "AP的最低信号强度"
+    ::= { iwnApWirelessEntry 4 }
+  
+		apSnrBSSIDSampleTime OBJECT-TYPE
+        SYNTAX Integer32
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "抽样时长"
+    ::= { iwnApWirelessEntry 5 }
+  
+		iwnapUplinkDateThroughput OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "AP无线上行端口流量(kb)"
+    ::= { iwnApWirelessEntry 6 }
+  
+		iwnapDownlinkDateThroughput OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "AP无线下行端口流量(kb)"
+    ::= { iwnApWirelessEntry 7 }
+  
+		iwnapWirelessUplinkUpdownTimes OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "AP无线上行端口updown次数(次)"
+    ::= { iwnApWirelessEntry 8 }
+  
+		iwnapWirelessDownlinkUpdownTimes OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "AP无线下行端口updown次数(次)"
+    ::= { iwnApWirelessEntry 9 }
+  
+		warpTLOctetsInQueue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "无线回传链路出口队列中Octets的数量"
+    ::= { iwnApWirelessEntry 10 }
+  
+		warpTLPacketsInQueue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "无线回传链路出口队列中包的数量"
+    ::= { iwnApWirelessEntry 11 }
+  
+		warpTLAvgDataRate OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "无线回传链路平均数据速率（bytes/s）"
+    ::= { iwnApWirelessEntry 12 }
+  
+		warpTLOutPackets OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "无线回传链路传送包数"
+    ::= { iwnApWirelessEntry 13 }
+  
+		warpTLInPackets OBJECT-TYPE
+        SYNTAX Counter32
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "无线回传链路接收的包数"
+    ::= { iwnApWirelessEntry 14 }
+
+		uplinkSlotTimeEffAvg OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "无线回传链路时隙的平均利用率"
+    ::= { iwnApWirelessEntry 15 }
+		
+		warpTLPhyDataRate OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "无线回传链路物理层数据速率"
+    ::= { iwnApWirelessEntry 16 }
+  
+		warpTLPhyTxDistribution OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "无线回传链路IP包发送比例分布"
+    ::= { iwnApWirelessEntry 17 }
+  
+		warpTLPhyRxDistribution OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "无线回传链路IP包接收比例分布"
+    ::= { iwnApWirelessEntry 18 }
+  
+		warpTLPhyFailedTransmission OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "无线回传链路物理层传输失败比例"
+    ::= { iwnApWirelessEntry 19 }
+--********************************************************************************
+--* iwncommApWlanUserInfo
+--******************************************************************************** 
+    
+    iwnWlanUserTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IwnWlanUserEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "WLAN终端用户相关参数"
+    ::= { iwncommApWlanUserInfo 1 }
+
+		iwnWlanUserEntry OBJECT-TYPE
+        SYNTAX IwnWlanUserEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "WLAN终端用户相关参数"
+        INDEX { staAddress }
+    ::= { iwnWlanUserTable 1 }
+
+		IwnWlanUserEntry ::=
+        SEQUENCE { 
+        staAddress                  OCTET STRING,             
+				staTxPkts		                Counter32,
+				staTxBytes		              Counter32,
+				staRxPkts		                Counter32,
+				staRxBytes		              Counter32,
+				staRetryPkts		          Counter32,
+				staRetryBytes		          Counter32,
+				staTxFragmentedPkts		      Counter32,
+				staRxFragmentedPkts		      Counter32,
+				staReceiveErrPkts		        Counter32,
+				staTxTotSignal		          Counter32,
+				staTxSignalPkts		          Counter32,
+				staFrameNonUnicastRate		  Integer32,
+				staFrameBandwidthRate		    Integer32,
+				bgUserAssoCount 							Counter32,
+				aUserAssoCount 							Counter32,
+				bgUserAssoFailCount 							Counter32,
+				aUserAssoFailCount 							Counter32,  
+				bgUserAssoReassoCount 							Counter32,
+				aUserAssoReassoCount 							Counter32,
+				smeNfaInsufficientResource	 Counter32,
+				inACRoamingSuccRate		      INTEGER,
+				outACRoamingSuccRate		    INTEGER}
+        
+    staAddress OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "连接到AP的终端的MAC地址"
+    ::= { iwnWlanUserEntry 1 }
+    
+    staTxPkts OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "发到终端的总包数"
+    ::= { iwnWlanUserEntry 2 }
+    
+    staTxBytes OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "发到终端的总字节数(kb)"
+    ::= { iwnWlanUserEntry 3 }
+    
+    staRxPkts OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "从终端收到的总包数"
+    ::= { iwnWlanUserEntry 4 }
+    
+    staRxBytes OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "从终端收到的总字节数(kb)"
+    ::= { iwnWlanUserEntry 5 }
+    
+    staRetryPkts OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "终端重传的包数"
+    ::= { iwnWlanUserEntry 6 }
+    
+    staRetryBytes OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "终端重传的字节数(kb)"
+    ::= { iwnWlanUserEntry 7 }
+    
+    staTxFragmentedPkts OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "终端发送的被AP拆分的包数"
+    ::= { iwnWlanUserEntry 8 }
+    
+    staRxFragmentedPkts OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "终端接收到的被拆分包数"
+    ::= { iwnWlanUserEntry 9 }
+    
+    staReceiveErrPkts OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "接收到的来自终端的错误包数"
+    ::= { iwnWlanUserEntry 10 }
+    
+    staTxTotSignal OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "发送到指定终端的信令包数"
+    ::= { iwnWlanUserEntry 11 }
+    
+    staTxSignalPkts OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "终端传送的信令包数"
+    ::= { iwnWlanUserEntry 12 }
+    
+    staFrameNonUnicastRate OBJECT-TYPE
+        SYNTAX Integer32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "终端的非单播帧的速率"
+    ::= { iwnWlanUserEntry 13 }
+    
+    staFrameBandwidthRate OBJECT-TYPE
+        SYNTAX Integer32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "终端的帧速率"
+    ::= { iwnWlanUserEntry 14 }
+    
+    bgUserAssoCount OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "802.11b/802.11g用户关联总次数(次)"
+    ::= { iwnWlanUserEntry 15 }
+    
+    aUserAssoCount    OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "802.11a用户关联总次数(次)"
+    ::= { iwnWlanUserEntry 16 }
+    
+    bgUserAssoFailCount    OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "802.11b/802.11g关联失败总次数(次)"
+    ::= { iwnWlanUserEntry 17 }
+    
+    aUserAssoFailCount    OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "802.11b关联失败总次数(次)"
+    ::= { iwnWlanUserEntry 18 }
+    
+    bgUserAssoReassoCount OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "802.11b/802.11g用户重新关联总次数(次)"
+    ::= { iwnWlanUserEntry 19 }
+    
+    aUserAssoReassoCount    OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "802.11b用户重新关联总次数(次)"
+    ::= { iwnWlanUserEntry 20 }
+    
+    smeNfaInsufficientResource    OBJECT-TYPE
+        SYNTAX Counter32 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "资源不足拒绝新用户注册的数量"
+    ::= { iwnWlanUserEntry 21 }
+    
+     inACRoamingSuccRate   OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "同控制域内漫游成功率"
+    ::= { iwnWlanUserEntry 22 }
+    
+    outACRoamingSuccRate OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "跨控制域漫游成功率"
+    ::= { iwnWlanUserEntry 23 }    
+      
+--********************************************************************************
+--* iwncommApQosBasicConfig
+--******************************************************************************** 
+iwnQosTotalBW OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "保障QoS业务分配的总带宽"
+        ::= {iwncommApQosBasicConfig  1}
+iwnQosResScale OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "保障QoS业务占用资源的百分比"
+        ::= {iwncommApQosBasicConfig  2}
+iwnQosShareBW OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "QoS类业务的共享带宽"
+        ::= {iwncommApQosBasicConfig  3}
+iwnQosResShareScale OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "QoS类业务的共享带宽占总资源的百分比"
+        ::= {iwncommApQosBasicConfig  4}
+iwnOperAtpArithmetic OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "不同类业务间的调度算法名称"
+        ::= {iwncommApQosBasicConfig  5}
+iwnUseResGrabPolicy OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "是否使用资源抢占策略"
+        ::= {iwncommApQosBasicConfig  6}
+iwnResPolicyName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "资源抢占策略的名称"
+        ::= {iwncommApQosBasicConfig  7}
+iwnUseResShovePolicy OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "是否使用资源挤占策略"
+        ::= {iwncommApQosBasicConfig  8}
+iwnResShoveName OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "资源挤占策略的名称"
+        ::= {iwncommApQosBasicConfig  9}
+iwnBgAvgRate OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "约定的Background类业务的平均速率"
+        ::= {iwncommApQosBasicConfig  10}
+iwnBgMaxDegree OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "约定的Background类业务的最大突发度"
+        ::= {iwncommApQosBasicConfig  11}
+iwnBgPolicyPRI OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Background类业务的调度优先级"
+        ::= {iwncommApQosBasicConfig  12}
+iwnBgResShovePRI OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Background类业务的资源挤占优先级"
+        ::= {iwncommApQosBasicConfig  13}
+iwnBgResGrabPRI OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Background类业务的资源抢占优先级"
+        ::= {iwncommApQosBasicConfig  14}
+iwnBesteffortAvgRate OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "约定的Besteffort类业务的平均速率"
+        ::= {iwncommApQosBasicConfig  15}
+iwnBesteffortMaxDegree OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "约定的Besteffort类业务的最大突发度"
+        ::= {iwncommApQosBasicConfig  16}
+iwnBesteffortPolicyPRI OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Besteffort类业务的调度优先级"
+        ::= {iwncommApQosBasicConfig  17}
+iwnBesteffortShovePRI OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Besteffort类业务的资源挤占优先级"
+        ::= {iwncommApQosBasicConfig  18}
+iwnBesteffortGrabPRI OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Besteffort类业务的资源抢占优先级"
+        ::= {iwncommApQosBasicConfig  19}
+iwnVoiceAvgRate OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "约定的Voice类业务的平均速率"
+        ::= {iwncommApQosBasicConfig  20}
+iwnVoiceMaxDegree OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "约定的Voice类业务的最大突发度"
+        ::= {iwncommApQosBasicConfig  21}
+iwnVoicePolicyPRI OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Voice类业务的调度优先级"
+        ::= {iwncommApQosBasicConfig  22}
+iwnVoiceResShovePRI OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Voice类业务的资源挤占优先级"
+        ::= {iwncommApQosBasicConfig  23}
+iwnVoiceResGrabPRI OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Voice类业务的资源抢占优先级"
+        ::= {iwncommApQosBasicConfig  24}
+iwnVideoAvgRate OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "约定的Video类业务的平均速率"
+        ::= {iwncommApQosBasicConfig  25}
+iwnVideoMaxDegree OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "约定的Video类业务的最大突发度"
+        ::= {iwncommApQosBasicConfig  26}
+iwnVideoPolicyPRI OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Video类业务的调度优先级"
+        ::= {iwncommApQosBasicConfig  27}
+iwnVideoResShovePRI OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Video类业务的资源挤占优先级"
+        ::= {iwncommApQosBasicConfig  28}          
+iwnVideoResGrabPRI OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "Video类业务的资源抢占优先级"
+        ::= {iwncommApQosBasicConfig  29}      
+ --********************************************************************************
+--* iwncommApAdmin
+--********************************************************************************  
+	 
+ 		 
+ 		iwnTrapPrimaryIP OBJECT-TYPE
+			SYNTAX IpAddress
+		  MAX-ACCESS read-write
+		  STATUS current
+		  DESCRIPTION
+		  "trapIP地址"
+ 		 	::= { iwncommApAdmin 1} 
+ 		 	 
+ 		iwnRocommunity OBJECT-TYPE
+			SYNTAX OCTET STRING 
+		  MAX-ACCESS read-write
+		  STATUS current
+		  DESCRIPTION
+		  "SNMP只读关键字"
+	 		 ::= { iwncommApAdmin 2}
+ 		 
+ 		 iwnRwcommunity OBJECT-TYPE
+				SYNTAX OCTET STRING 
+			  MAX-ACCESS read-write
+			  STATUS current
+			  DESCRIPTION
+			  "SNMP读写关键字"
+		 		::= { iwncommApAdmin 3}
+ 		 
+  	iwnTrapSecondaryIP OBJECT-TYPE
+				SYNTAX IpAddress
+			  MAX-ACCESS read-write
+			  STATUS current
+			  DESCRIPTION
+			  "trapIP地址"
+		 		 ::= { iwncommApAdmin 4} 
+		iwnAccessControlUsers OBJECT-TYPE
+				SYNTAX INTEGER (0..10)
+			  MAX-ACCESS read-write
+			  STATUS current
+			  DESCRIPTION
+			  "限制访问控制数"
+		 		 ::= { iwncommApAdmin 5} 
+		 
+		  iwnAccessControlSettingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IwnAccessControlSettingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "限制访问控制列表"
+   			 ::= { iwncommApAdmin 6 }
+
+		iwnAccessControlSettingEntry OBJECT-TYPE
+        SYNTAX IwnAccessControlSettingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "告警信息条目"
+        INDEX { accessControlIndex }
+    		::= { iwnAccessControlSettingTable 1 }
+
+		IwnAccessControlSettingEntry ::= 
+        SEQUENCE {	
+        	accessControlIndex							INTEGER ,
+        	accessControlIpList			  IpAddress }
+        	
+    accessControlIndex OBJECT-TYPE
+			SYNTAX INTEGER
+		  MAX-ACCESS read-only
+		  STATUS current
+		  DESCRIPTION
+		  "索引"
+ 		 	::= { iwnAccessControlSettingEntry 1} 
+ 		 	 
+ 		accessControlIpList OBJECT-TYPE
+			SYNTAX IpAddress 
+		  MAX-ACCESS read-write
+		  STATUS current
+		  DESCRIPTION
+		  "ip 列表"
+	 		 ::= { iwnAccessControlSettingEntry 2}
+	 		 
+	 	iwnAccessControlEnabled OBJECT-TYPE
+				SYNTAX INTEGER {false(0),true(1)}
+			  MAX-ACCESS read-write
+			  STATUS current
+			  DESCRIPTION
+			  "限制访问控制激活"
+		 		 ::= { iwncommApAdmin 7} 
+  		 
+--********************************************************************************
+--* iwncommApwapiConfig
+--********************************************************************************
+iwnApwapiConfigTable OBJECT-TYPE
+SYNTAX SEQUENCE OF IwnApwapiConfigEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+      "安全配置属性,以表格形式允许一个代理处有多个实例。"
+::={ iwncommApwapiConfig 1 } 
+
+iwnApwapiConfigEntry OBJECT-TYPE
+SYNTAX IwnApwapiConfigEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"gb15629dot11wapiConfigTable的一个表项。有可能一个代理处有多个接口,每个接口有惟一的MAC地址。本规范接口和Internet标准MIB上下文接口的关系是一一对应的,因此ifIndex对象实例值能直接用于标识此处定义的相应对象实例。
+ifIndex – 每一个本规范接口由一个ifEntry来表示。该MIB模块中的接口表由ifIndex来索引。"
+INDEX {ifIndex}
+::={ iwnApwapiConfigTable 1 }
+
+IwnApwapiConfigEntry::=
+SEQUENCE {
+	iwnConfigVersion 												  Integer32,
+	iwnControlledAuthControl									TruthValue,
+	iwnControlledPortControl									INTEGER,
+	iwnOptionalImplemented										TruthValue,
+	iwnPreauthenticationImplemented					  TruthValue,
+	iwnEnabled																TruthValue,
+	iwnPreauthenticationEnabled							  TruthValue,
+	iwnConfigUnicastKeysSupported						  Unsigned32,
+	iwnConfigUnicastRekeyMethod 							INTEGER,
+	iwnConfigUnicastRekeyTime								  Unsigned32,
+	iwnConfigUnicastRekeyPackets							Unsigned32,
+	iwnConfigMulticastCipher									OCTET STRING,
+	iwnConfigMulticastRekeyMethod 						INTEGER,
+	iwnConfigMulticastRekeyTime							  Unsigned32,
+	iwnConfigMulticastRekeyPackets 					  Unsigned32,
+	iwnConfigMulticastRekeyStrict 						TruthValue,
+	iwnConfigPSKValue 												OCTET STRING,
+	iwnConfigPSKPassPhrase										DisplayString,
+	iwnConfigCertificateUpdateCount					  Unsigned32,
+	iwnConfigMulticastUpdateCount 						Unsigned32,
+	iwnConfigUnicastUpdateCount 							Unsigned32,
+	iwnConfigMulticastCipherSize 						  Unsigned32,
+	iwnConfigBKLifetime 											Unsigned32,
+	iwnConfigBKReauthThreshold								Unsigned32,
+	iwnConfigSATimeout												Unsigned32,
+	iwnAuthenticationSuiteSelected						OCTET STRING,
+	iwnUnicastCipherSelected 								  OCTET STRING,
+	iwnMulticastCipherSelected 							  OCTET STRING,
+	iwnBKIDUsed															  OCTET STRING,
+	iwnAuthenticationSuiteRequested 					OCTET STRING,
+	iwnUnicastCipherRequested 								OCTET STRING,
+	iwnGroupCipherRequested							OCTET STRING,
+	iwnConfigUnicastCipher							OCTET STRING,
+	iwnConfigUnicastCipherEnabled				TruthValue ,
+	iwnConfigUnicastCipherSize					Unsigned32,
+	iwnConfigAuthenticationSuite        		 OCTET STRING,
+	iwnConfigAuthenticationSuiteEnabled  			TruthValue, 
+	iwnMulticastCipherRequested 							OCTET STRING,
+	iwnWapiIfIndex 														INTEGER,
+	iwnWapiIfNmae 														OCTET STRING,
+	iwnPskType 														INTEGER
+	}
+	
+	  iwnConfigVersion OBJECT-TYPE
+		SYNTAX Integer32
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+	  "该实体支持的WAPI最高版本号"
+ 		 ::= { iwnApwapiConfigEntry 1}
+
+		iwnControlledAuthControl OBJECT-TYPE
+		SYNTAX TruthValue{false(0),true(1)}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+	  "该属性表示实体是否启用鉴别。该值为假,则表示不启用鉴别,受控端口的状态为‘已鉴别’；若为真,则表示启用鉴别,受控端口的状态由端口的控制类型iwnControlledPortControl来决定。"
+		::= { iwnApwapiConfigEntry 2}
+
+		iwnControlledPortControl OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"该属性表示实体端口的控制类型,当iwnControlledAuthControl为真时有效。值为0,则表示‘自动’,受控端口的状态取决于鉴别结果；若为1,表示‘强制未鉴别’,受控端口的状态无条件为‘未鉴别’。"
+		::= { iwnApwapiConfigEntry 3}
+
+		iwnOptionalImplemented OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"该变量指示实体是否具有WAPI功能。取值为真,表示支持WAPI功能；否则,表示不支持WAPI功能。"
+		::= { iwnApwapiConfigEntry 4 }
+
+		iwnPreauthenticationImplemented OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"该变量指示实体是否支持WAPI预鉴别。除非iwnOptionImplemented取值为真,否则,该变量不能取值为真。"
+		::= { iwnApwapiConfigEntry 5 }
+
+		iwnEnabled OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"当为真时,该对象指示在该实体上的WAPI已激活。该实体将通过信标帧和探询响应帧广播WAPI信息元素。"
+		::= { iwnApwapiConfigEntry 6 }
+
+		iwnPreauthenticationEnabled OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"当为真时,该对象指示该实体上的WAPI预鉴别已激活。该对象要求将dot11WAPI Enabled也置为真。"
+		::= { iwnApwapiConfigEntry 7 }
+
+		iwnConfigUnicastKeysSupported OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"该对象指示WAPI实体支持的单播密钥个数。"
+	  ::= { iwnApwapiConfigEntry 8 }
+
+		iwnConfigUnicastRekeyMethod OBJECT-TYPE
+		SYNTAX INTEGER { disabled(1), timeBased(2),packetBased(3), timepacket-Based(4) }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"该对象选择一种机制来重新建立WAPI密钥USK。默认是基于时间的,一天一次。USK的更新由担当AE或ASUE角色的实体发起。"
+		DEFVAL { timeBased }
+		::= { iwnApwapiConfigEntry 9 }
+		
+		iwnConfigUnicastRekeyTime OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"WAPI USK需要更新的秒级定时。一旦USK通过MLME-SETWPIKEYS.request原语设置后,计时器就开始工作。"
+		::= { iwnApwapiConfigEntry 10 }
+
+		iwnConfigUnicastRekeyPackets OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		" WAPI USK需要更新的分组计数（以1000个分组为单位）。一旦USK通过MLME-SETWPIKEYS.request原语设置后,分组计数器就开始工作,统计采用当前USK加密的分组个数。"
+		::= { iwnApwapiConfigEntry 11 }
+
+		iwnConfigMulticastCipher OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"该对象指示实体必须采用的组播密码套件。WAPI信息元素的组播密码套件应采用该变量的值,它包含三个八位位组的OUI与一个八位位组的密码套件标识。"
+		::= { iwnApwapiConfigEntry 12 }
+
+		iwnConfigMulticastRekeyMethod OBJECT-TYPE
+		SYNTAX INTEGER { disabled(1), timeBased(2),	packetBased(3), timepacket-Based(4) }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"该对象选择一种机制来重新建立WAPI密钥MSK。默认是基于时间的,一天一次。MSK的更新只能由担当AE角色的实体发起。"
+		::= { iwnApwapiConfigEntry 13 }
+
+		iwnConfigMulticastRekeyTime OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"WAPI MSK需要更新的秒级定时。一旦MSK通过MLME-SETWPIKEYS.request原语设置后,计时器就开始工作。"
+		::= { iwnApwapiConfigEntry 14 }
+
+		iwnConfigMulticastRekeyPackets OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		" WAPI MSK需要更新的分组计数（以1000个分组为单位）。一旦MSK通过MLME-SETWPIKEYS.request原语设置后,分组计数器就开始工作,统计采用当前MSK加密的分组个数。"
+		::= { iwnApwapiConfigEntry 15}
+		
+		iwnConfigMulticastRekeyStrict OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"不论STA什么时候离开拥有密钥MSK的BSS,该对象都会发信号通知密钥MSK需要进行更新。"
+		::= { iwnApwapiConfigEntry 16 }
+
+		iwnConfigPSKValue OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"将PSK模式选为WAPI的AKM套件时的PSK值。BK将由该对象推导产生。该对象逻辑上是只写的,若读取该变量将返回不成功的状态或无意义或零。"
+		::= { iwnApwapiConfigEntry 17 }
+
+		iwnConfigPSKPassPhrase OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"将PSK模式选为WAPI的AKM套件时的PSK值,PSK通过iwnConfigPSKValue来配置。另一种可替换方法是使用口令－密钥算法来设置PSK。该变量提供了一种输入口令的方法 。当该对象被写入时,WAPI实体将使用口令－密钥算法导出一个预共享密钥,同时用导出的密钥填充iwnConfigPSKValue。该对象逻辑上是只写的。读取该对象将返回不成功状态或无意义或零。"
+		::= { iwnApwapiConfigEntry 18 }
+
+		iwnConfigCertificateUpdateCount OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"在每次证书鉴别握手中,WAPI证书鉴别握手协议的消息重传次数。"
+--		DEFVAL { 3 } 
+		::= { iwnApwapiConfigEntry 19 }
+
+		iwnConfigMulticastUpdateCount OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"在每次MSK握手中,WAPI组播密钥握手协议的消息重传的次数。"
+--		DEFVAL { 3 } 
+		::= { iwnApwapiConfigEntry 20 }
+		
+    iwnConfigUnicastUpdateCount OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"在每次3次握手中,WAPI单播密钥握手协议的消息重传的次数。"
+--		DEFVAL { 3 } 
+		::= { iwnApwapiConfigEntry 21 }
+
+		iwnConfigMulticastCipherSize OBJECT-TYPE
+		SYNTAX Unsigned32 (0..4294967295)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"该对象指示组播密钥长度的位数。对于SMS4来说,长度值应该为256。前面128位为加密密钥,后面128位为完整性校验密钥。"
+		::= { iwnApwapiConfigEntry 22 }
+	
+		iwnConfigBKLifetime OBJECT-TYPE
+		SYNTAX Unsigned32 (86400..31536000)
+--		UNITS "秒"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"BK缓存中,一个BK的最大生存期。"
+--		DEFVAL { 43200 } 
+		::= { iwnApwapiConfigEntry 23 }
+
+		iwnConfigBKReauthThreshold OBJECT-TYPE
+		SYNTAX Unsigned32 (1..100)
+--		UNITS "百分比"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"在重新进行证书鉴别之前,应当渡过BK生存期的百分比。"
+--		DEFVAL { 70 } 
+		::= { iwnApwapiConfigEntry 24 }
+
+		iwnConfigSATimeout OBJECT-TYPE
+		SYNTAX Unsigned32 (1..4294967295)
+--		UNITS "秒"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"安全关联建立需要的最长时间。"
+		DEFVAL { 60 } 
+		::= { iwnApwapiConfigEntry 25 }
+		
+    iwnAuthenticationSuiteSelected OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次协商的AKM套件。"
+		::= { iwnApwapiConfigEntry 26 }
+
+		iwnUnicastCipherSelected OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次协商的单播密码套件。"
+		::= { iwnApwapiConfigEntry 27 }
+	
+		iwnMulticastCipherSelected OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次协商的组播密码套件。"
+		::= { iwnApwapiConfigEntry 28 }
+
+		iwnBKIDUsed OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次单播密钥握手过程中所使用的BKID。"
+		::= { iwnApwapiConfigEntry 29 }
+
+		iwnAuthenticationSuiteRequested OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次请求的AKM套件。"
+		::= { iwnApwapiConfigEntry 30 }
+
+		iwnUnicastCipherRequested OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次请求的单播密码套件。"
+		::= { iwnApwapiConfigEntry 31 }
+
+		iwnGroupCipherRequested OBJECT-TYPE 
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"最后一次请求的组播密码套件。"
+		::= { iwnApwapiConfigEntry 32 }
+		
+		iwnConfigUnicastCipher OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"所支持的单播密码套件"
+		::= { iwnApwapiConfigEntry 33 }
+		
+		iwnConfigUnicastCipherEnabled OBJECT-TYPE
+		SYNTAX TruthValue 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"对象激活或禁止单播密码"
+		::= { iwnApwapiConfigEntry 34 }
+		
+		iwnConfigUnicastCipherSize OBJECT-TYPE
+		SYNTAX Unsigned32 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"单播密钥长度的位数"
+		::= { iwnApwapiConfigEntry 35 }
+		
+		iwnConfigAuthenticationSuite OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"AKM套件"
+		::= { iwnApwapiConfigEntry 36 }
+		
+		iwnConfigAuthenticationSuiteEnabled OBJECT-TYPE
+		SYNTAX TruthValue 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"AKM套件是处于激活还是禁止状态"
+		::= { iwnApwapiConfigEntry 37 }
+		
+		iwnWapiIfIndex OBJECT-TYPE
+		SYNTAX INTEGER 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"AKM套件是处于激活还是禁止状态"
+		::= { iwnApwapiConfigEntry 38 }
+		
+		iwnWapiIfNmae OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"AKM套件是处于激活还是禁止状态"
+		::= { iwnApwapiConfigEntry 39 }
+		
+		iwnPskType OBJECT-TYPE
+		SYNTAX INTEGER 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"PSK的类型, 0: 未启用；1: ASCII; 2: 十六进制"
+		::= { iwnApwapiConfigEntry 40 }
+
+
+--********************************************************************************
+--* iwncommApWAPI
+--********************************************************************************
+    iwnWapiAsType OBJECT-TYPE
+        SYNTAX INTEGER { inside(1), outside(2) }
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "AS类型"
+    ::= { iwncommApWAPI 1 }
+    
+    iwnWapiAsIP OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "AS的IP地址"
+    ::= { iwncommApWAPI 2 }
+    
+    iwnWapiAsPort OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "AS的端口"
+    ::= { iwncommApWAPI 3 }
+    
+    iwnWapiCertType OBJECT-TYPE
+        SYNTAX INTEGER { moExist(0), x509(1)}
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "证书类型"
+    ::= { iwncommApWAPI 4 }
+    
+    iwnWapiCertState OBJECT-TYPE
+        SYNTAX INTEGER { noExist(0), valid(1), invalid(2) }
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "证书状态"
+    ::= { iwncommApWAPI 5 }
+    
+    iwnWapiAsCert OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "ASU证书"
+    ::= { iwncommApWAPI 6 }
+    
+    iwnWapiUserCert OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "用户证书"
+    ::= { iwncommApWAPI 7 } 
+    
+    iwnWapiInstallCert OBJECT-TYPE
+        SYNTAX INTEGER { noExist(0), installed(1) }
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "安装证书"
+    ::= { iwncommApWAPI 8 }         
+--********************************************************************************
+--* iwncommApMssid
+--******************************************************************************** 
+    iwnVlanOnOff OBJECT-TYPE
+        SYNTAX INTEGER { off(0), on(1) }
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+			"关闭和启动Vlan,值0是关闭,值1是启动"
+	  ::= { iwncommApMssid 1 }
+	  
+	  iwnSsidNumber OBJECT-TYPE
+        SYNTAX INTEGER (1..15)
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+			"SSID表数目"
+	  ::= { iwncommApMssid 2 }
+
+	  iwnMssidTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IwnMssidEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "SSID表"
+    ::= { iwncommApMssid 3 }
+
+		iwnMssidEntry OBJECT-TYPE
+        SYNTAX IwnMssidEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "接口表ssid索引"
+        INDEX { ifIndex }
+    ::= { iwnMssidTable 1 }
+
+		IwnMssidEntry ::=
+        SEQUENCE { 	
+        iwnMssidIfindex     INTEGER,
+        iwnMssidDevName     OCTET STRING ,
+        iwnMssidWlanSSID    OCTET STRING ,   
+        iwnMssidHideSSID    INTEGER,
+        iwnMssidWAPI        INTEGER,
+        iwnMssidPskType     INTEGER,
+        iwnMssidPsk         OCTET STRING,
+        iwnMssidVlanID      INTEGER,
+        iwnMssidQos         INTEGER,
+        iwnMssidMacPolicy   INTEGER,
+        iwnMssidMaxUser 		INTEGER,
+        iwnMssidMaxTraffic 	INTEGER}
+        
+    iwnMssidIfindex OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "接口索引"
+    ::= { iwnMssidEntry 1 }
+    
+    iwnMssidDevName OBJECT-TYPE
+        SYNTAX OCTET STRING ( SIZE( 0..32 ) )
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "WLAN驱动名"
+    ::= { iwnMssidEntry 2 }
+    
+    iwnMssidWlanSSID OBJECT-TYPE
+        SYNTAX OCTET STRING ( SIZE( 0..32 ) )
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "WLAN驱动SSID"
+    ::= { iwnMssidEntry 3 }
+    
+    iwnMssidHideSSID OBJECT-TYPE
+        SYNTAX INTEGER { not(0), yes(1) }
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "隐藏策略"
+    ::= { iwnMssidEntry 4 }
+
+    iwnMssidWAPI OBJECT-TYPE
+        SYNTAX INTEGER { open(0), wapi(11), psk(7) }
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "安全策略"
+    ::= { iwnMssidEntry 5 }
+    
+    iwnMssidPskType OBJECT-TYPE
+        SYNTAX INTEGER {  na(0), asc(1), hex(2) }
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "密钥类型,na表示不置这个值"
+    ::= { iwnMssidEntry 6 }
+    
+    iwnMssidPsk OBJECT-TYPE
+        SYNTAX OCTET STRING ( SIZE( 1..16) ) 
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "密钥值"
+    ::= { iwnMssidEntry 7 }
+    
+    iwnMssidVlanID OBJECT-TYPE
+        SYNTAX INTEGER (0..4096)
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "VLAN的ID号"
+    ::= { iwnMssidEntry 8 }
+    
+    iwnMssidQos OBJECT-TYPE
+        SYNTAX INTEGER { not(0), yes(1) }
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "是否启用Qos功能"
+    ::= { iwnMssidEntry 9 }
+    
+    iwnMssidMacPolicy OBJECT-TYPE
+        SYNTAX INTEGER { open(0), white(1), black(2) }
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "MAC地址过滤策略：0开放式; 1白名单; 2黑名单"
+    ::= { iwnMssidEntry 10 }
+    
+    iwnMssidMaxUser OBJECT-TYPE
+        SYNTAX INTEGER (1..32)
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "最大用户数"
+    ::= { iwnMssidEntry 11 }
+    
+    iwnMssidMaxTraffic OBJECT-TYPE
+        SYNTAX INTEGER { v512K(1), v1M(2), v2M(3), v3M(4), v4M(5), v5M(6), v6M(7), 
+			  								v7M(8), v8M(9), v9M(10), v10M(11), v11M(12),
+			  								v12M(13), v14M(15), v15M(16), v16M(17), v17M(18), 
+			  								v18M(19), v19M(20), v20M(21), v21M(22), v22M(23)}
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "最大用户数"
+    ::= { iwnMssidEntry 12 }
+    
+    
+    iwnMssidAdd OBJECT-TYPE
+        SYNTAX INTEGER { addssid(1) }
+        ACCESS  read-write
+        STATUS current
+        DESCRIPTION
+        "添加一个SSID"
+    ::= { iwncommApMssid 4 }
+    
+    iwnMssidDel OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        ACCESS  read-write
+        STATUS current
+        DESCRIPTION
+        "删除一个SSID,按照WLAN接口名删除"
+    ::= { iwncommApMssid 5 }
+    
+--********************************************************************************
+--* iwncommApNtpTimes
+--******************************************************************************** 
+	  iwnNtpServerIP OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+			"NTP服务器的IP"
+	  ::= { iwncommApNtpTimes 1 }
+	  
+	  iwnNtpNetTimes OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+			"经过NTP较正后的网络时间"
+	  ::= { iwncommApNtpTimes 2 }
+	  
+ 
+--********************************************************************************
+--* iwncommApSoftVersion start
+--********************************************************************************
+    iwnApSoftwareVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "AP软件主版本号"
+        ::= { iwncommApSoftVersion 1 }
+        
+        iwnapSoftwareName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "AP系统软件的名称"
+        ::= { iwncommApSoftVersion 4 }
+        
+        iwnapSoftwareVendor OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "AP系统软件开发厂商"
+        ::= { iwncommApSoftVersion 3 }
+        
+    iwnApSoftSecondVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "AP软件次版本号"
+        ::= { iwncommApSoftVersion 5 }
+ 
+    iwnApManufacturer OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "AP厂商"
+        ::= { iwncommApSoftVersion 6 }
+
+    iwnApSysVersion OBJECT-TYPE
+        SYNTAX OCTET STRING 
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "AP版本信息"
+        ::= { iwncommApSoftVersion 7 }
+ 
+        
+--********************************************************************************
+--* iwncommApBasicInfo start
+--********************************************************************************
+	
+    iwnBasicCPU OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..128))
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "CPU型号和处理能力"
+    ::= { iwncommApBasicInfo 1 }
+    
+    iwnBasicMemory OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..128))
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "内存容量和型号"
+    ::= { iwncommApBasicInfo 2 }
+    
+    iwnBasicFlash OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..128))
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "硬盘型号和容量"
+    ::= { iwncommApBasicInfo 3}
+    
+    iwnBasicMAC OBJECT-TYPE
+        SYNTAX MacAddress
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "MAC地址"
+    ::= { iwncommApBasicInfo 4 }
+    
+    iwnBasic80211b OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..128))
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "是否支持11b"
+    ::= { iwncommApBasicInfo 5 }
+    
+    iwnBasic80211g OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..128))
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "是否支持11g"
+    ::= { iwncommApBasicInfo 6 }
+    
+    iwnHardwareVersion OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..128))
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "硬件版本"
+    ::= { iwncommApBasicInfo 7 }
+    
+    iwnApType OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..128))
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "AP的型号,室内和室外"
+    ::= { iwncommApBasicInfo 8 }
+    
+    iwnCpuUsage OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "CPU利用率"
+    ::= { iwncommApBasicInfo 9 }
+    
+    iwnMemUsage OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "内存利用率"
+    ::= { iwncommApBasicInfo 10 }
+ 
+--********************************************************************************
+--* iwncommApAlarmAdmin start
+--********************************************************************************  
+    --	iwnalarmTimes           ::=	{ iwncommApAlarmAdmin 1 }
+    --	iwnalarmflag            ::=	{ iwncommApAlarmAdmin 2 }
+    --	iwnalarmTable           ::=	{ iwncommApAlarmAdmin 3 }
+    
+    iwnalarmTimes OBJECT-TYPE
+        SYNTAX INTEGER  
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "告警时间记数器"
+    ::= { iwncommApAlarmAdmin 1 }
+    
+    iwnalarmflag OBJECT-TYPE
+        SYNTAX INTEGER  
+        ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "告警标记：1.表示有告警; 0. 表示没有告警 。"
+    ::= { iwncommApAlarmAdmin 2 }
+    
+    iwncommApAlarmAdminTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IwncommApAlarmAdminEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "告警信息条目"
+    ::= { iwncommApAlarmAdmin 3 }
+
+		iwncommApAlarmAdminEntry OBJECT-TYPE
+        SYNTAX IwncommApAlarmAdminEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "告警信息条目"
+        INDEX { alarmID }
+    ::= { iwncommApAlarmAdminTable 1 }
+
+		IwncommApAlarmAdminEntry ::= 
+        SEQUENCE {	
+        	alarmID											INTEGER ,
+        	alarmName										OCTET STRING ,
+        	alarmLevel									OCTET STRING ,
+        	alarmType										OCTET STRING ,
+        	alarmReasonId								INTEGER ,
+        	alarmReason									OCTET STRING ,
+        	alarmCreatTimes							INTEGER,
+        	--alarmEliminateTimes					INTEGER,
+        	alarmState									INTEGER ,
+        	alarmHeading								OCTET STRING ,
+        	alarmContent								OCTET STRING  }
+     alarmID OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"告警序列号"
+	  ::= { iwncommApAlarmAdminEntry 1 }
+	  
+	  alarmName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE(32))
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"网元的识别名"
+	  ::= { iwncommApAlarmAdminEntry 2 }
+	  
+	  alarmLevel OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE(20))
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"告警级别"
+	  ::= { iwncommApAlarmAdminEntry 3 }
+	  
+	  alarmType OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE(20))
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"告警类型"
+	  ::= { iwncommApAlarmAdminEntry 4 }
+	   
+	  alarmReasonId OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"告警原因号"
+	  ::= { iwncommApAlarmAdminEntry 5 }
+	  alarmReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"告警原因"
+	  ::= { iwncommApAlarmAdminEntry 6 }
+	  
+	  alarmCreatTimes OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"告警发生时间"
+	  ::= { iwncommApAlarmAdminEntry 7 }
+	  
+	  --alarmEliminateTimes OBJECT-TYPE
+		--	SYNTAX INTEGER
+		--	ACCESS read-only
+		--	STATUS current
+		--	DESCRIPTION
+		--	"告警清除时间"
+	 -- ::= { iwncommApAlarmAdminEntry 7 }
+	  
+	  alarmState OBJECT-TYPE
+			SYNTAX INTEGER { alarm(1), noAlarm(2)}
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"告警状态"
+	  ::= { iwncommApAlarmAdminEntry 8 }
+	  
+	  	  alarmHeading OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE(32))
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"告警标题"
+	  ::= { iwncommApAlarmAdminEntry 9 }
+	  
+	  alarmContent OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE(128))
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"告警内容"
+	  ::= { iwncommApAlarmAdminEntry 10 }	  
+	  
+	  --add by piyp 2008-11-28----------------
+		iwnStartScanApEnabled		OBJECT-TYPE	
+			SYNTAX INTEGER {false(0),true(1)}
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"开始扫描相邻AP激活"
+	  ::= { iwncommApAlarmAdmin 4 }	
+	  
+	  iwnAddNeighborhoodApMacAddr		OBJECT-TYPE	
+			SYNTAX  OCTET STRING
+			ACCESS write-only
+			STATUS current
+			DESCRIPTION
+			"开始扫描相邻AP激活"
+	  ::= { iwncommApAlarmAdmin 5 }	  
+	  
+	   iwnScanApTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IwnScanApEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "安全的相邻AP的MAC地址列表"
+    ::= { iwncommApAlarmAdmin 6 }
+
+		iwnScanApEntry OBJECT-TYPE
+        SYNTAX IwnScanApEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "安全的相邻AP的MAC地址实体"
+        INDEX { iwnNeighborhoodApMacId }
+    ::= { iwnScanApTable 1 }
+
+		IwnScanApEntry ::= 
+        SEQUENCE {	
+        	iwnNeighborhoodApMacId											INTEGER ,
+        	iwnNeighborhoodApMacList										OCTET STRING   }
+        	
+        	
+    iwnNeighborhoodApMacId		OBJECT-TYPE	
+			SYNTAX INTEGER 
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"相邻AP索引"
+	  ::= { iwnScanApEntry 1 }	 
+	  
+	  iwnNeighborhoodApMacList	OBJECT-TYPE	
+			SYNTAX OCTET STRING
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"相邻AP索引列表"
+	  ::= { iwnScanApEntry 2 }	 
+   
+--**********************************************************************
+--iwncommApConfig   OBJECT IDENTIFIER 	::= { iwncommPwlanAp  2  }
+--**********************************************************************
+	  	iwnConfigLanIP OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+			"LAN的IP"
+	  ::= { iwncommApConfig 1 }
+	  
+	  iwnConfigLanMask OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+			"LAN的IP掩码"
+	  ::= { iwncommApConfig 2 }
+	  
+	  iwnConfigLanGateway OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+			"LAN的网关"
+	  ::= { iwncommApConfig 3 }
+	  
+	  iwnConfigHostName OBJECT-TYPE
+			SYNTAX OCTET STRING 
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"主机名"
+	  ::= { iwncommApConfig 4 }
+	  
+	  iwnConfigTxPower OBJECT-TYPE
+			SYNTAX INTEGER { percentsix(4),eighth(3),quarter(2),half(1),full(0) }
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"发射功率,percentsix:全功率的6%;eighth:全功率的12.5%;quarter:全功率的%25;half:全功率的50%;full:全功率"
+	  ::= { iwncommApConfig 5 }
+	  
+	  iwnConfigWirelessModeA OBJECT-TYPE
+			SYNTAX INTEGER { a(1)}
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"B卡无线模式,802.11a"
+	  ::= { iwncommApConfig 6 }
+	  
+	  iwnConfigBeaconInterval OBJECT-TYPE
+			SYNTAX  INTEGER (20..1000)
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"Beacon帧间隔"
+	  ::= { iwncommApConfig 7 }
+	  
+	  iwnConfigRtsThreshold OBJECT-TYPE
+			SYNTAX  INTEGER (0..2347)
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"RTS门限"
+	  ::= { iwncommApConfig 8 }
+	  
+	  iwnConfigDtimPeriod OBJECT-TYPE
+			SYNTAX  INTEGER (256..2346) 
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"报文分段门限"
+	  ::= { iwncommApConfig 9 }
+	  
+	   iwnConfigWirelessModeBG OBJECT-TYPE
+			SYNTAX INTEGER { b(2), bg(3)}
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"A卡无线模式,802.11b/g"
+	  ::= { iwncommApConfig 10 }
+	  
+	   iwnConfigReboot OBJECT-TYPE
+			SYNTAX  INTEGER { normal(0), reboot(1)}
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"系统重启"
+	  ::= { iwncommApConfig 11}
+	  
+	   iwnConfigfactoryDefault OBJECT-TYPE
+			SYNTAX  INTEGER  { normal(0), renew(1)}
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"恢复出厂配置"
+	  ::= { iwncommApConfig 12 }
+	  
+   
+	  
+	  iwnPowerMgmtTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF IwnPowerMgmtEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION	              
+            "功率管理表"
+	  ::= { iwncommApConfig 13 }
+	  
+	  iwnPowerMgmtEntry OBJECT-TYPE
+              SYNTAX  IwnPowerMgmtEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+              "接口表ifIndex来索引"
+        INDEX { ifIndex }
+    ::= { iwnPowerMgmtTable 1 }
+
+	  	IwnPowerMgmtEntry ::=
+        SEQUENCE { 	
+        	rfPowerManager	INTEGER,
+        	rfTxPower       INTEGER,
+        	rfCurrentChannel    INTEGER
+      }
+       
+      rfPowerManager OBJECT-TYPE
+				SYNTAX  TruthValue  { off(0), on(1)}
+				ACCESS read-write
+				STATUS current
+				DESCRIPTION
+				"AP的功率管理"
+	  ::= { iwnPowerMgmtEntry 1 }
+	  
+	   rfTxPower OBJECT-TYPE
+				SYNTAX  INTEGER
+				ACCESS read-only
+				STATUS current
+				DESCRIPTION
+				"AP的功率dbm"
+	  ::= { iwnPowerMgmtEntry 2 }
+	  
+	  rfCurrentChannel OBJECT-TYPE
+				SYNTAX  INTEGER
+				ACCESS read-write
+				STATUS current
+				DESCRIPTION
+				"AP配置的当前射频信道"
+	  ::= { iwnPowerMgmtEntry 3 }
+       
+    
+--**********************************************************************
+--iwnapLoadBalance  add by piyp  2008-11-25
+--**********************************************************************   
+     iwnApLoadBalance       OBJECT IDENTIFIER  ::=	{ iwncommApConfig 14 }
+    
+	  iwnConfigLoadBalancePolicy OBJECT-TYPE
+        SYNTAX INTEGER {disable(0), users(1), flux(2)} 
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "负载均衡策略, 0:disable, 1:users, 2:flux"
+        ::= { iwnApLoadBalance 1 } 
+
+		iwnConfigLoadBalanceGroupName OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..32)) 
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "负载均衡组名称"
+        ::= { iwnApLoadBalance 2 } 
+
+		iwnConfigUsersLoadValue OBJECT-TYPE
+        SYNTAX INTEGER (1..100) 
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "用户数差值"
+        ::= { iwnApLoadBalance 3 } 
+
+		iwnConfigFluxLoadValue OBJECT-TYPE
+        SYNTAX INTEGER (1..10240) 
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "数据流量差值, 单位是kbps"
+        ::= { iwnApLoadBalance 4 } 
+	  
+	  
+	  
+	   iwnConfigUserSeparate OBJECT-TYPE
+        SYNTAX INTEGER {close(1), open(0)}
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "用户隔离设置"
+        ::= { iwncommApConfig 15 } 
+	  
+	  iwnApMultiModeAccessControl OBJECT-TYPE
+			SYNTAX INTEGER  { not(0), yes(1)}
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"AP多模接入控制状态"
+	  ::= { iwncommApConfig 18 }
+	  
+	  iwndot11QosEnabled OBJECT-TYPE
+			SYNTAX INTEGER  { false(0), true(1)}
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"Qos选项开启"
+	  ::= { iwncommApConfig 19 }
+	  
+	  iwnapSysNEId OBJECT-TYPE
+			SYNTAX OCTET STRING 
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"AP网元编码"
+	  ::= { iwncommApConfig 20 }
+	  
+	  iwnapSysHostName OBJECT-TYPE
+			SYNTAX OCTET STRING 
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"AP设备命名"
+	  ::= { iwncommApConfig 21 }
+	  
+	  iwnapSysLocation OBJECT-TYPE
+			SYNTAX OCTET STRING 
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"AP位置信息"
+	  ::= { iwncommApConfig 22 }
+	  
+	  iwnBasicManufacturer OBJECT-TYPE
+			SYNTAX OCTET STRING 
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"设备厂家的名称"
+	  ::= { iwncommApConfig 23 }
+	  
+  
+	  iwnConfigWapiState OBJECT-TYPE
+			SYNTAX TruthValue {false(0),true(1)}
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"WAPI模式的开启状态"
+	  ::= { iwncommApConfig 26 }	  
+
+	 iwnConfigWirelessDataRateBG   OBJECT-TYPE
+        SYNTAX INTEGER { auto(0), vv1M(1), v2M(2), v5aHalf(3), v6M(4), v9M(5), v11M(6), v12M(7), v18M(8), v24M(9), v36M(10), v48M(11), v54M(12) }
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+			"11b/g wireless data rate,eg:auto,1M,2M,5.5M,6M,9M,11M,12M,18M,24M,36M,48M,54M;5aHalf==5.5M"
+	  ::= { iwncommApConfig 27 }
+   
+	  iwnConfigWirelessDataRateA    OBJECT-TYPE
+        SYNTAX INTEGER { auto(0), v6M(4), v9M(5), v12M(7), v18M(8), v24M(9), v36M(10), v48M(11), v54M(12) }
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+			"11a wireless data rate. auto(0), 6M(4), 9M(5), 12M(7), 18M(8), 24M(9), 36M(10), 48M(11), 54M(12)"
+	  ::= { iwncommApConfig 28 }
+
+  
+	  iwnAPESSIDTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF IwnAPESSIDEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION	              
+            "AP的ESSID,ESSID的编号用于控制用户接入,中国移动ESSID的编号为CMCC"
+	  ::= { iwncommApConfig 35 }
+	  
+	  iwnAPESSIDEntry OBJECT-TYPE
+              SYNTAX  IwnAPESSIDEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+              "接口表ifIndex来索引"
+        INDEX { ifIndex }
+    ::= { iwnAPESSIDTable 1 }
+
+		IwnAPESSIDEntry ::=
+        SEQUENCE { 	
+        iwnESSIDIfindex                           INTEGER,
+        iwnDevNameBG  					                  OCTET STRING,
+        iwnDevNameA  					                    OCTET STRING,
+        apConfigBSSIDBG														OCTET STRING,
+        apConfigBSSIDA														OCTET STRING,
+        dot11DesiredSSID                          OCTET STRING,
+        apMaxSimultUsers													INTEGER,
+        apMaxSimultTraffic												INTEGER,
+        apBSSIDEncryption													INTEGER}
+        
+        iwnESSIDIfindex OBJECT-TYPE
+			  SYNTAX INTEGER (1..4)
+			  ACCESS read-only
+			  STATUS current
+			  DESCRIPTION
+			  "无线接口索引"			
+	      ::= { iwnAPESSIDEntry 1 }
+	      
+	      iwnDevNameBG OBJECT-TYPE
+			  SYNTAX OCTET STRING
+			  ACCESS read-only
+			  STATUS current
+			  DESCRIPTION
+			  "BG驱动名"			
+	      ::= { iwnAPESSIDEntry 2 }
+	     
+	      apConfigBSSIDBG OBJECT-TYPE
+			  SYNTAX OCTET STRING
+			  ACCESS read-only
+			  STATUS current
+			  DESCRIPTION
+			  "AP配置的所有BSSID"			
+	      ::= { iwnAPESSIDEntry 3 }
+	      
+	      iwnDevNameA OBJECT-TYPE
+			  SYNTAX OCTET STRING
+			  ACCESS read-only
+			  STATUS current
+			  DESCRIPTION
+			  "A驱动名"			
+	      ::= { iwnAPESSIDEntry 4 }
+	      
+	      apConfigBSSIDA OBJECT-TYPE
+			  SYNTAX OCTET STRING
+			  ACCESS read-only
+			  STATUS current
+			  DESCRIPTION
+			  "AP配置的所有BSSID"			
+	      ::= { iwnAPESSIDEntry 5 }
+	      
+	      dot11DesiredSSID OBJECT-TYPE
+			  SYNTAX OCTET STRING
+			  ACCESS read-write
+			  STATUS current
+			  DESCRIPTION
+			  "AP的ESSID"			
+	      ::= { iwnAPESSIDEntry 6 } 
+	      
+	      apMaxSimultUsers OBJECT-TYPE
+			  SYNTAX INTEGER (1..32)
+			  ACCESS read-write
+			  STATUS current
+			  DESCRIPTION
+			  "指定BSSID当前配置的最大并发的用户数"			
+	      ::= { iwnAPESSIDEntry 7 }
+	      
+	      apMaxSimultTraffic OBJECT-TYPE
+			  SYNTAX INTEGER { v512K(1), v1M(2), v2M(3), v3M(4), v4M(5), v5M(6), v6M(7), 
+			  								v7M(8), v8M(9), v9M(10), v10M(11), v11M(12),
+			  								v12M(13), v14M(15), v15M(16), v16M(17), v17M(18), 
+			  								v18M(19), v19M(20), v20M(21), v21M(22), v22M(23)}
+			  ACCESS read-write
+			  STATUS current
+			  DESCRIPTION
+			  "指定BSSID当前配置的最大流量"			
+	      ::= { iwnAPESSIDEntry 8 }
+	      
+	      apBSSIDEncryption OBJECT-TYPE
+			  SYNTAX INTEGER {
+			  			open(0),
+			  			wapi-psk(7),
+			  			wapi-cert(11),
+			  			wep(12),
+			  			wpa/wpa2-eap(16),
+			  			wpa/wpa2-psk(20)
+			  			}
+			  ACCESS read-write
+			  STATUS current
+			  DESCRIPTION
+			  "AP指定BSSID空中接口加密方式"			
+	      ::= { iwnAPESSIDEntry 9 }
+
+	  
+	  iwnBSSIDNumInESSID OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"ESSID下的BSSID数"			
+	  ::= { iwncommApConfig 36 }
+	  
+	  iwnapConfigBSSIDNum OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"AP配置的BSSID数"			
+	  ::= { iwncommApConfig 37 }
+	  
+  
+	  	iwnEAPAuthenSupport 	OBJECT-TYPE
+			SYNTAX INTEGER
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"EAP方式是否开启"			
+	  ::= { iwncommApConfig 39 }
+	  
+	  	iwnApWorkMode 	OBJECT-TYPE
+			SYNTAX INTEGER  { ap(1), bridge(2),  ap_bridge(3)}
+			ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			"AP的工作模式"			
+	  ::= { iwncommApConfig 40 }
+	  
+		iwnApAccessMaxUsers 	OBJECT-TYPE
+			SYNTAX INTEGER 
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"AP的接入最大用户数"			
+	  ::= { iwncommApConfig 41 }
+	  
+    --iwnapTxRates 	OBJECT-TYPE
+		--SYNTAX INTEGER
+		--ACCESS read-write
+		--STATUS current
+		--DESCRIPTION
+		--"AP配置的终端接入速率"			
+	  --::= { iwncommApConfig 41 }
+
+	  
+	  iwnapDot11aAntennaGain OBJECT-TYPE
+			SYNTAX INTEGER (0..27)
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"AP 802.11a天线增益"			
+	  ::= { iwncommApConfig 43 }
+	  
+    iwnapDot11gAntennaGain OBJECT-TYPE
+			SYNTAX INTEGER(0..27)
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"AP 802.11b/g天线增益"			
+	  ::= { iwncommApConfig 44 }
+	  
+  
+	  iwnconDNSServer OBJECT-TYPE
+			SYNTAX IpAddress
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"DNS服务器地址"			
+	  ::= { iwncommApConfig 48 }
+	  
+    iwndot11QosTrafficClass OBJECT-TYPE
+			SYNTAX INTEGER   { background(0), bestEffort(1), video(2), voice(3), all(4) }
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"提供QoS机制的业务类型"			
+	  ::= { iwncommApConfig 49 }
+	  
+	  iwnMultiModeAccessStatus OBJECT-TYPE
+			SYNTAX TruthValue {false(0),true(1)}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"AP配置的多种模式同时接入状态（指WAPI与802.11b与802.11a同时接入）"
+			::= { iwncommApConfig 50}
+		
+		
+		
+		 iwnAuthenticationAlgorithmTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF IwnAuthenticationAlgorithmEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION	              
+            "AP配置的安全机制"
+	  ::= { iwncommApConfig 51 }
+	  
+	  iwnAuthenticationAlgorithmEntry OBJECT-TYPE
+              SYNTAX  IwnAuthenticationAlgorithmEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+              "接口表ifIndex来索引"
+        INDEX { ifIndex }
+    ::= { iwnAuthenticationAlgorithmTable 1 }
+
+	  	IwnAuthenticationAlgorithmEntry ::=
+        SEQUENCE { 	
+        	iwndot11AuthenticationAlgorithm	INTEGER
+      }
+       
+		iwndot11AuthenticationAlgorithm OBJECT-TYPE
+				SYNTAX INTEGER {openSystem(1),sharedKey(2),cert(3)}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+							"AP配置的安全机制"
+		::= { iwnAuthenticationAlgorithmEntry 1}
+		
+		
+		frameRetryRateExceeded OBJECT-TYPE
+				SYNTAX INTEGER 
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+				"AP帧的重试超过上限"
+		::= { iwncommApConfig 53}
+		
+		dFSFreeCountBelowThreshold OBJECT-TYPE
+		SYNTAX INTEGER 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"可供使用的信道数过低"
+		::= { iwncommApConfig 54}
+		
+		beaconTimeout OBJECT-TYPE
+		SYNTAX INTEGER 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"链路beacon signal发送超时Y"
+		::= { iwncommApConfig 55}
+		
+		michaelerroroverthreshold OBJECT-TYPE
+		SYNTAX INTEGER 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Michael 错误超过阈值"
+		::= { iwncommApConfig 56}
+		
+		vAPMissingBssidRange OBJECT-TYPE
+		SYNTAX INTEGER 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"无法向虚拟AP分配BSSID"
+		::= { iwncommApConfig 57}
+		
+		vAPMisconfigured OBJECT-TYPE
+		SYNTAX INTEGER 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"虚拟AP配置错误"
+		::= { iwncommApConfig 58}
+		
+		iwnApARF 	OBJECT-TYPE
+			SYNTAX INTEGER  { off(0), on(1)}
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"A卡射频开关"			
+	  ::= { iwncommApConfig 59 }
+	  
+	  iwnApBRF 	OBJECT-TYPE
+			SYNTAX INTEGER  { off(0), on(1)}
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"B卡射频开关"			
+	  ::= { iwncommApConfig 60 }
+	  
+	  iwnApWZC 	OBJECT-TYPE
+			SYNTAX INTEGER  { off(0), on(1)}
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"客户端采用WZC配置无线网络"			
+	  ::= { iwncommApConfig 61 }
+	  
+	  iwnApFrequencySwitch 	OBJECT-TYPE
+			SYNTAX INTEGER  { off(0), on(1)}
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"支持5.1～5.3GHz频段"			
+	  ::= { iwncommApConfig 62 }
+
+	--add by guoxd 20081016  start 
+	iwnConfigAutoPower OBJECT-TYPE
+        SYNTAX INTEGER {disable(0), enable(1)}
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "自动功率设置, 0:disable, 1:enable"
+        ::= { iwncommApConfig 63 } 
+
+	iwnConfigAutoAdjustInterval OBJECT-TYPE
+        SYNTAX INTEGER (120..1200) 
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "功率自动调节间隔, 单位是秒"
+        ::= { iwncommApConfig 64 } 
+
+	iwnConfigFilterPkts OBJECT-TYPE
+        SYNTAX INTEGER (0..255) 
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "控制抓包过滤"
+        ::= { iwncommApConfig 65 } 
+	
+	--add by guoxd 20081016  end 
+		
+
+-- **********************************************************************
+-- *   iwncommApUpgrade
+-- **********************************************************************	
+	
+ 	  iwnServerURL OBJECT-TYPE
+			SYNTAX OCTET STRING 
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"提供升级文件的URL"
+	  ::= { iwncommApUpgrade 1 }	      
+  
+	  iwnStartUpgrade OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-write
+			STATUS current
+			DESCRIPTION
+			"开始升级AP"
+	  ::= { iwncommApUpgrade 2 }
+
+-- **********************************************************************
+-- *   End of IWNCOMMM-PWLAN-MIB
+-- **********************************************************************
+ 
+END    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

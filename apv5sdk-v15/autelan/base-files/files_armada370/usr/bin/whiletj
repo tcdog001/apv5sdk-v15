@@ -1,0 +1,9 @@
+#!/bin/ash
+
+while sleep 5
+do
+	date
+	readtj
+done
+
+

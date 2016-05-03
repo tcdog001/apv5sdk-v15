@@ -1,0 +1,50 @@
+.NOTPARALLEL:
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR = lib_ndis
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+CROSS=mips64-octeon-linux-gnu-
+CC=${CROSS}gcc
+PWD=$(shell pwd)
+TARGETS=ndis_connect ndis_test ndis_disconnect ctrl_lte
+export LC_GENERL_INCLUDE_DIR=$(PWD)/include
+export LC_LIB_DIR=$(PWD)/lib
+unexport LDFLAGS
+
+.PHONY: all
+all: build install
+.PHONY: build
+ifeq ($(BOARD_TYPE),db12x)
+ifeq ($(AQ_TYPE),AQ2000_X)
+build:
+	$(MAKE) -C $(PKG_BUILD_DIR) clean 
+	$(MAKE) -C $(PKG_BUILD_DIR) prep 
+	$(MAKE) -C $(PKG_BUILD_DIR)   
+	$(MAKE) -f Makefile.conn
+	$(MAKE) -f Makefile.disconn
+	$(MAKE) -f Makefile.ndis_test
+	$(CC) ctrl_lte.c -o ctrl_lte
+else
+build:
+	echo "nothing to be done"
+endif
+endif
+
+.PHONY: clean
+
+clean:
+	rm -f *.o $(TARGETS)
+	${MAKE} -C ${PKG_BUILD_DIR}   clean
+
+#install dir /usr/bin
+.PHONY: install
+install: 
+	$(STRIP) $(TARGETS)
+	cp -f ${LC_LIB_DIR}/libndis_dail.so ${ROOTFSDIR}/usr/lib  
+	cp -f profile.ini ${ROOTFSDIR}/etc
+	cp -f $(TARGETS) ${ROOTFSDIR}/usr/sbin

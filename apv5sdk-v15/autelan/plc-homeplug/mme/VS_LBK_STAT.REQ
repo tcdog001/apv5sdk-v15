@@ -1,0 +1,29 @@
+# file: efsu/VS_LBK_STAT.REQ
+
+# ====================================================================
+#
+# --------------------------------------------------------------------
+
+00 B0 52 BE EF 04 
+00 0F EA 10 D5 1C
+88 E1 00 
+48 A0 
+00 B0 52 
+0A 00 
+80 00 
+
+# ====================================================================
+# VS_SW_VER.REQ
+# --------------------------------------------------------------------
+
+FF FF FF FF FF FF 
+00 0F EA 10 D5 1C
+08 00 00 00
+A0 00 B0 52 FF FF FF FF FF FF FF Ff FF FF FF FF
+FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+

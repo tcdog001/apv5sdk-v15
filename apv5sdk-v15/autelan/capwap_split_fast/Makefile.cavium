@@ -1,0 +1,42 @@
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR = src
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR = /tmp/changzhimin-rootfs
+endif
+
+ifndef KERNELDIR
+KERNELDIR := $(OCTEON_ROOT)/linux/kernel_2.6/linux
+endif 
+
+INSTALLDIR=$(ROOTFSDIR)/lib/modules/2.6.21.7-Cavium-Octeon/drivers/wireless/
+
+TARGET_CROSS := mips64-octeon-linux-gnu-
+
+HAL_TARGET := mips64-be-elf
+
+
+MAKE_ARGS:= \
+	KERNELPATH="$(KERNELDIR)" \
+	CROSS_COMPILE="$(TARGET_CROSS)" \
+	TARGET="$(HAL_TARGET)" \
+
+all:capwap_split_fast install
+
+capwap_split_fast:
+	(( test -f ${PKG_BUILD_DIR}/Makefile.cavium && mv ${PKG_BUILD_DIR}/Makefile.cavium ${PKG_BUILD_DIR}/Makefile ) || : )
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean  
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) 
+	echo "finished"
+
+clean:
+	$(MAKE) -C $(PKG_BUILD_DIR) $(MAKE_ARGS) clean
+	
+install:capwap_split_fast
+	sudo mkdir -p $(INSTALLDIR)
+	cd $(PKG_BUILD_DIR) && \
+	sudo cp -f capwap_split_fast.ko $(INSTALLDIR)
+
+

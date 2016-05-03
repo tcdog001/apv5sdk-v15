@@ -1,0 +1,45 @@
+#!/bin/sh
+
+KILLALL=/usr/bin/killall
+MYDAEMON=/usr/sbin/mydaemon
+LOCALPATH=/usr/bin
+SLEEP=/bin/sleep
+
+DATACONF=${LOCALPATH}/data.conf
+LOCALCONF=${LOCALPATH}/local.conf
+CWMPCONF=${LOCALPATH}/cwmp.conf
+LOCALPORT=`cat ${DATACONF} | awk -F "=" '{print $2}'`
+LOCALHOST=http://127.0.0.1
+DELAY=40
+
+if [ ! $# -eq 1 ];then
+	echo "error: need one parameter \" ACS address \""
+fi
+
+target=datamodel
+value=`ps | awk '/'$target'/{flag=1;}END{print flag}' flag=0`
+if [ 0$value -eq 0 ];then
+	$MYDAEMON ${LOCALPATH}/${target} --file:${DATACONF} >/dev/null 2>&1
+fi
+
+target=LocalManager
+value=`ps | awk '/'$target'/{flag=1;}END{print flag}' flag=0`
+if [ 0$value -eq 0 ];then
+	$MYDAEMON ${LOCALPATH}/${target} --file:${LOCALCONF} --datamodel:${LOCALHOST}:${LOCALPORT} >/dev/null 2>&1
+	$SLEEP $DELAY
+fi
+
+target=cwmp
+value=`ps | awk '/'$target'/{flag=1;}END{print flag}' flag=0`
+if [ 0$value -eq 1 ];then
+	$KILLALL $target > /dev/null 2>&1
+fi
+$MYDAEMON ${LOCALPATH}/${target} --file:${CWMPCONF} --datamodel:${LOCALHOST}:${LOCALPORT} --ACS:${1}  >/dev/null 2>&1
+
+
+
+
+
+
+
+

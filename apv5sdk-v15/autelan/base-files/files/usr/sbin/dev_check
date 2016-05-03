@@ -1,0 +1,27 @@
+#!/bin/sh
+
+IWCONFIG=/usr/sbin
+IFCONFIG=/sbin/ifconfig
+
+CONFIG_XML=/tmp/device_info.xml
+. /usr/lib/web/xmlconf.sh
+
+wifi_info=`config_read /device/wifi_total 2>/dev/null`
+wifi_count=`config_getoption "${wifi_info}" count 2>/dev/null`
+
+dev_flag=0
+
+for i in `seq ${wifi_count}`
+do
+	j=$((i-1))
+	${IFCONFIG} wifi${j} 1>/dev/null 2>&1
+	if [ ! $? -eq 0 ];then
+		dev_flag=$((dev_flag+j))
+	fi
+done
+
+if [ ${dev_flag} -eq 0 ];then
+	echo "wireless device check ok, device count: ${wifi_count}!"
+else
+	echo "wireless device check error, error code : ${dev_flag}"
+fi

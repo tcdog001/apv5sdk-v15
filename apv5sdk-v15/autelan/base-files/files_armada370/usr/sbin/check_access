@@ -1,0 +1,7 @@
+#!/bin/sh
+wlanconfig ath0 list | grep "ADDR" >/dev/null 2>&1
+if [ $? == "0" ];then
+	state=`wlanconfig ath0 list | awk '{if(NR==2){print $12}}'`
+	echo "&"${state}"&"
+fi
+

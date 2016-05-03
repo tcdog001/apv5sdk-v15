@@ -1,0 +1,11 @@
+pci_indirect.c: In function 'indirect_read_config_byte':
+pci_indirect.c:110: warning: implicit declaration of function 'out_le32'
+pci_indirect.c:110: warning: implicit declaration of function 'in_8'
+pci_indirect.c: In function 'indirect_read_config_word':
+pci_indirect.c:111: warning: implicit declaration of function 'in_le16'
+pci_indirect.c: In function 'indirect_read_config_dword':
+pci_indirect.c:112: warning: implicit declaration of function 'in_le32'
+pci_indirect.c: In function 'indirect_write_config_byte':
+pci_indirect.c:118: warning: implicit declaration of function 'out_8'
+pci_indirect.c: In function 'indirect_write_config_word':
+pci_indirect.c:119: warning: implicit declaration of function 'out_le16'

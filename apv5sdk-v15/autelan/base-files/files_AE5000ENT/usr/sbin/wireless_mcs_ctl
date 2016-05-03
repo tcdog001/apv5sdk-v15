@@ -1,0 +1,48 @@
+#!/bin/sh
+
+if [ $# -le 1 ] ;then
+	echo "Usage: wireless_rate_ctl wifiN ratemask|off"
+	exit 1
+fi
+
+if [ $# != 2 ] ; then
+	echo "Usage: wireless_rate_ctl wifiN ratemask|off"
+	exit 1
+fi
+
+#param wifi check
+if [ $1 != "wifi0" ] && [ $1 != "wifi1" ];then
+	echo "wifi assigned not right"
+	exit 1
+fi
+wifin=$1
+num=`echo $1 | grep -o '[0-9]\{1,\}'`
+MACWIFI="/jffs/.mac_wifi"
+work_mode="`echo mcs`"
+filename=${MACWIFI}${num}${work_mode}
+
+echo $1
+echo $2
+echo $filename
+
+if [ $2 == "off" ];then
+	if [ -f $filename ];then
+		rm -rf $filename
+	fi
+else
+	echo $2 > $filename
+	case "$1" in
+		wifi0)
+			iwpriv wifi0 set_mcs_mask $2
+			iwpriv wifi0 set_mcs_cap 0x80 
+			;;
+		wifi1)
+		 	iwpriv wifi1 set_mcs_mask $2
+		 	iwpriv wifi1 set_mcs_cap 0x80
+			;;
+		*)
+			echo "wifi assigned not right"
+			exit 1
+			;;
+	esac
+fi

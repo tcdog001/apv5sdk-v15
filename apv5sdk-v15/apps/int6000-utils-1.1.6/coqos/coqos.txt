@@ -1,0 +1,8 @@
+BWcoqos.c
+BWcoqos.new.c
+coqos.c
+coqos_add.c
+coqos_info.c
+coqos_man.c
+coqos_mod.c
+coqos_rel.c

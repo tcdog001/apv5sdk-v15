@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			scanflush.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='scandigit.c.html' title=' scandigit.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='scangroup.c.html' title=' scangroup.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   void scanflush(SCAN * content);
+ *
+ *   scan.h
+ * 
+ *   flush the current token by aligning the first character pointer 
+ *   to the input character pointer, creating in a zero-length token 
+ *   string;
+ *
+ *.  released 2005 by charles maier associates ltd. for public use;
+ *:  compiled on debian gnu/linux with gcc 2.95 compiler;
+ *;  licensed under the gnu public license version two;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SCANFLUSH_SOURCE
+#define SCANFLUSH_SOURCE
+
+#include &quot;../scan/scan.h&quot;
+
+void scanflush (SCAN * content) 
+
+{
+	content-&gt;first = content-&gt;final;
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='scandigit.c.html' title=' scandigit.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='scangroup.c.html' title=' scangroup.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

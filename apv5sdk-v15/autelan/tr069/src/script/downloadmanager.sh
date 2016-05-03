@@ -1,0 +1,1 @@
+./downloadmanager --FileType:'1 Firmware Upgrade Image' --URL:'http://host:port'  --Username: --Password: --FileSize:1000 --TargetFileName: --DelaySeconds:1 

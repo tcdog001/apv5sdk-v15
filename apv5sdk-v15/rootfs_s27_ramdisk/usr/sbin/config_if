@@ -1,0 +1,69 @@
+#!/bin/sh
+
+if [ ! $# -eq 7 ];then
+	echo "usage:config_if [devname] [vapname] [mode] [channel] [txpower] [essid] [ip addr]"
+	echo "e.g. config_if wifi0 ath0 11nght20 1 20 fat_test 192.168.100.200"
+	exit
+fi
+
+POSTCONFIG=/jffs/postconfig
+cp -f /etc/wlan/postconfig $POSTCONFIG
+
+stop_monitor
+killall wtpd
+killall udhcpc
+killall factoryreset
+echo "stop_monitor" >> $POSTCONFIG
+echo "killall wtpd" >> $POSTCONFIG
+echo "killall udhcpc" >> $POSTCONFIG
+echo "killall factoryreset" >> $POSTCONFIG
+
+echo 0 > /proc/sys/dev/$1/thinap
+wlanconfig $2 destroy
+wlanconfig $2 create wlanmode ap wlandev $1
+brctl addif default $2
+ifconfig default $7
+echo "echo 0 > /proc/sys/dev/$1/thinap" >> $POSTCONFIG
+echo "wlanconfig $2 destroy" >> $POSTCONFIG
+echo "wlanconfig $2 create wlanmode ap wlandev $1" >> $POSTCONFIG
+echo "brctl addif default $2" >> $POSTCONFIG
+echo "ifconfig default $7" >> $POSTCONFIG
+
+if [ $3 == "11nght40" ]; then
+	ifconfig $2 down
+	iwconfig $2 channel 0
+	iwpriv $2 mode $3
+	iwconfig $2 channel $4
+	iwconfig $2 txpower $5
+	iwconfig $2 essid $6
+	iwpriv $2 disablecoext 1
+	ifconfig $2 up
+	echo "ifconfig $2 down" >> $POSTCONFIG
+	echo "iwconfig $2 channel 0" >> $POSTCONFIG
+	echo "iwpriv $2 mode $3" >> $POSTCONFIG
+	echo "iwconfig $2 channel $4" >> $POSTCONFIG
+	echo "iwconfig $2 txpower $5" >> $POSTCONFIG
+	echo "iwconfig $2 essid $6" >> $POSTCONFIG
+	echo "iwpriv $2 disablecoext 1" >> $POSTCONFIG
+	echo "ifconfig $2 up" >> $POSTCONFIG
+fi
+
+if [ $3 == "11nght20" ]; then
+	ifconfig $2 down
+	iwconfig $2 channel 0
+	iwpriv $2 mode $3
+	iwconfig $2 channel $4
+	iwconfig $2 txpower $5
+	iwconfig $2 essid $6
+	ifconfig $2 up
+	echo "ifconfig $2 down" >> $POSTCONFIG
+	echo "iwconfig $2 channel 0" >> $POSTCONFIG
+	echo "iwpriv $2 mode $3" >> $POSTCONFIG
+	echo "iwconfig $2 channel $4" >> $POSTCONFIG
+	echo "iwconfig $2 txpower $5" >> $POSTCONFIG
+	echo "iwconfig $2 essid $6" >> $POSTCONFIG
+	echo "ifconfig $2 up" >> $POSTCONFIG
+fi
+
+
+

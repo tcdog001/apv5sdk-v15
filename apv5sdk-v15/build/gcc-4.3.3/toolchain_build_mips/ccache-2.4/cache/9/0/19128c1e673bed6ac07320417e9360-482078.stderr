@@ -1,0 +1,2 @@
+WTPBinding.c: In function 'CWParseRateSet':
+WTPBinding.c:2549: warning: pointer targets in assignment differ in signedness

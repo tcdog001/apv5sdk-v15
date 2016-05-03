@@ -1,0 +1,35 @@
+.TH sdramtest 7a "Intellon Corporation" "int6000-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+sdramtest.nvm - SDRAM Diagnostic Applet
+.SH SYNOPSIS
+.RB int6ktest
+.RB [ memctl.nvm ]
+.BR sdramtest.nvm
+.RI [ ... ]
+.SH PURPOSE
+This diagnostic applet runs in TCM. It performs basic, slow-speed (160ns) SDRAM tests lasting about 4 seconds. Control returns to the booloader on successful completion. 
+.SH FAILURE 
+All LEDs will flash slowly on failure. Failure indicates bad SDRAM connections, power supply out of specification or major problems with board layout. Look for unconnected pins, shorted pins or power problems on the board. Missing or inadequate bypass capacitors can also cause failure. If this test fails then most other tests will probably fail. Try running the \fBmarchloop\fR applet to help determine the nature of the failure.
+.SH PREREQUISITES
+Bootloader software must be running. The SDRAM controller must be properly configured. See the \fBmemctl\fR applet for one means of configuratin SDRAM.
+.SH EXAMPLES
+The following example uses program \fBint6ktest\fR to download and execute applet file \fBmemctl.nvm\fR then applet file \fBsdramtest.nvm\fR. Applet \fBmemctl\fR is needed to configure the onboard SDRAM controller before executing applet \fBnvramtest\fR. 
+.PP
+   # int6ktest memctl.nvm sdramtest.nvm
+   eth2 00:B0:52:00:00:01 Start Applet memctl.nvm (0)
+   eth2 00:B0:52:00:00:01 Write Memory (00000040:6076)
+   eth2 00:B0:52:00:00:01 Wrote memctl.nvm
+   eth2 00:B0:52:00:00:01 Start Applet sdramtest.nvm (0)
+   eth2 00:B0:52:00:00:01 Write Memory (00001000:740)
+   eth2 00:B0:52:00:00:01 Wrote sdramtest.nvm
+.SH SEE ALSO
+.BR applets ( 7 ),
+.BR flashtest ( 7 ),
+.BR int6ktest ( 7 ),
+.BR memctl ( 7 ),
+.BR marchloop ( 7 ),
+.BR nvramtest ( 7 )
+.SH CREDITS
+ John Byron <john.byron@intellon.com>
+
+

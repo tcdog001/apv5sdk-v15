@@ -1,0 +1,22 @@
+Assembler messages:
+Warning: A different -mtune was already specified, is now mips32r2
+sm_inter_xdr.c: In function 'xdr_sm_name':
+sm_inter_xdr.c:11: warning: unused variable 'buf'
+sm_inter_xdr.c: In function 'xdr_my_id':
+sm_inter_xdr.c:21: warning: unused variable 'buf'
+sm_inter_xdr.c: In function 'xdr_mon_id':
+sm_inter_xdr.c:37: warning: unused variable 'buf'
+sm_inter_xdr.c: In function 'xdr_mon':
+sm_inter_xdr.c:51: warning: unused variable 'i'
+sm_inter_xdr.c:49: warning: unused variable 'buf'
+sm_inter_xdr.c: In function 'xdr_stat_chge':
+sm_inter_xdr.c:62: warning: unused variable 'buf'
+sm_inter_xdr.c: In function 'xdr_sm_stat':
+sm_inter_xdr.c:74: warning: unused variable 'buf'
+sm_inter_xdr.c: In function 'xdr_res':
+sm_inter_xdr.c:84: warning: unused variable 'buf'
+sm_inter_xdr.c: In function 'xdr_sm_stat_res':
+sm_inter_xdr.c:94: warning: unused variable 'buf'
+sm_inter_xdr.c: In function 'xdr_status':
+sm_inter_xdr.c:108: warning: unused variable 'i'
+sm_inter_xdr.c:106: warning: unused variable 'buf'

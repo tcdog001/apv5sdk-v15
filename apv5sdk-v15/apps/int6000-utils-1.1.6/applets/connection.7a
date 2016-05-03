@@ -1,0 +1,30 @@
+.TH connection 7a "Intellon Corporation" "int6400-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+connection - Intellon Connection Analyser
+.SH SYNOPSIS
+.BR int6ktest 
+.BR connection.nvm
+.RI [ ... ]
+.SH PURPOSE
+This diagnostic applet runs in Tightly Coupled Memory (TCM) and performs a sequence of memory read/write tests that detect bad circuit board connections. Control returns to the bootloader on successful completion.
+.SH FAILURE 
+All LEDs will flash on failure. If this test fails the most other tests will probably fail.  Look for broken connections, cold solder joints and shorted pins.
+.SH PREREQUISITES
+The device must be in bootloader mode. 
+.SH DISCLAIMER
+Intellon image file structure and content is proprietary to Intellon Corporation, Ocala FL USA. Consequently, public information is not available. Intellon Corporation reserves the right to change file structure or content in future firmware releases without any obligation to notify or compensate users of this program. This applet is reserved for use by Intellon Field Application Engineers. Intellon makes no claims concerning the reliability of this applet or the suitability of this applet for any particular purpose.
+.SH EXAMPLES
+The following example uses program \fBint6ktest\fR to download and execute applet \fBconnection\fR.
+.PP
+   # int6ktest connection.nvm              
+.SH SEE ALSO
+.BR applets ( 7 ),
+.BR int6ktest ( 7 ),
+.BR memctl ( 7 ),
+.BR flashtest ( 7 ),
+.BR marchloop ( 7 )
+.BR memburst (7)
+.SH CREDITS
+ John Byron <john.byron@intellon.com>
+
+

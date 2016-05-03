@@ -1,0 +1,382 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_config=`config_read /config/network/vap1`
+xml_wlan_if=`config_getoption "$xml_config" if`
+
+xml_wlan_authmode=`config_getoption "$xml_config" authmode`
+xml_wlan_security=`config_getoption "$xml_config" security`
+xml_wlan_wpamode=`config_getoption "$xml_config" wpamode`
+xml_wlan_encryption=`config_getoption "$xml_config" encryption`
+xml_wlan_wepkey=`config_getoption "$xml_config" wepkey`
+xml_wlan_wepkeytype=`config_getoption "$xml_config" wepkeytype`
+
+xml_wlan_wepbit=`config_getoption "$xml_config" wepbit`
+
+xml_wlan_passkey1=`config_getoption "$xml_config" passkey1`
+xml_wlan_passkey2=`config_getoption "$xml_config" passkey2`
+xml_wlan_passkey3=`config_getoption "$xml_config" passkey3`
+xml_wlan_passkey4=`config_getoption "$xml_config" passkey4`
+xml_wlan_passphrase=`config_getoption "$xml_config" passphrase`
+%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>Security Settings</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<script type="text/javascript" src="sha1.js"></script>
+<script type="text/javascript">
+ 	var flag="<%= $xml_session_lang %>";
+	
+ function genstr(){
+		  var str=hex_sha1(document.all.pass.value);
+			var substr1=str.substring(0,10);
+			var substr2=str.substring(10,20);
+			var substr3=str.substring(20,30);
+			var substr4=str.substring(30,40);
+			var substr11=str.substring(0,26);
+			var substr22=str.substring(5,31);
+			var substr33=str.substring(10,36);
+			var substr44=str.substring(14,40);
+			var substr111=str.substring(0,32);
+			var substr222=str.substring(2,34);
+			var substr333=str.substring(4,36);
+			var substr444=str.substring(7,39);
+			
+			if(document.all.wepbit.value == "64"){
+				document.all.passkey1.value = substr1;
+				document.all.passkey2.value = substr2;
+				document.all.passkey3.value = substr3;
+				document.all.passkey4.value = substr4;
+			
+			}
+			   
+			if(document.all.wepbit.value == "128"){
+				document.all.passkey1.value = substr11;
+				document.all.passkey2.value = substr22;
+				document.all.passkey3.value = substr33;
+				document.all.passkey4.value = substr44;
+			
+			}
+			
+			if(document.all.wepbit.value == "152"){
+				document.all.passkey1.value = substr111;
+				document.all.passkey2.value = substr222;
+				document.all.passkey3.value = substr333;
+				document.all.passkey4.value = substr444;
+			
+			}
+			
+}	
+
+function genascill()
+{ 
+	    var str1=str_sha1(document.all.pass.value);
+	    if(document.all.wepbit.value == "64"){
+			   document.all.passkey1.value = str1.substring(0,5);
+			   document.all.passkey2.value = str1.substring(5,10);
+			   document.all.passkey3.value = str1.substring(10,15);
+				 document.all.passkey4.value = str1.substring(15,20);
+			}
+			
+			if(document.all.wepbit.value == "128"){
+				 document.all.passkey1.value = str1.substring(0,13);
+			   document.all.passkey2.value = str1.substring(2,15);
+			   document.all.passkey3.value = str1.substring(4,17);
+				 document.all.passkey4.value = str1.substring(6,19);
+			}
+			
+			if(document.all.wepbit.value == "152"){
+				 document.all.passkey1.value = str1.substring(0,16);
+			   document.all.passkey2.value = str1.substring(2,18);
+			   document.all.passkey3.value = str1.substring(4,20);
+				 document.all.passkey4.value = str1.substring(3,19);
+			}
+}
+
+function typeselect()
+{
+		 if(document.all.etype.value == "hex")
+		 {
+		 	   genstr();
+		 }
+		 else
+		 {
+		 	   genascill();
+		 }
+}
+
+function passvalidate() {
+    var reg = /^[0-9a-fA-F]{1,32}$/;
+    var x = document.all.passkey1;
+    var y = document.all.passkey2;
+    var z = document.all.passkey3; 
+    var w = document.all.passkey4; 
+    var l = (parseInt(document.all.wepbit.value)-24)/4;
+    var p = (parseInt(document.all.wepbit.value)-24)/8; 
+     
+    
+    if(document.all.etype.value == "hex"){
+				    if(document.all.wepkey[0].checked == true){  
+					    if (!reg.test(x.value) || x.value.length != l) {
+							     alert("Please input passkey1 correctly.");
+							     x.focus();
+							     return false;
+						  }
+					  }
+					  
+					  if(document.all.wepkey[1].checked == true){ 
+						  if (!reg.test(y.value) || y.value.length != l) {
+							     alert("Please input passkey2 correctly.");
+							     y.focus();
+							     return false;
+						  }
+						}
+					  
+					  if(document.all.wepkey[2].checked == true){ 
+						  if (!reg.test(z.value) || z.value.length != l) {
+							     alert("Please input passkey3 correctly.");
+							     z.focus();
+							     return false;
+						  }
+						}
+					  
+					  if(document.all.wepkey[3].checked == true){ 
+						  if (!reg.test(w.value) || w.value.length != l) {
+							     alert("Please input passkey4 correctly.");
+							     w.focus();
+							     return false;
+						  }
+						}	
+			}
+			else
+			{
+				if(document.all.wepkey[0].checked == true){  
+					    if (x.value.length != p) {
+							     alert("Please input passkey1 correctly.");
+							     x.focus();
+							     return false;
+						  }
+					  }
+					  
+					  if(document.all.wepkey[1].checked == true){ 
+						  if (y.value.length != p) {
+							     alert("Please input passkey2 correctly.");
+							     y.focus();
+							     return false;
+						  }
+						}
+					  
+					  if(document.all.wepkey[2].checked == true){ 
+						  if (z.value.length != p) {
+							     alert("Please input passkey3 correctly.");
+							     z.focus();
+							     return false;
+						  }
+						}
+					  
+					  if(document.all.wepkey[3].checked == true){ 
+						  if (w.value.length != p) {
+							     alert("Please input passkey4 correctly.");
+							     w.focus();
+							     return false;
+						  }
+						}		
+			}			
+						 
+}	
+
+function shielding(){
+   if(document.all.security[0].checked == true){
+	  document.getElementById("a1").style.display="none";
+	  document.getElementById("a2").style.display="none";
+	  document.getElementById("a3").style.display="none";
+	  document.getElementById("a4").style.display="none";
+	  document.getElementById("a5").style.display="none";
+	  document.getElementById("a6").style.display="none";
+	  }
+	else if(document.all.security[1].checked == true){
+	  document.getElementById("a1").style.display="";
+	  document.getElementById("a2").style.display="none";
+	  document.getElementById("a3").style.display="none";
+	  document.getElementById("a4").style.display="";
+	  document.getElementById("a5").style.display="none";
+	  document.getElementById("a6").style.display="none";
+	}
+    else if(document.all.security[2].checked == true||document.all.security[3].checked == true){
+	  document.getElementById("a1").style.display="none";
+	  document.getElementById("a2").style.display="";
+	  document.getElementById("a3").style.display="";
+	  document.getElementById("a4").style.display="none";
+	  document.getElementById("a5").style.display="";
+	  document.getElementById("a6").style.display="";
+	  if(document.all.wpamode.value != "PSK"){
+	  document.getElementById("a3").style.display="none";
+	  document.getElementById("a6").style.display="none";
+	  }
+	}
+}	
+ </script>
+</head>
+
+<body bgcolor="#efefef" onLoad="shielding()">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1"><a href="wlan_settings.htm" target="MainFrame">WLAN State</a></td>
+          <td class="top1"><a href="wlan_set.htm" target="MainFrame">WLAN Settings</a></td>
+          <td class="top1">Security Settings</td>
+		  <td class="top1"><a href="radius_settings.htm" target="MainFrame">Radius Settings</a></td>		  
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">WLAN Settings-->Security Settings</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return passvalidate()">
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" >Wireless Lan Security</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+			<tr>
+			<td class="td_style" width="150">Wireless Security Type</td>
+			<td class="td_style" width="350">
+				<input type="radio" <% webui_radiobutton_check "$xml_wlan_security" "none" %> name="security" value="none" onClick="shielding()">None &nbsp;
+				<input type="radio" <% webui_radiobutton_check "$xml_wlan_security" "wep" %> name="security" value="wep" onClick="shielding()">WEP &nbsp;
+				<input type="radio" <% webui_radiobutton_check "$xml_wlan_security" "wpa" %> name="security" value="wpa" onClick="shielding()"> WPA &nbsp;
+				<input type="radio" <% webui_radiobutton_check "$xml_wlan_security" "wpa2" %> name="security" value="wpa2" onClick="shielding()"> WPA2 &nbsp; 
+			</td>
+			</tr>
+	  </table>
+	  </td>
+  </tr>
+  
+  <tr id="a1">
+    <td><font class="table_head" >WEP</font></td>
+  </tr>
+  <tr id="a4">
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+			<tr>
+				<td class="td_style" width="150">Mode</td>
+				<td class="td_style" width="350">
+					<select name="authmode">
+					<option value="1" <% webui_listbox_select "$xml_wlan_authmode" "1" %>>Open System</option>
+				  <option value="2" <% webui_listbox_select "$xml_wlan_authmode" "2" %>>Shared Key</option>
+					<option value="3" <% webui_listbox_select "$xml_wlan_authmode" "3" %>>Radius</option>
+					</select>
+				</td>
+			</tr>
+												
+			<tr>
+				<td class="td_style" >Encryption Type</td>
+				<td class="td_style" >
+					<select name="etype">
+					<option value="hex" <% webui_listbox_select "$xml_wlan_wepkeytype" "hex" %>>Hexadecimal</option>
+					<option value="ascii" <% webui_listbox_select "$xml_wlan_wepkeytype" "ascii" %>>Ascii</option>
+					</select>
+				</td>
+			</tr>
+												
+			<tr>
+				<td class="td_style">Encryption</td>
+				<td class="td_style">
+					<select name="wepbit">
+					<option value="64"<% webui_listbox_select "$xml_wlan_wepbit" "64" %>>64 bit WEP</option>
+					<option value="128"<% webui_listbox_select "$xml_wlan_wepbit" "128" %>>128 bit WEP</option>
+					<option value="152"<% webui_listbox_select "$xml_wlan_wepbit" "152" %>>152 bit WEP</option>
+					</select>
+				</td>
+			</tr>
+												
+			<tr>
+				<td class="td_style">WEP Passphrase</td>
+				<td class="td_style"><input type="text" name="pass">&nbsp;<input type="button" value="Generate" name="Generate" onclick="typeselect()"></td>
+			</tr>
+												
+			<tr>
+				<td class="td_style">WEP Key 1</td><td class="td_style"><input type="radio" <% webui_radiobutton_check "$xml_wlan_wepkey" "1" %>  name="wepkey" value="1">&nbsp;
+				<input type="text" name="passkey1" value="<%= "$xml_wlan_passkey1" %>"></td>
+			</tr>
+												
+			<tr>
+					<td class="td_style">WEP Key 2</td><td class="td_style"><input type="radio" <% webui_radiobutton_check "$xml_wlan_wepkey" "2" %>  name="wepkey" value="2">&nbsp;
+					<input type="text" name="passkey2" value="<%= "$xml_wlan_passkey2" %>"></td>
+			</tr>
+												
+			<tr>
+					<td class="td_style" >WEP Key 3</td><td class="td_style"><input type="radio" <% webui_radiobutton_check "$xml_wlan_wepkey" "3" %>  name="wepkey" value="3" >&nbsp;
+					<input type="text" name="passkey3" value="<%= "$xml_wlan_passkey3" %>"></td>
+			</tr>
+												
+			<tr>
+					<td class="td_style">WEP Key 4</td><td class="td_style"><input type="radio" <% webui_radiobutton_check "$xml_wlan_wepkey" "4" %>  name="wepkey" value="4" >&nbsp;
+					<input type="text" name="passkey4" value="<%= "$xml_wlan_passkey4" %>"></td>
+			</tr>									
+	  </table>
+	</td>
+  </tr>
+  
+  <tr id="a2">
+    <td><font class="table_head" >WPA</font></td>
+  </tr>
+  <tr id="a5">
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+			<tr>
+												<td class="td_style" width="150">WPA with</td>
+												<td class="td_style" width="350">
+												<select name="wpamode" onChange="shielding()">
+												<option <% webui_listbox_select "$xml_wlan_wpamode" "PSK" %> value="PSK" >PSK</option>
+												<option <% webui_listbox_select "$xml_wlan_wpamode" "RADIUS" %> value="RADIUS">RADIUS</option>
+												</select>
+												</td>
+												</tr>
+												
+												<tr>
+												<td class="td_style">Encryption</td>
+												<td class="td_style">
+												<input type="radio" <% webui_radiobutton_check "$xml_wlan_encryption" "TKIP" %> name="encryption" value="TKIP">TKIP &nbsp;
+												<input type="radio" <% webui_radiobutton_check "$xml_wlan_encryption" "AES" %> name="encryption" value="AES">AES&nbsp;
+												</td>
+												</tr>
+	  </table>
+	</td>
+  </tr>
+  
+  <tr  id="a3">
+    <td><font class="table_head" >PSK Settings</font></td>
+  </tr>
+  <tr id="a6">
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+												<tr>
+												<td class="td_style" width="150">Passphrase</td>
+												<td class="td_style" width="350"><input type="text" name="passphrase"  value="<%= "$xml_wlan_passphrase" %>"></td>
+												</tr>
+	  </table>
+	</td>
+  </tr>
+  
+  <tr>
+    <td><input id="but" type="submit" name="security_setting_commit" value="Submit"/></td>
+  </tr>
+</table>
+<input type="hidden" value="SEC Apply" name="SERVLET">
+</form>
+</div>
+</body>
+</html>

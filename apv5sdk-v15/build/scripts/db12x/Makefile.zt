@@ -1,0 +1,864 @@
+.notparallel: 
+export SHELL=/bin/bash
+CURRENT=${shell pwd}
+export SDKNAME=ap83sdk
+#ifndef OCTEON_ROOT
+#export OCTEON_ROOT=/home/changzhimin/cavium/OCTEONSDK
+#export OCTEON_ROOT=${CURRENT}/../OCTEON-SDK
+#export  OCTEON_ROOT=${CURRENT}/../build
+#endif
+#ifndef OCTEON_MODEL
+#export OCTEON_MODEL=OCTEON_CN50XX
+#endif
+ 
+ifndef TOPDIR
+export TOPDIR=${CURRENT}/../../../
+endif
+
+#ifndef MODE
+export MODE=wapi
+#else
+#export MODE=${MODE}
+#endif
+#export OCTEON_CPPFLAGS_GLOBAL_ADD= -DUSE_RUNTIME_MODEL_CHECKS=1 -DCVMX_ENABLE_PARAMETER_CHECKING=0 -DCVMX_ENABLE_CSR_ADDRESS_CHECKING=0 -DCVMX_ENABLE_POW_CHECKS=0
+
+#TOOLCHAIN_DIR=$(TOPDIR)/build/gcc-3.4.4-2.16.1/build_mips_nofpu/bin
+#HOSTTOOL_DIR=${OCTEON_ROOT}/host/bin
+
+#export PATH+=:$(TOOLCHAIN_DIR)
+WORKDIR=$(TOPDIR)/autelan
+PKGSOURCEDIR=$(TOPDIR)/autelan
+KERNELDIR=$(TOPDIR)/linux/kernels/mips-linux-2.6.31
+ROOTFSDIR=$(INSTALL_ROOT)
+#ROOTFSDIR=$(TOPDIR)/../build_ap83/rootfs-ap83fus.build
+#BINDIR=$(CURRENT)/bin
+MAKEFILE=Makefile.apv5
+ZTMAKEFILE=Makefile.zt_apv5
+
+######################################################################################
+#Source DIR
+######################################################################################
+ifeq "${MODE}" "11bg"
+MADWIFIDIR=${PKGSOURCEDIR}/madwifi-trunk3314
+endif
+ifeq "${MODE}" "wapi"
+MADWIFIDIR=${PKGSOURCEDIR}/madwifi-trunk-r3314-wapi
+endif
+
+HASERLDIR=$(PKGSOURCEDIR)/haserl-0.9.24
+MINIHTTPDDIR=$(PKGSOURCEDIR)/mini_httpd-1.19
+LIBMXMLDIR=$(PKGSOURCEDIR)/libmxml-0.9.1
+XMLCONFDIR=$(PKGSOURCEDIR)/xmlconf
+CRYPTOOLDIR=$(PKGSOURCEDIR)/crypttool
+WEBSCRIPTDIR=$(PKGSOURCEDIR)/web
+WIRELESSTOOLDIR=$(PKGSOURCEDIR)/wireless-tools
+BASICFILETDIR=$(PKGSOURCEDIR)/base-files
+BMUTILDIR=$(PKGSOURCEDIR)/bmutil
+BMKOMDIR=$(PKGSOURCEDIR)/bmkmod
+BUSYBOXDIR=$(PKGSOURCEDIR)/busybox
+AVRMODDIR=$(PKGSOURCEDIR)/avrmod
+AVRUTILDIR=$(PKGSOURCEDIR)/avrutil
+EBTABLESDIR=$(PKGSOURCEDIR)/ebtables
+NETSNMPDIR=$(PKGSOURCEDIR)/net-snmp
+GSSAPIDIR=$(PKGSOURCEDIR)/libgssapi
+TR69DIR=$(PKGSOURCEDIR)/tr069
+CURLDIR=$(PKGSOURCEDIR)/curl
+ZLIBDIR=$(PKGSOURCEDIR)/zlib-1.2.3
+GSOAPDIR=$(PKGSOURCEDIR)/gsoap
+NTPDIR=$(PKGSOURCEDIR)/ntpclient
+DROPBEARDIR=$(PKGSOURCEDIR)/dropbear
+HOSTAPDDIR=$(PKGSOURCEDIR)/hostapd-0.6.6
+ATHRHOSTAPDDIR=$(TOPDIR)/apps/athr-hostap/hostapd
+ATHEROS11NDIR=$(PKGSOURCEDIR)/atheros11n
+MADWIFI11NDIR=$(PKGSOURCEDIR)/11n_new
+DHCPSNOOPINGDIR=${PKGSOURCEDIR}/dhcpsnooping
+SMALLTOOLDIR=${PKGSOURCEDIR}/smalltool
+APLIBDIR=$(PKGSOURCEDIR)/aplib
+AUTEOSDIR=$(PKGSOURCEDIR)/auteos
+WTPDDIR=$(PKGSOURCEDIR)/wtpd
+APCTLDIR=$(PKGSOURCEDIR)/apctl
+DNSMASQDIR=$(PKGSOURCEDIR)/dnsmasq
+WPASUPDIR=$(PKGSOURCEDIR)/wpa_supplicant
+PPPDIR=$(PKGSOURCEDIR)/ppp
+LIBUPNPDIR=$(PKGSOURCEDIR)/libupnp
+LINUXIGDDIR=$(PKGSOURCEDIR)/linuxigd
+QUAGGADIR=$(PKGSOURCEDIR)/quagga
+LIBREADLINEDIR=$(PKGSOURCEDIR)/libreadline
+NCURSESDIR=$(PKGSOURCEDIR)/ncurses
+IGMPSNOOPDIR=$(PKGSOURCEDIR)/igmp_snooping
+OPENSSLDIR=$(PKGSOURCEDIR)/openssl
+SMS4DIR=$(PKGSOURCEDIR)/sms4
+SMS4SOURCE=$(PKGSOURCEDIR)/sms4_c
+WAPIDDIR=$(PKGSOURCEDIR)/wapid
+APLOCATORDIR=$(PKGSOURCEDIR)/aplocator
+IPERFDIR=$(PKGSOURCEDIR)/iperf
+CAPWAPSPLITFASTDIR=${PKGSOURCEDIR}/zt_capwap_split_fast
+WRCPU=${PKGSOURCEDIR}/pro_ctl_mod
+WRCPUUTIL=${PKGSOURCEDIR}/pro_ctl_util
+BINDDIR=${PKGSOURCEDIR}/bind-9.7.0
+DHCLIENTDIR=${PKGSOURCEDIR}/dhclient
+IPROUTEDIR=${PKGSOURCEDIR}/iproute2-2.6.29-1
+######################################################################################
+#Work DIR
+######################################################################################
+WHASERLDIR=$(WORKDIR)/haserl-0.9.24
+WMINIHTTPDDIR=$(WORKDIR)/mini_httpd-1.19
+WLIBMXMLDIR=$(WORKDIR)/libmxml-0.9.1
+WXMLCONFDIR=$(WORKDIR)/xmlconf
+WCRYPTOOLDIR=$(WORKDIR)/crypttool
+WWEBSCRIPTDIR=$(WORKDIR)/web
+WWIRELESSTOOLDIR=$(WORKDIR)/wireless-tools
+WBASICFILETDIR=$(WORKDIR)/base-files
+WBMUTILDIR=$(WORKDIR)/bmutil
+WBMKOMDIR=$(WORKDIR)/bmkmod
+WBUSYBOXDIR=$(WORKDIR)/busybox
+WAVRMODDIR=$(WORKDIR)/avrmod
+WAVRUTILDIR=$(WORKDIR)/avrutil
+WEBTABLESDIR=$(WORKDIR)/ebtables
+WNETSNMPDIR=$(WORKDIR)/net-snmp
+WGSSAPIDIR=$(WORKDIR)/libgssapi
+WTR69DIR=$(WORKDIR)/tr069
+WCURLDIR=$(WORKDIR)/curl
+WZLIBDIR=$(WORKDIR)/zlib-1.2.3
+WGSOAPDIR=$(WORKDIR)/gsoap
+WNTPDIR=$(WORKDIR)/ntpclient
+WDROPBEARDIR=$(WORKDIR)/dropbear
+WHOSTAPDDIR=$(WORKDIR)/hostapd-0.6.6
+WATHRHOSTAPDDIR=$(TOPDIR)/apps/athr-hostap/hostapd
+WATHEROS11NDIR=$(WORKDIR)/atheros11n
+WMADWIFI11NDIR=$(WORKDIR)/11n_new
+WDHCPSNOOPINGDIR=${WORKDIR}/dhcpsnooping
+WSMALLTOOLDIR=${WORKDIR}/smalltool
+WAPLIBDIR=$(WORKDIR)/aplib
+WAUTEOSDIR=$(WORKDIR)/auteos
+WWTPDDIR=$(WORKDIR)/wtpd
+WDNSMASQDIR=$(WORKDIR)/dnsmasq
+WWPASUPDIR=$(WORKDIR)/wpa_supplicant
+WPPPDIR=$(WORKDIR)/ppp
+WLIBUPNPDIR=$(WORKDIR)/libupnp
+WLINUXIGDDIR=$(WORKDIR)/linuxigd
+WQUAGGADIR=$(WORKDIR)/quagga
+WLIBREADLINEDIR=$(WORKDIR)/libreadline
+WNCURSESDIR=$(WORKDIR)/ncurses
+WIGMPSNOOPDIR=$(WORKDIR)/igmp_snooping
+WOPENSSLDIR=$(WORKDIR)/openssl
+WSMS4DIR=$(WORKDIR)/sms4
+WSMS4SOURCE=$(WORKDIR)/sms4_c
+WWAPIDDIR=$(WORKDIR)/wapid
+WAPLOCATORDIR=$(WORKDIR)/aplocator
+WIPERFDIR=$(WORKDIR)/iperf
+WCAPWAPSPLITFASTDIR=${WORKDIR}/zt_capwap_split_fast
+WWRCPU=${WORKDIR}/pro_ctl_mod
+WWRCPUUTIL=${WORKDIR}/pro_ctl_util
+WBINDDIR=${WORKDIR}/bind-9.7.0
+WDHCLIENTDIR=${WORKDIR}/dhclient
+WIPROUTEDIR=${WORKDIR}/iproute2-2.6.29-1
+
+#KERNEL_VERSION=${shell make -s -C ${KERNELDIR} kernelrelease}
+
+CROSS=mips-linux-uclibc
+TARGET_CROSS = mips-linux-uclibc-
+CC=${CROSS}-gcc
+TARGETCC=${CROSS}-gcc
+CXX=${CROSS}-g++
+LD=${CROSS}-ld
+TARGETLD=${CROSS}-ld
+AR=${CROSS}-ar
+TARGETAR=${CROSS}-ar
+RANLIB=${CROSS}-ranlib
+STRIP=${CROSS}-strip
+TARGETSTRIP=${CROSS}-strip
+CFLAGS=${TOOLCHAIN_ABI} -Os -fomit-frame-pointer
+CXXFLAGS=${TOOLCHAIN_ABI} -Os -fomit-frame-pointer
+CAVIUMFLAGS=-f ${MAKEFILE}
+ZTFLAGS=-f ${ZTMAKEFILE}
+
+
+#ifdef TOOLCHAIN_ABI_N32
+#  export TOOLCHAIN_ABI=-mabi=n32
+#  export LDFLAGS=-melf32btsmipn32
+#  export LIBDIR=/usr/lib32
+#endif
+
+#ifdef TOOLCHAIN_ABI_64
+#  export TOOLCHAIN_ABI=-mabi=64
+#  export LDFLAGS=-melf64btsmip
+#  export LIBDIR=/usr/lib64
+#endif
+
+#ifdef TOOLCHAIN_UCLIBC
+#  export TOOLCHAIN_ABI=-muclibc
+#  export LDFLAGS=-melf32btsmipn32
+#  export LIBDIR=/uclibc/usr/lib
+#endif
+
+######################################################################
+# Tell the user what to do
+######################################################################
+.DEFAULT: help
+.PHONY: help
+.SILENT: help
+help:
+				######################################################################
+				# Targets for autelan app packages 
+				######################################################################
+				echo ""
+				echo "    wirelesstool     - wireless tools"
+				echo "    tr069            - tr069"
+				echo "    snmp             - snmp agent"
+				echo "    websuit          - web management tool"
+				echo "    basicfile        - basic configuration files"
+				echo "    ntpclient              - ntp client"
+				echo "    hostapd          - hostapd 0.6.6"								
+				echo "    athr-hostapd     - athr-hostapd"
+				echo "    dhcpsnooping     - dhcp snooping "
+				echo "    smalltool        - smalltool" 
+				######################################################################
+				# Targets for autelan kernel ko 
+				######################################################################
+				echo " "
+				echo "    madwifi          - linux wireless driver 11abg"
+				echo "    atheros11n            - linux wireless driver for 11n "
+				echo "    bmkmodpkg        - autelan board manage ko and tool"
+				echo "    capwap_split_fast- autelan private module for thin ap"
+				######################################################################
+				# Targets for kernel 
+				######################################################################
+				echo ""
+				echo "    vmlinux          - Linux kernel with  the rootfs"
+				echo "    kernel           - Build the Linux kernel"
+				echo "    rootfs           - Linux rootfs"
+				echo "    image            - Bootable image for U-boot"
+
+				######################################################################
+				# Targets for cleaning up 
+				######################################################################
+				echo ""
+				echo "    cleanall          - Remove all generated files"
+				echo "    cleankernel       - Remove all generated files in kernel dir"
+				echo "    cleanrootfs       - Remove all generated files in rootfs"
+				echo "    cleanmadwifi      - Remove all generated files in madwifi"
+				echo "    cleanwebsuit      - Remove all generated files in websuit"
+				echo "    cleanwirelesstool - Remove all generated files in wirelesstool"
+				echo "    cleanbmkod - Remove all generated files in cleanbmkod"
+				env				
+######################################################################
+# Targets for autelan apps
+######################################################################	
+#11bg
+ifeq "${THINAP_ONLY}" "1"
+apps: basicfile capwap_split_fast autelan_hostapd wtpd websuit crypttool busybox  wrcpu wrcpuutil ntpclient smalltool dropbear dhcpsnooping 
+#11bg+wapi or 11n
+else
+#apps: basicfile capwap_split_fast autelan_hostapd wtpd websuit  crypttool busybox  wrcpu wrcpuutil  ntpclient smalltool dropbear  dhcpsnooping netsnmp iperf
+apps: basicfile wtpd apctl crypttool  busybox  smalltool dhcpsnooping  wrcpu wrcpuutil zlib  websuit ntpclient dropbear capwap_split_fast athrhostapd
+endif
+			@echo "Build all applications"
+			ln -sf /tmp   ${ROOTFSDIR}/var
+			
+basicfile:
+			@echo "Copying basic files and scripts!"
+			${MAKE} -C ${WBASICFILETDIR} \
+				${ZTFLAGS} ROOTFSDIR=${ROOTFSDIR} 
+
+apctl:
+			@echo "staring compile apctl."
+			${MAKE} -C ${APCTLDIR} CC=${CC} AR=${AR} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}			
+	
+wtpd:
+			@echo "staring compile wtpd tools."
+			${MAKE} -C ${WWTPDDIR} CC=${CC} AR=${AR} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}			
+	
+wirelesstool:
+			@echo "staring compile wireless tools."
+			${MAKE} -C ${WIRELESSTOOLDIR} ${CAVIUMFLAGS} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+		
+websuit:haserl minihttpd xmlconf crypttool
+			@echo "Copying web htmls and scripts!"
+			${MAKE} -C ${WWEBSCRIPTDIR} ROOTFSDIR=${ROOTFSDIR} \
+				${ZTFLAGS} 
+			
+haserl:
+			@echo "staring compile haserl."
+			${MAKE} -C ${WHASERLDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+autelan_openssl:
+			@echo "staring compile openssl"
+			${MAKE} -C ${WOPENSSLDIR} CC=${CC} \
+                              ${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+minihttpd: autelan_openssl
+			@echo "staring compile minihttpd."
+			${MAKE} -C ${WMINIHTTPDDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} \
+				SSL_TREE=${WORKDIR}/openssl/src
+			
+xmlconf:libmxml
+			@echo "staring compile xmlconf."
+			${MAKE} -C ${WXMLCONFDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+			
+crypttool:
+			@echo "staring compile crptool."
+			${MAKE} -C ${WCRYPTOOLDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+busybox:
+			@echo "staring compile busybox."
+			${MAKE} -C ${WBUSYBOXDIR} CC=${CC} \
+				${ZTFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+ebtables:
+			@echo "staring compile ebtables."
+			${MAKE} -C ${EBTABLESDIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+netsnmp: aplib
+			@echo "staring compile net-snmp."
+			${MAKE} -C ${WNETSNMPDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+tr069: curl gssapi aplib gsoap
+#tr069:
+#tr069: gsoap
+			@echo "starting compile tr066. "
+			${MAKE} -C ${WTR69DIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} \
+				OCTEON_ROOT=${OCTEON_ROOT}
+
+
+curl:
+			@echo "staring compile curl. "
+			${MAKE} -C ${WCURLDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} \
+				OCTEON_ROOT=${OCTEON_ROOT}
+
+zlib:
+			@echo "staring compile zlib. "
+			${MAKE} -C ${WZLIBDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+gssapi:
+			@echo "staring compile gssapi. "
+			${MAKE} -C ${WGSSAPIDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+gsoap:
+			@echo "staring compile gsoap. "
+			${MAKE} -C ${WGSOAPDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				OCTEON_ROOT=${OCTEON_ROOT} \
+				ROOTFSDIR=${ROOTFSDIR} 
+
+iperf:	autelan_openssl
+			@echo "staring comile iperf. "
+			${MAKE} -C ${WIPERFDIR} CC=${CC} \
+				CXX=${CXX} \
+				ROOTFSDIR=${ROOTFSDIR} \
+				${CAVIUMFLAGS} \
+				OCTEON_ROOT=${OCTEON_ROOT}
+
+ntpclient:
+			@echo "staring compile ntpclient. "
+			${MAKE} -C ${WNTPDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+bind: #zlib
+			@echo "staring compile bind. "
+			${MAKE} -C ${WBINDDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+dhclient: #zlib
+			@echo "staring compile dhclient. "
+			${MAKE} -C ${WDHCLIENTDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+iproute: 
+			@echo "staring compile iproute. "
+			${MAKE} -C ${WIPROUTEDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+dropbear:
+			@echo "staring compile dropbear. "
+			${MAKE} -C ${WDROPBEARDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+autelan_hostapd: autelan_openssl
+			@echo "staring compile hostapd. "
+			${MAKE} -C ${WHOSTAPDDIR} ${CAVIUMFLAGS} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR}  
+
+athrhostapd:
+			@echo "staring compile athr-hostapd. "
+			if ( test -e ../apps/athr-hostap/hostapd ) then \
+			cp -f scripts/$(BOARD_TYPE)/athr_hostapd.conf ../apps/athr-hostap/hostapd/.config; \
+			cd ${WATHRHOSTAPDDIR};${MAKE} clean;${MAKE} CC=${CC} AR=${AR} LD=${LD};${STRIP} ${WATHRHOSTAPDDIR}/hostapd;cp ${WATHRHOSTAPDDIR}/hostapd $(ROOTFSDIR)/usr/sbin; \
+			fi
+
+#${MAKE} -C ${WATHRHOSTAPDDIR} clean 
+dhcpsnooping:
+			@echo "staring compile dhcpsnooping . "
+			${MAKE} -C ${WDHCPSNOOPINGDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+dnsmasq:
+			@echo "staring compile dnsmasq. "
+			${MAKE} -C ${DNSMASQDIR} ${CAVIUMFLAGS} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+
+smalltool:auteos
+			@echo "staring compile smalltool . "
+			${MAKE} -C ${WSMALLTOOLDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+wrcpuutil:auteos
+			@echo "staring compile wrcpuutil . "
+			${MAKE} -C ${WWRCPUUTIL} CC=${CC} \
+			${CAVIUMFLAGS} \
+			ROOTFSDIR=${ROOTFSDIR} \
+			BOARD_TPYE=${BOARD_TPYE}
+
+aplib: libmxml
+			@echo "staring compile aplib. "
+			${MAKE} -C ${WAPLIBDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} 
+auteos:
+			@echo "staring compile auteos. "
+			${MAKE} -C ${WAUTEOSDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} 
+
+wpasup:
+			@echo "starting compile wpa supplicant" 
+			${MAKE} -C ${WPASUPDIR} ${CAVIUMFLAGS} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR}
+ppp:
+			@echo "starting compile ppp"
+			${MAKE} -C ${PPPDIR} CC=${CC} \
+				STRIP=${TARGETSTRIP} \
+				ROOTFSDIR=${ROOTFSDIR} 
+wapid:sms4 autelan_openssl
+			@echo "starting compile wapid"
+			${MAKE} -C ${WAPIDDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				STRIP=${TARGETSTRIP} \
+				ROOTFSDIR=${ROOTFSDIR} 
+
+sms4: 
+			@echo "starting compile sms4"
+			{ test -d ${SMS4DIR} || ln -sf ${SMS4SOURCE} ${SMS4DIR} ;}
+			{ ( test -f ${SMS4DIR}/kernel_module/src/Makefile.cavium && mv ${SMS4DIR}/kernel_module/src/Makefile.cavium ${SMS4DIR}/kernel_module/src/Makefile ) || : ;} 
+			${MAKE} -C ${SMS4DIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				STRIP=${TARGETSTRIP} \
+				ROOTFSDIR=${ROOTFSDIR} 
+
+libupnp:
+			@echo "starting compile libupnp"
+			${MAKE} -C ${LIBUPNPDIR} CC=${CC} \
+				STRIP=${TARGETSTRIP} \
+				ROOTFSDIR=${ROOTFSDIR} 				 
+linuxigd:libupnp 
+			@echo "starting compile linuxigd"
+			${MAKE} -C ${LINUXIGDDIR} CC=${CC} \
+				STRIP=${TARGETSTRIP} \
+				UPNPDIR=${LIBUPNPDIR} \
+				ROOTFSDIR=${ROOTFSDIR} 		
+libreadline:
+			@echo "starting compile quagga"
+			${MAKE} -C ${LIBREADLINEDIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR} 
+ncurses:
+			@echo "starting compile ncurses"
+			${MAKE} -C ${NCURSESDIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+quagga: libreadline ncurses
+			@echo "starting compile quagga"
+			${MAKE} -C ${QUAGGADIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR} 	
+					
+igmpsnoop:
+			@echo "staring compile igmp-snooping"
+			${MAKE} -C ${IGMPSNOOPDIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+aplocator:
+			@echo "staring compile aplocator"
+			${MAKE} -C ${APLOCATORDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+
+######################################################################
+# Targets for autelan libs
+######################################################################	
+libmxml: zlib autelan_openssl
+			@echo "staring compile libmxml."
+			${MAKE} -C ${WLIBMXMLDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+
+######################################################################
+# Targets for autelan kernel ko 
+######################################################################
+#11n
+ifeq "${MODE}" "11n"
+kmods: bmkmodpkg avrmodpkg capwap_split_fast madwifi11n
+#11bg or wapi
+else
+kmods: bmkmodpkg avrmodpkg capwap_split_fast madwifi
+endif
+				@echo "kmods compile finished!"
+bmkmodpkg:
+				@echo "Starting compile bmutil"
+				${MAKE} -C ${BMUTILDIR} CC=${CC} \
+					ROOTFSDIR=${ROOTFSDIR}
+				@echo "Starting compile bmkmod"
+				${MAKE} -C ${BMKOMDIR} ROOTFSDIR=${ROOTFSDIR} \
+					TARGET_CROSS=${TARGET_CROSS} \
+					KERNELDIR=${KERNELDIR}
+
+avrmodpkg:
+				@echo "staring compile avrutil"
+				${MAKE} -C ${AVRUTILDIR} CC=${CC} \
+					ROOTFSDIR=${ROOTFSDIR}
+				@echo "staring compile avrmod"
+				${MAKE} -C ${AVRMODDIR} CC=${CC} \
+					ROOTFSDIR=${ROOTFSDIR} \
+					TARGET_CORSS=${TARGET_CROSS} \
+					KERNELDIR=${KERNELDIR}
+
+
+madwifi11n:
+				@echo "staring compile 11n driver."
+				${MAKE} -C ${MADWIFI11NDIR} CC=${CC} \
+					ROOTFSDIR=${ROOTFSDIR} \
+					TARGET_CROSS=${TARGET_CROSS} \
+					KERNELDIR=${KERNELDIR}
+
+atheros11n:
+				@echo "Starting compile atheros11n"
+				${MAKE} -C ${ATHEROS11NDIR} ROOTFSDIR=${ROOTFSDIR}				
+
+madwifi: sms4
+				@echo "Starting compile madwifi"
+				sudo rm -rf ${ROOTFSDIR}/sbin/80211stats
+				${MAKE} -C ${MADWIFIDIR} ${CAVIUMFLAGS} ROOTFSDIR=${ROOTFSDIR} \
+					TARGET_CROSS=${TARGET_CROSS}\ KERNELDIR=${KERNELDIR}
+				
+capwap_split_fast:
+				@echo "Starting compile capwap_split_fast"
+				echo $(KERNELDIR)
+				${MAKE} -C ${WCAPWAPSPLITFASTDIR} ${CAVIUMFLAGS} ROOTFSDIR=${ROOTFSDIR} \
+					TARGET_CROSS=${TARGET_CROSS}\
+					KERNELDIR=${KERNELDIR}
+
+
+wrcpu:
+				@echo "Starting compile wrcpu"
+				echo $(KERNELDIR)
+				${MAKE} -C ${WWRCPU} ${CAVIUMFLAGS} ROOTFSDIR=${ROOTFSDIR} \
+					TARGET_CROSS=${TARGET_CROSS}\
+					KERNELDIR=${KERNELDIR}
+#####################################################################
+# Kernel build targets
+######################################################################
+initfs:
+#				sudo rm -rf ${ROOTFSDIR} 
+				sudo cp -r ${ROOTFSDIR}_org ${ROOTFSDIR}
+				sudo rm -rf ${ROOTFSDIR}/dev
+				sudo cp -rv ${ROOTFSDIR}/../dev ${ROOTFSDIR}
+
+kernel: 
+				@echo "Making kernel ..."
+				${MAKE} -C ${KERNELDIR}
+#rootfs:  kernel  
+#rootfs:  kernel kmods 
+rootfs: initfs kernel kmods apps 
+				@echo "Making rootfs ..."
+				@echo "Copy kernel modules..."
+				mkdir -p ${ROOTFSDIR}/lib/modules/${KERNEL_VERSION}
+				sudo find ${ROOTFSDIR} -name .svn -exec rm -rf {} +
+				#sudo chown -R root:root ${ROOTFSDIR} 
+				cd ${KERNELDIR} && find . -name "*.ko" | xargs sudo cp -f --parents --target-directory=${ROOTFSDIR}/lib/modules/${KERNEL_VERSION}; 
+				
+				cd ${ROOTFSDIR} && sudo find . | sudo cpio --format=newc -oF ${BINDIR}/rootfs.cpio
+				sudo chmod a+r ${BINDIR}/rootfs.cpio
+				gzip -9 < $(BINDIR)/rootfs.cpio > $(BINDIR)/rootfs.cpio.gz
+				cp ${BINDIR}/rootfs.cpio ${KERNELDIR}/usr/initramfs_data.cpio
+				cp ${BINDIR}/rootfs.cpio.gz ${KERNELDIR}/usr/initramfs_data.cpio.gz
+
+vmlinux: rootfs 
+				@echo "Making vmlinux ..."
+				${MAKE} -C $(KERNELDIR) vmlinux.64 modules
+				cp -rf $(KERNELDIR)/vmlinux.64 $(BINDIR)
+				$(TARGETSTRIP) $(BINDIR)/vmlinux.64
+				cd $(CURRENT)/bin && cp vmlinux.64 vmlinux && rm -f vmlinux.64.gz  && gzip -9 vmlinux.64 &&  $(CURRENT)/tools/mkimage -A mips -O linux -T kernel -C gzip  -a 6000000 -n "AP-OS" -d vmlinux.64.gz vmlinux64.img 
+				
+				
+######################################################################
+# clean targets
+######################################################################
+cleanbusybox:
+			@echo "staring clean busybox."
+			${MAKE} -C ${BUSYBOXDIR} CC=${CC} \
+				${ZTFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+cleanzlib:
+			@echo "staring clean zlib."
+			${MAKE} -C ${ZLIBDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				 clean
+
+
+cleanbmkmod:
+				@echo "Starting clean bmutil"
+				${MAKE} -C ${BMUTILDIR} CC=${CC} \
+					ROOTFSDIR=${ROOTFSDIR} clean
+				@echo "Starting compile bmkmod"
+				${MAKE} -C ${BMKOMDIR} ROOTFSDIR=${ROOTFSDIR} \
+					TARGET_CROSS=${TARGET_CROSS}\
+					KERNELDIR=${KERNELDIR} clean
+cleanavrmodpkg:
+				@echo "starting clean avrmodpkg"
+				${MAKE} -C ${AVRMODDIR} CC=${CC} \
+					ROOTFSDIR=${ROOTFSDIR} clean
+				${MAKE} -C ${AVRUTILDIR} CC=${CC} \
+					ROOTFSDIR=${ROOTFSDIR} clean
+cleanopenssl:
+			@echo "clean openssl"
+			${MAKE} -C ${OPENSSLDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+
+cleanwapid: 
+			@echo "clean openssl"
+			${MAKE} -C ${WAPIDDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+
+cleansms4: 
+			@echo "clean sms4"
+			${MAKE} -C ${SMS4DIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+
+cleanwirelesstool:
+			@echo "clean wireless tools."
+			${MAKE} -C ${WIRELESSTOOLDIR} ${CAVIUMFLAGS} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+
+cleanwebsuit:cleanhaserl cleanminihttpd cleanxmlconf cleancrypttool
+			@echo "web suit cleaned!"			
+
+cleanhaserl:
+			@echo "staring clean haserl."
+			${MAKE} -C ${HASERLDIR} CC=${CC} \
+				${CAVIUMFLAGS} clean
+			
+cleanminihttpd:
+			@echo "staring clean minihttpd."
+			${MAKE} -C ${MINIHTTPDDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} \
+				clean	
+cleanxmlconf:
+			@echo "staring clean xmlconf."
+			${MAKE} -C ${XMLCONFDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+cleancrypttool:
+			@echo "staring clean crptool."
+			${MAKE} -C ${CRYPTOOLDIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+cleanebtables:
+			@echo "staring clean ebtables." 
+			${MAKE} -C ${EBTABLESDIR} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+cleannetsnmp:
+			@echo "staring clean snmp."
+			${MAKE} -C ${NETSNMPDIR} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+
+cleantr069: cleangssapi cleangsoap 
+			@echo "staring clean tr069."
+			${MAKE} -C ${TR69DIR} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+
+cleangssapi:
+			@echo "staring clean gssapi."
+			${MAKE} -C ${GSSAPIDIR} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+		
+cleangsoap:
+			@echo "staring clean gsoap."
+			${MAKE} -C ${GSOAPDIR} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+
+cleaniperf:
+			@echo "staring clean iperf."
+			${MAKE} -C ${IPERFDIR} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+cleancurl:
+			@echo "staring clean curl."
+			${MAKE} -C ${CURLDIR} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+cleanntp:
+			@echo "staring clean ntpclient."
+			${MAKE} -C ${NTPDIR} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+cleanbind:
+			@echo "staring clean bind."
+			${MAKE} -C ${BINDDIR} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+
+cleandhclient:
+			@echo "staring clean dhclient."
+			${MAKE} -C ${DHCLIENTDIR} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+cleaniproute:
+			@echo "staring clean iproute."
+			${MAKE} -C ${IPROUTEDIR} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+cleanhostapd:
+			@echo "staring clean hostapd."
+			${MAKE} -C ${HOSTAPDDIR} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} cleanbg
+ 
+cleanathrhostapd:
+			@echo "staring clean athr-hostapd."
+			${MAKE} -C ${ATHRHOSTAPDDIR} \
+				clean \
+
+cleandhcpsnooping:
+			@echo "staring clean dhcpsnooping . "
+			${MAKE} -C ${DHCPSNOOPINGDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+cleanigmpsnoop:
+			@echo "staring clean igmp-snooping . "
+			${MAKE} -C ${IGMPSNOOPDIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+
+cleanaplocator:
+			@echo "staring clean cleanaplocator . "
+			${MAKE} -C ${APLOCATORDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+
+cleandnsmasq:
+			@echo "staring clean cleanaplocator . "
+			${MAKE} -C ${DNSMASQDIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+
+cleansmalltool:
+			@@echo "staring clean smalltool. "
+			${MAKE} -C ${SMALLTOOLDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+cleanaplib:
+			@echo "staring clean aplib."
+			${MAKE} -C ${APLIBDIR} clean \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+cleanauteos:
+			@echo "staring clean auteos."
+			${MAKE} -C ${AUTEOSDIR} clean \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR}
+cleanwpasup:
+			@echo "starting clean wpa supplicant"
+			${MAKE} -C ${WPASUPDIR} clean \
+				ROOTFSDIR=${ROOTFSDIR}
+cleanppp:
+			@echo "starting compile ppp"
+			${MAKE} -C ${PPPDIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR}  clean
+cleanlibupnp:
+			@echo "starting comple libupnp"
+			${MAKE} -C ${LIBUPNPDIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR} 		clean
+cleanlinuxigd: cleanlibupnp
+			@echo "starting compile linuxigd"
+			${MAKE} -C ${LINUXIGDDIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR} 	clean
+cleanlibreadline:
+			@echo "starting compile libreadline"
+			${MAKE} -C ${LIBREADLINEDIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+cleanncurses:
+			@echo "starting compile ncurses"
+			${MAKE} -C ${NCURSESDIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+cleanquagga: cleanlibreadline cleanncurses
+			@echo "starting compile quagga"
+			${MAKE} -C ${QUAGGADIR} CC=${CC} \
+				ROOTFSDIR=${ROOTFSDIR} 	clean
+				
+cleanlibmxml:
+			@echo "staring clean libmxml."
+			${MAKE} -C ${LIBMXMLDIR} CC=${CC} \
+				${CAVIUMFLAGS} \
+				ROOTFSDIR=${ROOTFSDIR} clean
+				
+cleanmadwifi:
+				@echo "clean madwifi"
+				${MAKE} -C ${MADWIFIDIR} ${CAVIUMFLAGS} ROOTFSDIR=${ROOTFSDIR} \
+					TARGET_CROSS=${TARGET_CROSS}\
+					KERNELDIR=${KERNELDIR} clean
+
+cleancapwap:
+				@echo "clean capwap_split_fast"
+				${MAKE} -C ${CAPWAPSPLITFASTDIR} ROOTFSDIR=${ROOTFSDIR} \
+					TARGET_CROSS=${TARGET_CROSS}\
+					${CAVIUMFLAGS} \
+					KERNELDIR=${KERNELDIR} clean
+					
+cleankernel:
+				${MAKE} -C ${KERNELDIR} clean
+
+
+cleanrootfs:
+				@echo "clean rootfs files"
+				rm -f $(BINDIR)/rootfs.*
+				sudo rm -f ${KERNELDIR}/usr/initramfs_data.cpio
+				sudo rm -f ${KERNELDIR}/usr/initramfs_data.cpio.gz
+
+
+cleanmadwifi11n:
+				@echo "clean 11n driver"
+				${MAKE} -C ${MADWIFI11NDIR} \
+					ROOTFSDIR=${ROOTFSDIR} clean 
+
+cleanall: cleankernel cleanrootfs cleanmadwifi cleanmadwifi11n cleanwebsuit cleanwirelesstool cleanebtables cleannetsnmp cleantr069 cleancurl cleanntp cleanbind cleanhostapd cleanaplib cleanauteos cleanavrmodpkg cleandnsmasq cleanwpasup\
+	cleandhcpsnooping cleansmalltool cleancapwap cleanaplocator
+				@echo "All generate files cleaned!"

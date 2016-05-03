@@ -1,0 +1,21 @@
+#!/usr/bin/haserl
+<html>
+        <head>
+                <title>Vlan</title>
+        </head>
+        <body>
+        <br>VLAN (Virtual Local Area Network) technology, can effectively limit the message to be broadcast by VLAN technology defined in a logical subnets. We can 
+Function through the creation of virtual local area network with the specified VID the vlan, and the adoption of wireless capabilities will be joined by the creation 
+of VAP in the VLAN. In this way, when a mobile device access to the VAP, then the mobile devices have joined the VAP on the corresponding VLAN.
+
+1.create :  create/destroy current vlan  £¨checked to create and unchecked to destroy£©
+2.VID : VLAN corresponding to the current VLAN ID, used to distinguish between different VLAN. this value is 0 ~ 4096 for the non-negative integer
+3.vlanname  : VLAN of the VLAN corresponding to the current name, so that users on the VLAN configuration to distinguish between
+4.IP £ºThe current IP address of the VLAN, can be empty
+5.MASK :  The current netmask of the VLAN, can be empty
+6.eth[n] : Adding the current uplink VLAN interface (n grounds of 0 to start the non-negative integer, the upper limit for "number of the current equipment uplink
+ interface -1")
+
+        </body>
+</html>
+

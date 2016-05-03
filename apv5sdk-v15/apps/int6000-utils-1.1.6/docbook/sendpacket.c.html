@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			sendpacket.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='sdramtext.c.html' title=' sdramtext.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='session.c.html' title=' session.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   signed sendpacket (struct channel * channel, void * packet, signed length);
+ *
+ *   channel.h
+ *   
+ *   send one packet over a raw packet channel; return the number of 
+ *   bytes sent or -1 on error; dump outgoing packets on stdout when 
+ *   the VERBOSE flag is set; 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *	Nathan Houghton &lt;nathan.houghton@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SENDPACKET_SOURCE
+#define SENDPACKET_SOURCE
+
+#include &lt;unistd.h&gt;
+
+#include &quot;../ether/channel.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/flags.h&quot;
+
+signed sendpacket (struct channel * channel, void * memory, signed extent) 
+
+{
+	if (_anyset (channel-&gt;flags, CHANNEL_VERBOSE)) 
+	{
+		hexdump (memory, 0, extent, stdout);
+	}
+
+#if defined (__linux__)
+
+	extent = sendto (channel-&gt;fd, memory, extent, 0, (struct sockaddr *) (0), (socklen_t) (0));
+
+#elif defined (__APPLE__)
+
+	extent = write (channel-&gt;fd, memory, extent);
+
+#elif defined (__OpenBSD__)
+
+	extent = write (channel-&gt;fd, memory, extent);
+
+#elif defined (WINPCAP) || defined (LIBPCAP)
+
+	if (pcap_sendpacket (channel-&gt;socket, memory, extent)) 
+	{
+		extent = -1;
+	}
+
+#else
+#error &quot;Unknown Environment&quot;
+#endif
+
+	return (extent);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='sdramtext.c.html' title=' sdramtext.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='session.c.html' title=' session.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

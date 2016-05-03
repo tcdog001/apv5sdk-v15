@@ -1,0 +1,13 @@
+#!/bin/sh
+while :
+do
+	iwconfig 2>/dev/null|grep ath.0-1
+	[  $? = 0 ]&&{
+		sleep 30
+		iwpriv ath.0-1 emu_baseip 0x14010164
+		iwpriv ath.0-1 emu-macpl 1
+		iwpriv ath.0-1 emu-basemac 00:22:44:66:88:ff
+		iwpriv ath.0-1 sta-emulate 1
+		exit
+	}	
+done

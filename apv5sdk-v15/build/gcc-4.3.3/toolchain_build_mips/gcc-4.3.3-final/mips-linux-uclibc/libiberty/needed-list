@@ -1,0 +1,4 @@
+./strncmp.o
+./bcmp.o
+./bcopy.o
+./bzero.o

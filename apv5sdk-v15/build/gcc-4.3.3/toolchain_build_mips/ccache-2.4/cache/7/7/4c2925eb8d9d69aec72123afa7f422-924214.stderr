@@ -1,0 +1,6 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/QMIDevice.c: In function 'ReadCallback':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/QMIDevice.c:403: warning: unused variable 'pClientMem'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/QMIDevice.c: In function 'ReadSync':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/QMIDevice.c:1022: warning: unused variable 'pClientMem'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/QMIDevice.c: In function 'UserspacePoll':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/gobi_driver/gobi_net/QMIDevice.c:2914: warning: unused variable 'pClientMem'

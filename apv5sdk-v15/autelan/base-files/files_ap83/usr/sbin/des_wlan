@@ -1,0 +1,11 @@
+#!/bin/sh
+while :
+do
+    ifname="`iwconfig |awk  '{if(NR==1){print $1}}'`"
+if [[ "$ifname" == "" ]];then 
+    echo "have no ath interface"
+    exit 1
+else
+    wlanconfig $ifname destroy
+fi
+done

@@ -1,0 +1,10 @@
+LDFLAGS:=-shared -fPIC
+
+all:
+	rm -f *.a *.o *.so
+	$(CC) -c  conf_file_opt.c $(CPPFLAGS) $(EXTRA_CPPFLAGS)
+	$(CC) -c  ap_interface.c -I../include $(CPPFLAGS) $(EXTRA_CPPFLAGS) 
+	${CC} $(LDFLAGS) -Wall -o libapfunc.so ./*.o $(EXTRA_LDFLAGS)
+
+clean:
+	rm -f *.a *.o *.so

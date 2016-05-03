@@ -1,0 +1,18 @@
+LDFLAGS:=-shared -fPIC
+
+all:
+	rm -f *.a *.o *.so
+	$(CC) -fPIC -Wall -c  date_and_time.c -I../include $(CPPFLAGS) 
+	$(CC) -fPIC -Wall -c  io_on_streams.c -I../include $(CPPFLAGS)  
+	$(CC) -fPIC -Wall -c  low_Level_io.c -I../include $(CPPFLAGS) 
+	$(CC) -fPIC -Wall -c  memory.c -I../include $(CPPFLAGS) 
+	$(CC) -fPIC -Wall -c  pipe_and_fifo.c -I../include $(CPPFLAGS) 
+	$(CC) -fPIC -Wall -c  processes.c -I../include $(CPPFLAGS) 
+	$(CC) -fPIC -Wall -c  resource.c -I../include $(CPPFLAGS) 
+	$(CC) -fPIC -Wall -c  signal.c -I../include $(CPPFLAGS) 
+	$(CC) -fPIC -Wall -c  socket_lib.c -I../include $(CPPFLAGS) 
+	$(CC) -fPIC -Wall -c  system_management.c -I../include $(CPPFLAGS) 
+	${CC} $(LDFLAGS) -Wall -o libauteos.so ./*.o 
+
+clean:
+	rm -f *.a *.o *.so

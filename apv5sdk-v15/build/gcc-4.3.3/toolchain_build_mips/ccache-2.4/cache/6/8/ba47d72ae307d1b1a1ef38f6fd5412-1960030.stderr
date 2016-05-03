@@ -1,0 +1,32 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c: In function 'ieee80211_state_set':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:792: warning: unused variable 'udp_len'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:790: warning: unused variable 'c_flag'
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c: In function 'ieee80211_create_sta':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2028: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2028: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2036: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2036: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2068: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2068: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2072: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2072: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c: In function 'ieee80211_input':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2697: warning: ISO C90 forbids mixed declarations and code
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2750: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2750: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2758: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2758: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2764: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2764: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2769: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2769: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2786: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2786: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2792: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2792: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2803: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2803: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2807: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:2807: warning: comparison of distinct pointer types lacks a cast
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c: In function 'ieee80211_state_set':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/autelan/aquila/wlan/os/linux/../../umac/txrx/ieee80211_input.c:815: warning: 'index' may be used uninitialized in this function

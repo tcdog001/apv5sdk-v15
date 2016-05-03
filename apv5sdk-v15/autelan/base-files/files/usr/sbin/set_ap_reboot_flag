@@ -1,0 +1,26 @@
+#!/bin/sh
+#set_ap_reboot ap_reboot_enable
+
+AP_REBOOT_FLAG=/tmp/aprebootflag
+#
+#usage()
+#
+usage()
+{
+	echo "set_ap_reboot ap_reboot_enable"
+	exit 1
+}
+
+if [ ! $# -eq 1 ];then
+	usage
+fi
+
+AP_REBOOT_ENABLE=$1
+
+
+if [ -e ${AP_REBOOT_FLAG} ]; then
+#	echo "echo "${AP_REBOOT_ENABLE}" > ${AP_REBOOT_FLAG}"
+	echo "${AP_REBOOT_ENABLE}" > ${AP_REBOOT_FLAG}
+fi
+
+

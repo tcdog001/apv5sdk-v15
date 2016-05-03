@@ -1,0 +1,11 @@
+#!/bin/sh
+
+#wds add mac
+ADD_MAC=$2
+
+#ath.wds rename
+MAC_STR=`echo $ADD_MAC | awk -F ":" '{print $1$2$3$4$5$6}'`
+
+iwpriv $1 wds_add $2
+ifconfig $MAC_STR up
+brctl addif default $MAC_STR

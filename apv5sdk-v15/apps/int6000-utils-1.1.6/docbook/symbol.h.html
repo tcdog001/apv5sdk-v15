@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			symbol.h
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='stdint.h.html' title=' stdint.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='tcp_session.h.html' title=' tcp_session.h '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   symbol.h - symbol table definitions and declarations;
+ *
+ *   this file is a subset of the original with some additions not in
+ *   the original;
+ *
+ *.  Motley Tools by Charles Maier &lt;cmaier@cmassoc.net&gt;;
+ *:  Published 2005 by Charles Maier Associates Limited;
+ *;  Released under the GNU General Public Licence v2 and later;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef SYMBOL_HEADER
+#define SYMBOL_HEADER
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/types.h&quot;
+
+/*====================================================================*
+ *   functions;             
+ *--------------------------------------------------------------------*/
+
+const char * synonym (const char * term, const struct _term_ list [], size_t size);
+void assist (const char * name, const char * type, const struct _code_ list [], size_t size, FILE *fp);
+signed lookup (const char * name, const struct _code_ list [], size_t size);
+const char * reword (code_t code, const struct _code_ list [], size_t size);
+void expect (const struct _code_ list [], size_t size, FILE *fp);
+const char * typename (const struct _type_ list [], size_t size, type_t type, const char * name);
+const char * codename (const struct _code_ list [], size_t size, code_t code, const char * name);
+size_t typeload (struct _type_ list [], size_t size);
+size_t codeload (struct _code_ list [], size_t size);
+void typesave (struct _type_ list [], size_t size, const char * name);
+void codesave (struct _code_ list [], size_t size, const char * name);
+
+/*====================================================================*
+ *   
+ *--------------------------------------------------------------------*/
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='stdint.h.html' title=' stdint.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='tcp_session.h.html' title=' tcp_session.h '>NEXT</a>]
+			</div>
+		</body>
+	</html>

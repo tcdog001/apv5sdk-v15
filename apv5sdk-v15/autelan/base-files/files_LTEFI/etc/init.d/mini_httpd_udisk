@@ -1,0 +1,26 @@
+#!/bin/sh
+
+prog=mini_httpd
+
+start()
+{
+    /sbin/mini_httpd -d /tmp/udisk/www -u root -p 443 -l /tmp/udisk/www/minihttp.log -E /sbin/mini_httpd.pem -S 
+    /sbin/mini_httpd -d /tmp/udisk/www -u root -l /tmp/udisk/www/minihttp.log
+}
+
+stop()
+{
+    killall mini_httpd
+}
+
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  *)
+        echo "Usage: $prog {start|stop}"
+        exit 1
+esac

@@ -1,0 +1,16 @@
+#!/bin/sh
+. /usr/lib/web/constant.sh
+. /usr/lib/web/xmlconf.sh
+SYSREBOOT="/sbin/sysreboot"
+
+local xml_system=`config_read /config/system`
+local workmode=`config_getoption "${xml_system}" workmode`
+local autoswitch=`config_getoption "${xml_system}" wtpenable`
+
+if [ 0${workmode} -eq 0 ];then
+	if [ "${autoswitch}" == "yes" ];then
+		xml_system=`config_setoption "${xml_system}" workmode 1`
+		config_write /config/system "${xml_system}"	
+	fi	
+	${SYSREBOOT}
+fi

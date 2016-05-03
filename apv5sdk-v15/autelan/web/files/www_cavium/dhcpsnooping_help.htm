@@ -1,0 +1,9 @@
+#!/usr/bin/haserl
+<html>
+	<head>
+		<title>DHCP Snooping</title>
+	</head>
+	<body>
+		<br>DHCP-Snooping允许将某个物理端口设置为信任端口或不信任端口。信任端口可以正常接收并转发DHCP Offer报文，而不信任端口会将接收到的DHCP Offer报文丢弃。这样，可以完成设备对假冒DHCP Server的屏蔽作用，确保客户端从合法的DHCP Server获取IP地址。option 82是dhcp报文中的中继代理信息选项（relay agent information option）。当dhcp client发送请求报文到dhcp server时，若需要经过dhcp中继，则由dhcp中继将option 82添加到请求报文中。option 82实现了dhcp客户端和dhcp中继设备的地址信息在dhcp服务器上的记录，与其他软件配合使用可以实现dhcp分配的限制和计费功能
+	</body>
+</html>

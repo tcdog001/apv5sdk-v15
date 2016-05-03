@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			odc.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='nvmsplit.7.html' title=' nvmsplit.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='odd.7.html' title=' odd.7 '>NEXT</a>]
+			</div>
+<pre>
+odc(7)                                     Motley Tools                                    odc(7)
+
+NAME
+       odc - object driven compare
+
+SYNOPSIS
+       odc [options] file file [&gt;stdout]
+
+DESCRIPTION
+       Compare  two  binary  files, object by object, and print the objects that differ on stdout
+       for analysis. This program requires an object definition file that lists  the  length  and
+       symbols for file objects.
+
+OPTIONS
+       -f definitions
+              The  name  of  the  object  definition file. This file lists the length, symbol and
+              description of individual objects in order of occurance. If this option is  omitted
+              then  object definitions are read from stdin. The file is not modified by this pro‐
+              gram. See the odd man page for an example of an object definition file.
+
+       -?,--help
+              Print program help summary on stdout.  This  option  takes  precedence  over  other
+              options on the command line.
+
+       -!,--version
+              Print  program  version  information  on  stdout. This option takes precedence over
+              other options on the command line. Usethis option  when  sending  screen  dumps  to
+              Intellon  Technical  Support  so  that they know exactly which version of the Linux
+              Toolkit you are using.
+
+ARGUMENTS
+       file   The name of a binary file. Two binary files are  needed  for  comparison  and  both
+              should conform to the object definition file for the comarison to be meaningful.
+
+EXAMPLES
+       The  following  example compares file abc.bin and def.bin and prints objects that are dif‐
+       ferent in hexdump format. Objects are defined in objects.txt and read using -f.
+
+          # odc -f objects.txt abc.bin def.bin
+
+SEE ALSO
+       grab(7), odd(7), odx(7)
+
+CREDITS
+        Nathan Houghton &lt;nathan@brainwerk.org&gt;
+        Charles Maier &lt;cmaier@cmassoc.net&gt;
+
+cmassoc-tools-1.5.10                                                                       odc(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='nvmsplit.7.html' title=' nvmsplit.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='odd.7.html' title=' odd.7 '>NEXT</a>]
+			</div>
+		</body>
+	</html>

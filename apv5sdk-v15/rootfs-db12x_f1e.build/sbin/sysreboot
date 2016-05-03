@@ -1,0 +1,10 @@
+#!/bin/sh
+
+tail -n 640 /tmp/message_report > /jffs/message_report_backup
+
+#sysreboot command in AQ2120
+SYSREBOOT_FLAG=/proc/kes_debug_flag
+touch /jffs/sysrebootflag
+#/usr/bin/avrutil -y
+echo r > ${SYSREBOOT_FLAG}
+/sbin/reboot -f

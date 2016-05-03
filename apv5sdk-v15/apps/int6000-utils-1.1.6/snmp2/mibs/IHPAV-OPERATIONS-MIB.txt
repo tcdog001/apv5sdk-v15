@@ -1,0 +1,740 @@
+-- IHPAV-OPERATIONS-MIB: Intellon Home Plug AV operations MIB
+-- $Id: IHPAV-OPERATIONS-MIB.txt,v 1.1 2009-05-14 20:26:51 nhoughton Exp $
+--
+-- Contributor(s):
+--     Rishi Panjwani <rishi.panjwani@intellon.com>
+--     Nathan Houghton <nathan.houghton@intellon.com>
+--
+
+IHPAV-OPERATIONS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE
+		FROM SNMPv2-SMI
+        DisplayString
+		FROM SNMPv2-TC
+        intellon
+		FROM INTELLON-MIB;
+
+
+protocols OBJECT IDENTIFIER ::= { intellon 1 }
+ihpav OBJECT IDENTIFIER ::= { protocols 1 }
+
+
+ihpav-operations MODULE-IDENTITY
+	LAST-UPDATED "200905141000Z"
+	ORGANIZATION "Intellon Corporation"
+	CONTACT-INFO
+		"Intellon Corporation
+		
+		5955 T.G. Lee Blvd., Suite 600
+		Orlando, FL 32822
+		Tel: +1-407-428-2800
+		Fax: +1-407-428-2850 (fax)
+
+		http://www.intellon.com/support/contactsupport.php"
+
+	DESCRIPTION
+		"Management Information Base (MIB) for Intellon Corporation's Home Plug AV device management operations"
+	REVISION "200905141000Z"
+	DESCRIPTION
+		"version 0.0"
+	::= { ihpav 1 }
+
+--Table of status/operations of all devices connected to this Management agent
+
+deviceCount OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of devices connected to this Management Agent"
+	::= {ihpav-operations 1}
+
+operationsTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF OperationsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A table containing the status of each device attached to this Management Agent"
+       ::= {ihpav-operations 2}
+
+operationsEntry OBJECT-TYPE
+	SYNTAX		OperationsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry containing status of a single device"
+	INDEX { deviceIndex }
+	::= { operationsTable 1 }
+
+OperationsEntry ::=
+	SEQUENCE {
+		deviceIndex					INTEGER,
+		deviceMacAddress				DisplayString,
+		deviceID					DisplayString,
+		deviceFirmwareRevision				DisplayString,
+		deviceReset					INTEGER,
+		deviceInitialize				DisplayString,
+		devicePriorityVLANTagsEnable			INTEGER,
+		devicePriorityVLANTag0				INTEGER,
+		devicePriorityVLANTag1				INTEGER,
+		devicePriorityVLANTag2				INTEGER,
+		devicePriorityVLANTag3				INTEGER,
+		devicePriorityVLANTag4				INTEGER,
+		devicePriorityVLANTag5				INTEGER,
+		devicePriorityVLANTag6				INTEGER,
+		devicePriorityVLANTag7				INTEGER,
+		devicePriorityTrafficClassEnable		INTEGER,
+		devicePriorityTOSBitsEnable			INTEGER,
+		devicePriorityTOSBits0				INTEGER,
+		devicePriorityTOSBits1				INTEGER,
+		devicePriorityTOSBits2				INTEGER,
+		devicePriorityTOSBits3				INTEGER,
+		devicePriorityTOSBits4				INTEGER
+		devicePriorityTOSBits5				INTEGER,
+		devicePriorityTOSBits6				INTEGER,
+		devicePriorityTOSBits7				INTEGER,
+		devicePriorityTTLCap0				INTEGER,
+		devicePriorityTTLCap1				INTEGER,
+		devicePriorityTTLCap2				INTEGER,
+		devicePriorityTTLCap3				INTEGER,
+		devicePriorityDefaultIGMP			INTEGER,
+		devicePriorityDefaultUnicast			INTEGER,
+		devicePriorityDefaultIGMPManagedMulticast	INTEGER,
+		devicePriorityDSCPEnable			INTEGER,
+		deviceNMK					DisplayString,
+		deviceResettoFactoryDefault			INTEGER,
+		deviceHFID					DisplayString,
+		deviceMDUEnable					INTEGER,
+		deviceMDURole					INTEGER,
+		deviceAVNetworkCCoSelection			INTEGER,
+		deviceFirmwareUpgrade				INTEGER,
+		deviceTransmittedPhyRate			Gauge,				
+		deviceReceivedPhyRate				Gauge,
+		deviceTransmittedToneMaps			Gauge,
+		deviceReceivedToneMaps				Gauge,
+		deviceTransmittedMPDUGoodCount			Counter,
+		deviceReceivedMPDUGoodCount			Counter,
+		deviceTransmittedMPDUBadCount			Counter,
+		deviceReceivedMPDUBadCount			Counter,
+		deviceTransmittedMPDUCollisionCount		Counter,
+		deviceTransmittedPDGoodCount			Counter,
+		deviceReceivedPDGoodCount			Counter,
+		deviceTransmittedPDBadCount			Counter,
+		deviceReceivedPDBadCount			Counter,
+		deviceReceivedFECGoodCount			Counter,
+		deviceReceivedFECBadCount			Counter,
+		}
+deviceIndex OBJECT-TYPE
+	SYNTAX 		INTEGER
+	MAX-ACCESS 	not-accessible
+	STATUS 		current
+	DESCRIPTION
+			"The device's Index"
+	::={ operationsEntry 1 }
+
+deviceMacAddress OBJECT-TYPE
+	SYNTAX 		DisplayString
+	MAX-ACCESS 	read-write
+	STATUS 		current
+	DESCRIPTION
+			"The MAC address of the device"
+	::={ operationsEntry 2 }
+
+deviceID		OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The deviceID describes the device hardware"
+ 
+	::={ operationsEntry 3 }
+
+deviceFirmwareRevision	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The deviceFirmwareRevision describes the current Firmware on the device"
+ 
+	::={ operationsEntry 4 }
+
+deviceReset OBJECT-TYPE
+	SYNTAX 		INTEGER
+	MAX-ACCESS 	read-write
+	STATUS		current
+	DESCRIPTION
+			"The deviceReset is used to reset the device"
+	::={ operationsEntry 5 }
+
+deviceInitialize OBJECT-TYPE
+	SYNTAX 		INTEGER
+	MAX-ACCESS 	read-write
+	STATUS		current
+	DESCRIPTION
+			"The deviceInitialize is used to initialize the device"
+	::={ operationsEntry 6 }
+
+
+
+
+devicePriorityVLANTagsEnable OBJECT-TYPE
+	SYNTAX		INTEGER {
+				disable (0)
+				enable (1)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The devicepriorityVLANTagsEnable is used to enable/disable priorities using VLAN tags"
+	::={ operationsEntry 7 }
+
+
+
+devicePriorityVLANTag0 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The CAP priority for VLAN Tag 0 for this device"
+	::={ operationsEntry 8 }
+
+devicePriorityVLANTag1 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The CAP priority for VLAN Tag 1 for this device"
+	::={ operationsEntry 9 }
+
+devicePriorityVLANTag2 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The CAP priority for VLAN Tag 2 for this device"
+	::={ operationsEntry 10 }
+
+devicePriorityVLANTag3 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The CAP priority for VLAN Tag 3 for this device"
+	::={ operationsEntry 11 }
+
+devicePriorityVLANTag4 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The CAP priority for VLAN Tag 4 for this device"
+	::={ operationsEntry 12 }
+
+devicePriorityVLANTag5 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The CAP priority for VLAN Tag 5 for this device"
+	::={ operationsEntry 13 }
+
+devicePriorityVLANTag6 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The CAP priority for VLAN Tag 6 for this device"
+	::={ operationsEntry 14 }
+
+devicePriorityVLANTag7 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The CAP priority for VLAN Tag 7 for this device"
+
+	::={ operationsEntry 15 }
+
+devicePriorityTrafficClassEnable OBJECT-TYPE
+	SYNTAX		INTEGER {
+				disable (0)
+				enable (1)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The devicePriorityTrafficClassEnable is used to enable/disable priorities using TrafficClass"
+	::={ operationsEntry 16 }
+
+devicePriorityTOSBitsEnable OBJECT-TYPE
+	SYNTAX		INTEGER {
+				disable (0)
+				enable (1)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The devicePriorityTOSBitsEnable is used to enable/disable priorities using TOS Bits"
+	::={ operationsEntry 17 }
+
+devicePriorityTOSBits0 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The CAP priority for TOSBits=0"
+	::={ operationsEntry 18 }
+
+
+devicePriorityTOSBits1 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The CAP priority for TOSBits=1"
+	::={ operationsEntry 19 }
+
+devicePriorityTOSBits2 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The CAP priority for TOSBits=2"
+	::={ operationsEntry 20 }
+
+
+
+devicePriorityTOSBits3 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The CAP priority for TOSBits=3"
+	::={ operationsEntry 21 }
+
+devicePriorityTOSBits4 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The CAP priority for TOSBits=4"
+	::={ operationsEntry 22 }
+
+devicePriorityTOSBits5 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The CAP priority for TOSBits=5"
+	::={ operationsEntry 23 }
+
+devicePriorityTOSBits6 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The CAP priority for TOSBits=6"
+	::={ operationsEntry 24 }
+
+
+devicePriorityTOSBits7 OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The CAP priority for TOSBits=7"
+	::={ operationsEntry 25 }
+
+
+
+
+devicePriorityTTLCap0 OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The Time-to-live period for CAP 0 in milliseconds"
+	::={ operationsEntry 26 }
+
+devicePriorityTTLCap1 OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The Time-to-live period for CAP 1 in milliseconds"
+	::={ operationsEntry 27 }
+
+devicePriorityTTLCap2 OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The Time-to-live period for CAP 2 in milliseconds"
+	::={ operationsEntry 28 }
+
+devicePriorityTTLCap3 OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The Time-to-live period for CAP 3 in milliseconds"
+	::={ operationsEntry 29 }
+
+devicePriorityDefaultIGMP OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The CAP priority for IGMP"
+	::={ operationsEntry 30 }
+
+devicePriorityDefaultUnicast OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The CAP priority for Unicast"
+	::={ operationsEntry 31 }
+
+devicePriorityDefaultIGMPManagedMulticast OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The CAP priority for IGMP Managed Multicast"
+	::={ operationsEntry 32 }
+
+devicePriorityDefaultMulticastBroadcast OBJECT-TYPE
+	SYNTAX		INTEGER {
+				cap0 (0)
+				cap1 (1)
+				cap2 (2)
+				cap3 (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The CAP priority for Multicast/Broadcast"
+	::={ operationsEntry 33 }
+
+
+devicePriorityDSCPEnable OBJECT-TYPE 
+	SYNTAX		INTEGER {
+				disable (0)
+				enable (1)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The devicePriorityDSCPEnable is used to enable/disable priorities using DSCP"
+	::={ operationsEntry 34 }
+
+
+
+deviceNMK	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The Network Management Key of the device."
+	::={ operationsEntry 35 }
+
+
+
+deviceResettoFactoryDefault OBJECT-TYPE
+	SYNTAX 		INTEGER
+	MAX-ACCESS 	read-write
+	STATUS		current
+	DESCRIPTION
+			"The deviceResettoFactoryDefault is used to reset the device to factory default"
+	::={ operationsEntry 36 }
+
+deviceHFID OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The HumanFriendly ID of the device"
+	::={ operationsEntry 37 }
+
+deviceMDUEnable OBJECT-TYPE
+	SYNTAX		INTEGER {
+				disable (0)
+				enable (1)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The deviceMDUEnable is used to enable or disable MDU functionality
+			1:enable
+			2:disable"
+	::={ operationsEntry 38 }
+
+deviceMDURole OBJECT-TYPE
+	SYNTAX		INTEGER {
+				master (0)
+				slave (1)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The deviceMDURole is used to describe the special MDU functionality
+			0:Master
+			1:Slave"
+	::={ operationsEntry 39 }
+
+deviceAVNetworkCCoSelection OBJECT-TYPE
+	SYNTAX		INTEGER {
+				auto (1)
+				always (2)
+				never (3)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	
+			"The deviceAVNetworkCCoSelection is used to describe the CCo role of the device"
+	::={ operationsEntry 40 }
+
+
+
+
+deviceFirmwareUpgrade OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+			"The deviceFirmwareUpgrade is used to upgrade the device firmware"
+	::={ operationsEntry 41 }
+
+
+
+
+
+
+deviceTransmittedPhyRate OBJECT-TYPE
+	SYNTAX		Gauge
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The average transmitted Physical Rate from the device"
+	::={ operationsEntry 42 }
+
+deviceReceivedPhyRate OBJECT-TYPE
+	SYNTAX		Gauge
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The average Received Physical Rate by the device"
+	::={ operationsEntry 43 }
+
+deviceTransmittedToneMaps OBJECT-TYPE
+	SYNTAX		Gauge
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The transmitted Tone Maps from the device"
+	::={ operationsEntry 44 }
+
+deviceReceivedToneMaps OBJECT-TYPE
+	SYNTAX		Gauge
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The Received Tone Maps by the device"
+	::={ operationsEntry 45 }
+
+
+deviceTransmittedMPDUGoodCount OBJECT-TYPE
+	SYNTAX		Counter
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The transmitted MPDU good count from the device"
+	::={ operationsEntry 46 }
+
+deviceReceivedMPDUGoodCount OBJECT-TYPE
+	SYNTAX		Counter
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The Received MPDU good count by the device"
+	::={ operationsEntry 47 }
+
+deviceTransmittedMPDUBadCount OBJECT-TYPE
+	SYNTAX		Counter
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The transmitted MPDU bad count from the device"
+	::={ operationsEntry 48 }
+
+deviceReceivedMPDUBadCount OBJECT-TYPE
+	SYNTAX		Counter
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The Received MPDU bad count by the device"
+	::={ operationsEntry 49 }
+
+
+
+deviceTransmittedMPDUCollisionCount OBJECT-TYPE
+	SYNTAX		Counter
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The transmitted MPDU collision count from the device"
+	::={ operationsEntry 50 }
+
+
+deviceTransmittedPDGoodCount OBJECT-TYPE
+	SYNTAX		Counter
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The transmitted PD good count from the device"
+	::={ operationsEntry 51 }
+
+deviceReceivedPDGoodCount OBJECT-TYPE
+	SYNTAX		Counter
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The Received PD good count by the device"
+	::={ operationsEntry 52 }
+
+
+deviceTransmittedPDBadCount OBJECT-TYPE
+	SYNTAX		Counter
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The transmitted PD bad count from the device"
+	::={ operationsEntry 53 }
+
+deviceReceivedPDBadCount OBJECT-TYPE
+	SYNTAX		Counter
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The Received PD bad count by the device"
+	::={ operationsEntry 54 }
+
+deviceReceivedFECGoodCount OBJECT-TYPE
+	SYNTAX		Counter
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The Received FEC bad count by the device"
+	::={ operationsEntry 55 }
+
+deviceReceivedFECBadCount OBJECT-TYPE
+	SYNTAX		Counter
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"The Received FEC bad count by the device"
+	::={ operationsEntry 56 }
+
+
+
+
+END

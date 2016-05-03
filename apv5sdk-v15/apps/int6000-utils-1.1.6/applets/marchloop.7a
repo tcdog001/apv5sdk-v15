@@ -1,0 +1,36 @@
+.TH marchloop 7a "Intellon Corporation" "int6000-utils-linux" "Intellon Linux Toolkit"
+.SH NAME
+marchloop.nvm - SDRAM Diagnostic Applet
+.SH SYNOPSIS
+.BR int6ktest
+.RB memctl.nvm 
+.BR marchloop.nvm
+.RI [ ... ]
+.SH PURPOSE
+This diagnostic applet checks SDRAM address lines, data lines and memory cells using an industry standard \fBMarch2\fR memory test sequence. This sequence writes zeros to all of memory then sequentually reads each address and rewrites it with the complement of the contents before moving on to the next cell. Reading first from low memory to high then high memory to low. Progress and status messages appear on the local host console.  Control returns to the bootloader and SDRAM will contain all zeros on successful completion. 
+.SH FAILURE
+Failures are indicated by local host console error messages.
+.SH PREREQUISITES
+Bootloader software must be running. SDRAM must be properly configured. See applet \fBmemctl\fR for one means of configurating SDRAM.
+.SH DISCLAIMER
+Intellon image file structure and content is proprietary to Intellon Corporation, Ocala FL USA. Consequently, public information is not available. Intellon Corporation reserves the right to change file structure or content in future firmware releases without any obligation to notify or compensate users of this program. This applet is reserved for use by Intellon Field Application Engineers. Intellon makes no claims concerning the reliability of this applet or the suitability of this applet for any particular purpose.
+.SH EXAMPLES
+The following example uses program \fBint6ktest\fR to download and execute the \fBmemctl.nvm\fR test applet to configurat SDRAM then downloads and executes the \fBmarchloop.nvm\fR test applet to verfiy proper SDRAM operation. Successful completion results in a single error message on the console. Failure may result in muliple messages indicating the exact cause of failure.
+.PP
+   # int6ktest memctl.nvm marchloop.nvm
+   eth1 00:B0:52:00:00:01 Write Memory (00000040:6076)
+   eth1 00:B0:52:00:00:01 Wrote memctl.nvm
+   eth1 00:B0:52:00:00:01 Start memctl.nvm (0)
+   eth1 00:B0:52:00:00:01 Write Memory (00001000:2212)
+   eth1 00:B0:52:00:00:01 Wrote marchloop.nvm
+   eth1 00:B0:52:00:00:01 Start marchloop.nvm (0)
+   eth1 00:B0:52:00:00:01 0x00 March2 test - Pass
+.SH SEE ALSO
+.BR applets ( 7 ),
+.BR flashtest ( 7 ),
+.BR int6ktest ( 7 ),
+.BR linesynctest ( 7 ),
+.BR memctl ( 7 )
+.SH CREDITS
+ John Byron <john.byron@intellon.com>
+

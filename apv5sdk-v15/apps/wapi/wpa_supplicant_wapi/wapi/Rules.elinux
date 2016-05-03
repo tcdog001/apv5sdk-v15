@@ -1,0 +1,71 @@
+CC          = 	$(CROSS)gcc 
+STRIPFLAGS = --strip-all --remove-section=.note --remove-section=.comment
+STRIP	    =   $(CROSS)strip $(STRIPFLAGS)
+INSTALL     = 	/usr/bin/install
+LD          = 	$(CROSS)ld
+AR          = 	$(CROSS)ar
+RANLIB      = 	$(CROSS)ranlib
+CHMODE		=	chmod
+MODE		=	0755
+CRYPTO	    =	crypto
+ENG_VER		=no
+LD_DYLIB	=no
+MEM_DEBUG   =no
+ATH	=yes
+
+#TARGET=xscale
+TARGET=x86
+
+ifeq ($(TARGET), xscale)
+	CROSS=/opt/dev_env/XSCALE/usr/local/bin/arm-linux-
+	CFLAGS += -mbig-endian -O2 -DIWN_XSCALE_AS
+	LDFLAGS += -mbig-endian -O2
+endif
+ifeq ($(TARGET),x86)
+        CROSS=
+        CFLAGS += -O2 -g
+	LDFLAGS += -O2
+endif
+ifeq ($(TARGET),ARM)
+	CROSS=/usr/local/arm/4.1.1/bin/arm-linux-
+        CFLAGS += -O2 
+endif
+
+# The following are a set of standard rules to try to make sure we build
+# and install the correct files.
+
+all:		pre-all-recurse all-recurse
+
+# Make eroot a dependency of all install rules to make sure the $(prefix)
+# variable is set (to $HROOT or $EROOT depending on whether this
+depend:		pre-depend-recurse depend-recurse
+install:	pre-install-recurse install-recurse
+uninstall:	pre-uninstall-recurse uninstall-recurse
+clean:		pre-clean-recurse clean-recurse
+
+# Used to change the target for the build.
+host:		pre-host-recurse host-recurse
+host:
+	@if test ! -f .target_$@ ; then \
+	  NO_SUBDIR_RECURSION=1 $(MAKE) --no-print-directory clean; \
+	fi
+	rm -rf .target_*
+	touch .target_$@
+
+# These are hooks that can be used to have rules executed before the
+# recursive rules are checked
+pre-all-recurse pre-depend-recurse pre-install-recurse pre-uninstall-recurse pre-clean-recurse :
+
+# Recursive rules to make all, depend, install, uninstall, clean
+all-recurse depend-recurse install-recurse uninstall-recurse clean-recurse :
+	@if test $(NO_SUBDIR_RECURSION)0 -eq 0 ; then \
+	  for subdir in $(SUBDIRS); do \
+	    if test -d $$subdir ; then \
+	      target=`echo $@ | sed 's/-recurse//'`; \
+	      echo Making $$target in $$subdir; \
+	      (cd $$subdir && $(MAKE) $$target) || exit 1; \
+	    fi; \
+	  done; \
+	fi
+
+###########################################################################

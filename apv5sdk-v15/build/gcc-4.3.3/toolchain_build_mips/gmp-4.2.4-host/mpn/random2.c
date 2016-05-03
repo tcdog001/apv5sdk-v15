@@ -1,0 +1,1 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/build/gcc-4.3.3/toolchain_build_mips/gmp-4.2.4/mpn/generic/random2.c

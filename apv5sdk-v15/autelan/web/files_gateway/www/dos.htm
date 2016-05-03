@@ -1,0 +1,70 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_dos=`config_read /config/firewall/dosfilter`
+xml_dos_status=`config_getoption "$xml_dos" status`
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>DOS</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+</head>
+
+<body bgcolor="#efefef">
+<table width="100%" border="0">
+  <tr>
+    <td background="orange/right-up.jpg" style="padding-left:30px">
+	  <table border="0">
+        <tr>
+          <td class="top1"><a href="firewall.htm" target="MainFrame">IP</a></td>
+		  <td class="top1"><a href="mac.htm" target="MainFrame">MAC</a></td>
+		  <td class="top1"><a href="url.htm" target="MainFrame">URL</a></td>
+		  <td class="top1">DoS</td>
+		  <td class="top1"><a href="port_forwarding.htm" target="MainFrame">Virtual server</a></td>
+		  <td class="top1"><a href="ip_forwarding.htm" target="MainFrame">DMZ</a></td>
+		  <td class="top1"><a href="upnp.htm" target="MainFrame">upnp</a></td>
+        </tr>
+      </table>
+	</td>
+  </tr>
+  <tr>
+    <td background="orange/right-down.jpg" class="top2">Firewall-->DoS Firewall</td>
+  </tr>
+</table>
+<div style="padding-top:20px; padding-left:70px">
+<form method="post" action="<%= $firewall_action_cgi %>" >
+<table width="500" border="0" class="main">
+  <tr>
+    <td><font class="table_head" title="DoS Firewall illustration">DoS Firewall</font></td>
+  </tr>
+  <tr>
+    <td style="padding-top:5px; padding-bottom:10px">
+	  <table width="500" border="0" class="main" bgcolor="#FFFFFF">
+	    <tr>
+          <td class="td_style" width="150">DoS Firewall</td>
+          <td class="td_style" width="350">
+		    <table width="350" border="0">
+              <tr>
+                <td width="60"><input type="radio" <% webui_radiobutton_check "$xml_dos_status" "disable" %> name="dos_firewall" value="disable"/>Disable</td>
+                <td width="290"><input type="radio" <% webui_radiobutton_check "$xml_dos_status" "enable" %> name="dos_firewall" value="enable" />Enable</td>
+              </tr>
+            </table>
+		  </td>
+        </tr>
+	  </table>
+	</td>
+  </tr>
+  <tr>
+    <td><input id="but" type="submit" name="ip_filter_commit" value="Submit"/></td>
+  </tr>
+</table>
+<input type="hidden" value="DOS filter" name="SERVLET">
+</form>
+</div>
+</body>
+</html>

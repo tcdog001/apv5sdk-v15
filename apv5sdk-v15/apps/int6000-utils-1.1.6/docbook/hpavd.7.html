@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			hpavd.7
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='hpav.7.html' title=' hpav.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='hpavkey.7.html' title=' hpavkey.7 '>NEXT</a>]
+			</div>
+<pre>
+hpavd(7)                              Intellon Linux Toolkit                             hpavd(7)
+
+NAME
+       hpav - HomePlug AV Packet Daemon
+
+SYNOPSIS
+       hpavd [options]
+
+DESCRIPTION
+       Displays  HomePlug  AV ethernet frames transmitted by a HomePlug AV device to the host. It
+       does not display HomePlug AV frames from the host to the  device  or  HomePlug  AV  frames
+       transmitted  over  powerline  unless  they  have  been forwarded to the host via the local
+       device.
+
+       The program is an example of a simple packet listener and daemon. Consequently,  it  lacks
+       features.  Engineers  and software developers can use it to build custom applications. The
+       framework is present but details must be modified or added.
+
+CAVEATS
+       This program places the selected interface  in  the  promiscuous  mode  when  started  and
+       restores  the  original  mode  on  normal exit. It can fail to restore the orignal mode on
+       abnormal exit. Placing an Ethernet adapter in promiscuous mode cause unwanted interactions
+       with other programs using the same adapter. Select your configuration accordingly.
+
+OPTIONS
+       -d     Spawns  the  program as a background process, or daemon, and returns control of the
+              console to the user. The the foreground process returns immediately but  the  back‐
+              ground process runs until terminated.
+
+       -i interface
+              Names the host ethernet interface to watch. The named interface, such as eth0, eth1
+              and so on, must be connected to a HomePlug AV ethernet-to-powerline bridge  adapter
+              to receive any HomePlug AV traffic. The default interface is eth1.
+
+       -q     Quiet mode. Suppress the printing of the normal message descriptions on stdout.
+
+       -v     Verbose  mode.  Displays incoming frames in hexadecimal dump format on stdout. This
+              option is independent of option -a which prints VS_ARPC message text on stderr.
+
+       -?, --help
+              Print program help summary on stdout.  This  option  takes  precedence  over  other
+              options on the command line.
+
+       -!, --version
+              Print  program  version  information  on  stdout. This option takes precedence over
+              other options on the command line. Usethis option  when  sending  screen  dumps  to
+              Intellon  Technical  Support  so  that they know exactly which version of the Linux
+              Toolkit you are using.  See the HomePlug AV Specification for a description of  all
+              HomePlug AV message types. See the Intellon INT6000 Firmware Reference Manual for a
+              description of Intellon Vendor Specific message types.
+
+EXAMPLES
+       The following command monitors the default host interface for HomePlug AV traffic and dis‐
+       play incoming frames on the console as they arrive. It will continue to run until the user
+       types ^C or ^Z at the console. Generally, hpavd is run in a separate console window.
+
+          # hpavd
+
+       The following command monitors host interface eth4 for Homeplug AV frames and  write  them
+       to  file  hpavd.log.  Frames  are  printed in hexadecimal dump format because option -v is
+       present.
+
+          # hpavd -v -i eth4 &gt; hpavd.log
+
+DISCLAIMER
+       Intellon HomePlug AV Vendor Specific Management Message structure and content  is  propri‐
+       etary  to  Intellon  Corporation,  Ocala  FL  USA. Consequently, public information is not
+       available. Intellon Corporation reserves the right to modify management message  structure
+       and  content  in  future  firmware releases without any obligation to notify or compensate
+       users of this program.
+
+SEE ALSO
+       efsu(7), ilt(7)
+
+CREDITS
+        Charles Maier &lt;charles.maier@intellon.com&gt;
+
+int6000-utils-linux             Intellon Corporation, Ocala FL USA                       hpavd(7)
+</pre>
+		<div class='footerlink'>
+			[<a href='hpav.7.html' title=' hpav.7 '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='hpavkey.7.html' title=' hpavkey.7 '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,34 @@
+This README explains the structure of the spectraldaemon app code and which functions can be found where.
+
+Start with the file <spectral_test_server.c>
+This contains the main function which will create both the listening socket to connect to the GUI and the netlink socket which receive spectral data from the kernel.
+The daemon will need to monitor both sockets. On the socket connected to the GUI / client it will receive SAMP request messages.
+
+<spectral_parse_req.c> contains code to parse the incoming SAMP request messages sent by the client / GUI. These requests contain the type of scan (classify or not) and a list of channels that are to be scanned. 
+This file also contains code to switch channels and update state.
+
+<spectral_samp.c> The spectraldaemon needs to send spectral data as part of a SAMP message back to the client. This SAMP message has all the bin data and may also contain classification results if a classify scan is run and interference has been detected. 
+
+The AD GUI is very simple and needs to receive interleaved messages from each channel on its channel list. There are only 2 channels (5 and 11) and it must receive data from channel 5, then 11, then 5 again and so on.
+
+When in classify mode, the AP must stay in each channel for 1 second. So to interleave messages from both channels as required by the GUI, the spectraldaemon has to buffer or save some SAMP messages from the current channel. Then when it is in the other channel, it will use this buffered information to send the GUI interleaved messages.
+
+Sometimes, the spectraldaemon may need to send a dummy message to the GUI to maintain flow control. This logic is also contained in the file <spectral_samp.c>
+
+To make the spectral view look better, the spectraldaemon tries to send spectral data with the highest RSSI obtained within the maxhold interval. This is further explained in the code comments. 
+
+Two message pools are maintained to buffer SAMP messages for each frequency.
+
+<spectral_build_rsp.c> contains code to build the SAMP message response required by te GUI / client.
+
+<spectral_debug.c> contains debug functions to print SAMP msgs, etc.
+
+<spectral_interf.c> maintains interference state. This is added to the SAMP response messages sent to the GUI/client.
+
+<spectral_daemon_eacs.c> contains the logic to check if dynamic channel change is required. It bases this decision on a calculation of current channel loading conditions and whether interference has been detected in the current channel.
+
+<spectral_parse_data.c> contains parsing logic to process the spectral data read from the netlink socket. The driver puts all FFT data (with some extra information like RSSI, etc) into the netlink socket. This is read by the spectraldaemon and passed to the classifier for classification of interferers.
+
+Channel change is immediate in non classify mode and is delayed by a second in the classify mode, so saving and sending SAMP messages to the GUI /client is handled differently for each mode.
+
+<spectraldemo.c> and <spectraldemo.h> are obsolete and maintained for historical purposes only. 

@@ -1,0 +1,30 @@
+<%
+  xml_session=`config_read /config/session`
+  xml_session_lang=`config_getoption "$xml_session" language`
+  if [ "$xml_session_lang" == "zh-ch" ]; then
+  	if [ "$my_action_status" == "Session Timeout" ]; then
+  		action_dis="会话超时"
+  	fi
+  	if [ "$my_action_status" == "Invalid Session" ]; then
+  		action_dis="会话错误"
+  	fi
+  else
+  	action_dis="$my_action_status"
+  fi
+%>
+<%
+if [ "$my_action_status" != "" ]; then
+%>
+<div align="center">
+<table border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td align="center">&nbsp;<%= $action_dis %>&nbsp;</td>
+</tr>
+</table>
+</div>
+<%
+fi
+%>

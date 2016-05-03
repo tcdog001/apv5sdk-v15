@@ -1,0 +1,28 @@
+#!/bin/sh
+. /usr/lib/web/xmlconf.sh
+
+#
+#usage()
+#
+usage()
+{
+	echo "set_vendorclassid [vendorclassid]"
+	exit 1
+}
+
+if [ ! $# -eq 1 ];then
+	usage
+fi
+
+VENDORCLASSID=$1
+
+
+
+CONFIG_XML=/etc/config/config.xml
+vendor=`config_read "/config/network/lan"`
+
+ vendor=`config_setoption "$vendor" vendorclassid "${VENDORCLASSID}"`
+ config_write "/config/network/lan" "$vendor"
+ echo "vendorclassid:$VENDORCLASSID"
+
+

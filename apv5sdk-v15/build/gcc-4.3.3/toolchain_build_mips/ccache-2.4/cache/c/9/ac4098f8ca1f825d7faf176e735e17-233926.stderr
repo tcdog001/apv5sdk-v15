@@ -1,0 +1,2 @@
+coreutils/uniq.c: In function 'uniq_main':
+coreutils/uniq.c:87: warning: passing argument 1 of 'free' discards qualifiers from pointer target type

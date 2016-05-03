@@ -1,0 +1,2 @@
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/apps/art/modules/client.c: In function 'reset_device':
+/home/zhangsiyu/pc018work-v15-at/apv5sdk-v15/apps/art/modules/client.c:793: warning: unused variable 'out'

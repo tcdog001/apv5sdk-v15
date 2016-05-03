@@ -1,0 +1,2 @@
+init.c:116: warning: unused parameter 'papdata'
+init.c:116: warning: unused parameter 'mgmttype'

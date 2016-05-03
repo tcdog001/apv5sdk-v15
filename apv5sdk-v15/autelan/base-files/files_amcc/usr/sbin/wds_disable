@@ -1,0 +1,9 @@
+#!/bin/sh
+MV=/bin/mv
+MOUNT=bin/mount
+BRCTL=/usr/sbin/brctl
+cd /usr/sbin
+${MOUNT} -o remount +w /
+${MV} sta_access_limit.bar sta_access_limit
+${BRCTL} addif default ath0
+echo 0 > /proc/sys/net/capwap/wds_tunnel

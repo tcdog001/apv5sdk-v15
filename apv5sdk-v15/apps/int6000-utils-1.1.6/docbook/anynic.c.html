@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			anynic.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='alert.c.html' title=' alert.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='argv.c.html' title=' argv.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   signed anynic (char buffer [], size_t length);
+ *
+ *   find an available host Ethernet interface and copy the name
+ *   into the designated buffer; truncate the name if necessary;
+ *   return 0 on success or -1 on error;
+ *
+ *   if the only interface is loopback then -1 is returned since 
+ *   lo is of no use;
+ *
+ *   this function is only available for Linux at this time and
+ *   is only used by the CGI device manager;
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef ANYNIC_SOURCE
+#define ANYNIC_SOURCE
+
+#include &lt;sys/ioctl.h&gt;
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../ether/ether.h&quot;
+#include &quot;../tools/error.h&quot;
+
+signed anynic (char buffer [], size_t length) 
+
+{
+	char memory [1024];
+	struct ifconf ifc;
+	struct ifreq *ifr;
+	signed fd;
+	memset (buffer, 0, length);
+	if ((fd = socket (AF_INET, SOCK_DGRAM, 0)) &lt; 0) 
+	{
+		error (1, errno, &quot;Can't open socket&quot;);
+	}
+	ifc.ifc_len = sizeof (memory);
+	ifc.ifc_buf = memory;
+	if (ioctl (fd, SIOCGIFCONF, &amp;ifc) &lt; 0) 
+	{
+		error (1, errno, &quot;Can't read configuration&quot;);
+	}
+	ifr = ifc.ifc_req;
+	if ((length) &amp;&amp; (ifc.ifc_len &gt; sizeof (struct ifreq))) 
+	{
+		memcpy (buffer, (++ifr)-&gt;ifr_name, --length);
+		return (0);
+	}
+	return (-1);
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='alert.c.html' title=' alert.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='argv.c.html' title=' argv.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

@@ -1,0 +1,53 @@
+diff -u -r openssl-0.9.8e/ssl/d1_both.c openssl-0.9.8e-fix/ssl/d1_both.c
+--- openssl-0.9.8e/ssl/d1_both.c	2005-08-29 01:20:52.000000000 +0200
++++ openssl-0.9.8e-fix/ssl/d1_both.c	2007-04-04 12:15:21.000000000 +0200
+@@ -725,11 +725,18 @@
+     /* case (3): received a immediately useful fragment.  Determine the 
+      * possible overlap and copy the fragment.
+      */
+-    overlap = (s->init_num - DTLS1_HM_HEADER_LENGTH) - frag_off;
++    /* FIX DTLS */
++    /* overlap = (s->init_num - DTLS1_HM_HEADER_LENGTH) - frag_off; */
++    /* END FIX DTLS */
+         
+     /* retain the header for the first fragment */
+     if ( s->init_num > DTLS1_HM_HEADER_LENGTH)
+         {
++        /* FIX DTLS */
++        s->init_num -= DTLS1_HM_HEADER_LENGTH;
++        ovelap = (s->init_num - DTLS1_HM_HEADER_LENGTH) - frag_off;
++        /* END FIX DTLS */
++        
+         memmove(&(s->init_buf->data[s->init_num]),
+             &(s->init_buf->data[s->init_num + DTLS1_HM_HEADER_LENGTH + overlap]),
+             frag_len - overlap);
+@@ -737,7 +744,13 @@
+         s->init_num += frag_len - overlap;
+         }
+     else
++	{
++	/* FIX DTLS */
++	overlap = 0;
++	/* END FIX DTLS */
++	
+         s->init_num += frag_len;
++        }
+ 
+     dtls1_process_handshake_fragment(s, frag_len - overlap);
+ 
+diff -u -r openssl-0.9.8e/ssl/d1_srvr.c openssl-0.9.8e-fix/ssl/d1_srvr.c
+--- openssl-0.9.8e/ssl/d1_srvr.c	2005-12-05 18:32:19.000000000 +0100
++++ openssl-0.9.8e-fix/ssl/d1_srvr.c	2007-04-04 12:19:38.000000000 +0200
+@@ -1086,6 +1086,12 @@
+ #endif
+ 
+ 		/* XDTLS:  set message header ? */
++		
++		/* FIX DTLS */
++		msg_len = s->init_num - DTLS1_HM_HEADER_LENGTH;
++		dtls1_set_message_header(s, s->init_buf->data, SSL3_MT_CERTIFICATE_REQUEST, msg_len, 0, msg_len);
++		/* END FIX DTLS */
++		
+ 		/* buffer the message to handle re-xmits */
+ 		dtls1_buffer_message(s, 0);
+ 

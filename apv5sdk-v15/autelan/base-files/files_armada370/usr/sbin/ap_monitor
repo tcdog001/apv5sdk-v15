@@ -1,0 +1,238 @@
+#!/bin/sh
+RESET_FLAG=0
+
+INTERVAL=15
+BUF_ERR_FLAG=/proc/sys/dev/wifi0/no_txbuf
+REBOOT=/sbin/sysreboot
+CAT_CPU_INFO="cat /proc/cpuinfo"
+THINAP=`cat /proc/sys/dev/wifi0/thinap`
+
+WATCHSTATE=/proc/sys/dev/wifi0/thinap_state
+WATCHDOG=/proc/sys/dev/wifi0/thinap_check_timer
+
+WTPD_HAS_ENTER_RUN=0
+WTPD_HAS_GOT_MANAGER_ID=0
+
+if [ $# -eq 1  ];then
+	INTERVAL=${1}
+fi
+
+${CAT_CPU_INFO} |grep "Cavium\|PowerPC"
+local notCavium=$?
+
+check_info=""
+
+#mem_check
+MEM_MAX_COUNT=2
+MEM_CHECK_FLAG=0
+mem_check()
+{
+	local mem_exc=`free | awk '/Mem/{ mr=$3/$2  }END{ if ( mr > 0.9) {print 1} else {print 0}  }'`
+	if [ ${mem_exc} -eq 1  ];then
+		MEM_CHECK_FLAG=$((${MEM_CHECK_FLAG}+1))
+	fi
+	if [ ${MEM_CHECK_FLAG} -gt ${MEM_MAX_COUNT}  ];then
+		local mem_free=`free | awk '/Mem/{print $4}'`
+		check_info="memory check error, memory free:${mem_free}"
+		RESET_FLAG=1
+	fi
+}
+
+#radio_check
+radio_check()
+{
+	local RADIO_FLAG=0
+	if [ -f ${BUF_ERR_FLAG}  ];then
+		RADIO_FLAG=`cat ${BUF_ERR_FLAG}`
+		if [ ! 0${RADIO_FLAG} -eq 0 ];then
+			RESET_FLAG=1
+		fi
+	fi
+}
+
+hot_start()
+{
+	ps | awk '/wtpd/{if($4=="wtpd"){print $1}}' | xargs kill -9 >/dev/null 2>&1
+	WTPD_HAS_GOT_MANAGER_ID=0
+	rm -rf /tmp/manager_id
+	
+	local wtpd_restart_count=0
+	if [ -f /jffs/wrt ];then
+		wtpd_restart_count="`cat /jffs/wrt`"
+	fi
+	
+	check_info="proc check error: ${proc_count}"
+	
+	if [ ! -d /jffs/last_log ];then
+		mkdir -p /jffs/last_log
+	fi
+	if [ -f /tmp/neighbordead ];then
+		tail -50 /tmp/wtpd.log > /jffs/last_log/last_wtpd_log
+		cp /tmp/echo_time /jffs/last_log/last_echo_time
+		if [ -f /tmp/cpu_ratio ];then
+			cp /tmp/cpu_ratio /jffs/last_log/last_cpu_ratio
+		fi
+		if [ -f /proc/net/capwap_record ];then
+			cp /proc/net/capwap_record /jffs/last_log/last_capwap_record
+		fi
+	else
+		tail -50 /tmp/wtpd.log > /jffs/last_log/wtpd_log
+		cp /tmp/echo_time /jffs/last_log/
+		if [ -f /tmp/cpu_ratio ];then
+			cp /tmp/cpu_ratio /jffs/last_log/
+		fi
+		if [ -f /proc/net/capwap_record ];then
+			cp /proc/net/capwap_record /jffs/last_log/
+		fi
+	fi
+	touch /jffs/apmon_log
+	linenu=`cat /jffs/apmon_log | wc -l`
+	if [ ${linenu} -gt 50 ];then
+		echo "reset apmon_log!" > /jffs/apmon_log
+	fi
+	date >> /jffs/apmon_log
+	echo "wtpd hot reboot at this time!" >> /jffs/apmon_log
+	
+	wtpd -V >/dev/null 2>&1 &
+	echo $((wtpd_restart_count+1)) > /jffs/wrt
+#			RESET_FLAG=1
+}
+
+
+proc_check_for_Cavium()
+{
+	local proc_count=`ps | awk '/wtpd/{if($4=="wtpd"){print}}' | wc -l`
+	local wtpd_restart_count=0
+	if [ -f /jffs/wrt ];then
+		wtpd_restart_count="`cat /jffs/wrt`"
+	fi
+	if [  0${proc_count} -lt 1  ];then
+		check_info="proc check error: ${proc_count}"
+		
+		if [ ! -d /jffs/last_log ];then
+			mkdir -p /jffs/last_log
+		fi
+		tail -100 /tmp/wtpd.log > /jffs/last_log/wtpd_log
+		cp /tmp/echo_time /jffs/last_log/
+		if [ -f /tmp/cpu_ratio ];then
+			cp /tmp/cpu_ratio /jffs/last_log/
+		fi
+		if [ -f /proc/net/capwap_record ];then
+			cp /proc/net/capwap_record /jffs/last_log/
+		fi
+		touch /jffs/apmon_log
+		linenu=`cat /jffs/apmon_log | wc -l`
+		if [ ${linenu} -gt 50 ];then
+			echo "reset apmon_log!" > /jffs/apmon_log
+		fi
+		date >> /jffs/apmon_log
+		echo "wtpd hot reboot at this time!" >> /jffs/apmon_log
+		
+		wtpd -V >/dev/null 2>&1 &
+		echo $((wtpd_restart_count+1)) > /jffs/wrt
+#		RESET_FLAG=1
+	fi
+}
+
+
+proc_check_for_noCavium()
+{
+	#local proc_count=`ps | awk '/wtpd/{if($5=="wtpd"){print}}' | wc -l`
+	local proc_count=`ps | awk '/wtpd/{if($4=="wtpd"){print}}' | wc -l`
+	#wangxinlin add for ps cmd differ 
+	
+	if [ ${WTPD_HAS_ENTER_RUN} -eq 0 ];then
+		if [ -e /tmp/run_state ];then
+			WTPD_HAS_ENTER_RUN=1
+		fi
+		if [  0${proc_count} -lt 1  ];then
+			check_info="proc check error, no run: ${proc_count}"
+			RESET_FLAG=1
+	    	fi
+	else
+		
+		if [ ${WTPD_HAS_GOT_MANAGER_ID} -eq 0 ];then
+			WTPD_HAS_GOT_MANAGER_ID=`cat /tmp/manager_id`
+			if [ ${WTPD_HAS_GOT_MANAGER_ID:-0} -eq 0 ];then
+				hot_start
+				return
+			fi
+		fi
+		
+		if [  0${proc_count} -lt 1 ];then
+			hot_start
+			return
+	    	fi
+	    	
+		ps | awk '/wtpd/{if($4=="wtpd"){print $1}}' | grep -q ${WTPD_HAS_GOT_MANAGER_ID}
+		if [ $? -eq 1 ];then
+			echo "wtpd manage thread is abnormal(zombie or noexist),hot start!" >> /jffs/apmon_log
+			hot_start
+		fi
+	fi
+}
+
+
+proc_check()
+{
+	if [ ${notCavium} -eq 1 ];then
+		proc_check_for_noCavium	
+	else
+		proc_check_for_Cavium
+	fi
+}
+
+
+#stat_check()
+stat_check()
+{
+	local stat_d_count=`ps | awk '{if($3=="DW"){print }}' | wc -l`
+	if [ 0${stat_d_count} -gt 0 ];then
+		check_info="proc stat check error:${stat_d_count}"
+		RESET_FLAG=1
+	fi
+}
+
+#fat_check()
+fat_check()
+{
+	mem_check
+#	stat_check
+#	radio_check
+}
+
+#thin_check()
+thin_check()
+{
+	mem_check
+#	stat_check
+#	radio_check
+	proc_check
+}
+
+if [ -f /proc/sys/dev/wifi0/monitor_process ];then
+	echo $$ > /proc/sys/dev/wifi0/monitor_process
+fi
+
+if [ ${THINAP} -eq 0 ];then
+	echo 1 > ${WATCHSTATE}
+fi
+
+while :
+do
+	if [ ${THINAP} -eq 1  ];then
+	    thin_check
+	else
+		fat_check
+		echo 0 > ${WATCHDOG}
+	fi
+	#sleep 60
+	if [ ${RESET_FLAG} -eq 1  ];then
+		touch /jffs/apmon_log
+		date >> /jffs/apmon_log
+		echo "${check_info}" >> /jffs/apmon_log
+		echo o > /proc/kes_debug_flag
+		${REBOOT}
+	fi
+	sleep ${INTERVAL}
+done

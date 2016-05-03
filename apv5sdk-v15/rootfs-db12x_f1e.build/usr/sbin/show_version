@@ -1,0 +1,16 @@
+#!/bin/sh
+
+WRCPUUTIL=/usr/bin/pro_ctl_util
+CURRENT="`$WRCPUUTIL -C|awk -F ':' '/current/{print $2}'`"
+NEXT="`$WRCPUUTIL -C|awk -F ':' '/next/{print $2}'`"
+#FLAG="`$WRCPUUTIL -C|awk -F ':' '/opt/{print $2}'`"
+OPT="`df | awk '{ if($6 == "/")print $1 }' | grep -e "[0-9]" -o`"
+if [ $OPT -eq 3 ];then
+	echo "boot from kernel 1"
+fi
+if [ $OPT -eq 5 ];then
+	echo "boot from kernel 2"
+fi
+echo "current version:$CURRENT"
+echo "next version:$NEXT"
+

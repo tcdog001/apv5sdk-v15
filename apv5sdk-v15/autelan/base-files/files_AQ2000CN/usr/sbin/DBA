@@ -1,0 +1,24 @@
+#!/bin/sh
+
+USAGE="Usage: $(basename $0) <ath0|eth1> <Dest MAC> <CIR> <PIR>"
+
+if [ $# -lt 4 ];then
+	echo "${USAGE}" >&2
+	exit 1
+fi
+
+MAC01="`echo ${2} | cut -b 1-4`"
+MAC2345="`echo ${2} | cut -b 5-12`"
+
+tc qdisc del dev ${1} root 2> /dev/null > /dev/null
+tc qdisc del dev ${1} ingress 2> /dev/null > /dev/null
+tc qdisc add dev ${1} root handle 1: htb default 20
+
+tc class add dev ${1} parent 1: classid 1:1 htb rate 100mbit burst 100K
+tc class add dev ${1} parent 1:1 classid 1:10 htb rate ${3}mbit ceil ${4}mbit burst ${4}k prio 0
+tc class add dev ${1} parent 1:1 classid 1:20 htb rate 64mbit ceil 80mbit burst 80k prio 0
+
+tc qdisc add dev ${1} parent 1:10 handle 10: sfq perturb 10
+tc qdisc add dev ${1} parent 1:20 handle 20: sfq perturb 10
+
+tc filter add dev ${1} parent 1:0 protocol ip prio 0 u32 match u16 0x0800 0xffff at -2 match u32 0x${MAC2345} 0xffffffff at -12 match u16 0x${MAC01} 0xffff at -14 flowid 1:10

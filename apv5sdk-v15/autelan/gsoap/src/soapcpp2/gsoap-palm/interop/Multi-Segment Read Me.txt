@@ -1,0 +1,36 @@
+###############################################################################
+#
+# Copyright (c) 1999-2000 Palm, Inc. or its subsidiaries.
+# All rights reserved.
+#
+# File: Multi-Segment Read Me.txt
+#
+###############################################################################
+
+This is a stationery project for a multi-segment application that 
+runs on Palm OS devices.  Even though you can create applications 
+with multiple segments, you must follow the example used in this
+project.  See the "Targetting Palm OS" manual in the CodeWarrior 
+Documentation folder for more information on working with multi-
+segment applications.
+
+Segments are numbered from 0.  Segment 0 contains information for 
+the segment loader and is created by the linker.  Segment 1 contains 
+your application code and the startup code.  This segment __must__ 
+contain "MSL Runtime Palm OS (xx).lib", PilotMain(), and any code that 
+is executed when PilotMain() receives a launch command other than 
+sysAppLaunchCmdNormalLaunch.  This stipulation is caused by the fact 
+that A5-relative data is not relocated when the application is called 
+with any other launch code, thus all global variable addresses will be
+wrong and cause a crash.
+
+The best way to determine what files can go into segments other
+than 1 is to comment out the code in PilotMain() that handles the
+sysAppLaunchCmdNormalLaunch command, select the "Link Map" option
+from the 68K Linker preferences, and rebuild.  Any file that shows
+up in the link map on a line beginning with "Code:" must be in the
+first segment.  
+
+If you follow the coding style used by the Palm OS examples, form 
+handlers and the static functions called by the form handlers are
+good candidates to be placed in secondary segments.

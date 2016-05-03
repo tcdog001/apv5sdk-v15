@@ -1,0 +1,21 @@
+#!/bin/sh
+#set_dhcp vapname dhcp_enable
+
+AUTELAN=/usr/sbin/autelan
+#
+#usage()
+#
+usage()
+{
+	echo "set_dhcp vapname dhcp_enable"
+	exit 1
+}
+
+if [ ! $# -eq 2 ];then
+	usage
+fi
+
+VAPNAME=$1
+DHCP_ENABLE=$2
+
+${AUTELAN} mac_binding ${VAPNAME} set_dhcp_enable ${DHCP_ENABLE}

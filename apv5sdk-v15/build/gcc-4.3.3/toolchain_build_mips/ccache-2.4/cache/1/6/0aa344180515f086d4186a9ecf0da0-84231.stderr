@@ -1,0 +1,5 @@
+autelan-app/src/partool/partool.c: In function 'part_write':
+autelan-app/src/partool/partool.c:154: warning: pointer targets in passing argument 1 of 'flash_write' differ in signedness
+autelan-app/src/partool/partool.c:140: warning: unused variable 'tmp'
+autelan-app/src/partool/partool.c: In function 'partool_show_byname_api':
+autelan-app/src/partool/partool.c:569: warning: passing argument 1 of 'strlen' makes pointer from integer without a cast

@@ -1,0 +1,43 @@
+.NOTPARALLEL:
+
+ifndef PKG_BUILD_DIR
+PKG_BUILD_DIR := files
+CAV_BUILD_DIR := files_cavium
+endif
+
+ifndef ROOTFSDIR
+ROOTFSDIR=/tmp/${USER}-rootfs
+endif 
+
+
+unexport LDFLAGS
+
+.PHONY: all
+all: install 
+
+
+ifeq "${MODE}" "11n"
+RMFILE := preconfig_wapi preconfig_11bg config_wapi config_11bg
+TARGETPREFILE := preconfig_11n
+TARGETCONFFILE := config_11n
+endif
+ifeq "${MODE}" "wapi"
+RMFILE := preconfig_11n preconfig_11bg config_11n config_11bg
+TARGETPREFILE := preconfig_wapi
+TARGETCONFFILE := config_wapi
+endif
+ifeq "${MODE}" "11bg"
+RMFILE=preconfig_wapi preconfig_11n config_wapi config_11n
+TARGETPREFILE := preconfig_11bg
+TARGETCONFFILE := config_11bg
+endif
+
+.PHONY: install
+install:
+	rm -rf ${PKG_BUILD_DIR}/sbin/set_mac
+	sudo cp -rf ${PKG_BUILD_DIR}/* ${ROOTFSDIR}/
+	sudo cp -rf ${CAV_BUILD_DIR}/* ${ROOTFSDIR}/
+	( cd ${ROOTFSDIR}/etc/wlan && \
+	  sudo rm -rf ${RMFILE} && \
+	  sudo mv ${TARGETPREFILE} preconfig && \
+	  sudo mv ${TARGETCONFFILE} config )

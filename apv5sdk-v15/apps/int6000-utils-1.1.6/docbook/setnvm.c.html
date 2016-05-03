@@ -1,0 +1,252 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			setnvm.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='session.c.html' title=' session.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='setpib.c.html' title=' setpib.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   setnvm.c - 
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;string.h&gt;
+#include &lt;errno.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../nvm/nvm.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/checksum_32.c&quot;
+#include &quot;../tools/fdchecksum_32.c&quot;
+#include &quot;../tools/basespec.c&quot;
+#include &quot;../tools/strfbits.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/alert.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../nvm/nvmpeek.c&quot;
+#endif
+
+/*====================================================================*
+ *
+ *   void function (const char * filename, uint8_t type, uint16_t omit, flag_t flags) 
+ *
+ *   open an NVM file and change the image-type and host-mask field
+ *   for every image in the file;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+static void function (const char * filename, uint8_t type, uint16_t omit, flag_t flags) 
+
+{
+	struct header_nvm header_nvm;
+	signed image = 0;
+	signed ifd;
+	memset (&amp;header_nvm, 0, sizeof (header_nvm));
+	if ((ifd = open (filename, O_BINARY|O_CREAT|O_RDWR)) == -1) 
+	{
+		error (1, errno, &quot;Can't open %s&quot;, filename);
+	}
+	do 
+	{
+		if (lseek (ifd, 0, SEEK_CUR) != LE32TOH (header_nvm.NEXTHEADER)) 
+		{
+			error (1, errno, &quot;Bad file position: %s (%d)&quot;, filename, image);
+		}
+		if (read (ifd, &amp;header_nvm, sizeof (header_nvm)) &lt; sizeof (header_nvm)) 
+		{
+			error (1, errno, &quot;Can't read header: %s (%d)&quot;, filename, image);
+		}
+		if (LE32TOH (header_nvm.HEADERVERSION) != NVM_HEADER_VERSION) 
+		{
+			error (1, errno, &quot;Bad header version: %s (%d)&quot;, filename, image);
+		}
+		if (checksum_32 (&amp;header_nvm, sizeof (header_nvm), 0)) 
+		{
+			error (1, errno, &quot;Bad header checksum: %s (%d)&quot;, filename, image);
+		}
+		if (type) 
+		{
+			header_nvm.HEADERMINORVERSION = NVM_HEADER_MINOR_VERSION;
+			header_nvm.IMAGETYPE = type;
+		}
+		if (omit) 
+		{
+			header_nvm.HEADERMINORVERSION = NVM_HEADER_MINOR_VERSION;
+			header_nvm.IGNOREMASK = omit;
+		}
+		header_nvm.HEADERCHECKSUM = 0;
+		header_nvm.HEADERCHECKSUM = checksum_32 (&amp;header_nvm, sizeof (header_nvm), 0);
+		if (_anyset (flags, NVM_VERBOSE)) 
+		{
+			printf (&quot;------- %s (%d) -------\n&quot;, filename, image);
+			nvmpeek (&amp;header_nvm);
+		}
+		if (lseek (ifd, 0-sizeof (header_nvm), SEEK_CUR) == -1) 
+		{
+			error (1, errno, &quot;Can't rewind %s&quot;, filename);
+		}
+		if (write (ifd, &amp;header_nvm, sizeof (header_nvm)) &lt; sizeof (header_nvm)) 
+		{
+			error (1, errno, &quot;Can't save header: %s (%d)&quot;, filename, image);
+		}
+		if (fdchecksum_32 (ifd, LE32TOH (header_nvm.IMAGELENGTH), header_nvm.IMAGECHECKSUM)) 
+		{
+			error (1, errno, &quot;Bad images checksum: %s (%d)&quot;, filename, image);
+		}
+		image++;
+	}
+	while (header_nvm.NEXTHEADER);
+	close (ifd);
+	return;
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char * argv []);
+ *   
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *   
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	static const char *optv [] = 
+	{
+		&quot;o:qt:v&quot;,
+		&quot;file [file] [...]&quot;,
+		&quot;Intellon image file mangler&quot;,
+		&quot;t x\timage type is (x)&quot;,
+		&quot;o x\thost mask is (x)&quot;,
+		&quot;q\tquiet mode&quot;,
+		&quot;v\tverbose mode&quot;,
+		(const char *) (0) 
+	};
+	uint8_t type = 0;
+	uint16_t omit = 0;
+	flag_t flags = (flag_t)(0);
+	signed c;
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch (c) 
+		{
+		case 't':
+			type = (uint8_t)(basespec (optarg, 0, sizeof (uint8_t)));
+			break;
+		case 'o':
+			omit = (uint16_t)(basespec (optarg, 0, sizeof (uint16_t)));
+			break;
+		case 'q':
+			_setbits (flags, NVM_SILENCE);
+			break;
+		case 'v':
+			_setbits (flags, NVM_VERBOSE);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		function (*argv, type, omit, flags);
+		argc--;
+		argv++;
+	}
+	return (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='session.c.html' title=' session.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='setpib.c.html' title=' setpib.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

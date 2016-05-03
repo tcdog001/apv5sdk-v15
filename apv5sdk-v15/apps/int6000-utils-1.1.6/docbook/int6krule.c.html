@@ -1,0 +1,392 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			int6krule.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='int6krate.c.html' title=' int6krate.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kstat.c.html' title=' int6kstat.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   int6krule.c - Intellon Stream Classification Utility;
+ *
+ *   this program sends and receives raw ethernet frames and so needs
+ *   root priviledges; if you install it using &quot;chmod 555&quot; and &quot;chown 
+ *   root:root&quot; then you must login as root to run it; otherwise, you 
+ *   can install it using &quot;chmod 4555&quot; and &quot;chown root:root&quot; so that 
+ *   anyone can run it; the program will refuse to run until you get
+ *   things right;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*&quot;
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;unistd.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdint.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/number.h&quot;
+#include &quot;../tools/symbol.h&quot;
+#include &quot;../tools/types.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../int6k/int6k.h&quot;
+#include &quot;../int6k/rules.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/basespec.c&quot;
+#include &quot;../tools/hexdump.c&quot;
+#include &quot;../tools/hexencode.c&quot;
+#include &quot;../tools/bytespec.c&quot;
+#include &quot;../tools/ipv4spec.c&quot;
+#include &quot;../tools/ipv6spec.c&quot;
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/todigit.c&quot;
+#include &quot;../tools/endian.c&quot;
+#include &quot;../tools/error.c&quot;
+#include &quot;../tools/synonym.c&quot;
+#include &quot;../tools/assist.c&quot;
+#include &quot;../tools/lookup.c&quot;
+#include &quot;../tools/expect.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../int6k/Confirm.c&quot;
+#include &quot;../int6k/Display.c&quot;
+#include &quot;../int6k/Failure.c&quot;
+#include &quot;../int6k/ReadMME.c&quot;
+#include &quot;../int6k/Request.c&quot;
+#include &quot;../int6k/SendMME.c&quot;
+#include &quot;../int6k/devices.c&quot;
+#include &quot;../int6k/EthernetHeader.c&quot;
+#include &quot;../int6k/IntellonHeader.c&quot;
+#include &quot;../int6k/UnwantedPacket.c&quot;
+#include &quot;../int6k/rules.c&quot;
+#include &quot;../int6k/ParseRule.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../ether/channel.c&quot;
+#include &quot;../ether/openchannel.c&quot;
+#include &quot;../ether/closechannel.c&quot;
+#include &quot;../ether/readpacket.c&quot;
+#include &quot;../ether/sendpacket.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../mme/MMECode.c&quot;
+#endif
+
+/*====================================================================*
+ *
+ *   signed Classification (struct int6k * int6k, struct rule * rule);
+ *
+ *   int6k.h
+ *
+ *   This plugin for program int6krule adds or removes a temporary
+ *   or permanent network classification rule to a device using a
+ *   VS_CLASSIFICATION message;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+signed Classification (struct int6k * int6k, struct rule * rule) 
+
+{
+
+	struct channel * channel = (struct channel *)(int6k-&gt;channel);
+	struct message * message = (struct message *)(int6k-&gt;message);
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_classification_request 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		struct rule rule;
+	}
+	* request = (struct vs_classification_request *)(message);
+	struct __packed vs_classification_confirm 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+	}
+	* confirm = (struct vs_classification_confirm *)(message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	Request (int6k, &quot;Set Classification Rules&quot;);
+	memset (message, 0, sizeof (struct message));
+	EthernetHeader (&amp;message-&gt;ethernet, channel-&gt;peer, channel-&gt;host);
+	IntellonHeader (&amp;message-&gt;intellon, (VS_CLASSIFICATION | MMTYPE_REQ));
+	int6k-&gt;packetsize = sizeof (struct vs_classification_request);
+	memcpy (&amp;request-&gt;rule, rule, sizeof (request-&gt;rule));
+	if (SendMME (int6k) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, INT6K_CANTSEND);
+		return (-1);
+	}
+	if (ReadMME (int6k, (VS_CLASSIFICATION | MMTYPE_CNF)) &lt;= 0) 
+	{
+		error ((int6k-&gt;flags &amp; INT6K_BAILOUT), errno, INT6K_CANTREAD);
+		return (-1);
+	}
+	if (confirm-&gt;MSTATUS) 
+	{
+		Failure (int6k, INT6K_WONTDOIT);
+		return (-1);
+	}
+	Confirm (int6k, &quot;Setting ...&quot;);
+	return (0);
+}
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char * argv[]);
+ *   
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	extern struct channel channel;
+	extern const struct _term_ devices [];
+	static const char *optv [] = 
+	{
+		&quot;ei:qtT:vV:&quot;,
+		&quot;action operand condition [...] control volatility [device] [...]\n\n          where a condition is: field operator value&quot;,
+		&quot;Intellon Stream Classification Utility&quot;,
+		&quot;e\tredirect stderr messages to stdout&quot;,
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+		&quot;i n\thost interface number [2]&quot;,
+
+#else
+
+		&quot;i s\thost interface name [&quot; CHANNEL_ETHDEVICE &quot;]&quot;,
+
+#endif
+
+		&quot;q\tquiet mode&quot;,
+		&quot;t\tdisplay symbol tables&quot;,
+		&quot;T x\tinserted vlan tag is x [0x00000000]&quot;,
+		&quot;v\tverbose mode&quot;,
+		&quot;V n\tcspec version is n [0]&quot;,
+		(const char *) (0) 
+	};
+
+#include &quot;../int6k/int6k-struct.c&quot;
+
+	struct cspec cspec;
+	struct rule rule;
+	signed c;
+	memset (&amp;rule, 0, sizeof (rule));
+	memset (&amp;cspec, 0, sizeof (cspec));
+	if (getenv (PLCDEVICE)) 
+	{
+#if defined (WINPCAP) || defined (LIBPCAP)
+		channel.id = atoi (getenv (PLCDEVICE));
+#else
+		channel.name = strdup (getenv (PLCDEVICE));
+#endif
+	}
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'e':
+			dup2 (STDOUT_FILENO, STDERR_FILENO);
+			break;
+		case 'i':
+
+#if defined (WINPCAP) || defined (LIBPCAP)
+
+			channel.id = atoi (optarg);
+
+#else
+
+			channel.name = optarg;
+
+#endif
+
+			break;
+		case 'q':
+			_setbits (channel.flags, CHANNEL_SILENCE);
+			_setbits (int6k.flags, INT6K_SILENCE);
+			break;
+		case 't':
+			printf (&quot;\n&quot;);
+			printf (&quot; Controls are &quot;);
+			expect (controls, CONTROLS, stdout);
+			printf (&quot;\n&quot;);
+			printf (&quot; Volatilities are &quot;);
+			expect (volatilities, VOLATILITIES, stdout);
+			printf (&quot;\n&quot;);
+			printf (&quot; Actions are &quot;);
+			expect (actions, ACTIONS, stdout);
+			printf (&quot;\n&quot;);
+			printf (&quot; Operands are &quot;);
+			expect (operands, OPERANDS, stdout);
+			printf (&quot;\n&quot;);
+			printf (&quot; Fields are &quot;);
+			expect (fields, FIELDS, stdout);
+			printf (&quot;\n&quot;);
+			printf (&quot; Operators are &quot;);
+			expect (operators, OPERATORS, stdout);
+			printf (&quot;\n&quot;);
+			printf (&quot; States  are &quot;);
+			expect (states, STATES, stdout);
+			printf (&quot;\n&quot;);
+			printf (&quot;\n&quot;);
+			return (0);
+		case 'T':
+			cspec.VLAN_TAG = (uint32_t)(basespec (optarg, 16, sizeof (cspec.VLAN_TAG)));
+			cspec.VLAN_TAG = htonl (cspec.VLAN_TAG);
+			break;
+		case 'v':
+			_setbits (channel.flags, CHANNEL_VERBOSE);
+			_setbits (int6k.flags, INT6K_VERBOSE);
+			break;
+		case 'V':
+			cspec.CSPEC_VERSION = (uint16_t)(basespec (optarg, 10, sizeof (cspec.CSPEC_VERSION)));
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	if (ParseRule (&amp;argc, &amp;argv, &amp;rule, &amp;cspec) == -1) 
+	{
+		error (1, 0, &quot;invalid rule&quot;);
+	}
+
+#ifndef WIN32
+
+/*
+ *      raw packets require root priviledges on linux; one does not have to be
+ *      root when this program is installed setuid using 'chown root:root' and 
+ *      'chmod 4555';
+ */
+
+	if (geteuid ()) 
+	{
+		error (1, EPERM, INT6K_NEEDROOT);
+	}
+
+#endif
+
+	openchannel (&amp;channel);
+	if (!(int6k.message = malloc (sizeof (struct message)))) 
+	{
+		error (1, errno, INT6K_ERR_MEMORY);
+	}
+	if (!argc) 
+	{
+		Classification (&amp;int6k, &amp;rule);
+	}
+	while ((argc) &amp;&amp; (*argv)) 
+	{
+		if (!hexencode (channel.peer, sizeof (channel.peer), synonym (*argv, devices, DEVICES))) 
+		{
+			error (1, errno, INT6K_BAD_MAC, *argv);
+		}
+		Classification (&amp;int6k, &amp;rule);
+		argc--;
+		argv++;
+	}
+	free (int6k.message);
+	closechannel (&amp;channel);
+	exit (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='int6krate.c.html' title=' int6krate.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='int6kstat.c.html' title=' int6kstat.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

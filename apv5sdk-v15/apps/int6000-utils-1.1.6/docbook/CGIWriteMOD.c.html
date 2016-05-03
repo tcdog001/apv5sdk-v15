@@ -1,0 +1,185 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			CGIWriteMOD.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='CGISetKey.c.html' title=' CGISetKey.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='CMEncrypt.c.html' title=' CMEncrypt.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================* 
+ *
+ *   void CGIWriteMOD (uint8_t module, const void * memory, signed extent);
+ *   
+ *   session.h 
+ *
+ *   write a memory region to the current powerline device using as
+ *   many VS_WR_MOD message as needed;
+ *   
+ *   this module is for CGI applications and not for general use;
+ *
+ *   See the Intellon HomePlug AV Firmware Technical Reference Manual 
+ *   for more information;
+ *   
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2009 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *      Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef CGIWRITEMOD_SOURCE
+#define CGIWRITEMOD_SOURCE
+
+#include &lt;unistd.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../int6k/int6k.h&quot; 
+#include &quot;../ether/channel.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../cgi/session.h&quot;
+#include &quot;../cgi/page.h&quot;
+
+void CGIWriteMOD (uint8_t module, const void * memory, signed extent) 
+
+{
+	extern struct session session;
+	extern struct channel channel;
+	extern struct message message;
+
+#ifndef __GNUC__
+#pragma pack (push,1)
+#endif
+
+	struct __packed vs_wr_mod_req 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MODULEID;
+		uint8_t RESERVED;
+		uint16_t MLENGTH;
+		uint32_t MOFFSET;
+		uint32_t CHKSUM;
+		uint8_t MBUFFER [INT6K_BLOCKSIZE];
+	}
+	* request = (struct vs_wr_mod_req *) (&amp;message);
+	struct __packed vs_wr_mod_cnf 
+	{
+		struct header_eth ethernet;
+		struct header_int intellon;
+		uint8_t MSTATUS;
+		uint8_t MODULEID;
+		uint8_t RESERVED;
+		uint16_t MLENGTH;
+		uint32_t MOFFSET;
+	}
+	* confirm = (struct vs_wr_mod_cnf *) (&amp;message);
+
+#ifndef __GNUC__
+#pragma pack (pop)
+#endif
+
+	uint32_t length = INT6K_BLOCKSIZE;
+	uint32_t offset = 0;
+	while (extent) 
+	{
+		memset (&amp;message, 0, sizeof (message));
+		EthernetHeader (&amp;request-&gt;ethernet, session.device.MAC, channel.host);
+		IntellonHeader (&amp;request-&gt;intellon, (VS_WR_MOD | MMTYPE_REQ));
+		if (length &gt; extent) 
+		{
+			length = extent;
+		}
+		memcpy (request-&gt;MBUFFER, memory + offset, length);
+		request-&gt;MODULEID = module;
+		request-&gt;RESERVED = 0;
+		request-&gt;MLENGTH = HTOLE16 (length);
+		request-&gt;MOFFSET = HTOLE32 (offset);
+		request-&gt;CHKSUM = checksum_32 (request-&gt;MBUFFER, length, 0);
+		if (sendpacket (&amp;channel, &amp;message, sizeof (message)) &lt;= 0) 
+		{
+			status (0, EIO, INT6K_CANTSEND);
+		}
+		if (readpacket (&amp;channel, &amp;message, sizeof (message)) &lt;= 0) 
+		{
+			status (0, EIO, INT6K_CANTREAD);
+		}
+		if (confirm-&gt;MSTATUS) 
+		{
+			status (0, EPERM, INT6K_WONTDOIT &quot; (0x%02X)&quot;, confirm-&gt;MSTATUS);
+		}
+
+#if 1
+
+		if (LE16TOH (confirm-&gt;MLENGTH) != length) 
+		{
+			status (0, EIO, INT6K_ERR_LENGTH);
+		}
+		if (LE32TOH (confirm-&gt;MOFFSET) != offset) 
+		{
+			status (0, EIO, INT6K_ERR_OFFSET);
+		}
+
+#else
+
+		if (LE16TOH (confirm-&gt;MLENGTH) != length) 
+		{
+			error (0, EIO, INT6K_ERR_LENGTH);
+			length = INT6K_BLOCKSIZE;
+			offset = 0;
+			continue;
+		}
+		if (LE32TOH (confirm-&gt;MOFFSET) != offset) 
+		{
+			error (0, EIO, INT6K_ERR_OFFSET);
+			length = INT6K_BLOCKSIZE;
+			offset = 0;
+			continue;
+		}
+
+#endif
+
+		extent -= length;
+		offset += length;
+	}
+	return;
+}
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='CGISetKey.c.html' title=' CGISetKey.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='CMEncrypt.c.html' title=' CMEncrypt.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

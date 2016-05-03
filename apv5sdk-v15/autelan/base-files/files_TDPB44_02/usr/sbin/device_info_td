@@ -1,0 +1,88 @@
+
+if [ $# -le 0 ];then
+    echo "error: need device type"
+    exit 0
+fi
+
+if [ -z $3 ];then
+    config_file_path=/tmp/device_info.xml
+else
+    config_file_path=$3
+    if [ ! -d $(dirname $config_file_path) ];then
+        echo "error: file path error"
+        exit 0
+    fi
+fi
+
+if [ ! -z $2 ];then
+    HV=`echo $2 | cut -b 1-3`
+fi
+
+case "$1" in
+'R2000 AP-IN(D)')
+	echo "TDPB44V2"
+	cpu_t="Atheros ar7100"
+	wifi_n=2
+		wifi0=enable
+			wifi0_mode=an
+			wifi0_max_power=20
+			wifi0_txc=3
+		wifi1=enable
+			wifi1_mode=n
+			wifi1_max_power=20
+			wifi1_txc=3
+		eth_n=1
+		eth0=enable
+	;;
+*)
+	echo "no such device type"
+	exit 0
+	;;
+esac
+
+echo "<device>" > $config_file_path
+echo "    <product_model>${1}</product_model>" >> $config_file_path
+echo "    <cpu_type>${cpu_t}</cpu_type>" >> $config_file_path
+echo "    <wifi_total>" >> $config_file_path
+echo "        <count>${wifi_n}</count>" >> $config_file_path
+echo "        <wifi_sol>" >> $config_file_path 
+for n in `seq $wifi_n`
+do
+n=$(($n-1))
+echo "            <wifi${n}>" >> $config_file_path
+eval "value=\$wifi${n}"
+echo "                <status>${value}</status>" >> $config_file_path
+eval "value=\$wifi${n}_mode"
+echo "                <mode>${value}</mode>" >> $config_file_path
+eval "value=\$wifi${n}_max_power"
+echo "                <max_power>$value</max_power>" >> $config_file_path
+limit=0
+if [ -f /jffs/tx-offset ];then
+	if [ ${n} -eq 0 ];then
+		limit=`cat /jffs/tx-offset`
+	fi
+fi
+echo "                <limit>${limit}</limit>" >> $config_file_path
+eval "value=\$wifi${n}_mode"
+if [ ${value} == "n" ]||[ ${value} == "an" ];then
+	eval "value=\$wifi${n}_txc"
+	echo "                <txchain>${value}</txchain>" >> $config_file_path
+fi
+echo "            </wifi$n>" >> $config_file_path
+done
+echo "        </wifi_sol>" >> $config_file_path
+echo "    </wifi_total>" >> $config_file_path
+echo "    <if_total>" >> $config_file_path
+echo "        <count>${eth_n}</count>" >> $config_file_path
+echo "        <if_sol>" >> $config_file_path
+for n in `seq $eth_n`
+do
+n=$(($n-1))
+echo "        <if${n}>" >> $config_file_path
+eval "value=\$eth${n}"
+echo "            <status>${value}</status>" >> $config_file_path
+echo "        </if${n}>" >> $config_file_path
+done
+echo "        </if_sol>" >> $config_file_path
+echo "    </if_total>" >> $config_file_path
+echo "</device>"  >> $config_file_path

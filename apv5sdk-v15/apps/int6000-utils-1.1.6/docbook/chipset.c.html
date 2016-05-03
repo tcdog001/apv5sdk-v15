@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			chipset.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='checksum_32.c.html' title=' checksum_32.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='chknvm.c.html' title=' chknvm.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   chipset.c - Intellon chipset names;
+ *
+ *   chipsets.h
+ *
+ *   Intellon chipsets are identified by code in the VS_SW_VER vendor
+ *   specific management message; the chipset [] vector translates a
+ *   chipset code to a chipset name;
+ *
+ *   this vector is referenced by VersionInfo() and VersionInfo2();
+ *
+ *.  Intellon INT6x00 Linux Toolkit for HomePlug AV; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef CHIPSET_SOURCE
+#define CHIPSET_SOURCE
+
+#include &quot;../int6k/chipset.h&quot;
+
+const char * chipset [CHIPSETS+1] = 
+
+{
+	&quot;UNKNOWN&quot;,
+	&quot;INT6000&quot;,
+	&quot;INT6300&quot;,
+	&quot;INT6400&quot; 
+};
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='checksum_32.c.html' title=' checksum_32.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='chknvm.c.html' title=' chknvm.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

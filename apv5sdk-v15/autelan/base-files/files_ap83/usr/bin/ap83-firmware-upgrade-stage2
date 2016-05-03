@@ -1,0 +1,210 @@
+#!/bin/sh
+
+if [ -z $1 ]; then
+	logger -s "$0 [netboot]"
+	exit 1
+fi
+
+#sync
+#/bin/sleep 1
+#echo "*** Unmounting existing file systems"
+#/bin/umount /oldroot/dev/pts
+#/bin/umount /oldroot/proc
+#/bin/umount /oldroot/etc
+#/bin/umount /oldroot/var
+#/bin/umount -l /oldroot/
+
+upgrade_single_to_single()
+{
+	#wangyu add for the test of file length
+	size=$(ls -l vmlinux_f1e.lzma.uImage | awk -F " " '{print $5}')
+        echo $size
+        if [ $size -lt 716800 ];then
+        	logger -s "wrong size of uImage"
+        	exit 1
+        fi
+        echo "the size of uImage is ok!"
+        size=$(ls -l rootfs.squashfs | awk -F " " '{print $5}')
+    	echo $size
+    	if [ $size -gt 14811136 ];then
+      	 	logger -s "wrong size of rootfs"
+     		exit 1
+  	fi
+  	echo "the size of rootfs is ok!"
+  	#wangyu add end
+	sync
+	/bin/sleep 1
+	echo "*** Unmounting existing file systems"
+	/bin/umount /oldroot/dev/pts
+	/bin/umount /oldroot/proc
+	#/bin/umount /oldroot/etc
+	#/bin/umount /oldroot/var
+	/bin/umount -l /oldroot/
+	/bin/sleep 1
+
+	echo "*** Erasing / Copying kernel image to flash (/dev/mtd9)"
+	#flashcp vmlinux_f1e.lzma.uImage /dev/mtd2
+	dd if=vmlinux_f1e.lzma.uImage of=/dev/mtdblock9
+	if [ $? -ne 0 ];then
+        	logger -s "ERROR: failed to copy kernel image"
+        	rm -f $FIRMWARE_FILE
+		exit 3
+	fi
+	echo "*** Erasing / Copying rootfs image to flash (/dev/mtd10)"
+	#flashcp rootfs.squashfs /dev/mtd3
+	dd if=rootfs.squashfs of=/dev/mtdblock10
+	if [ $? -ne 0 ];then
+		logger -s "ERROR: failed to copy rootfs image"
+		rm -f $FIRMWARE_FILE
+		exit 4
+	fi
+
+}
+upgrade_single_to_double()
+{
+	#wangyu add for the test of file length
+	size=$(ls -l vmlinux_f1e.lzma.uImage | awk -F " " '{print $5}')
+        echo $size
+        if [ $size -lt 716800 ];then
+        	logger -s "wrong size of uImage"
+        	exit 1
+        fi
+        echo "the size of uImage is ok!"
+        size=$(ls -l rootfs.squashfs | awk -F " " '{print $5}')
+    	echo $size
+    	if [ $size -gt 7012352 ];then
+      	 	logger -s "wrong size of rootfs"
+     		exit 1
+  	fi
+  	echo "the size of rootfs is ok!"
+  	#wangyu add end
+	sync
+	/bin/sleep 1
+	echo "*** Unmounting existing file systems"
+	/bin/umount /oldroot/dev/pts
+	/bin/umount /oldroot/proc
+	#/bin/umount /oldroot/etc
+	#/bin/umount /oldroot/var
+	/bin/umount -l /oldroot/
+	/bin/sleep 1
+
+	echo "*** Erasing / Copying kernel image to flash (/dev/mtd2)"
+	#flashcp vmlinux_f1e.lzma.uImage /dev/mtd2
+	dd if=vmlinux_f1e.lzma.uImage of=/dev/mtdblock2
+	if [ $? -ne 0 ];then
+        	logger -s "ERROR: failed to copy kernel image"
+        	rm -f $FIRMWARE_FILE
+		exit 3
+	fi
+
+	echo "*** Erasing / Copying rootfs image to flash (/dev/mtd3)"
+	#flashcp rootfs.squashfs /dev/mtd3
+	dd if=rootfs.squashfs of=/dev/mtdblock3
+	if [ $? -ne 0 ];then
+		logger -s "ERROR: failed to copy rootfs image"
+		rm -f $FIRMWARE_FILE
+		exit 4
+	fi
+
+}
+upgrade_double_to_single()
+{
+	#wangyu add for the test of file length
+	size=$(ls -l vmlinux_f1e.lzma.uImage | awk -F " " '{print $5}')
+        echo $size
+        if [ $size -lt 716800 ];then
+        	logger -s "wrong size of uImage"
+        	exit 1
+        fi
+        echo "the size of uImage is ok!"
+        size=$(ls -l rootfs.squashfs | awk -F " " '{print $5}')
+    	echo $size
+    	if [ $size -gt 14811136 ];then
+      	 	logger -s "wrong size of rootfs"
+     		exit 1
+  	fi
+  	echo "the size of rootfs is ok!"
+  	#wangyu add end
+	sync
+	/bin/sleep 1
+	echo "*** Unmounting existing file systems"
+	/bin/umount /oldroot/dev/pts
+	/bin/umount /oldroot/proc
+	#/bin/umount /oldroot/etc
+	#/bin/umount /oldroot/var
+	/bin/umount -l /oldroot/
+
+	echo "*** Erasing / Copying kernel image to flash (/dev/mtd2)"
+	#flashcp vmlinux_f1e.lzma.uImage /dev/mtd2
+	dd if=vmlinux_f1e.lzma.uImage of=/dev/mtdblock9
+	if [ $? -ne 0 ];then
+        	logger -s "ERROR: failed to copy kernel image"
+        	rm -f $FIRMWARE_FILE
+		exit 3
+	fi
+
+	echo "*** Erasing / Copying rootfs image to flash (/dev/mtd3)"
+	#flashcp rootfs.squashfs /dev/mtd3
+	dd if=rootfs.squashfs of=/dev/mtdblock10
+	if [ $? -ne 0 ];then
+		logger -s "ERROR: failed to copy rootfs image"
+		rm -f $FIRMWARE_FILE
+		exit 4
+	fi
+
+}
+write_crc()
+{
+	CRC_KERNEL="`sed -n '1p' crc.info`"
+	KERNEL_LENTH="`sed -n '2p' crc.info`"
+	CRC_ROOTFS="`sed -n '3p' crc.info`"
+	ROOTFS_LENTH="`sed -n '4p' crc.info`"
+	sync
+	sleep 1
+	echo "write kernel lenth"
+	/usr/bin/pro_ctl_util -V $KERNEL_LENTH -S 40160
+	echo "write rootfs lenth"
+	/usr/bin/pro_ctl_util -V $ROOTFS_LENTH -S 40164
+	sync
+	sleep 1
+	echo "write kernel crc value"
+	/usr/bin/pro_ctl_util -V $CRC_KERNEL -S 40144
+	echo "write rootfs crc value"
+	/usr/bin/pro_ctl_util -V $CRC_ROOTFS -S 40148
+	sync
+	sleep 1
+}
+
+WRCPUUTIL=/usr/bin/pro_ctl_util
+MARK="`$WRCPUUTIL -T | awk -F':' '/kernel_num/{print $2}'`"
+if [ $MARK -eq 1 ];then
+	[ -e single_os ]
+	if [  $? -eq 0 ];then
+		upgrade_single_to_single
+	fi
+	[ -e double_os ]
+	if [ $? -eq 0 ];then
+		upgrade_single_to_double
+		bin/sleep 1
+		$WRCPUUTIL -V 2 -S 40196
+		VERSION="`cat version`"
+		$WRCPUUTIL -P $VERSION -O 40180
+		bin/sleep 1
+		$WRCPUUTIL -V 1 -S 40176
+		write_crc
+	fi
+elif [ $MARK -eq 2 ];then
+	[ -e single_os ]
+	if [ $? -eq 0 ];then
+		echo "now begin double_os to single_os"
+		upgrade_single_to_single
+		 $WRCPUUTIL -V 1 -S 40196
+	fi
+else	
+	echo "not mesure single_os or double_os"
+	exit 5
+fi
+
+/bin/sleep 1
+echo i > /proc/kes_debug_flag
+/sbin/reboot

@@ -1,0 +1,145 @@
+#!/usr/bin/haserl
+<%in /usr/lib/web/libweb.sh %>
+<% session_validate %>
+<% response_headers %>
+
+<%
+xml_config=`config_read /config/network/advanset`
+xml_stp_portprio=`config_getoption "$xml_config" portprio`
+xml_stp_setfd=`config_getoption "$xml_config" setfd`
+xml_stp_sethello=`config_getoption "$xml_config" sethello`
+xml_stp_setmaxage=`config_getoption "$xml_config" maxage`
+xml_stp_enable=`config_getoption "$xml_config" stpenable`
+
+xml_session=`config_read /config/session`
+xml_session_lang=`config_getoption "$xml_session" language`
+%>
+
+<html>
+<head>
+<%in page_title.htm %>
+<link href="image/style.css" rel="stylesheet" type="text/css">
+<% include_js network_set.js %>
+<script language="JavaScript" src="util.js" type="text/javascript"></script>
+<script language="javascript">
+	var flag="<%= $xml_session_lang %>";
+	init_mmenu(flag);
+	init_advmenu(flag);
+	init_stp(flag);
+function valvalidate()
+{
+		if(document.getElementById("portprio").value == "" || document.getElementById("portprio").value.search(/^[0-9]+$/) < 0 || document.getElementById("portprio").value < 0 || document.getElementById("portprio").value > 65535){
+			alert("Please input bridge priority correctly");
+			document.getElementById("portprio").focus();
+			return false;
+		}
+		if (document.getElementById("setfd").value == "" || document.getElementById("setfd").value.search(/^[0-9]+$/) < 0 || document.getElementById("setfd").value < 4 || document.getElementById("setfd").value > 30){
+			alert("Please input forward delay correctly");
+			document.getElementById("setfd").focus();
+			return false;
+		}
+		if (document.getElementById("sethello").value == "" || document.getElementById("sethello").value.search(/^[0-9]+$/) < 0 || document.getElementById("sethello").value < 1 || document.getElementById("sethello").value > 10){
+			alert("Please input hello time correctly");
+			document.getElementById("sethello").focus();
+			return false;
+		}
+		if (document.getElementById("setmaxage").value == "" || document.getElementById("setmaxage").value.search(/^[0-9]+$/) < 0 || document.getElementById("setmaxage").value < 6 || document.getElementById("setmaxage").value > 40){
+			alert("Please input max age correctly");
+			document.getElementById("setmaxage").focus();
+			return false;
+		}
+		if (document.getElementById("setmaxage").value > 2 * (parseInt(document.getElementById("setfd").value) - 1)){
+			alert("Max Age is too large,or Forward Delay is too small: MAX AGE <= ( Forward Delay - 1 ) * 2");
+			document.getElementById("setfd").focus();
+			return false;
+		}  
+		if (document.getElementById("setmaxage").value < 2 * (parseInt(document.getElementById("sethello").value) + 1)){
+			alert("Max Age is too small,or Hello Time is too large: MAX AGE >= ( Hello Time + 1 ) * 2");  
+			document.getElementById("sethello").focus();  
+			return false;
+    }   
+    	overlayer();
+}
+</script>
+</head>
+<body>
+	<%in overlayer.htm %>
+<%in page_header.htm %>
+<%in menu_network1.htm %>
+<div align="center">
+<table bgcolor="#f4f9fd" border="0"  cellpadding="0" cellspacing="0" width="774" >
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+
+<tr>
+<td align="center"  bordercolor="#f4f9fd">
+<form method="post" action="<%= $action_cgi %>" onsubmit="return valvalidate()">
+  <div align="center">
+    <table bgcolor="#ffffff" align="center"  bordercolor="#90b5dd"  border="1" cellpadding="0" cellspacing="0">
+					      <tr>
+					        <td width="100%" align="left" colspan="2" height="22" bgcolor="#456f95" bordercolor="#456f95"><b><script language="javascript">replace(stp_config)</script></b> </td>
+					      </tr>
+					      
+					       <tr>
+									<td colspan="2" height="10">
+									</td>
+									</tr>	
+					      
+					      <tr>
+					        <td align="right" height="24" width="280" bordercolor="#ffffff"><script language="javascript">replace(stp_prior)</script>&nbsp;</td>
+					        <td height="24" width="370" bordercolor="#ffffff"><input type="text" name="portprio" id="portprio" value="<%= "$xml_stp_portprio" %>">[0-65535]</td>
+					       </tr>
+					       
+					       <tr>
+					        <td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(stp_delay)</script>&nbsp;</td>
+					        <td bordercolor="#ffffff"><input type="text" name="setfd" id="setfd" value="<%= "$xml_stp_setfd" %>">[4-30]s</td>
+					      </tr> 
+					      
+					       <tr>
+					        <td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(stp_hello)</script>&nbsp;</td>
+					        <td bordercolor="#ffffff"><input type="text" name="sethello" id="sethello" value="<%= "$xml_stp_sethello" %>">[1-10]s</td>
+					      </tr> 
+ 
+					      <tr>
+					        <td align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(stp_age)</script>&nbsp;</td>
+					        <td bordercolor="#ffffff"><input type="text" name="setmaxage" id="setmaxage" value="<%= "$xml_stp_setmaxage" %>">[6-40]s</td>
+					      </tr>
+					
+					     <tr>
+					        <td  align="right" height="24"  bordercolor="#ffffff"><script language="javascript">replace(stp_name)</script>&nbsp;</td>
+					        <td  bordercolor="#ffffff">
+					        <input type="radio" <% webui_radiobutton_check "$xml_stp_enable" "yes" %> id="stpenable" name="stpenable" value="yes"><script language="javascript">replace(stp_enable)</script> &nbsp;
+					        <input type="radio" <% webui_radiobutton_check "$xml_stp_enable" "no" %> id="stpenable" name="stpenable" value="no"><script language="javascript">replace(stp_disable)</script> &nbsp;
+					        </td>
+					    </tr>
+					    
+					     <tr>
+							<td colspan="2" height="10">
+							</td>
+							</tr>	
+					    </table>
+		          <table  align="center"  border="0" cellpadding="0" cellspacing="0" width="650">	
+					    <tr>
+					       <td align="center" height="40" valign="middle" colspan="2"><script language="javascript">replace(stp_apply)</script>&nbsp;</td>
+					   </tr> 
+					   <tr>
+			        <td align="right"   colspan="2"><script language="javascript">replace(stp_help)</script></td>
+			      </tr>
+    </table>
+  </div>
+  <input type="hidden" value="STP Setup" name="SERVLET" >
+</form>
+</td>
+</tr>
+
+<tr>
+			<td  height="25">
+			</td>
+</tr>
+</table>
+</div>
+<%in page_footer.htm %>
+</body>
+</html>

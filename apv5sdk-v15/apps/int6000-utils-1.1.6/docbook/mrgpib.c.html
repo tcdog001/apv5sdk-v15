@@ -1,0 +1,223 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			mrgpib.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='modpib.c.html' title=' modpib.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='nextbreak.c.html' title=' nextbreak.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   mrgpib.c - overlay one PIB with another;
+ *
+ *   This software and documentation is the property of Intellon 
+ *   Corporation, Ocala, Florida. It is provided 'as is' without 
+ *   expressed or implied warranty of any kind to anyone for any 
+ *   reason. Intellon assumes no responsibility or liability for 
+ *   errors or omissions in the software or documentation and 
+ *   reserves the right to make changes without notification. 
+ *   
+ *   Intellon customers may modify and distribute the software 
+ *   without obligation to Intellon. Since use of this software 
+ *   is optional, users shall bear sole responsibility and 
+ *   liability for any consequences of it's use. 
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#define _GETOPT_H
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;errno.h&gt;
+
+/*====================================================================*
+ *   custom header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/getoptv.h&quot;
+#include &quot;../tools/memory.h&quot;
+#include &quot;../tools/flags.h&quot;
+#include &quot;../tools/error.h&quot;
+#include &quot;../tools/files.h&quot;
+#include &quot;../pib/pib.h&quot;
+
+/*====================================================================*
+ *   custom source files;
+ *--------------------------------------------------------------------*/
+
+#ifndef MAKEFILE
+#include &quot;../tools/getoptv.c&quot;
+#include &quot;../tools/putoptv.c&quot;
+#include &quot;../tools/version.c&quot;
+#include &quot;../tools/fdchecksum_32.c&quot;
+#include &quot;../tools/error.c&quot;
+#endif
+
+#ifndef MAKEFILE
+#include &quot;../pib/pibfile.c&quot;
+#endif
+
+/*====================================================================*
+ *   
+ *   int main (int argc, const char * argv []);
+ *
+ *.  Intellon INT6000 Linux Toolkit for HomePlug AV;
+ *:  Published 2006-2008 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+int main (int argc, const char * argv []) 
+
+{
+	static const char *optv [] = 
+	{
+		&quot;qv&quot;,
+		&quot;target source&quot;,
+		&quot;overlay target PIB with source PIB&quot;,
+		&quot;q\tquiet&quot;,
+		&quot;v\tverbose messages&quot;,
+		(const char *) (0) 
+	};
+	struct _file_ new;
+	struct _file_ old;
+	struct VersionHeader target;
+	struct VersionHeader source;
+	byte * buffer;
+	signed length;
+	flag_t flags = (flag_t)(0);
+	signed c;
+	optind = 1;
+	opterr = 1;
+	while ((c = getoptv (argc, argv, optv)) != -1) 
+	{
+		switch ((char) (c)) 
+		{
+		case 'q':
+			_setbits (flags, PIB_SILENCE);
+			break;
+		case 'v':
+			_setbits (flags, PIB_VERBOSE);
+			break;
+		default:
+			break;
+		}
+	}
+	argc -= optind;
+	argv += optind;
+	if (!argc--) 
+	{
+		error (1, ECANCELED, &quot;No target file given&quot;);
+	}
+	new.name = *argv++;
+	if ((new.file = open (new.name, O_BINARY|O_CREAT|O_RDWR)) == -1) 
+	{
+		error (1, errno, &quot;Can't open %s&quot;, new.name);
+	}
+	if (pibfile (&amp;new)) 
+	{
+		error (1, errno, &quot;Bad target file: %s&quot;, new.name);
+	}
+	if (read (new.file, &amp;target, sizeof (target)) &lt; sizeof (target)) 
+	{
+		error (1, errno, &quot;Can't read header: %s&quot;, new.name);
+	}
+	if (!argc--) 
+	{
+		error (1, ECANCELED, &quot;No source file given&quot;);
+	}
+	old.name = *argv++;
+	if ((old.file = open (old.name, O_BINARY|O_RDONLY)) == -1) 
+	{
+		error (1, errno, &quot;Can't open %s&quot;, old.name);
+	}
+	if (pibfile (&amp;old)) 
+	{
+		error (1, errno, &quot;Bad source file: %s&quot;, old.name);
+	}
+	if (read (old.file, &amp;source, sizeof (source)) &lt; sizeof (source)) 
+	{
+		error (1, errno, &quot;Can't read header: %s&quot;, old.name);
+	}
+	if (LE16TOH (target.PIBLength) &lt; LE16TOH (source.PIBLength)) 
+	{
+		length = LE16TOH (target.PIBLength) - sizeof (target);
+	}
+	else 
+	{
+		length = LE16TOH (source.PIBLength) - sizeof (source);
+	}
+	if (!(buffer = malloc (length))) 
+	{
+		error (1, errno, &quot;Need (%d) bytes: %s&quot;, length, old.name);
+	}
+	if (read (old.file, buffer, length) &lt; length) 
+	{
+		error (1, errno, &quot;Can't read %s body&quot;, old.name);
+	}
+	if (write (new.file, buffer, length) &lt; length) 
+	{
+		error (1, errno, &quot;Can't save %s body&quot;, new.name);
+	}
+	free (buffer);
+	close (old.file);
+	target.Checksum = 0;
+	if (lseek (new.file, 0, SEEK_SET)) 
+	{
+		error (1, errno, &quot;Can't rewind %s&quot;, new.name);
+	}
+	if (write (new.file, &amp;target, sizeof (target)) &lt; sizeof (target)) 
+	{
+		error (1, errno, &quot;Can't update %s header&quot;, new.name);
+	}
+	if (lseek (new.file, 0, SEEK_SET)) 
+	{
+		error (1, errno, &quot;Can't rewind %s&quot;, new.name);
+	}
+	target.Checksum = fdchecksum_32 (new.file, LE16TOH (target.PIBLength), 0);
+	if (lseek (new.file, 0, SEEK_SET)) 
+	{
+		error (1, errno, &quot;Can't rewind %s&quot;, new.name);
+	}
+	if (write (new.file, &amp;target, sizeof (target)) &lt; sizeof (target)) 
+	{
+		error (1, errno, &quot;Can't update %s header&quot;, new.name);
+	}
+	close (new.file);
+	exit (0);
+}
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='modpib.c.html' title=' modpib.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='nextbreak.c.html' title=' nextbreak.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

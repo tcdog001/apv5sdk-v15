@@ -1,0 +1,100 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>ADM5120™</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"><meta name="keywords" content="
+				int6k 
+				, 
+				powerline 
+				"><link rel="start" href="index.html" title="Intellon INT6000 Linux Toolkit"><link rel="up" href="ch07.html" title="Chapter 7.  Embedded Applications"><link rel="prev" href="ch07.html" title="Chapter 7.  Embedded Applications"><link rel="next" href="ch07s03.html" title="AMiLDA™"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">
+			<span class="productname">ADM5120</span>™
+			</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07.html">Prev</a> </td><th width="60%" align="center">Chapter 7. 
+		Embedded Applications
+		</th><td width="20%" align="right"> <a accesskey="n" href="ch07s03.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="embedded-ADM5120"></a>
+			<span class="productname">ADM5120</span>™
+			</h2></div></div></div><p>
+			</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="ADM5120-connection"></a>
+				Connections
+				</h3></div></div></div><p>
+				The <span class="productname">ADM5120</span>™ has several communication ports including one internal serial port, two external usb ports and two ethernet interfaces with five ethernet ports. The ethernet ports are configured as a gateway where that four ports service a Local Area Network (<acronym class="acronym">LAN</acronym>) interface and the fifth port services a Wide Area Network (<acronym class="acronym">WAN</acronym>) interface.	
+				</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="ADM5120-usb-serial"></a>
+				USB-to-Serial Port Connection
+				</h3></div></div></div><p>
+				Since most of our computers do not have an external serial port we obtained a USB-to-serial cable and modified the serial connector for the interal <span class="productname">ADM5120</span>™ serial connector. The following steps explain how to connect to the <span class="productname">AMD5120</span>™ using a USB-to-serial cable and communicate with it using the <span class="application">minicom</span> terminal emulation program. The serial port characteristics are 115200 bps, 8 data bits, 1 stop bit, no parity, no hardware flow control, no software flow control.
+
+				</p><div class="orderedlist"><ol type="1"><li><p>
+						Connect the serial end of the USB serial cable to the interal <span class="productname">ADM5120</span>™ serial connector and power on the <span class="productname">ADM5120</span>™ device. Let device will boot up as you perform the next steps.
+						</p></li><li><p>
+						Plug the USB serial adapter into the <span class="productname">ubuntu</span>™ host. Confirm that device <code class="filename">/dev/ttyUSB0</code> have been created. This device is now the USB serial port.
+						</p></li><li><p>
+						Configure the <span class="application">minicom</span> program by opening a console window and typing the command <span class="command"><strong>minicom -s</strong></span>. A text-based popup window should appear displaying the <span class="application">minicom</span> configuration menu.
+						</p></li><li><p>
+						Use the cursor keys to select option <span class="command"><strong>Serial port setup</strong></span> then press <strong class="userinput"><code>Enter</code></strong>. Another text-based popup window should appear displaying serial port parameters.
+						</p><pre class="screen">
+    +-----------------------------------------------------------------------+   
+    | A - Serial Device         : /dev/ttyUSB0                              |   
+    | B - Lockfile Location     : /var/lock                                 |   
+    | C - Callin Program        :                                           |   
+    | D - Callout Program       :                                           |   
+    | E - Bps/Par/Bits          : 115200 8N1                                |   
+    | F - Hardware Flow Control : No                                        |   
+    | G - Software Flow Control : No                                        |   
+    |                                                                       |   
+    |    Change which setting?                                              |   
+    +-----------------------------------------------------------------------+   
+</pre><div class="orderedlist"><ol type="a"><li><p>
+								Press the letter <strong class="userinput"><code>A</code></strong> to select the <span class="command"><strong>Serial Device</strong></span> and type <strong class="userinput"><code>/dev/ttyUSB0</code></strong> then press <strong class="userinput"><code>Enter</code></strong>. This assumes you are using a USB-to-serial cable;  otherwise, name the appropriate tty device.
+								</p></li><li><p>
+								Press the letter <strong class="userinput"><code>E</code></strong> to select the <span class="command"><strong>Bps/Par/Bits</strong></span> and type <strong class="userinput"><code>115200 8N1</code></strong> then press <strong class="userinput"><code>Enter</code></strong>.
+								</p></li><li><p>
+								Press the letter <strong class="userinput"><code>F</code></strong> to toggle <span class="command"><strong>Hardware Flow Control</strong></span> until it indicates <strong class="userinput"><code>No</code></strong>. 						
+								</p></li><li><p>
+								Press the letter <strong class="userinput"><code>F</code></strong> to toggle <span class="command"><strong>Software Flow Control</strong></span> until it indicates <strong class="userinput"><code>No</code></strong>. 						
+								</p></li><li><p>
+								Press <strong class="userinput"><code>Enter</code></strong> when done to close the <span class="command"><strong>Serial port setup</strong></span> window and return to the <span class="command"><strong>configuration</strong></span> window.
+								</p></li></ol></div></li><li><p>
+						Use the cursor keys to select option <span class="command"><strong>Filenames and paths</strong></span> and press <strong class="userinput"><code>Enter</code></strong>. Another text-based popup window should appear displaying various pathname options.
+						</p><pre class="screen">
+    +-----------------------------------------------------------------------+
+    | A - Download directory : /home/mydir/AMiLDA                           |
+    | B - Upload directory   : /home/mydir/AMiLDA                           |
+    | C - Script directory   :                                              |
+    | D - Script program     : runscript                                    |
+    | E - Kermit program     :                                              |
+    | F - Logging options                                                   |
+    |                                                                       |
+    |    Change which setting?                                              |
+    +-----------------------------------------------------------------------+
+</pre><div class="orderedlist"><ol type="a"><li><p>
+								Press the letter <strong class="userinput"><code>A</code></strong> to select the <span class="command"><strong>Download directory</strong></span> then type a valid pathname then press <strong class="userinput"><code>Enter</code></strong>.  
+								</p></li><li><p>
+								Press the letter <strong class="userinput"><code>B</code></strong> to select the <span class="command"><strong>Upload directory</strong></span> then type a valid pathname then press <strong class="userinput"><code>Enter</code></strong>. 								
+								</p></li></ol></div><p>
+						<span class="application">Minicom</span> truncates long pathnames without giving any immediate indication so keep your pathnames short.
+						</p><p>
+						The <span class="productname">AMiLDA</span>™ build stream places file <code class="filename">vmlinuz</code> in folder <code class="filename">/usr/src/AMiLDA/linux-2.4.32-amilda/</code> by default but that pathname is too long and will be truncated. You may want to modify the build stream to place the file in another location or copy the file to another location or create a symlink to the file from another location.  
+						</p></li><li><p>
+						Use the cursor keys to select option <span class="command"><strong>Save setup as dfl</strong></span> then press <strong class="userinput"><code>Enter</code></strong>.	This will save your setting as file <code class="filename">/etc/minicom/minirc.dfl</code>.					
+						</p></li><li><p>
+						Use the cursor keys to select option <span class="command"><strong>Exit</strong></span> and press <strong class="userinput"><code>Enter</code></strong> to close the <span class="command"><strong>configuration</strong></span> window and start the <span class="application">minicom</span> program. Assuming the <span class="productname">ADM5120</span>™ is properly connected and powered up,  you should see the <span class="application">Linux</span> login prompt in the console window.
+						</p></li></ol></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="ADM5120-boot-menu"></a>
+				Bootloader Menu
+				</h3></div></div></div><p>
+				Power cycle the <span class="productname">ADM5120</span>™ board to see the boot prompt. You will have about two or three seconds to press the space three times before the the <span class="application">Linux</span> system starts to bootload. If you are fast enough then you should see the following menu and be able to download a new <code class="filename">vmlinuz</code> image into either <acronym class="acronym">SDRAM</acronym> or <acronym class="acronym">NVRAM</acronym> via a menu.
+				</p><div class="example"><a name="id2577275"></a><p class="title"><b>Example 7.1. 
+					<span class="productname">ADM5120</span>™ Boot Menu
+					</b></p><div class="example-contents"><pre class="screen">
+ADM5120 Boot:
+
+Linux Loader Menu
+====================
+(a) Download vmlinuz to flash ...
+(b) Download vmlinuz to sdram (for debug) ...
+(c) Exit
+
+Please enter your key :
+</pre></div></div><br class="example-break"><p>
+				After typing either <span class="command"><strong>a</strong></span> or <span class="command"><strong>b</strong></span>,  you will have about 8 seconds to commence an XMODEM protocol download of you image file. The actual filename is not important but the file format is important. If you select option <span class="command"><strong>b</strong></span> then the image file can be a standard <span class="trademark">Linux</span>™ vmlinuz file. If you select option <span class="command"><strong>a</strong></span> then the image file must a standard <span class="trademark">Linux</span>™ image file with header and checksum. If you select option <span class="command"><strong>c</strong></span>, either the flashed or the downloaded <code class="filename">vmlinuz</code> image will execute and proceed to a <span class="application">login</span> prompt.
+				</p><p>
+				Although <span class="application">minicom</span> can be used to download firmware images,  Intellon recommends using scripts <code class="filename">download.sh</code> and <code class="filename">flash.sh</code>,  instead. They are easier to use and are more reliable. See <a class="link" href="ch07s03.html#AMiLDA-download" title="Downloading Images">Downloading Images</a> for more information about these scripts.
+				</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch07.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch07s03.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 7. 
+		Embedded Applications
+		 </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 
+			<span class="productname">AMiLDA</span>™
+			</td></tr></table></div></body></html>

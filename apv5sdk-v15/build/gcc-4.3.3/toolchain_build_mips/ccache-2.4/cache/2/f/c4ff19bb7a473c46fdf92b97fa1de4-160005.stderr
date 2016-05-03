@@ -1,0 +1,16 @@
+In file included from sar.c:32:
+sa.h:241: warning: 'packed' attribute ignored for field of type 'unsigned char'
+sa.h:242: warning: 'packed' attribute ignored for field of type 'unsigned char'
+sa.h:243: warning: 'packed' attribute ignored for field of type 'unsigned char'
+sa.h:245: warning: 'packed' attribute ignored for field of type 'char[65]'
+sa.h:247: warning: 'packed' attribute ignored for field of type 'char[65]'
+sa.h:249: warning: 'packed' attribute ignored for field of type 'char[65]'
+sa.h:329: warning: 'packed' attribute ignored for field of type 'unsigned char'
+sa.h:334: warning: 'packed' attribute ignored for field of type 'unsigned char'
+sa.h:335: warning: 'packed' attribute ignored for field of type 'unsigned char'
+sa.h:336: warning: 'packed' attribute ignored for field of type 'unsigned char'
+sa.h:370: warning: 'packed' attribute ignored for field of type 'unsigned char'
+sa.h:371: warning: 'packed' attribute ignored for field of type 'unsigned char[3]'
+sa.h:384: warning: 'packed' attribute ignored for field of type 'unsigned char[4]'
+sar.c: In function 'set_loc_time':
+sar.c:248: warning: pointer targets in passing argument 1 of 'localtime' differ in signedness

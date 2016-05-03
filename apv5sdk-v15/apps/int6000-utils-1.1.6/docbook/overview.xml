@@ -1,0 +1,1108 @@
+<chapter id='overview'>
+	<title>
+		Toolkit Overview 
+		</title>
+	<section id='overview-intro'>
+		<title>
+			Introduction 
+			</title>
+		<para>
+			 Intellon Corporation provides the Intellon <application>Linux Toolkit</application> free of charge to their customers. The toolkit contains C Language source code and <productname>GNU</productname> makefiles to compile many useful programs. It also includes Linux shell scripts that use these programs, in various ways, to interrogate, control and manage  Intellon  <productname>INT6000</productname>, <productname>INT6300</productname> and <productname>INT6400</productname> devices. The toolkit is intended for hardware engineers and embedded software developers, consequently, the programs are simple and compact. They are not intended for end users or computer novices. Intellon has a similar,  but less mature, toolkit available for <productname>INT5500</productname> devices.
+			</para>
+		<para>
+			All toolkit programs are written in C and have command line intefaces. The source code conforms to <ulink url='http://www.open-std.org/jtc1/sc22/wg14/www/standards.html#9899'>ISO/IEC9899:1999</ulink> except for the use of function <constant>strdup()</constant> as an intrinsic library function. The command line interface conforms to <ulink url='http://www.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap12.html#tag_12_02'> <citetitle>Section 12.2 Utility Syntax Guidelines</citetitle></ulink> of The  Open Group  Base Specification Issue 6 (<ulink url='http://www.opengroup.org/onlinepubs/009695399/mindex.html'>
+<citetitle>IEEE Std 1003.1, 2004 Edition</citetitle></ulink>). 
+			</para>
+		<para>
+			The toolkit also includes source code, project files and solutions files to compile the toolkit on Microsoft Windows; however, Intellon does not support this toolkit on Microsoft Windows. See the sections covering  <productname>Windows</productname> compilation for more information. 
+			</para>
+		<para>
+			The toolkit includes a copy of the Intellon <application>Embedded API</application> which is also distributed as an indpendent software package, <filename>int6000-api-x.x.x.tar.gz</filename>. The toolkit includes program <application>int6k2</application> which is similar to program <application>int6k</application> but is implemented using the Intellon <application>Embedded API</application>. This offers software developers several alternative means of accomplishing their objectives. 
+			</para>
+		<para>
+			The toolkit includes extensive HTML documentation and online man pages. The HTML documentation tree starts with file <ulink url="index.html">docbook/index.html</ulink>. HTML versions of the online man page start with file <ulink url="toolkit.html">docbook/toolkit.html</ulink>, for users who cannot access man pages directly.
+			</para>
+		</section>
+	<section id='overview-background'>
+		<title>
+			Background 
+			</title>
+		<para>
+			<trademark class='registered'>HomePlug</trademark> AV is an industry standard protocol for powerline communications developed by the <ulink url='http://www.homeplug.org/home'>HomePlug Powerline Alliance</ulink>.  Intellon  Corporation manufactures a family of chipsets that conform to that standard and have PCI, MII and Ethernet interfaces. The <productname>INT6000</productname>,  <productname>INT6300</productname> and <productname>INT6400</productname>chipsets are flagship members of that chipset family. The principle difference between the chipsets is their boot method,  cost and speed. The <trademark>INT6000</trademark> requires onboard NVRAM but the <productname>INT6300</productname> and <productname>INT6400</productname> do not. The <productname>INT6300</productname> is the fastest and cheapest chipset by all accounts. 
+			</para>
+		<para>
+			The <trademark class='registered'>HomePlug</trademark> AV protocol is based on IEEE-802.3, has ethertype <constant>0x88E1</constant> and uses special message formats. A subset of those message formats is reserved for each chipset vendor to define their own message formats.  Intellon uses this vendor-specific subset to communicate between host processors and Intellon devices. This toolkit uses Intellon vendor-specific message formats to communicates with  Intellon devices. It also understands Intellon firmware and configuration file formats. 
+			</para>
+		<para>
+			This toolkit sends and receives Intellon vendor-specific messages, not generic <trademark class='registered'>HomePlug</trademark> AV messages. Intellon vendor-specific management message formats are described in the  Intellon  <citetitle><trademark class='registered'>HomePlug</trademark> AV Firmware Technical Reference Manual</citetitle>. If you do not have a copy of this document then you may request one from Intellon.
+			</para>
+		</section>
+	<section id='overview-distribution'>
+		<title>
+			Toolkit Distribution
+			</title>
+		<para>
+			The  Intellon  <application>Linux Toolkit</application> package is distributed using compressed tape archive files named <filename>int6000-utils-x.x.x.tar.gz</filename> or <filename>int6000-utils-x.x.x.tar.bz2</filename>,  where <emphasis>x.x.x</emphasis> is the version number. Archive files ending in <filename>.gz</filename> can be decompressed with the Linux <application>gzip</application> utility. Archive files ending in <filename>.bz2</filename> can be decompressed with the Linux <application>bzip2</application> utility. The contents of decompressed archives can be extracted using the Linux <application>tar</application> utility. Recent versions of the Linux <application>tar</application> utility allow decompression and extraction in one operation. The <application>WinZip</application> program can be used to decompress archives and extract contents on Miscrosoft Windows platforms.
+			</para>
+		<para>
+			The Intellon <application>Linux Toolkit</application> package contains source code, build scripts and documentation. Some third party libraries are included for support on Microsoft platforms. Microsoft Windows versions of toolkit programs are pre-compiled and ready-to-run but they are not supported since this package is designed for use on Linux platforms.
+			</para>
+		</section>
+	<section id="overview-install-linux">
+		<title>
+			Toolkit Installation on Linux
+			</title>
+		<para>
+			The Linux version of the toolkit must be compiled from source code. The only requirement is the standard <application>GNU/Linux</application> toolchain consisting of <application>make</application>,  <application>gcc</application> and <application>ld</application>. These are included with most <application>Linux</application> distributions but may require installation. On <productname>Debian</productname> based distributions, such as <productname>Ubuntu</productname>, they may be installed using <application>apt-get</application>. On <productname>RedHat</productname> distributions,  such as <productname>Fedora</productname>, they may be installed using <application>rpm</application>. On <productname>SuSE</productname> based distributions, they may be installed using <application>YaST2</application>.
+			</para>
+		<section>
+			<title>
+				Toolkit Installation on GNU/<productname>Linux</productname>
+				</title>
+			<example>
+				<title>
+					Toolkit Installation on GNU/<productname>Linux</productname>
+					</title>
+<screen>
+# cp int6000-utils-0.3.12.tar.gz /home/mydir
+# cd /home/mydir
+# tar -vzxf int6000-utils-0.3.12.tar.gz
+# cd int6000-utils-0.3.12
+# make
+# make install
+# make manuals
+</screen>
+				</example>
+			<para> 
+				Decompress the archive and extract the contents with the <application>tar</application> utility. This will create a folder having the same basename as the archive such that one version will not over-write another. Consult the <application>tar</application> man page on your system for detailed instructions. Change directory to the appropriate folder.
+				</para>
+			<para>
+				The main package folder contains a recursive <filename>Makefile</filename> that will compile and install all toolkit programs. If you do not want to compile and install all programs then change directory to the appropriate folder and run <application>make</application> from there. To compile binary files, type <userinput>make</userinput>. To install binary files, type <userinput>make install</userinput>. To install man pages, type <userinput>make manuals</userinput>. The package does not automatically install examples, scripts, applets or man pages. 
+				</para>
+			<para>
+				We recommend that you <command>login</command> as <constant>root</constant> user before installing the toolkit; otherwise, you will be prompted for the <constant>root</constant> password as each program or component is installed. 
+				</para>
+			<para>
+				Programs are installed in folder <filename>/usr/local/bin</filename> and man pages are installed in folders <filename>/usr/share/man/man7</filename>. If these folders are not correct for your system, or if you want to install in other folders, then edit the folder names defined in the <link linkend="software-cross-compile">make.def</link> file found in main toolkit folder or over-ride these definitions in subordinate makefiles.
+				</para>
+			</section>
+		<section>
+			<title>
+				Toolkit Documentation on GNU/Linux
+				</title>
+			<para>
+				Toolkit web pages are not automatically installed. To access toolkit documentation, point your browser to <ulink url="index.html">docbook/index.html</ulink> and add the page to the browser bookmark or favorites list. If you are interested in how the toolkit has been implemented then do the same for page <ulink url="toolkit.html">docbook/toolkit.html</ulink>. 				</para>
+			<para>
+				The method described above is only recommended if you do not plan to move or remove toolkit folders. Otherwise,  you can merely copy the entire contents of the toolkit <filename>docbook</filename> folder to another folder of your choice and point your browser to the new file locations.
+				</para>
+<screen>
+cp -rv docbook/* /home/mydir/toolkit
+</screen>
+			</section>
+		<section>
+			<title>
+				Toolkit Removal on GNU/<productname>Linux</productname>
+				</title>		
+			<para>
+				To uninstall installed programs and man pages on Linux, change to the main toolkit folder and type <userinput>make uninstall</userinput>.
+				</para>
+			<example>
+				<title>
+					Toolkit Removal on GNU/<productname>Linux</productname>
+					</title>
+<screen>
+# cd /home/mydir/int6000-utils/0.3.12
+make uninstall
+</screen>
+				</example>
+			</section>
+		</section>
+	<section id="overview-install-osx">
+		<title>
+			Toolkit Installation on Mac OS X
+			</title>
+		<para>
+			Toolkit installation on <productname>Mac OS X</productname> is essentially identical to installation on Linux but special steps are needed before starting.
+			</para>
+		<para>
+			First, you must install the toolkit as the <varname>root</varname> user or you will be denied permission. The <varname>root</varname> user account is disabled by default and so you must enable it in order to login. Follow instructions at <ulink url='http://support.apple.com/kb/HT1528'>Enabling the &quot;root&quot; user in Mac OS X</ulink> to enable the account and login. After installation, toolkit programs should be run from a normal user account.
+			</para>
+		<para>
+			Second, <productname>Mac OS X</productname> does not include C Language development tools by default. You must download and install them in order to build the toolkit. You can either download and install them from the Apple website or (if you are ambitious)  download,  compile and install them from various open source websites. Consider using <ulink url="http://developer.apple.com/technology/Xcode.html"><application>Xcode</application></ulink> on <application>Mac OS X Leopard</application>. 
+			</para>
+		<para>
+			Login as the root user and download or copy the toolkit archive file to your preferred folder. Follow the <link linkend='overview-install-linux'>instructions</link> for installing the toolkit on Linux.
+				</para>
+		<example>
+			<title>
+				Setting the <constant>PATH</constant> variable on <productname>OS X</productname>
+				</title>
+		<para>
+			While still logged in as the <varname>root</varname> user, edit <filename>/etc/profile</filename> and add folder<filename>/usr/local/bin</filename> to the <varname>PATH</varname> definition found there. This will ensure that all users can access toolkit programs. The change may not take effect until the next time you login or open a new command shell.
+				</para>
+
+<screen>
+PATH="/bin:/sbin:/usr/local/bin"
+</screen>
+			</example>
+		<example>
+			<title>
+				Installing the Toolkit on <productname>Mac OS X</productname>
+				</title>
+		<para>
+			While still logged in as the <varname>root</varname> user,  remember to delete the toolkit source folder or,  at least change ownership of all files in the toolkit folder, so that you can access and/or remove them later.
+			</para>
+<screen>
+cd ..
+rm -r int6000-utils-x.x.x
+</screen>
+			</example>
+		</section>
+	<section id="overview-install-windows">
+		<title>
+			Toolkit Installation on <productname>Windows XP</productname>
+			</title>
+		<para>
+			The <productname>Windows</productname> version of the toolkit comes pre-compiled and ready to install and run using the <application>Windows Installer</application>. You may copy and distribute installation file <filename>int6000-utils-x.x.x.msi</filename>. Users may then click on the installation file to install the package then discard it afterwards. The installation file permits remote installation over the network.
+			</para>
+		<para>
+			The toolkit needs <productname>WinPcap 4.0.2</productname> or later from <ulink url="http://www.winpcap.org/install/default.htm">winpcap.org</ulink>. It may be installed either before or after toolkit installation but many of the tools will not run without it. If you have <productname>Wireshark</productname> installed then you already have <productname>WinPcap</productname> installed. You may want to install <productname>WinPcap</productname> before starting toolkit installation.
+			</para>
+		<para>
+			The toolkit needes Microsoft <productname>DotNet 1.1</productname> available from <ulink url="http://www.microsoft.com/downloads/details.aspx?FamilyID=a8f5654f-088e-40b2-bbdb-a83353618b38">Microsoft</ulink>. Newer versions of <productname>DotNet</productname> may not work. It must be installed before toolkit installation or the <productname>Windows Installer</productname> will report depenency errors and may refuse to complete installation.
+			</para>
+		<para>
+			Failure to <link linkend='overview-removal-windows'>remove previous toolkit versions</link> on some systems may result in the message &quot;Another version of this product is already installed&quot; when trying to install a new version. You may want to remove prior version before starting toolkit installation.
+			</para>
+		<section>
+			<title>
+				Toolkit Installation on <productname>Windows XP</productname>
+				</title>
+			<para>
+				Use a compression program like <application>WinZip</application> to decompress the archive file and extract all files. Use Microsoft <application>Windows Explorer</application> to locate file <filename>.\VisualStudioNET\Intellon-Linux-Toolkit.msi</filename> under the main toolkit folder. Click on the file to start the <application>Windows Installer</application> then follow the installation instructions.
+				</para>
+			<figure>
+				<title>
+					WIndows Installer Dialogue
+					</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref='WindowsInstaller.png' align="center" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			<para>
+				 Toolkit programs are installed in folder <filename>C:\Program Files\Intellon\Toolkit</filename> by default. If you select a different folder, remember it for the next step. 
+				</para>
+			</section>
+		<section>
+			<title>
+				Setting the PATH variable
+				</title>
+			<para>
+				<application>Toolkit</application> programs have command line interfaces and must be run from an open console window. To simplify program access and minimize the typing required, add the toolkit installation path mentioned above to the <envar>PATH</envar> environment variable by following steps listed below. If you have <constant>Administrator</constant> priviledges then we recommend that you edit the system <envar>PATH</envar> variable; otherwise, you may need to create and/or edit a user <envar>PATH</envar> variable.
+				</para>
+			<figure>
+				<title>
+					Control Panel System Dialogue
+					</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref='PathVariable.png' format='PNG' align="center" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			<orderedlist>
+				<listitem>
+					<para>
+						On the <command>Start</command> menu,  select the <command>Control Panel</command> option.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						In the <command>Control Panel</command> window,  select the <command>System</command> icon.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						On the <command>System Properties</command> dialog box,  select the <command>Advanced</command> tab.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						On the <command>Advanced</command> tab, press the <command>Environment Variables</command> button.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						On the <command>Environment Variables</command> dialog box, scroll down the <command>System variables</command> list and select the <command>Path</command> variable then press the <command>Edit</command> button.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						On the <command>Edit System Variable</command> dialogue box, append the installation path to the <command>Variable value</command> field.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						Press the <command>OK</command> button.
+						</para>
+					</listitem>
+				</orderedlist> 
+			</section>
+		<section id="overview-removal-windows">
+			<title>
+				Toolkit Removal on <productname>Windows XP</productname>
+				</title>
+			<para>
+				To remove an existing version of the Intellon <application>Linux Toolkit</application> from your system, follow the steps listed below. If the toolkit is not installed on you rsystem then omit these steps. If you are unsure, you can follow them to determine if you have the toolkit installed or you can attempt to install, anyway, and return here if installation is prevented.
+				</para>
+			<figure>
+				<title>
+					Control Panel Add/Remove Dialogue
+					</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="AddRemoveProgram.png" align="center"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+			<orderedlist>
+				<listitem>
+					<para>
+						On the <command>Start</command> menu, select the <option>Control Panel</option> option.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						In the <command>Control Panel</command> window, select the <option>Add or Remove Programs</option> icon.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						On the <command>Add or Remove Programs</command> dialog box, scroll down and select the <option>Intellon Toolkit</option> entry then press the <option>Remove</option> pushbutton.
+						</para>
+					</listitem>
+				</orderedlist>
+			</section>
+		</section>
+	<section id="overview-install-widgets">
+		<title>
+			<productname>AV-ator</productname> Widget Installation on Windows
+			</title>
+		<para>
+			Intellon provides an example Yahoo! widget for demonstration purposes. The Intellon <productname>AV-ator</productname>widget runs on <productname>Windows</productname> and displays either the transmit or receive PHY rate of a given powerline adaptor using Intellon Toolkit programs. It needs the <productname>Yahoo! Widgets SDK</productname>,  available from <ulink url="http://download.yimg.com/ycs/widgets/us/4.5.2x10a50/widgetsus.exe">Yahoo!</ulink>, this is a development version that can be skinned with a custom meter face.
+			</para>
+		<figure>
+			<title>
+				The AV-ator Widget
+				</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="AV-ator.png" align="center"/>
+					</imageobject>
+				<caption>
+					<para>
+					The AV-ator Widget
+						</para>
+					</caption>
+				</mediaobject>
+			</figure>
+		<section>
+			<title>
+				Widget Installation on Windows
+				</title>
+			<para>
+				Widget installation on Windows is essentially the same as <link linkend='overview-install-windows'>Toolkit Installation on Windows</link> with the addition of the <productname>Yahoo! Widgets</productname>&nbsp;<application>Deskbar</application> and the Intellon <productname>AV-ator</productname> widget,  itself.
+				</para>
+			<para>
+				The <productname>AV-ator</productname> widget is distributed as a <productname>WinZip</productname> archive,  named <filename>AV-ator-xxx-xx-xx.zip</filename>. The file contains all widget source code and images,  a Yahoo! <productname>Widgets 4.5</productname> installation program, a <productname>DotNet 1.1</productname> installation program  and a <productname>WinPcap 4.0.2</productname> installation program.
+				</para>
+			<orderedlist>
+				<listitem>
+					<para>
+						Extract the <application>AV-ator</application> archive file into a temporary folder on your Windows host. It will create a folder named <filename>AV-ator.widget</filename>.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						Using <application>Windows Explorer</application>, double-click on file <filename>AV-ator.widget/Contents/Installation/AV-ator-install.bat</filename> to start installation. The batch file will invoke <application>Control Panel</application> applets and installation files in proper sequence. If problems occur during installation,  merely restart the installation at this step and skip the steps that have been successfully completed. Most of the steps only need to be done once.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						The <productname>DotNet 1.1 </productname> installation file, <filename>dotnetfx.exe</filename>,  will execute. If you do not have this specified version installed then install it, even if you have a later version. Old and new version can coexist. Otherwise,  close the installation dialogue and continue. 
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						The <productname>WinPcap 4.5</productname> installation file, <filename>WinPcap_4_0_2.exe</filename>, will execute. It you do not have this version,  or a later version, installed then install it. Otherwise,  close the installation dialogue and continue. 
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						The <application>Control Panel</application>&nbsp;<command>Add/Remove Software</command> applet will open to show installed applications. If you have a previous version of the Intellon Toolkit installed then remove it. Otherwise,  close the dialogue and continue.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						The Intellon Toolkit installation file, <filename>int6000-utils-x.x.x.msi</filename>, will execute. If you do not have this version of the toolkit installed then install it. Otherwise, close the dialogue and continue.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						The <application>Control Panel</application>&nbsp;<command>System</command> applet will open. Select the <command>Advanced</command> tab then press the <command>Environment Variables</command> pushbutton. 
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						If folder <filename>C:\Program Files\Intellon\Toolkit</filename> is not in your current <constant>Path</constant> string then add it. If you have Administrator permissions then edit the <command>System Variable</command> list. Otherwise, edit the <command>User Variable</command> list. If you do not know how to do this then ask someone. Close the dialogue to continue.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						<application>Internet Explorer</application> will open. If you do not have Yahoo! <productname>Widgets 4.5</productname> installed then download and install it. Otherwise,  close the download dialogue and continue. 
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						The Yahoo! Widgets <application>Deskbar</application> will appear from the right or left side of you screen as the cursor approaches the edge. Click on the <command>gear</command> icon in the upper left of the <application>Deskbar</application> and select <command>Open Widget ...</command> from the menu that appears. Select file <filename>AV-ator.kon</filename> to load and execute the <productname>AV-ator</productname> widget. If asked to copy the widget, respond in the affirmative.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						The first time the widget executes, you will be prompted with a confirmation dialogue. After that,  the widget will appear as a pushbutton on the <application>Deskbar</application>.
+						</para>
+					</listitem>
+				<listitem>
+					<para>
+						Once the <productname>AV-ator</productname> appears, right-click on the meter face to open the preferences menu. Select an Ethernet interface from the dropdown <command>Host Interface</command> list and powerline device from the <command>Powerline Link</command> list. Press the <command>Save pushbutton</command> to save your preferences. If there are any powerline devices connected to the selected interfaces then the meter needle will indicate the PHY rate.
+						</para>
+					</listitem>
+				</orderedlist>
+			</section>
+		<section>
+			<title>
+				Widget Removal on Windows
+				</title>
+			<para>
+				After successful installation,  you may delete the original archive file and the temporary folders that it created. The installed <productname>AV-ator</productname> widget will be located in your <filename>My Documents\My Widgets\AV-ator.widget</filename> folder. It can be removed from there using the <productname>Yahoo! Widgets</productname>&nbsp;<application>Deskbar</application>.
+				</para>
+			</section>
+		</section>
+	<section id='overview-programs'>
+		<title>
+			Toolkit Programs 
+			</title>
+		<para>
+			The Intellon <application>Linux Toolkit</application> is a collection of over 50 small programs. Each program deals with some aspect of Intellon device management but programs can be combined in various ways, using shell scripts, to perform sophisticated and complex tasks. With these program, one can identify chipset hardware and firmware version, reset devices, flash devices, identify other  Intellon  network devices, validate <filename>*.pib</filename> and <filename>*.nvm</filename> files, sniff <trademark class='registered'>HomePlug</trademark> AV Ethernet frames, send generic Ethernet frames and so on. 
+			</para>
+		<para>
+			Program source code is designed to illustrate, demonstrate and educate software developers and hardware engineers. It may be modified without obligation to Intellon  Corporation. Intellon would appreciate feedback concerning changes that might improve the useability, reliability or efficiency. Keep in mind that these tools are intended to be simple and compact. 
+			</para>
+		<para>
+			Program descriptions appear below in alphabetical order: 
+			</para>
+		<variablelist>
+			<varlistentry id="program-chknvm">
+				<term>
+					<application>
+						chknvm 
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to validate <filename>.nvm</filename> files based on their internal checksum, file size and other characteristics. Optionally, it can be used to display the image headers inside the file. This program is installed in folder <filename>/usr/local/bin</filename> with 0555 file permissions. The main source code is located in folder <filename>./nvm</filename>. See the <ulink url='chknvm.7.html'>chknvm</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-chkpib">
+				<term>
+					<application>
+						chkpib 
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to validate <filename>.pib</filename> files based on their internal checksum, file size and other characteristics. It can also be used to produce a text catalog of <filename>.pib</filename> files. This program is installed in folder <filename>/usr/local/bin</filename> with 0555 file permissions. The main source code is located in folder <filename>./pib</filename>. See the <ulink url='chkpib.7.html'>chkpib</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-config2cfg">
+				<term>
+					<application>
+						config2cfg 
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to convert an SDRAM configruation file used by the  Intellon  <application>Windows Device Manager</application> to the configuration file format used by the Linux Toolkit applications. This program is installed in folder <filename>/usr/local/bin</filename> with 0555 file permissions. The main source code is located in folder <filename>./sdram</filename>. See the <ulink url='config2cfg.7.html'>config2cfg</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-efsu">
+				<term>
+					<application>
+						efsu 
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A freeform Ethernet frame send utility used to define and send Ethernet packets. Packets are defined in text files containing hexadecimal byte codes plus optional comments and whitespace. Input files are stripped of comments and whitespace then transmitted as Ethernet frames. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./efsu</filename>. See the <ulink url='efsu.7.html'>efsu</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-getpib">
+				<term>
+					<application>
+						getpib
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A free-form means of extracting paremeters from a PIB file when the offset, length and format of the parameter is known. It is a companion to program <link linkend='program-setpib'>setpib</link>. The user specifies the filename, a starting offset and a sequence of type/data pairs. Values are echoed in order on the console in the specified format. This program is installed in folder <filename>/usr/local/bin</filename> with 0555 file permissions. The main source code is located in folder <filename>./pib</filename>. See the <ulink url='getpib.7.html'>getpib</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-hpav">
+				<term>
+					<application>
+						hpav 
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A basic <trademark class='registered'>HomePlug</trademark> AV packet sniffer that displays only <trademark class='registered'>HomePlug</trademark> AV protocol frames on the console as they are sent or arrive on a given interface. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./hpav</filename>. See the <ulink url='hpav.7.html'>hpav</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-hpavkey">	
+				<term>
+					<application>
+						hpavkey
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A <trademark class='registered'>HomePlug</trademark> AV key generator. Pass phrase arguments are hashed to form the corresponding Device Access Key (<acronym>DAK</acronym>), Network Membership Key (<acronym>NMK</acronym>) or Network Identifier (<acronym>NID</acronym>). This program is installed in folder <filename>/usr/local/bin</filename> with 4555 permissions. The main source code is located in folder <filename>./crypt</filename>. See the <ulink url='hpavkey.7.html'>hpavkey</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-hpavkeys">	
+				<term>
+					<application>
+						hpavkeys
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A <trademark class='registered'>HomePlug</trademark> AV key generator. Pass phrases are read from a file and hashed to form the corresponding Device Access Key (<acronym>DAK</acronym>), Network Membership Key (<acronym>NMK</acronym>) or Network Identifier (<acronym>NID</acronym>). This program is installed in folder <filename>/usr/local/bin</filename> with 4555 permissions. The main source code is located in folder <filename>./crypt</filename>. See the <ulink url='hpavkeys.7.html'>hpavkeys</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int64host">
+				<term>
+					<application>
+						int64host
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility that waits for and services VS_HST_ACTION messages from a flash-less device <productname>INT6300</productname> or <productname>INT6400</productname> device. It is similar to program <link linkend='program-int6khost'>int6khost</link> but does not use an <acronym>SDRAM</acronym> configuration files. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int64host.7.html'>int64host</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6k">
+				<term>
+					<application>
+						int6k 
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to inspect and control <trademark>INT6000</trademark> and <trademark>INT6300</trademark> devices connected to the local host. It performs several of the device maintenance functions available in the  Intellon  <application>Windows Device Manager</application> but is small enough to run on an embedded system. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>.int6k</filename>. See the <ulink url='int6k.7.html'>int6k</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6k2">
+				<term>
+					<application>
+						int6k2 
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to inspect and control <trademark>INT6000</trademark> and <productname>int6300</productname> devices connected to the local host. It is similar to <application>int6k</application> but calls the  Intellon  <application>Embedded API</application>, described in the  Intellon  <citetitle><trademark class='registered'>HomePlug</trademark> AV API User's Guide</citetitle>, to perform device management tasks. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int6k2.7.html'>int6k2</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6kboot">
+				<term>
+					<application>
+						int6kboot 
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to start and optionally flash <trademark>INT6300</trademark> and <trademark>INT6400</trademark>' devices that have no NVRAM or have a blank or corrupted <acronym>NVRAM</acronym>. It communicates with the Intellon  <application>Bootloader</application> to configure <acronym>SDRAM</acronym>, download runtime firmware and PIB and start firmware execution. Users can optionally request that the same PIB and firmware then be used to flash <acronym>NVRAM</acronym>. It is similar to program <ulink url='int6kf.7.html'>int6kf</ulink> but does not accept an <acronym>SDRAM</acronym> configuration file. Instead,  it uses on the <ulink url='memctl.7a.html'>memctl</ulink> applet. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int6kboot.7.html'>int6kboot</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6kf">
+				<term>
+					<application>
+						int6kf 
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to start and optionally flash <trademark>INT6000</trademark> and <trademark>INT6300</trademark> devices having no <acronym>NVRAM</acronym> or having a blank or corrupted <acronym>NVRAM</acronym>. It communicates with the Intellon  <application>Bootloader</application> to configure <acronym>SDRAM</acronym>, download runtime firmware and PIB and start firmwrae execution. It can also be used to force flash blank or corrupted <acronym>NVRAM</acronym>. It is similar to program <ulink url='int6kboot.7.html'>int6kboot</ulink> but requires an <acronym>SDRAM</acronym> parameter file. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int6kf.7.html'>int6kf</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6khost">
+				<term>
+					<application>
+						int6khost
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility that waits for and services VS_HST_ACTION messages from a flash-less <productname>INT6000</productname> or <productname>INT6300</productname> device. It is similar to program <link linkend='program-int64host'>in64host</link> but needs an <acronym>SDRAM</acronym> configuration file. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int6khost.7.html'>int6khost</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6kid">
+				<term>
+					<application>
+						int6kid
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility that prints the DAK or NMK strings read from one or more devices. It can be used in shell scripts to dynamically obtain device keys and insert them on program command lines as arguments. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int6kid.7.html'>int6kid</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6klist">
+				<term>
+					<application>
+						int6klist
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility that lists local devices, or remote devices associated with a specific device, on stdout in undecorated format. It can be used in shell scripts to dynamically determine, and then traverse, network topology. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int6klist.7.html'>int6klist</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6klog">
+				<term>
+					<application>
+						int6klog
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility that exports the runtime watchdog report in binary or XML format. Output is suitable for input to the Intellon Windows Device Manager. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int6klog.7.html'>int6klog</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6kprobe">
+				<term>
+					<application>
+						int6kprobe
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility that probes for neighboring networks. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int6kprobe.7.html'>int6kprobe</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6krate">
+				<term>
+					<application>
+						int6krate
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility that polls a device and prints the average transmit and receive PHY rates between it and each of it's network neighbors. Program output is suitable for loading into a spreadsheet or other program that can process column-oriented information. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int6krate.7.html'>int6krate</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6krule">
+				<term>
+					<application>
+						int6krule
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to format and send classification rules to a device. Classification rules are specified using symbolic names for actions, options, conditions and frame fields. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int6krule.7.html'>int6krule</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6kstat">
+				<term>
+					<application>
+						int6kstat
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility that polls a device and prints various network and link statistics in a format suitable for processing by another program. It is a work in progress because we are investigating different ways to present the information. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int6kstat.7.html'>int6kstat</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6ktest">
+				<term>
+					<application>
+						int6ktest
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility that downloads and executes program images stored in an Intellon <filename>.nvm</filename> file. This program can be used to download and execute Intellon hardware diagnostic programs like those in the <filename>./applets</filename> folder. It should not intended to download and start runtime firmware. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int6ktest.7.html'>int6ktest</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-int6kwait">
+				<term>
+					<application>
+						int6kwait
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility that polls a device and waits for the bootloader or runtime firmware to either stop executing or start executing or wait for a device to associate with another device. It can be used to synchronize scripts with device or network events such as connection make or break, power on or off and firmware stop or start. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./int6k</filename>. See the <ulink url='int6kwait.7.html'>int6kwait</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-mac2pw">
+				<term>
+					<application>
+						mac2pw
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A device password generator that prints a range of MAC address and passwords on stdout. It is an alternative to the Intellon Production Test System (<acronym>PTS</acronym>) DBBuilder Utility and toolkit program <link linkend='program-mac2pwd'>mac2pwd</link>. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./crypt</filename>. See the <ulink url='mac2pw.7.html'>mac2pw</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-mac2pwd">
+				<term>
+					<application>
+						mac2pwd
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A device password generator that reads files containing MAC addresses and prints address/password pairs. It is an alternative to the Intellon Production Test System (<acronym>PTS</acronym>) DBBuilder Utility and toolkit program <link linkend='program-mac2pw'>mac2pw</link>. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./crypt</filename>. See the <ulink url='mac2pwd.7.html'>mac2pwd</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-modpib">
+				<term>
+					<application>
+						modpib 
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to change the MAC, DAK and/or NMK of an existing PIB file and recompute the checksum. It can also be used to change the manufacturer string, network name and username strings. This program is installed in folder <filename>/usr/local/bin</filename> with 0555 file permissions. The main source code is located in folder <filename>./pib</filename>. See the <ulink url='modpib.7.html'>modpib</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-mrgpib">
+				<term>
+					<application>
+						mrgpib 
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility that transfers parameters from one PIB file to another. The two files needs not  have the same PIB version. This program is installed in folder <filename>/usr/local/bin</filename> with 0555 file permissions. The main source code is located in folder <filename>./pib</filename>. See the <ulink url='mrgpib.7.html'>mrgpib</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-nvmmerge">
+				<term>
+					<application>
+						nvmmerge
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to combine multiple Intellon image files into one. It is reserved for use by Intellon Field Application Engineers. Use of this probram could void some contractual obligations made by Intellon. This program is installed in folder <filename>/usr/local/bin</filename> with 0555 file permissions. The main source code is located in folder <filename>./nvm</filename>. See the <ulink url='nvmmerge.7.html'>nvmmerge</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-nvmsplit">
+				<term>
+					<application>
+						nvmsplit
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to extract all constituent images from an Intellon image file. It is reserved for use by Intellon Field Application Engineers. Use of this probram could void some contractual obligations made by Intellon. This program is installed in folder <filename>/usr/local/bin</filename> with 0555 file permissions. The main source code is located in folder <filename>./nvm</filename>. See the <ulink url='nvmsplit.7.html'>nvmsplit</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-odc">
+				<term>
+					<application>
+						odc
+						</application>
+					</term>
+				<listitem>
+					<para>
+					An offset-driven binary file compare utility for the <acronym>PIB</acronym>. It requires an offset description file to be useful. The user specifies an offset description file and two binary files. The files are compared,  field by field, and differences are printed on stdout,  field by field. An example file, <filename>piboffset.txt</filename>,  is included as a basic example. The example offset description file is intentionally incomplete. Complete files are reserved for use by Intellon Field Application Engineers. This program is an alternative to program <link linkend='program-odx'>odx</link> and a companion to program <link linkend='program-odd'>odd</link>. The main source code is located in folder <filename>./tools</filename>. See the <ulink url='odc.7.html'>odc</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-odd">
+				<term>
+					<application>
+						odd
+						</application>
+					</term>
+				<listitem>
+					<para>
+					An offset-driven dump utility for the <acronym>PIB</acronym>. It requires an offset description file to be useful. An example file, <filename>piboffset.txt</filename>,  is included as a basic example. The example offset description file is intentionally incomplete. Complete files are reserved for use by Intellon Field Application Engineers. This program is a companion to program <link linkend='program-odc'>odc</link>. The main source code is located in folder <filename>./tools</filename>. See the <ulink url='odd.7.html'>odd</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-odx">
+				<term>
+					<application>
+						odx
+						</application>
+					</term>
+				<listitem>
+					<para>
+					An offset-driven <acronym>XML</acronym> dump utility for the <acronym>PIB</acronym>. It requires an offset description file to be useful. The user specifies an offset description file and a PIB file. The program output an <acronym>XML</acronym> description of PIB fields. An example file, <filename>piboffset.txt</filename>,  is included as a basic example. The example offset description file is intentionally incomplete. Complete files are reserved for use by Intellon Field Application Engineers. This program is an alternative to program <link linkend='program-odd'>odd</link>. The main source code is located in folder <filename>./tools</filename>. See the <ulink url='odx.7.html'>odx</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-pcapdevs">
+				<term>
+					<application>
+						pcapdevs
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A utility to enumerate <application>LibPcap</application> or <application>WinPcap</application> devices available on the host. It is compiled but only works if one of these two packages is installed on the host. At present, it is only needed with the Windows version of the Toolkit which is compiled against the <application>WinPcap</application> library.  The main source code is located in folder <filename>./ether</filename>. See the <ulink url='pcapdevs.7.html'>pcapdevs</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-pibruin">
+				<term>
+					<application>
+						pibruin
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility that inserts classifier rules,  read from a file,  into a <acronym>PIB</acronym> file. It is an alternative to program <ulink url="int6krule.7.html">int6krule</ulink> and companion to program <ulink url="pibrump.7.html">pibrump</ulink>. The main source code is located in folder <filename>./pib</filename>. See the <ulink url='pibruin.7.html'>pibruin</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-pibrump">
+				<term>
+					<application>
+						pibrump
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility that reads classifier rules from a PIB file and prints them on stdout in a format suitable for input to program <ulink url="pibruin.7.html">pibruin</ulink>. The main source code is located in folder <filename>./pib</filename>. See the <ulink url='pibrump.7.html'>pibrump</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-psin">
+				<term>
+					<application>
+						psin
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to insert an amplitude map into an existing PIB file. The map is read from stdin in text format allowing the output of program <ulink url='psout.7.html'>psout</ulink> to be piped directly into this program. The main source code is located in folder <filename>./pib</filename>. See the <ulink url='psin.7.html'>psin</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-psout">
+				<term>
+					<application>
+						psout
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to that exports an amplitude map stored in an existing PIB file. The map is written directly to stdin in text format allowing the output of this program to be piped into the input of program <ulink url='psin.7.html'>psin</ulink>. The main source code is located in folder <filename>./pib</filename>. See the <ulink url='psout.7.html'>psout</ulink> man page for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-pxe">
+				<term>
+					<application>
+						pxe 
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A generic 'Remote PIB Management' tool. One or more XML files define decimal, hexadecimal and string edits to be applied to a PIB file. The PIB is read, edits are applied, a new checksum is computed and the PIB is saved. This program is installed in folder <filename>/usr/local/bin</filename> with 0555 file permissions. The main source code is located in folder <filename>./pib</filename>. See the <ulink url='pxe.7.html'>pxe</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-rkey">
+				<term>
+					<application>
+						rkey 
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A command line utility to dynamically generate distinct HomePlug AV compliant keys from a user created keyfile. It can be used in shell scripts to dynamically insert random and distinct keys on program command lines as arguments. For example, a Linux bash script can reference "$(rkey -i eth0 -D secret.key)" inline. This program is installed in folder <filename>/usr/local/bin</filename> with 4555 file permissions. See the discussion on security for more information about file permissions. The main source code is located in folder <filename>./crypt</filename>. See the <ulink url='rkey.7.html'>rkey</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="program-setpib">
+				<term>
+					<application>
+						setpib
+						</application>
+					</term>
+				<listitem>
+					<para>
+					A simple means of setting PIB parameters when the parameter offset, length and format are known. It is an alternative to program <link linkend='program-pxe'>pxe</link> and a companion to program <link linkend='program-getpib'>getpib</link>. The user specifies the filename, a starting offset and a sequence of type/data pairs. Edits are applied in order and a new checksum is computed. A full or partial dump of the PIB displays the result. This program is installed in folder <filename>/usr/local/bin</filename> with 0555 file permissions. The main source code is located in folder <filename>./pib</filename>. See the <ulink url='setpib.7.html'>setpib</ulink> man page for more information. 
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		<para>
+			 Intellon  Corporation reserves the right to add, remove or rename utility programs or modify their command line options or their functionality in future software releases without any obligation to notify or compensate users of this software. 
+			</para>
+		</section>
+	<section id='overview-toolkit-folders'>
+		<title>
+			Toolkit Folders 
+			</title>
+		<para>
+			The  Intellon  Linux Toolkit package folder has many subfolders. Some contain source code, some contain documentation and others contain shell scripts. Some source folders contain programs that require components in neighboring folders. Consequently, you will see references to relative pathnames like ../folder, throughout source code, makefiles and shell scripts. This notation simplifies development and maintenance and is helpful when locating specific files. 
+			</para>
+		<para>
+			Folder descriptions appear below in alphabetical order: 
+			</para>
+		<variablelist>
+			<varlistentry id="folder-applets">
+				<term>
+					./applets
+					</term>
+				<listitem>
+					<para>
+					A library of programs that can run, stand-alone, on Intellon powerline devices. Most perform diagnostic tests on hardware connections, functionality and performance. Some run to completion and return to the <application>Bootloader</application>. Others run continuously until the device is reset. Most can be run and executed in sequence using program <link linkend='program-int6ktest'>int6ktest</link>.   
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-cgi">
+				<term>
+					./cgi
+					</term>
+				<listitem>
+					<para>
+					A CGI application that serves as a simple device manager. It is designed for <productname>Linux</productname> platform having an <acronym>HTTP</acronym> server with <acronym>CGI</acronym> enabled. This application is experimental and ultimately intended for embedded applications. The application does not automatically compile and install when the main toolkit <filename>Makefile</filename> is executed. The main application is defined <ulink url="intellon.c">intellon.c</ulink>. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-docbook">
+				<term>
+					./docbook
+					</term>
+				<listitem>
+					<para>
+					HTML pages generated by several methods, but mostly <ulink url="http://www.docbook.org/">Docbook 4.5</ulink>. Some pages have been created using special tools that are not provided and will not be made available. The <filename>Makefile</filename> in this folder will compile the core XML source files on GNU/Linux systems that have <application>Docbook 4.5</application> installed with extentions by <ulink url='http://nwalsh.com/'>Normal Walsh</ulink> but it does not install the pages. See <link linkend="overview-install-linux">Installation on Linux</link> for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-efsu">
+				<term>
+					./efsu 
+					</term>
+				<listitem>
+					<para>
+					The main source code and <filename>Makefile</filename> for program <ulink url="efsu.7.html">efsu</ulink>. The <filename>Makefile</filename> in this folder will compile and install file <ulink url="efsu.c.html">efsu.c</ulink> in <filename>/usr/local/bin</filename> on GNU/Linux systems. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-ether">
+				<term>
+					./ether 
+					</term>
+				<listitem>
+					<para>
+					Network specific source code that supports raw ethernet packets in a platform independent fashion using plugin modules. The principle feature is the <constant>channel</constant> data structure used to read and write raw ethernet packets using network features on GNU/Linux, with or without <application>libpcap</application>, and on  <productname>Windows</productname> with <application>winpcap</application>. The source code in this folder is difficult to port cross-platform due to the way different operating systems implement their system header files and network stacks. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-hpav">
+				<term>
+					./hpav 
+					</term>
+				<listitem>
+					<para>
+					The main source code and <filename>Makefile</filename> file for program <ulink url='hpav.7.html'>hpav</ulink>. The <filename>Makefile</filename> in this folder will compile and install file <ulink url="hpav.c.html">hpav.c</ulink> in <filename>/usr/local/bin</filename> on GNU/Linux systems. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-ihpapi">
+				<term>
+					./ihpapi 
+					</term>
+				<listitem>
+					<para>
+					This folder contains source code and header files comprising the Intellon Embedded API. The API interface is task oriented such that users do not have to manipulate message buffers directly and can perform common multi-message operations using one call. See the  Intellon  Embedded Application Interface User's Guide for more information on the API and int6k2 for an example application that uses it. See <link linkend="interface-intro">Embedded API Reference</link> for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-int6k">
+				<term>
+					./int6k 
+					</term>
+				<listitem>
+					<para>
+					The main source code for programs <ulink url="int6k.7.html">int6k</ulink>, <ulink url="int6k2.7.html">int6k2</ulink> and <ulink url="int6kf.7.html">int6kf</ulink>. These are essential programs for engineers and embedded software developers wanting to explore  Intellon  device behavior. The Makefile in this folder will compile and install files <ulink url="int6k.c.html">int6k.c</ulink>,  <ulink url="int6k2.c.html">int6k2.c</ulink> and <ulink url="int6kf.c.html" >int6kf.c</ulink> in <filename>/usr/local/bin</filename> on GNU/Linux systems. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-mme">
+				<term>
+					./mme 
+					</term>
+				<listitem>
+					<para>
+					A collection of helper functions dealing with <trademark class='registered'>HomePlug</trademark> and Intellon management messages. They are not needed for proper toolkit operation but they can be useful during development and debugging because they print message content in readable format. Most of these functions require extra memory because they include symbol tables and extra data conversion functions.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-nodes">
+				<term>
+					./nodes
+					</term>
+				<listitem>
+					<para>
+					A collection of functions that comrpise a generic,  light-weight XML parser. Intellon is currently exprimenting with various XML-based applications to support device management on embedded systems. These functions are the core. Currently,  they are only used by the <ulink url="pxe.7.html">pxe</ulink> and <ulink url="int6k2.7.html">int6k2</ulink> programs. See <link linkend="support-xml">XML Editing Functions</link> for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder.nvm">
+				<term>
+					./nvm 
+					</term>
+				<listitem>
+					<para>
+					Programs,  functions and make files related to Intellon NonVolatile Memory (<acronym>NVM</acronym>) files. All programs in this folder either read from or write to NVM files. None communicate with powerline devices. Some of the popular programs are <ulink url='chknvm.7.html'>chknvm</ulink>, <ulink url='nvmsplit.7.html'>nvmsplit</ulink> and <ulink url='nvmmerge.7.html'>nvmmerge</ulink>.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-patches">
+				<term>
+					./patches
+					</term>
+				<listitem>
+					<para>
+					A collection of useful <productname>Linux</productname> kernel patches and install scripts. Of particular interest is the <link linkend="hardware-send-to-self">send-to-self</link> patch that enables external routing of ISO Layer 3 traffic between two Ethernet interfaces on the same host. Intellon provides them but does not support them.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-pib">
+				<term>
+					./pib 
+					</term>
+				<listitem>
+					<para>
+					Programs, functions and make files related to Intellon Parameter Information Block (<acronym>PIB</acronym>) files. All programs in this folder either read from or write to PIB files. None comminicate with powerline devices. Some of the popular programs are <ulink url='chkpib.7.html'>chkpib</ulink>, <ulink url='modpib.7.html'>modpib</ulink>, <ulink url='getpib.7.html'>getpib</ulink> and <ulink url='setpib.7.html'>setpib</ulink>.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-scripts">
+				<term>
+					./scripts 
+					</term>
+				<listitem>
+					<para>
+					Miscellaneous shell scripts that call various programs in this package to perform tasks such as flashing a FW2.0 device. Care must be taken here to ensure that environment variables at the start of each script are appropriate for your system. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-snmp">
+				<term>
+					./snmp 
+					</term>
+				<listitem>
+					<para>
+					Example SNMP MIB files and an SNMP agent program. The agent is not automatically compile or installed. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-snmp2">
+				<term>
+					./snmp2
+					</term>
+				<listitem>
+					<para>
+					Example SNMP MIB files and an SNMP agent program. This version of the agent calls the Intellon API from folder <filename>../ihpapi</filename> to perform requested services. The agent is not automatically compile or installed. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-ram">
+				<term>
+					./ram 
+					</term>
+				<listitem>
+					<para>
+					Support modules for reading, printing and checking <acronym>NVRAM</acronym> and <acronym>SDRAM</acronym> configuration files. The <filename>.cfg</filename> files in this folder have a different format than the <filename>.config</filename> files released with the Intellon Windows <application>Device Manager</application>. The files distributed with the Windows <application>Device Manger</application> are 64 ASCII character with no checksum. The files in this directory are 32 binary bites with trailing checksum. Users may create new sdram configuration files by compiling <constant>sdram.c</constant>, using <command>gcc -o sdram sdram.c</command> and running it without any command line arguments. 
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-tools">
+				<term>
+					./tools 
+					</term>
+				<listitem>
+					<para>
+					Source code and header files used by virtually all programs in the toolkit. These files are generic and have application beyond this package. They provide GNU/Linux-style or POSIX-style functionality to programs running in environments that do not have either. They also implement operations like checksum computation and multi-byte hexadecimal encoding and decoding. See <link linkend="support-functions">Support Function Reference</link> for more information.
+						</para>
+					</listitem>
+				</varlistentry>
+			<varlistentry id="folder-visualstudio-net">
+				<term>
+					./VisualStudioNET 
+					</term>
+				<listitem>
+					<para>
+					Components unique to Microsoft Windows are kept in and under this folder. Specifically, it contains a <productname>Visual Studio .NET</productname> solution to compile most of the programs in this package using only Microsoft and winpcap libraries. Compiled .exe files can be run on <trademark>Windows</trademark> enabled systems having <application>winpcap</application> installed. Adjustments may be necessary depending on your environment. 
+						</para>
+					<para>
+					Microsoft does not provide full POSIX support on Windows platforms. Consequently, alternative headers and libraries are included under this folder. For example, an abridged version of <ulink url="unistd.h.html">unistd.h</ulink> and an alternative version of <ulink url="stdint.h.html">stdint.h</ulink> are included under <filename>VisualStudioNET/include</filename>. Other significant header files included here are <ulink url="ethernet.h.html">ethernet.h</ulink>, <ulink url="if_ether.h.html" >if_ether.h</ulink> and <ulink url="in.h.html">in.h</ulink>. Subfolder <filename>VisualStudio\Library</filename> contains <productname>WinPcap</productname> libraries. These folders are referenced in appropriate compiler and linker options for Microsoft Development environments. 
+						</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		<para>
+			 Intellon  reserves the right to add, remove, rename or reorganize package files and folders in future releases without any obligation to notify or compensate users of this package. 
+			</para>
+		</section>
+	<section id='overview-toolkit-support'>
+		<title>
+			Toolkit Support 
+			</title>
+		<para>
+			Contact the  Intellon  System Application Engineering Team if you have questions concerning the content, operation,  application or direction of this toolkit on GNU/Linux systems. If you are having trouble communicating with Intellon powerline devices using the toolkit, try following the <link linkend="procedure-troubleshoot-problems">troubleshooting</link> procedure found later in this document.			</para>
+		</section>
+	</chapter>

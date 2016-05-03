@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			hostnics.c
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='hexwrite.c.html' title=' hexwrite.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='hpav.c.html' title=' hpav.c '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   unsigned hostnics (struct nic list [], size_t size);
+ *   
+ *.  Intellon Linux Toolkit; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration; Not for production use;
+ *
+ *   Contributor(s):
+ *	Charles Maier &lt;charles.maier@intellon.com&gt;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef HOSTNICS_SOURCE
+#define HOSTNICS_SOURCE
+
+#if defined (__linux__)
+#	include &lt;net/if.h&gt;
+#	include &lt;net/ethernet.h&gt;
+#	include &lt;sys/ioctl.h&gt;
+#elif defined (__APPLE__)
+#	incluse &lt;sys/types.h&gt;
+#	include &lt;ifaddrs.h&gt;
+#	include &lt;net/if_dl.h&gt;
+#endif
+#include &lt;memory.h&gt;
+#include &lt;errno.h&gt;
+
+#include &quot;../ether/ether.h&quot;
+#include &quot;../tools/error.h&quot;
+
+unsigned hostnics (struct nic list [], size_t size) 
+
+{
+#if defined (__linux__)
+
+	char buffer [1024];
+	struct ifconf ifc;
+	struct ifreq * ifr;
+	signed count;
+	signed fd;
+	memset (list, 0, size * sizeof (struct nic));
+	if ((fd = socket (AF_INET, SOCK_DGRAM, 0)) &lt; 0) 
+	{
+		error (1, errno, &quot;Can't open socket&quot;);
+	}
+	ifc.ifc_len = sizeof (buffer);
+	ifc.ifc_buf = buffer;
+	if (ioctl (fd, SIOCGIFCONF, &amp;ifc) &lt; 0) 
+	{
+		error (1, errno, &quot;Can't read interface configuration&quot;);
+	}
+	ifr = ifc.ifc_req;
+	count = ifc.ifc_len / sizeof (struct ifreq);
+	if (count &gt; size) 
+	{
+		count = size;
+	}
+	if (count &lt; size) 
+	{
+		size = count;
+	}
+	while (count--) 
+	{
+		memcpy (list [count].name, ifr-&gt;ifr_name, IF_NAMESIZE);
+		memcpy (list [count].internet, &amp;((struct sockaddr_in *)(&amp;ifr-&gt;ifr_addr))-&gt;sin_addr, 4);
+		if (ioctl (fd, SIOCGIFHWADDR, ifr) &lt; 0) 
+		{
+			error (1, errno, &quot;Can't read %s hardware address&quot;, ifr-&gt;ifr_name);
+		}
+		memcpy (list [count].ethernet, ((struct ether_addr *)(ifr-&gt;ifr_hwaddr.sa_data)), ETHER_ADDR_LEN);
+		ifr++;
+	}
+#elif defined (__APPLE__)
+
+	struct ifaddrs *ifaddrs;
+	struct ifaddrs *ifaddr;
+	signed count = 0;
+	if (getifaddrs (&amp;ifaddrs) == -1) 
+	{
+		error (1, errno, &quot;No interfaces available&quot;);
+	}
+	for (ifaddr = ifaddrs; ifaddr &amp;&amp; (count &lt; size); ifaddr = ifaddr-&gt;ifa_next) 
+	{
+		if (!ifaddr-&gt;ifa_addr) 
+		{
+			continue;
+		}
+		if (ifaddr-&gt;ifa_addr-&gt;sa_family == AF_LINK) 
+		{
+			struct sockaddr_dl * sockaddr = (struct sockaddr_dl *) (ifaddr-&gt;ifa_addr);
+			memcpy (list [count++].ethernet, LLADDR (sockaddr), ETHER_ADDR_LEN);
+			continue;
+		}
+	}
+	freeifaddrs (ifaddrs);
+
+#endif
+	return (size);
+}
+
+/*====================================================================*
+ *   test/demo program;
+ *--------------------------------------------------------------------*/
+
+#if 0
+#include &lt;sys/ioctl.h&gt;
+#include &lt;net/if.h&gt;
+#include &lt;net/ethernet.h&gt;
+#include &lt;netinet/in.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;arpa/inet.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;memory.h&gt;
+
+#include &quot;../ether/ether.h&quot;
+#include &quot;../ether/hostnics.c&quot;
+
+#include &quot;../tools/hexdecode.c&quot;
+#include &quot;../tools/decdecode.c&quot;
+#include &quot;../tools/hexstring.c&quot;
+#include &quot;../tools/decstring.c&quot;
+
+int main (int argc, const char * argv []) 
+
+{
+	char address [ETHER_ADDR_LEN * 3];
+	struct nic list [10];
+	struct nic * item = list;
+	unsigned size = sizeof (list) /sizeof (struct nic);
+	size = hostnics (list, size);
+	while (size--) 
+	{
+		printf (&quot; %s&quot;, hexstring (address, sizeof (address), item-&gt;ethernet, sizeof (item-&gt;ethernet)));
+		printf (&quot; %s&quot;, decstring (address, sizeof (address), item-&gt;internet, sizeof (item-&gt;internet)));
+		printf (&quot; %s&quot;, item-&gt;name);
+		printf (&quot;\n&quot;);
+		item++;
+	}
+	return (0);
+}
+
+#endif
+
+/*====================================================================*
+ *
+ *--------------------------------------------------------------------*/
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='hexwrite.c.html' title=' hexwrite.c '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='hpav.c.html' title=' hpav.c '>NEXT</a>]
+			</div>
+		</body>
+	</html>

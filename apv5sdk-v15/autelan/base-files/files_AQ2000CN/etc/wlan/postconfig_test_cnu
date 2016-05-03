@@ -1,0 +1,27 @@
+#!/bin/sh
+if [ ! -f /jffs/art_flag ];then
+	showsysinfo
+else
+	echo "****into art mode!!!"
+fi
+echo "==========================="
+echo "system check:"
+echo "==========================="
+
+product_type="`/usr/bin/pro_ctl_util -i | awk -F ":" '/product type is/{print $2}' | cut -b 1-3`"
+if [ "$product_type" == "AGU" ];then
+	#ifconfig eth1 down
+	wlanconfig ath0 create wlandev wifi0 wlanmode sta
+	iwpriv ath0 mode 11nght40minus
+	iwpriv ath0 cwmmode 1
+	iwpriv ath0 extoffset -1
+	iwpriv ath0 wds 1
+	brctl delif default eth1
+	brctl addif default ath0
+	brctl addif default eth1
+	ifconfig ath0 up
+	ifconfig ath0 allmulti
+fi
+stop_monitor
+killall wtpd
+/usr/sbin/record_burn_in_time_cnu &

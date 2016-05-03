@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<!doctype html public '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html xmlns='http://www.w3c.org/1999/xhtml' lang='en-us'>
+	<head>
+		<title>
+			files.h
+			</title>
+		<meta http-equiv='content-type' content='text/html;iso-8859-1'/>
+		<meta name='generator' content='Motley Tools 1.7.0'/>
+		<meta name='author' content='cmaier@cmassoc.net'/>
+		<meta name='robots' content='noindex,nofollow'/>
+		<link href='intellon.css' rel='stylesheet' type='text/css'/>
+		</head>
+	<body>
+		<div class='headerlink'>
+			[<a href='ethernet.h.html' title=' ethernet.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='flags.h.html' title=' flags.h '>NEXT</a>]
+			</div>
+<pre>
+/*====================================================================*
+ *
+ *   files.h - custom filesystem definitions and declarations;
+ *
+ *   this file is a subset of the original that includes only those
+ *   definitions and declaration needed for toolkit programs;
+ *
+ *.  Intellon Linux Toolkit; 
+ *:  Published 2007 by Intellon Corp. ALL RIGHTS RESERVED;
+ *;  For demonstration and evaluation only; Not for production use;
+ *
+ *--------------------------------------------------------------------*/
+
+#ifndef FILES_HEADER 
+#define FILES_HEADER 
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;sys/stat.h&gt;
+
+/*====================================================================*
+ *   system header files;
+ *--------------------------------------------------------------------*/
+
+#include &quot;../tools/types.h&quot;
+
+/*====================================================================*
+ *   path and file extenders;
+ *--------------------------------------------------------------------*/
+
+#ifdef WIN32
+#define PATH_C_EXTENDER '\\'
+#define FILE_C_EXTENDER '.'
+#else
+#define PATH_C_EXTENDER '/'
+#define FILE_C_EXTENDER '.'
+#endif
+
+/*====================================================================*
+ *   file create and access modes;
+ *--------------------------------------------------------------------*/
+
+#ifdef WIN32
+#define FILE_FILEMODE S_IREAD|S_IWRITE
+#else
+#define FILE_FILEMODE S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH
+#define O_BINARY 0
+#endif
+
+/*====================================================================*
+ *   functions;
+ *--------------------------------------------------------------------*/
+
+FILE *efopen (const char *filename, const char *openmode);
+FILE *efreopen (const char *filename, const char *openmode, FILE *fp);
+bool checkfilename (const char * string);
+const char * filepart (const char * string);
+
+/*====================================================================*
+ *   
+ *--------------------------------------------------------------------*/
+
+#endif
+
+
+</pre>
+		<div class='footerlink'>
+			[<a href='ethernet.h.html' title=' ethernet.h '>PREV</a>]
+			[<a href='toolkit.html' title=' Index Page '>HOME</a>]
+			[<a href='flags.h.html' title=' flags.h '>NEXT</a>]
+			</div>
+		</body>
+	</html>
